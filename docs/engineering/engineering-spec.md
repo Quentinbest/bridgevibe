@@ -168,7 +168,7 @@ Phase V, M · FR-BOT3, NFR-P4, INV-7
 
 - US-12.1 A robot decision takes at most 1.5 s at the 95th percentile on both reference phones (provisional budget).
 - US-12.2 When the deadline passes, the robot takes a fallback action from the fallback policy (§4.6.6). The action is marked `fallback: timeout` in its provenance.
-- US-12.3 The benchmark report states the fallback rate per device.
+- US-12.3 The benchmark report states, per device and per robot policy, the share of deals with at least one timeout fallback and the number of engine-failure fallbacks. Recommended threshold (U-16): at most 5% of deals with a timeout fallback on the reference Android, and zero engine-failure fallbacks in the F7 soak.
 - US-12.4 When the app is in the background or the screen is off, deadlines pause. On return, an interrupted decision is requested again; it is never replaced by a fallback because the phone throttled the worker.
 - US-12.5 If an engine worker crashes or runs out of memory, the robot takes a fallback action marked `fallback: engine-failure`, and the worker is restarted. After repeated failures in one session (threshold Proposed), the app stops calling that engine for the rest of the session, and every analysis statement becomes an *unavailable* abstention.
 - US-12.6 Robots and the core loop (lessons, play, rules feedback, score) work when WebAssembly is unavailable or blocked (for example, iOS Lockdown Mode or a locked-down school browser). Only analysis-backed features abstain. In V, the robot policy therefore uses no solver.
@@ -290,6 +290,7 @@ Phase M (V: sign-off recorded for the slice's lesson and templates) · FR-C3, FR
 
 - US-26.1 Each content version carries zero or more sign-offs. A release build includes only versions with a valid sign-off and a rights record. Otherwise the build fails.
 - US-26.2 A new content version invalidates the earlier version's sign-off for that item.
+- US-26.4 *(Recommended, U-17)* A sign-off by the item's author counts only for versions that the pipeline shows change no learner-facing text and nothing that decides correctness (for example, skill tags, metadata or presentation settings). Every new content ID, and every change to commentary, hint or template text, needs sign-off from a teacher other than the author. Text in a locale other than English needs sign-off from a teacher who knows bridge in that language.
 - US-26.3 The regression set (CI-8) runs on every engine or content change. Any change in its facts or template IDs fails the run until a teacher re-signs.
 
 **US-27. Validity checks block broken lessons.** *As a teacher, I want the pipeline to reject a lesson with impossible or inconsistent play.*
@@ -316,7 +317,7 @@ Phase M · FR-P1, FR-P3, FR-P4, INV-15, INV-16
 - US-28.5 No UI copy or stored field uses "mastery".
 - US-28.6 The app asks the browser for persistent storage. Safari can delete a site's stored data after 7 days without a visit unless the app was added to the home screen, and school computers often wipe storage at logout. The app therefore offers "add to home screen" and the progress file as calm, optional suggestions; it never uses loss-framed copy (NFR-S). The device test plan includes a storage-eviction check on the reference iPhone.
 - US-28.7 When storage is full, the app removes the oldest recent-deal records and their cached review facts first. It never removes attempts or completions, and it tells the learner if anything was removed.
-- US-28.8 Every attempt records whether a hint was used before the answer. Whether hint use changes the outcome is U-15.
+- US-28.8 Every attempt records the highest hint tier used (none, a, b or c), and whether the hint came before the first answer or after a wrong one. *(Recommended, U-15)* Hint use does not change the outcome and is never shown to the learner as a penalty; how it counts is left to the teachers' validated progress formula (FR-P3). Authors who need an unaided measure turn hints off on that prompt.
 
 **US-29. Skill tags.** Phase M (Should) · FR-P2. *As a teacher, I want items tagged with skills.* US-29.1 Every MVP item has at least one tag from the stable taxonomy, and the pipeline rejects unknown tags.
 
@@ -359,6 +360,7 @@ Phase M · FR-B4, CI-6
 - US-36.1 First launch asks a neutral age question. Under-13s get the UX §2.2 screen and cannot continue to lessons.
 - US-36.2 No network request carries personal data. Analytics and error reporting are off until the learner consents.
 - US-36.3 The app stores only the age gate's result (13 or over), not the age itself.
+- US-36.4 *(Recommended, U-18)* The MVP has one learner per device. All progress is stored under a local learner ID, so profiles can be added later without migrating stored data. A **Start fresh** action offers to save the progress file, then clears progress and settings for the next person. The age gate is answered once per device; that a younger person on a shared device inherits the answer is an accepted limitation.
 
 **US-37. Works offline after first load.** Phase M (Should) · NFR-C3. US-37.1 Lessons, practice and review work with the network disabled, if the gate selects a browser-only architecture.
 
@@ -391,7 +393,7 @@ Phase V · VAL-03, F2
 Phase V · T2, NFR-P1–P6, VAL-04, F7
 
 - US-43.1 The harness runs F2 and the F7 100-deal soak on both reference phones for each solver candidate (bridge-dds; macroxue; DDS 3.1 single-threaded, and threaded with cross-origin isolation; pons-dds optional).
-- US-43.2 The report gives 95th percentiles for NFR-P1 to P4, the longest main-thread task (P5), peak memory and any crash (P6), the cost per layout sample, and the robot fallback rate.
+- US-43.2 The report gives 95th percentiles for NFR-P1 to P4, the longest main-thread task (P5), peak memory and any crash (P6), the cost per layout sample, and the robot fallback measures in US-12.3. Fallbacks caused by background throttling and *not covered* call fallbacks are excluded; the latter are tracked by the coverage metric (PRD §15).
 
 **US-44. Permutation test.** Phase V, M (re-run on full bridge in M) · CI-9, F3, VAL-05. *As an engineer, I want hidden-card leaks caught automatically.* US-44.1 The suite builds playthroughs from deals that differ only in cards hidden from the tested seat, with identical public history. Robot actions and `VISIBLE` statements are identical, with zero failures. The test runs at the composition seam, not on an isolated function (§5.3).
 
@@ -541,10 +543,10 @@ Schemas are versioned. Each persisted or exported document carries a `schemaVers
 | `Exercise` | contentId, version, deal or starting position, script, steps, teaching claim *(optional, FR-C2)* | Validity-checked (US-27) |
 | `Step` | kind: commentary (template or string refs, answer references), exposure (cards), scripted action, prompt | |
 | `Prompt` | promptId, answer kind (card, call, number, choice), expected answers, `countsRejections` (default false), hint (text ref plus referenced cards), skill tags | Q3, Q12 |
-| `Attempt` | prompt content ID + version, outcome, hint used, time, playthrough ID | Appended, never overwritten; replaying a lesson adds attempts. Never created in a retry (INV-16) |
+| `Attempt` | learner ID, prompt content ID + version, outcome, hint tier used (none, a, b, c), hint timing (before first answer, after a wrong answer), time, playthrough ID | Appended, never overwritten; replaying a lesson adds attempts. Never created in a retry (INV-16) |
 | `SignOff` | content ID + version, teacher, date, scope | INV-12 |
 | `RightsRecord` | content ID, source, licence or written grant reference | LR-5, FR-C4 |
-| `ProgressExport` | schemaVersion, attempts, completions, settings, records of in-progress and recent playthroughs | FR-P4 |
+| `ProgressExport` | schemaVersion, learner ID, attempts, completions, settings, records of in-progress and recent playthroughs | FR-P4 |
 
 **Storage:**
 - **V:** in memory for the session, plus an exported JSON file for records and the provenance log (PRD §13.3 excludes persistence beyond the session).
@@ -770,10 +772,10 @@ The teachers review the fallback policy, because its actions can show up in play
 | U-12 | How a lesson hint declares the cards it mentions (Q12) | Structured card references, checked against exposures (US-15) | Teachers + engineering lead |
 | U-13 | Review analysis only after completion (ADR-0001 §4), versus sealed precomputation during play | Start at completion and show progressively; revisit with T2 data, which would need an ADR-0001 amendment | Owner |
 | U-14 | Sampling budget and order for review decision quality in M | §4.6.5 step 3 | Teachers + engineering lead |
-| U-15 | Whether using a hint changes a lesson attempt's outcome | Record hint use (US-28.8); keep the outcome unchanged until the teachers decide | Teachers |
-| U-16 | Maximum acceptable robot fallback rate on the reference phones (the PRD only asks for it to be reported) | Treat a rate above 2% of robot decisions as a VAL-04 failure for that solver or policy | Owner + engineering lead |
-| U-17 | Whether a teacher may sign off content they authored | The second teacher signs off; the author may sign alone only for typo-level versions | Owner + teachers |
-| U-18 | Several learners sharing one device (siblings, school computers) | Known MVP limitation: progress belongs to the device; the progress file and a "reset progress" action are the workaround. Profiles on one device are a later decision | Owner |
+| U-15 | Whether using a hint changes a lesson attempt's outcome | **Recommended:** no change to the outcome and no visible penalty. Record the highest hint tier and its timing on every attempt, because local data can't be backfilled later; the teachers' progress formula decides how it counts. Authors turn hints off where they need an unaided measure (US-28.8) | Teachers |
+| U-16 | Maximum acceptable robot fallback rate on the reference phones (the PRD only asks for it to be reported) | **Recommended:** measure per deal, not per decision; a robot makes up to 39 plays per deal, so 2% per decision would put a fallback in about 55% of deals. VAL-04 fails for a solver or policy with more than 5% of deals containing a timeout fallback on the reference Android (about 0.13% per decision), or with any engine-failure fallback in the F7 soak. Throttling and *not covered* call fallbacks are excluded. Mainly decides whether a sampled robot policy is viable for the MVP (US-12.3) | Owner + engineering lead |
+| U-17 | Whether a teacher may sign off content they authored | **Recommended:** a teacher other than the author signs off every new content ID and every change to learner-facing text. The author may sign alone only for versions the pipeline shows touch no learner-facing text and nothing that decides correctness. Non-English text needs a teacher who knows bridge in that language. Batch reviews per module, and include reviewer time in the MVP estimate at the gate (RK-12, RK-13; US-26.4) | Owner + teachers |
+| U-18 | Several learners sharing one device (siblings, school computers) | **Recommended:** accept one learner per device for the MVP. Profiles wouldn't help on school computers that wipe storage, where the progress file is the carrier. Store progress under a local learner ID now so profiles need no migration later, add **Start fresh**, and ask about shared devices in the beta pilot to decide on profiles (US-36.4) | Owner |
 
 ### 7.4 Edge cases and failure modes added in v0.2
 
