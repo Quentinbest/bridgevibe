@@ -23,9 +23,10 @@ CI (`.github/workflows/ci.yml`) runs each check as its own step.
 
 ## Modules
 
-`src/<module>/` follows engineering spec §4.2: one module per bounded context, created by the ticket that needs it. Today there are three:
+`src/<module>/` follows engineering spec §4.2: one module per bounded context, created by the ticket that needs it. Today there are four:
 
-- **table**: the authoritative rules core. For now it holds only types (`Card`, `Suit`, `Rank`, `Seat`, `Hand`, `Deal`) and the `as const` lists they derive from. It **may depend on nothing**: no other module, package or Node builtin (its tests may import Vitest).
+- **table**: the authoritative rules core. `startPlaythrough({ deal, contract })` returns a handle with `legalActions(seat)`, `submit(seat, controller, action)`, `seatView(seat)` and `record()`. It checks card plays, owns turns and trick winners, exposes Dummy after the opening lead, and completes after 13 tricks. Rejections preserve all state. It **may depend on nothing**: no other module, package or Node builtin (its tests may import Vitest).
+- **robots**: deterministic fallback card policy (§4.6.6), receiving only a branded `SeatView`. It imports only Table. ESLint prohibits full-Deal types and SeatView assertions outside Table.
 - **explanation**: the string catalogue (`catalogue` keyed by ID, `text(id, params)` with `{param}` interpolation). Every entry carries `status: 'draft'` until a teacher signs it off (CI-8).
 - **app**: the composition root and all UI. Only **app** may import **app**.
 
@@ -35,9 +36,9 @@ Rules every later module must keep:
 
 - The Table is the only authority on rules: the UI and robots only submit actions (INV-1).
 - Robots and in-play hints receive only a Seat View, never a full Deal. Only **table** constructs Seat Views and completed playthrough records (ADR-0001).
-- The UI is built from a learner view: face-up cards plus a count for each hidden hand. No hidden card identity reaches the UI, its page or its bundle before the playthrough is completed (US-16.4). Until the Table builds Seat Views, the static screen's `learnerView` in `src/app/fixture.ts` stands in for one, and the full Deal lives only in `src/app/fixture.test.ts`.
+- The UI is built from a learner view: face-up cards plus a count for each hidden hand. No hidden card identity reaches React props, page text or accessibility names (US-16.4). The fixed Deal lives in `src/app/fixture.ts` for composition; `src/app/play.ts` projects South’s SeatView into the learner view. The authored Deal is necessarily present in the client bundle in this fixed-Deal slice.
 - When the learner's side declares, the learner plays Declarer, and the display rotates so Declarer is at the bottom (ADR-0003).
-- Every engine (solver, sampler, robot policy, bidding) runs in a Web Worker behind a port interface.
+- Robots run on the main thread for issue #2, with 500 ms `setTimeout` delays and a 1 s trick collection delay. Workers arrive with #8.
 
 ## No hard-coded learner-facing text (US-38)
 
@@ -86,3 +87,9 @@ Every issue repeats this list. A ticket is done when:
 - all copy comes from the catalogue, marked as a draft;
 - the UI works at 390×844 and 1440×900, in light and dark themes, with keyboard, screen reader and reduced motion;
 - nothing outside the ticket's scope is built, and gaps are raised as issue comments.
+
+## Gameplay checks
+
+F1 in `src/table/playthrough.test.ts` runs unchanged in Node and Chromium. It checks reason precedence, rejection immutability, controller rules, blind leads, trick winners, completion and snapshot isolation. `test/boundaries.test.ts` checks the private SeatView brand at typecheck time and exercises ESLint restrictions through its API. Dependency fixtures include a robot importing explanation.
+
+The shared first-legal learner strategy completes the fixed Deal with 6 declaring-side tricks against fallback defenders. Node tests cover the Table and timer composition seams. Playwright uses its clock for a full Deal on `390-light` and `1440-dark`; keyboard, rejection, hidden-card, layout, theme and axe checks run on every project. Layout checks advance through the opening lead to expose Dummy, then resume timers before axe audits the initial, raised-card and rejected-card states. They also check viewport height and footer overlap. Browser checks require permission to bind local ports; in a sandbox that blocks ports, leave them for an unrestricted runner.

@@ -6,6 +6,7 @@ for (const [fixture, rule] of [
   ['table-to-builtin', 'table-is-independent'],
   ['explanation-to-app', 'app-is-composition-root'],
   ['app-to-modules', null],
+  ['robots-to-explanation', 'robots-only-table'],
 ] as const) {
   test(`dependency rules: ${fixture}`, () => {
     const args = ['node_modules/dependency-cruiser/bin/dependency-cruiser.mjs', '--config', '.dependency-cruiser.cjs', `test/fixtures/${fixture}/src`];

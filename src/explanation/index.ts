@@ -1,5 +1,30 @@
+import type { Card, ReasonCode } from '../table';
+
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
+  "reason.playthrough-complete": { text: "This deal is finished.", status: 'draft' },
+  "reason.malformed-action": { text: "Choose a card from the hand you control.", status: 'draft' },
+  "reason.not-your-turn": { text: "Wait for your turn to play.", status: 'draft' },
+  "reason.only-declarer-plays-dummy": { text: "You choose the cards for dummy.", status: 'draft' },
+  "reason.card-not-held": { text: "Choose a card still in this hand.", status: 'draft' },
+  "reason.must-follow-suit": { text: "Play {suit}; you still have that suit.", status: 'draft' },
+  "turn.lead": { text: "Your lead", status: 'draft' },
+  "turn.play": { text: "Your turn", status: 'draft' },
+  "turn.dummy": { text: "Play from dummy", status: 'draft' },
+  "turn.dummy-lead": { text: "Dummy's lead", status: 'draft' },
+  "turn.west": { text: "West is playing", status: 'draft' },
+  "turn.east": { text: "East is playing", status: 'draft' },
+  "play": { text: "Play it", status: 'draft' },
+  "target": { text: "Need {target} tricks", status: 'draft' },
+  "tricks.sides": { text: "You {you} · Them {them}", status: 'draft' },
+  "announce.play": { text: "{seat} plays the {card}", status: 'draft' },
+  "announce.winner": { text: "{seat} wins the trick", status: 'draft' },
+  "result": { text: "You took {won} of 13 tricks (needed {target})", status: 'draft' },
+  "led": { text: "LED", status: 'draft' },
+  "trick": { text: "Current trick", status: 'draft' },
+  "card.playable": { text: "{card}, playable", status: 'draft' },
+  "dummy.hidden": { text: "Dummy · {count} cards", status: 'draft' },
+
   "product": { text: "BridgeVibe", status: 'draft' },
   "product.first": { text: "Bridge", status: 'draft' },
   "product.second": { text: "Vibe", status: 'draft' },
@@ -56,4 +81,17 @@ export const catalogue = {
 export type StringId = keyof typeof catalogue;
 export function text(id: StringId, params: Readonly<Record<string, string | number>> = {}): string {
   return catalogue[id].text.replace(/\{(\w+)\}/g, (match, key: string) => String(params[key] ?? match));
+}
+
+// US-01.9: adding a Reason Code requires a corresponding copy template.
+export const reasonStrings: Record<ReasonCode, StringId> = {
+  'playthrough-complete': 'reason.playthrough-complete',
+  'malformed-action': 'reason.malformed-action',
+  'not-your-turn': 'reason.not-your-turn',
+  'only-declarer-plays-dummy': 'reason.only-declarer-plays-dummy',
+  'card-not-held': 'reason.card-not-held',
+  'must-follow-suit': 'reason.must-follow-suit',
+};
+export function cardName(card: Card): string {
+  return text('card.name', { rank: text(`rank.${card.rank}`), suit: text(`suit.${card.suit}`) });
 }

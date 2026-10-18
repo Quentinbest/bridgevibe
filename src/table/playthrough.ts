@@ -1,0 +1,126 @@
+import { RANKS, SEATS, SUITS, type Card, type Deal, type Seat, type Side, type Suit } from './index';
+
+export type Contract = Readonly<{ level: number; strain: Suit | 'no-trumps'; declarer: Seat }>;
+export type Controller = 'learner' | 'robot';
+export type Action = Readonly<{ kind: 'play-card'; card: Card }>;
+export type Status = 'in-progress' | 'completed';
+export const REASON_CODES = ['playthrough-complete', 'malformed-action', 'not-your-turn', 'only-declarer-plays-dummy', 'card-not-held', 'must-follow-suit'] as const;
+export type ReasonCode = typeof REASON_CODES[number];
+export type PlayedCard = Readonly<{ seat: Seat; card: Card }>;
+export type Trick = Readonly<{ cards: readonly PlayedCard[]; winner: Seat }>;
+const seatViewBrand: unique symbol = Symbol('SeatView');
+export type SeatView = Readonly<{
+  [seatViewBrand]: true;
+  seat: Seat;
+  positionIndex: number;
+  hand: readonly Card[];
+  dummy: readonly Card[] | null;
+  contract: Contract;
+  tricks: readonly Trick[];
+  currentTrick: readonly PlayedCard[];
+  turn: Seat | null;
+  tricksWon: Readonly<Record<Side, number>>;
+  cardCounts: Readonly<Record<Seat, number>>;
+  status: Status;
+}>;
+export type PlaythroughRecord = Readonly<{
+  schemaVersion: 1;
+  playthroughId: string;
+  deal: Deal;
+  contract: Contract;
+  learnerSide: Side;
+  actions: readonly Readonly<{ index: number; seat: Seat; controller: Controller; action: Action }>[];
+  status: Status;
+  result: Readonly<Record<Side, number>>;
+}>;
+export type TableEvent = Readonly<{ kind: 'card-played'; seat: Seat; card: Card }>
+  | Readonly<{ kind: 'trick-won'; winner: Seat }>
+  | Readonly<{ kind: 'status-changed'; status: 'completed' }>;
+export type Submission = { kind: 'accepted'; events: readonly TableEvent[] }
+  | { kind: 'rejected'; reason: ReasonCode; details: Readonly<{ cause?: 'controller'; suit?: Suit }> };
+export const sideOf = (seat: Seat): Side => seat === 'north' || seat === 'south' ? 'northSouth' : 'eastWest';
+export const sameCard = (a: Card, b: Card): boolean => a.suit === b.suit && a.rank === b.rank;
+const nextSeat = (seat: Seat): Seat => SEATS[(SEATS.indexOf(seat) + 1) % 4];
+const copyCard = (card: Card): Card => ({ suit: card.suit, rank: card.rank });
+const copyPlay = (play: PlayedCard): PlayedCard => ({ seat: play.seat, card: copyCard(play.card) });
+function isAction(value: unknown): value is Action {
+  if (!value || typeof value !== 'object' || !('kind' in value) || value.kind !== 'play-card' || !('card' in value)) return false;
+  const card = value.card;
+  return !!card && typeof card === 'object' && 'suit' in card && 'rank' in card
+    && SUITS.some(suit => suit === card.suit) && RANKS.some(rank => rank === card.rank);
+}
+let nextId = 0;
+export function startPlaythrough(input: { deal: Deal; contract: Contract }) {
+  // INV-2: take ownership of the input; no returned object aliases mutable Table state.
+  const deal: Deal = JSON.parse(JSON.stringify(input.deal));
+  const contract = { ...input.contract };
+  const playthroughId = `playthrough-${++nextId}`;
+  const hands = { north: [...deal.hands.north], east: [...deal.hands.east], south: [...deal.hands.south], west: [...deal.hands.west] };
+  const dummySeat = nextSeat(nextSeat(contract.declarer));
+  const learnerSide = sideOf(contract.declarer);
+  let turn: Seat | null = nextSeat(contract.declarer);
+  let status: Status = 'in-progress';
+  let currentTrick: PlayedCard[] = [];
+  const tricks: Trick[] = [];
+  const actions: Array<PlaythroughRecord['actions'][number]> = [];
+  const tricksWon = { northSouth: 0, eastWest: 0 };
+  function legalActions(seat: Seat): Action[] {
+    if (seat !== turn || status === 'completed') return [];
+    const led = currentTrick[0]?.card.suit;
+    const following = hands[seat].filter(card => card.suit === led);
+    return (following.length ? following : hands[seat]).map(card => ({ kind: 'play-card', card: copyCard(card) }));
+  }
+  function seatView(seat: Seat): SeatView {
+    return {
+      [seatViewBrand]: true, seat, positionIndex: actions.length,
+      hand: hands[seat].map(copyCard), dummy: actions.length ? hands[dummySeat].map(copyCard) : null,
+      contract: { ...contract }, tricks: tricks.map(trick => ({ cards: trick.cards.map(copyPlay), winner: trick.winner })),
+      currentTrick: currentTrick.map(copyPlay), turn, tricksWon: { ...tricksWon },
+      cardCounts: { north: hands.north.length, east: hands.east.length, south: hands.south.length, west: hands.west.length }, status,
+    };
+  }
+  function record(): PlaythroughRecord {
+    return JSON.parse(JSON.stringify({ schemaVersion: 1, playthroughId, deal, contract, learnerSide, actions, status, result: tricksWon }));
+  }
+  function submit(seat: unknown, controller: unknown, action: unknown): Submission {
+    const reject = (reason: ReasonCode, details: { cause?: 'controller'; suit?: Suit } = {}): Submission => ({ kind: 'rejected', reason, details });
+    // US-01.6: validate everything before mutating any state, in reason-code precedence order.
+    if (status === 'completed') return reject('playthrough-complete');
+    if (!SEATS.some(candidate => candidate === seat) || (controller !== 'learner' && controller !== 'robot') || !isAction(action)) return reject('malformed-action');
+    const actingSeat = seat as Seat;
+    const expectedController = sideOf(actingSeat) === learnerSide ? 'learner' : 'robot';
+    if (actingSeat !== dummySeat && controller !== expectedController) return reject('malformed-action', { cause: 'controller' });
+    if (actingSeat !== turn) return reject('not-your-turn');
+    // ADR-0003: Dummy belongs to Declarer's controller, never an independent robot.
+    if (actingSeat === dummySeat && controller !== 'learner') return reject('only-declarer-plays-dummy');
+    const index = hands[actingSeat].findIndex(card => sameCard(card, action.card));
+    if (index < 0) return reject('card-not-held');
+    const led = currentTrick[0]?.card.suit;
+    if (led && action.card.suit !== led && hands[actingSeat].some(card => card.suit === led)) return reject('must-follow-suit', { suit: led });
+    const card = copyCard(action.card);
+    hands[actingSeat].splice(index, 1);
+    actions.push({ index: actions.length, seat: actingSeat, controller, action: { kind: 'play-card', card } });
+    currentTrick.push({ seat: actingSeat, card });
+    const events: TableEvent[] = [{ kind: 'card-played', seat: actingSeat, card: copyCard(card) }];
+    turn = nextSeat(actingSeat);
+    if (currentTrick.length === 4) {
+      // US-01.7: only trumps or cards in the led suit can overtake the current winner.
+      const winningPlay = currentTrick.reduce((winner, play) => {
+        if (play.card.suit === winner.card.suit) return RANKS.indexOf(play.card.rank) < RANKS.indexOf(winner.card.rank) ? play : winner;
+        return play.card.suit === contract.strain ? play : winner;
+      });
+      tricks.push({ cards: currentTrick, winner: winningPlay.seat });
+      currentTrick = [];
+      tricksWon[sideOf(winningPlay.seat)]++;
+      turn = winningPlay.seat;
+      events.push({ kind: 'trick-won', winner: winningPlay.seat });
+      if (tricks.length === 13) {
+        status = 'completed'; turn = null;
+        events.push({ kind: 'status-changed', status });
+      }
+    }
+    return { kind: 'accepted', events };
+  }
+  return { legalActions, seatView, record, submit };
+}
+export type Playthrough = ReturnType<typeof startPlaythrough>;

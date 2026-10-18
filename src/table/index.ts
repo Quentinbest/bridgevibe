@@ -9,3 +9,4 @@ export type Hand = readonly [Card, Card, Card, Card, Card, Card, Card, Card, Car
 export type Side = 'northSouth' | 'eastWest';
 export type Vulnerability = Readonly<Record<Side, boolean>>;
 export type Deal = Readonly<{ hands: Readonly<Record<Seat, Hand>>; dealer: Seat; vulnerability: Vulnerability }>;
+export * from './playthrough';
