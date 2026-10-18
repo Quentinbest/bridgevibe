@@ -1,4 +1,4 @@
-# PlayBridge: Engineering Specification
+# BridgeVibe: Engineering Specification
 
 | Field | Value |
 |---|---|
@@ -92,7 +92,7 @@ Phase V, M · ADR-0002, INV-13, FR-R7, FR-R9
 
 - US-04.1 Each playthrough keeps a `PlaythroughRecord` (§4.4) containing every accepted action in order, with its seat, controller and provenance.
 - US-04.2 Replay rebuilds every position from the record alone. Replaying a record made with robot policy version *n* gives the identical sequence under version *n+1*.
-- US-04.3 The record can be exported as PBN and imported again. Contract Bridge deals, auctions and play round-trip without loss. PBN has no tags for MiniBridge setup (announcements, objective), so those travel in a PlayBridge-specific supplemental tag and are dropped by other tools; the JSON export is the lossless format. Malformed PBN is rejected with a parse error (FR-R7, Should).
+- US-04.3 The record can be exported as PBN and imported again. Contract Bridge deals, auctions and play round-trip without loss. PBN has no tags for MiniBridge setup (announcements, objective), so those travel in a BridgeVibe-specific supplemental tag and are dropped by other tools; the JSON export is the lossless format. Malformed PBN is rejected with a parse error (FR-R7, Should).
 - US-04.4 *(M)* A retry creates a new playthrough whose record starts with a copy of the parent's actions up to the chosen position, plus a link to the parent and the position.
 - US-04.5 Practice has no undo. Undoing after robots have played would reveal cards and let the learner replay with hindsight. A mis-tap is prevented by the UX's confirm-to-play (U-10), not repaired afterwards. Undo in lessons (FR-R9) steps back to an earlier step; attempts already recorded are never erased.
 

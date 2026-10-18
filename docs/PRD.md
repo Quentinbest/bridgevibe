@@ -1,6 +1,6 @@
-# PlayBridge: Product Requirements Document
+# BridgeVibe: Product Requirements Document
 
-*"PlayBridge" is a working name; see decision D6.*
+*Product name: BridgeVibe (decision D6, decided 2026-10-18). Earlier drafts used the working name "PlayBridge".*
 
 | Field | Value |
 |---|---|
@@ -25,7 +25,7 @@
 
 ## 1. Summary
 
-PlayBridge is a web game that teaches **complete beginners** to play **contract bridge**. It combines:
+BridgeVibe is a web game that teaches **complete beginners** to play **contract bridge**. It combines:
 - short lessons;
 - practice deals against computer players;
 - plain-language explanations of the rules;
@@ -615,7 +615,7 @@ These targets are placeholders set by this draft, not derived from data. They ar
 | RK-8 | Learning value is unproven | Medium | High | Learner observation (VAL-09); pilot before release (§16) |
 | RK-9 | Scope creep into multiplayer, advanced coaching or a chat coach | Medium | Medium | Non-goals (§3); separate requirements documents |
 | RK-10 | Language-model claims that are not true (if adopted) | Medium | High | CI-7: input limited to facts, output checked, kill switch |
-| RK-11 | Name collision: `maxgiraldo/playbridge` is a bridge and MiniBridge project with the same name [R §9.4] | High (it exists) | Low–Medium | Decision D6 before any public release |
+| RK-11 | Name collision: `maxgiraldo/playbridge` is a bridge and MiniBridge project with the same name as our former working name [R §9.4] | Low (renamed to BridgeVibe, D6) | Low | Decision D6 before any public release |
 | RK-12 | Teaching judgement rests on too few people | Medium | High | Two teachers grade every review set, with disagreements resolved and recorded; both recruited in week 0 |
 | RK-13 | Content production is underestimated | Medium | High | The MVP estimate at the gate includes lessons, deals and teacher time (§13.9) |
 
@@ -630,7 +630,7 @@ These targets are placeholders set by this draft, not derived from data. They ar
 | D3 | **Backend acceptable, and hosting region** | The gate | PA-1: browser-first; add a server only if a Must requirement fails without one [A] |
 | D4 | **Launch languages** | Before MVP content production | English first, with all strings externalised; Simplified Chinese as a candidate |
 | D5 | **Does MiniBridge ship as a curriculum module** (for example, module 6, "points and choosing a contract")? | After the exercise | No commitment; FR-R4 is Could for the MVP |
-| D6 | **Product name** | Before any public release | "PlayBridge" as a working name only (RK-11) |
+| D6 | **Product name** | **Decided 2026-10-18:** BridgeVibe | Replaces the working name "PlayBridge", which collided with `maxgiraldo/playbridge` (RK-11). A trademark check is still needed before public launch |
 | D7 | **Language-model phrasing in the MVP** | The gate | No; templates only |
 | D8 | **Practice scoring variant:** duplicate score per hand, Chicago or rubber | Before MVP design | Duplicate score per hand (FR-R5) |
 | D9 | **Target age group and tone** | **Decided 2026-10-17:** teenagers aged 13–17 | See §4 and §10.5. Coach wording in the teenage register (for example, "Good call, bad luck" for CI-3, "X-ray view" for CI-2) still needs teacher sign-off (CI-8) |

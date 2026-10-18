@@ -1,4 +1,4 @@
-# PlayBridge: UI/UX Specification
+# BridgeVibe: UI/UX Specification
 
 | Field | Value |
 |---|---|
@@ -50,7 +50,7 @@ Age question → (13+) Welcome (one screen) → Lesson 1.1 starts
 ```
 
 - **Age question (NFR-S age gate).** "How old are you?" with a scrolling picker that has no preselected value and doesn't hint at a "right" answer. There is no account and nothing else is asked.
-- **Under 13.** "PlayBridge is made for ages 13 and up. Bridge clubs and schools often run junior sessions; ask a teacher or a local club." It links to the **Rules** reference, which collects no data. This is not a dead end, and the app does not let the user change the answer straight away.
+- **Under 13.** "BridgeVibe is made for ages 13 and up. Bridge clubs and schools often run junior sessions; ask a teacher or a local club." It links to the **Rules** reference, which collects no data. This is not a dead end, and the app does not let the user change the answer straight away.
 - **Welcome.** One sentence about what bridge is, plus one button: **Start learning**. No tour carousel; the first lesson *is* the tour.
 - **Analytics consent** is asked later, once, from Me → Privacy, off by default. It is never asked during onboarding.
 

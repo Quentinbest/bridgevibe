@@ -1,6 +1,6 @@
-# PlayBridge Glossary
+# BridgeVibe Glossary
 
-The shared language of the PlayBridge domain. Terms are grouped by bounded context. This file does not describe implementation: no types, services or engines by product name.
+The shared language of the BridgeVibe domain. Terms are grouped by bounded context. This file does not describe implementation: no types, services or engines by product name.
 
 **Status markers**
 - No marker: resolved.
@@ -79,7 +79,7 @@ UI copy for teenagers may use friendlier words ("points", "X-ray view"). Those a
 | **Position** | The state of a Playthrough after a given sequence of accepted Actions. Two Positions are the same only if they have the same Deal and the same sequence, not just the same number of Actions. A Position can be the starting point of a retry or an Exercise. |
 | **Reason Code** | The Table's identifier for why an Action was rejected (for example, *must follow suit*). |
 | **Playthrough Record** | The ordered list of accepted Actions of a Playthrough, with its Deal, Game Format, Convention Profile version and the versions of every engine that acted. The source of truth for replay and review (ADR-0002). |
-| **Revoke** | In the Laws, failing to follow suit when able. It cannot happen in PlayBridge, because the Table rejects the Action. Use "rejected play" instead. |
+| **Revoke** | In the Laws, failing to follow suit when able. It cannot happen in BridgeVibe, because the Table rejects the Action. Use "rejected play" instead. |
 
 ## 3. Information
 
