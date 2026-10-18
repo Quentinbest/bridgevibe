@@ -15,6 +15,8 @@ function TableScreen({ view, play }: { view: LearnerView; play: (seat: 'north' |
   const [selected, setSelected] = useState<TableCard | null>(null);
   const active = !view.collecting && view.status !== 'completed';
   const target = view.contract.level + 6;
+  // UX §10: an illegal card's name says which suit it must follow.
+  const ledSuit = view.collecting ? undefined : view.displayedTrick[0]?.card.suit;
   const banner = view.collecting && view.lastTrickWinner
     ? text('announce.winner', { seat: text(`seat.${view.lastTrickWinner}`) })
     : view.turn === 'west' || view.turn === 'east' ? text(`turn.${view.turn}`)
@@ -36,7 +38,7 @@ function TableScreen({ view, play }: { view: LearnerView; play: (seat: 'north' |
       <section className="table" aria-label={text('table')}>
         <section className="dummy" aria-label={text('dummy')}>
           <p className="seat-label">{text('dummy')}</p>
-          {view.dummy ? <Hand cards={view.dummy} dummy active={active && view.turn === 'north'} legalCards={view.legalCards}
+          {view.dummy ? <Hand cards={view.dummy} dummy active={active && view.turn === 'north'} legalCards={view.legalCards} ledSuit={ledSuit}
             selected={selected} onSelect={setSelected} onPlay={submit} /> : <>
             <div className="suit-columns">{SUITS.map(suit => <div className="suit-column" key={suit}><CardBack /></div>)}</div>
             <p>{text('dummy.hidden', { count: view.cardCounts.north })}</p>
@@ -52,7 +54,7 @@ function TableScreen({ view, play }: { view: LearnerView; play: (seat: 'north' |
         <section className="learner" aria-label={text('hand')}>
           <p className="turn-banner" aria-live="polite">{view.status === 'completed' && !view.collecting ? text('result', { won: view.tricksWon.northSouth, target }) : banner}</p>
           <p className="reason" aria-live="assertive">{view.reason}</p>
-          <Hand cards={view.hand} active={active && view.turn === 'south'} legalCards={view.legalCards}
+          <Hand cards={view.hand} active={active && view.turn === 'south'} legalCards={view.legalCards} ledSuit={ledSuit}
             selected={selected} onSelect={setSelected} onPlay={submit} />
           <p className="seat-label">{text('learner')}</p>
         </section>

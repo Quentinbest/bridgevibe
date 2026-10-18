@@ -2,7 +2,7 @@ import { expect, test } from 'vitest';
 import { card, dealWith } from '../../test/deals';
 import { RANKS, SEATS, startPlaythrough, type Contract, type Playthrough, type ReasonCode, type Seat } from './index';
 const contract: Contract = { level: 3, strain: 'no-trumps', declarer: 'south' };
-const make = () => startPlaythrough({ deal: dealWith(), contract });
+const make = () => startPlaythrough({ deal: dealWith(), contract, learnerSide: 'northSouth' });
 const state = (table: Playthrough) => ({ record: table.record(), turn: table.seatView('south').turn, views: SEATS.map(seat => table.seatView(seat)) });
 function reject(table: Playthrough, seat: unknown, controller: unknown, action: unknown, reason: ReasonCode) {
   const before = state(table);
@@ -12,7 +12,7 @@ function reject(table: Playthrough, seat: unknown, controller: unknown, action: 
   return result;
 }
 function play(table: Playthrough, seat: Seat, chosen = table.legalActions(seat)[0]) {
-  const result = table.submit(seat, seat === 'north' || seat === 'south' ? 'learner' : 'robot', chosen);
+  const result = table.submit(seat, table.controllerOf(seat), chosen);
   expect(result.kind).toBe('accepted'); return result;
 }
 // F1 / US-01: run these identical card-play cases in Node and Chromium.
@@ -55,14 +55,14 @@ test('legalActions is pure and empty for seats not to play', () => {
 });
 test('highest card of suit led wins without trumps and leads next', () => {
   const deal = dealWith({ west: [card('spades', '2')], north: [card('spades', 'A')], east: [card('spades', 'Q')], south: [card('spades', 'K')] });
-  const table = startPlaythrough({ deal, contract });
+  const table = startPlaythrough({ deal, contract, learnerSide: 'northSouth' });
   for (const seat of ['west', 'north', 'east', 'south'] as const) play(table, seat, { kind: 'play-card', card: deal.hands[seat][0] });
   expect(table.seatView('south')).toMatchObject({ turn: 'north', tricksWon: { northSouth: 1, eastWest: 0 }, currentTrick: [], tricks: [{ winner: 'north' }] });
 });
 for (const strain of ['hearts', 'no-trumps'] as const) {
   test(`void plays: highest trump wins, otherwise led suit (${strain})`, () => {
     const deal = dealWith({ west: RANKS.map(rank => card('spades', rank)), north: [card('hearts', '2')], east: [card('hearts', 'A')], south: [card('hearts', 'K')] });
-    const table = startPlaythrough({ deal, contract: { ...contract, strain } });
+    const table = startPlaythrough({ deal, contract: { ...contract, strain }, learnerSide: 'northSouth' });
     for (const seat of ['west', 'north', 'east', 'south'] as const) play(table, seat, { kind: 'play-card', card: deal.hands[seat][0] });
     expect(table.seatView('south').turn).toBe(strain === 'hearts' ? 'east' : 'west');
   });
@@ -87,16 +87,32 @@ test('duplicate played card is no longer held on a later turn', () => {
   reject(table, 'west', 'robot', action, 'card-not-held');
 });
 test('North declarer is learner-controlled and South dummy is learner-controlled', () => {
-  const table = startPlaythrough({ deal: dealWith(), contract: { ...contract, declarer: 'north' } });
+  const table = startPlaythrough({ deal: dealWith(), contract: { ...contract, declarer: 'north' }, learnerSide: 'northSouth' });
   expect(table.seatView('north').turn).toBe('east');
   play(table, 'east'); play(table, 'south'); play(table, 'west'); play(table, 'north');
   expect(table.record().actions.map(action => action.controller)).toEqual(['robot', 'learner', 'robot', 'learner']);
 });
 test('input and output mutation cannot alter authoritative state', () => {
-  const deal = dealWith(); const table = startPlaythrough({ deal, contract }); const before = state(table);
+  const deal = dealWith(); const table = startPlaythrough({ deal, contract, learnerSide: 'northSouth' }); const before = state(table);
   Object.assign(deal.hands.west[0], { rank: '2' });
   Object.assign(table.seatView('west').hand[0], { rank: '2' });
   Object.assign(table.record().deal.hands.west[0], { rank: '2' });
   Object.assign(table.legalActions('west')[0].card, { rank: '2' });
   expect(state(table)).toEqual(before);
+});
+test('ADR-0003, US-02.1: in defence the learner controls only South; Dummy follows the robot Declarer', () => {
+  const table = startPlaythrough({ deal: dealWith(), contract: { ...contract, declarer: 'east' }, learnerSide: 'northSouth' });
+  expect(SEATS.map(seat => table.controllerOf(seat))).toEqual(['robot', 'robot', 'learner', 'robot']);
+  expect(table.seatView('south').turn).toBe('south');
+  expect(reject(table, 'south', 'robot', table.legalActions('south')[0], 'malformed-action')).toMatchObject({ details: { cause: 'controller' } });
+  play(table, 'south');
+  // West is Dummy: only East's controller (a robot) may play its cards.
+  reject(table, 'west', 'learner', table.legalActions('west')[0], 'only-declarer-plays-dummy');
+  play(table, 'west');
+  expect(reject(table, 'north', 'learner', table.legalActions('north')[0], 'malformed-action')).toMatchObject({ details: { cause: 'controller' } });
+  play(table, 'north'); play(table, 'east');
+  expect(table.record().actions.map(action => action.controller)).toEqual(['learner', 'robot', 'robot', 'robot']);
+});
+test('the learner sits South, so only North–South can be the learner side', () => {
+  expect(() => startPlaythrough({ deal: dealWith(), contract, learnerSide: 'eastWest' })).toThrow();
 });

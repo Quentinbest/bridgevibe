@@ -76,7 +76,7 @@ test('keyboard arrows, Enter, Escape and Space play from the active hand', async
 });
 test('off-suit card is rejected, retained and announced until the next action', async ({ page }) => {
   await open(page); await page.clock.runFor(500);
-  const queen = page.getByRole('button', { name: 'Queen of hearts', exact: true });
+  const queen = page.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades", exact: true });
   await queen.click(); await queen.click();
   await expect(queen).toHaveAttribute('aria-pressed', 'false');
   await expect(page.locator('[aria-live="assertive"]')).toHaveText('Play spades; you still have that suit.');

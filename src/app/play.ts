@@ -14,7 +14,7 @@ export type LearnerView = Readonly<Pick<SeatView,
 }>;
 
 export function createPlay() {
-  const table = startPlaythrough({ deal: fixedDeal, contract: { level: 3, strain: 'no-trumps', declarer: 'south' } });
+  const table = startPlaythrough({ deal: fixedDeal, contract: { level: 3, strain: 'no-trumps', declarer: 'south' }, learnerSide: 'northSouth' });
   const listeners = new Set<() => void>();
   let timer: ReturnType<typeof setTimeout> | undefined;
   let running = false;
@@ -52,7 +52,7 @@ export function createPlay() {
     } else {
       for (const event of result.events) {
         if (event.kind === 'card-played') announcements.push(text('announce.play', { seat: text(`seat.${event.seat}`), card: cardName(event.card) }));
-        if (event.kind === 'trick-won') announcements.push(text('announce.winner', { seat: text(`seat.${event.winner}`) }));
+        // The winner is announced once, by the turn banner's live region during collection (UX §10).
       }
       const view = table.seatView('south');
       collecting = result.events.some(event => event.kind === 'trick-won');

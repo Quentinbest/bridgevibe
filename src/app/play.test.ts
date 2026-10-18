@@ -49,5 +49,5 @@ test('composition retains reason until the next action and publishes each play a
   play.play('north', play.getSnapshot().legalCards[0]);
   expect(play.getSnapshot().reason).toBe('');
   vi.advanceTimersByTime(500); play.play('south', play.getSnapshot().legalCards[0]);
-  expect(play.getSnapshot().announcements).toEqual(['West plays the 9 of spades', 'North plays the Ace of spades', 'East plays the 3 of spades', 'South plays the King of spades', 'North wins the trick']); stop();
+  expect(play.getSnapshot().announcements).toEqual(['West plays the 9 of spades', 'North plays the Ace of spades', 'East plays the 3 of spades', 'South plays the King of spades']); stop();
 });

@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { SUITS, sameCard, type Card as TableCard } from '../table';
+import { SUITS, sameCard, type Card as TableCard, type Suit } from '../table';
 import { cardName, text } from '../explanation';
 import { Card } from './Card';
 
-type Props = { cards: readonly TableCard[]; dummy?: boolean; active: boolean; legalCards: readonly TableCard[];
+type Props = { cards: readonly TableCard[]; dummy?: boolean; active: boolean; legalCards: readonly TableCard[]; ledSuit?: Suit;
   selected: TableCard | null; onSelect: (card: TableCard | null) => void; onPlay: (card: TableCard) => void };
-export function Hand({ cards, dummy = false, active, legalCards, selected, onSelect, onPlay }: Props) {
+export function Hand({ cards, dummy = false, active, legalCards, ledSuit, selected, onSelect, onPlay }: Props) {
   const ordered = SUITS.flatMap(suit => cards.filter(card => card.suit === suit));
   const [focusIndex, setFocusIndex] = useState(0);
   // UX §10: keep a tab stop when the previously focused last card is removed.
@@ -35,7 +35,8 @@ export function Hand({ cards, dummy = false, active, legalCards, selected, onSel
         {/* UX §10 names cards in full ("Jack of spades, playable"). The name comes from content, not
             aria-label, so the abbreviated face isn't a visible label missing from the name (WCAG 2.5.3). */}
         <span aria-hidden="true">{text(`face.${card.rank}`)}</span><span aria-hidden="true">{text(`symbol.${card.suit}`)}</span>
-        <span className="sr-only">{legal ? text('card.playable', { card: cardName(card) }) : cardName(card)}</span>
+        <span className="sr-only">{legal ? text('card.playable', { card: cardName(card) })
+          : ledSuit ? text('card.unplayable', { card: cardName(card), suit: text(`suit.${ledSuit}`) }) : cardName(card)}</span>
       </button> : <Card key={card.rank} card={card} />;
     })}
   </div>)}</div>;

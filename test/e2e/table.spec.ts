@@ -112,7 +112,7 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
   // Play North's spade, wait for East, then attempt an off-suit card from South.
   await page.getByRole('button', { name: 'Play it', exact: true }).click();
   await expect(page.getByRole('button', { name: 'King of spades, playable', exact: true })).toBeVisible();
-  const heart = page.getByRole('button', { name: 'Ace of hearts', exact: true });
+  const heart = page.getByRole('button', { name: "Ace of hearts, can't play: you must follow spades", exact: true });
   await heart.click();
   await page.getByRole('button', { name: 'Play it', exact: true }).click();
   await expect(page.locator('[aria-live="assertive"]')).toHaveText('Play spades; you still have that suit.');
