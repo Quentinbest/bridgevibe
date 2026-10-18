@@ -1,12 +1,12 @@
 import { SUITS } from '../table';
 import { text } from '../explanation';
 import { Card, CardBack } from './Card';
-import { fixedDeal, display } from './fixture';
+import { learnerView, display } from './fixture';
 
 function Opponent({ seat }: { seat: 'west' | 'east' }) {
   return <section className={`opponent ${seat}`} aria-label={text(`seat.${seat}`)}>
     <div className="backs"><CardBack /><CardBack /><CardBack /></div>
-    <p>{text('opponent', { seat: text(`seat.${seat}`), count: fixedDeal.hands[seat].length })}</p>
+    <p>{text('opponent', { seat: text(`seat.${seat}`), count: learnerView.opponentCardCount[seat] })}</p>
   </section>;
 }
 export function App() {
@@ -22,7 +22,7 @@ export function App() {
         <section className="dummy" aria-label={text('dummy')}>
           <p className="seat-label">{text('dummy')}</p>
           <div className="suit-columns">{SUITS.map(suit => <div className="suit-column" key={suit} data-suit={suit}>
-            {fixedDeal.hands.north.filter(card => card.suit === suit).map(card => <Card key={card.rank} card={card} />)}
+            {learnerView.dummy.filter(card => card.suit === suit).map(card => <Card key={card.rank} card={card} />)}
           </div>)}</div>
         </section>
         <Opponent seat="west" />
@@ -30,7 +30,7 @@ export function App() {
         <Opponent seat="east" />
         <section className="learner" aria-label={text('hand')}>
           <div className="hand">{SUITS.map(suit => <div className="hand-suit" key={suit}>
-            {fixedDeal.hands.south.filter(card => card.suit === suit).map(card => <Card key={card.rank} card={card} />)}
+            {learnerView.hand.filter(card => card.suit === suit).map(card => <Card key={card.rank} card={card} />)}
           </div>)}</div>
           <p className="seat-label">{text('learner')}</p>
         </section>

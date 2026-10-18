@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.app.json",
     "lint": "eslint .",
     "deps:check": "depcruise --config .dependency-cruiser.cjs src",
     "test": "vitest run --project node",
