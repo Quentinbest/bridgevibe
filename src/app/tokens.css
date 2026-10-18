@@ -1,0 +1,105 @@
+:root {
+  --accent: #C8F45A;
+  --felt: #0F5C50;
+  --felt-text: #D8F1EA;
+  --felt-line: #2E7F70;
+  --card-back: #1B7A69;
+  --card-back-border: #6FB3A5;
+  --card-face: #FFFDF8;
+  --card-border: #D9D4C7;
+  --suit-black: #16171D;
+  --suit-red: #C62A22;
+  --suit-orange: #C05A00;
+  --suit-green: #1E7A3E;
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --font-display: 'Bricolage Grotesque', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --radius-6: 6px;
+  --radius-8: 8px;
+  --radius-10: 10px;
+  --radius-12: 12px;
+  --radius-20: 20px;
+  --radius-28: 28px;
+  --radius-32: 32px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --type-11: 11px;
+  --type-12: 12px;
+  --type-13: 13px;
+  --type-14: 14px;
+  --type-15: 15px;
+  --type-16: 16px;
+  --type-17: 17px;
+  --type-18: 18px;
+  --type-23: 23px;
+  --type-24: 24px;
+  --type-32: 32px;
+  --radius-pill: 999px;
+  --light-background: #F6F4EE;
+  --light-surface: #FFFFFF;
+  --light-raised: #FFFFFF;
+  --light-border: #DEDAD0;
+  --light-text: #14151C;
+  --light-muted: #5A5E70;
+  --light-faint: #B7B3A8;
+  --light-accent-text: #3F6B00;
+  --light-accent-soft: #E6F5C2;
+  --light-accent-soft-text: #2E4D00;
+  --dark-background: #11121A;
+  --dark-surface: #1B1D28;
+  --dark-raised: #252836;
+  --dark-border: #343849;
+  --dark-text: #F4F2EC;
+  --dark-muted: #A7ABBF;
+  --dark-faint: #6E7389;
+  --dark-accent-text: #C8F45A;
+  --dark-accent-soft: #263214;
+  --dark-accent-soft-text: #DDF7A0;
+}
+:root {
+  --background: var(--light-background);
+  --surface: var(--light-surface);
+  --raised: var(--light-raised);
+  --border: var(--light-border);
+  --text: var(--light-text);
+  --muted: var(--light-muted);
+  --faint: var(--light-faint);
+  --accent-text: var(--light-accent-text);
+  --accent-soft: var(--light-accent-soft);
+  --accent-soft-text: var(--light-accent-soft-text);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+  --background: var(--dark-background);
+  --surface: var(--dark-surface);
+  --raised: var(--dark-raised);
+  --border: var(--dark-border);
+  --text: var(--dark-text);
+  --muted: var(--dark-muted);
+  --faint: var(--dark-faint);
+  --accent-text: var(--dark-accent-text);
+  --accent-soft: var(--dark-accent-soft);
+  --accent-soft-text: var(--dark-accent-soft-text);
+  color-scheme: dark;
+}
+}
+:root[data-theme="dark"] {
+  --background: var(--dark-background);
+  --surface: var(--dark-surface);
+  --raised: var(--dark-raised);
+  --border: var(--dark-border);
+  --text: var(--dark-text);
+  --muted: var(--dark-muted);
+  --faint: var(--dark-faint);
+  --accent-text: var(--dark-accent-text);
+  --accent-soft: var(--dark-accent-soft);
+  --accent-soft-text: var(--dark-accent-soft-text);
+  color-scheme: dark;
+}

@@ -1,0 +1,57 @@
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--background); color: var(--text); font-family: var(--font-body); font-size: var(--type-16); }
+p, h1 { margin: 0; }
+.header { background: var(--surface); border-bottom: 1px solid var(--border); padding: var(--space-16) var(--space-32); }
+h1 { font: 800 var(--type-24) var(--font-display); letter-spacing: -.03em; max-width: 1100px; margin: auto; }
+.wordmark-accent { color: var(--accent-text); }
+main { max-width: 1164px; margin: auto; padding: var(--space-24) var(--space-32); }
+.status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-12); margin-bottom: var(--space-16); color: var(--muted); font-size: var(--type-15); }
+.contract { background: var(--text); color: var(--background); padding: var(--space-6) var(--space-12); border-radius: var(--radius-10); font-weight: 600; }
+.tricks { margin-left: auto; background: var(--accent-soft); color: var(--accent-soft-text); padding: var(--space-8) var(--space-12); border-radius: var(--radius-10); font-weight: 600; }
+.table { background: var(--felt); color: var(--felt-text); border-radius: var(--radius-32); padding: var(--space-24); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr); grid-template-rows: auto 1fr auto; gap: var(--space-20); min-height: 690px; }
+.dummy { grid-column: 1 / 4; text-align: center; }
+.seat-label, .opponent p { font: 500 var(--type-12) var(--font-mono); }
+.seat-label { margin-bottom: var(--space-12); }
+.suit-columns { display: grid; grid-template-columns: repeat(4, 60px); gap: var(--space-8); justify-content: center; }
+.suit-column { display: flex; flex-direction: column; }
+.card { flex: none; width: 80px; height: 114px; min-width: 44px; min-height: 44px; background: var(--card-face); border: 1px solid var(--card-border); border-radius: var(--radius-10); padding: var(--space-8) 0 0 10px; text-align: left; align-items: flex-start; font-size: var(--type-23); font-weight: 600; line-height: 1; display: flex; flex-direction: column; color: var(--suit-black); }
+.card[data-suit="hearts"], .card[data-suit="diamonds"] { color: var(--suit-red); }
+.card[data-deck="four-colour"][data-suit="diamonds"] { color: var(--suit-orange); }
+.card[data-deck="four-colour"][data-suit="clubs"] { color: var(--suit-green); }
+.suit-column .card { width: 60px; height: 44px; flex-direction: row; gap: var(--space-4); font-size: var(--type-17); border-radius: var(--radius-8); }
+.opponent { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-8); text-align: center; }
+.west { grid-column: 1; grid-row: 2; }
+.east { grid-column: 3; grid-row: 2; }
+.backs { display: flex; }
+.card-back { width: 44px; height: 60px; border-radius: var(--radius-6); background: var(--card-back); border: 2px solid var(--card-back-border); }
+.card-back + .card-back { margin-left: -32px; }
+.trick-area { grid-column: 2; grid-row: 2; width: min(100%, 200px); aspect-ratio: 1; border: 1px solid var(--felt-line); border-radius: var(--radius-pill); display: grid; place-items: center; justify-self: center; align-self: center; }
+.trick-area div { width: 66px; height: 94px; border: 2px dashed var(--card-back-border); border-radius: var(--radius-8); }
+.learner { grid-column: 1 / 4; min-width: 0; text-align: center; }
+.hand { display: flex; width: max-content; margin: auto; padding: var(--space-4) 0 var(--space-16); }
+.hand-suit { display: flex; }
+.hand-suit + .hand-suit, .hand .card + .card { margin-left: -36px; }
+.learner .seat-label { margin: 0; }
+@media (max-width: 399px) {
+  .header { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); padding: 0; border: 0; }
+  main { padding: var(--space-12); }
+  .status { gap: var(--space-8); font-size: var(--type-13); }
+  .tricks { padding: var(--space-6); }
+  .table { padding: var(--space-16) var(--space-8); border-radius: var(--radius-28); gap: var(--space-16) var(--space-4); min-height: 720px; grid-template-columns: 1fr 1.4fr 1fr; }
+  .trick-area { border: 0; }
+  .opponent p { font-size: var(--type-11); }
+}
+/* 12 exposed edges × (80px − 36px) + one 80px card = 608px.
+   Add main padding (64px) and table padding (48px): one row needs 720px. */
+@media (max-width: 719px) {
+  main { padding-inline: var(--space-12); }
+  .table { padding-inline: var(--space-8); }
+  .hand-suit + .hand-suit, .hand .card + .card { margin-left: 0; }
+  .hand { display: grid; grid-template-columns: auto auto; gap: var(--space-12) var(--space-8); }
+  .hand .card { width: 44px; height: 86px; margin: 0; border-radius: var(--radius-8); font-size: var(--type-18); padding: var(--space-4); }
+}
+/* Two suit columns need 4 × 44px + 3 × 44px + 8px gap = 316px.
+   Add main padding (24px) and table padding (16px): two columns need 356px. */
+@media (max-width: 355px) {
+  .hand { grid-template-columns: auto; }
+}
