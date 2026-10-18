@@ -4,11 +4,11 @@ p, h1 { margin: 0; }
 .header { background: var(--surface); border-bottom: 1px solid var(--border); padding: var(--space-16) var(--space-32); }
 h1 { font: 800 var(--type-24) var(--font-display); letter-spacing: -.03em; max-width: 1100px; margin: auto; }
 .wordmark-accent { color: var(--accent-text); }
-main { max-width: 1164px; margin: auto; padding: var(--space-24) var(--space-32); }
+main { max-width: 1164px; margin: auto; padding: var(--space-16) var(--space-32); }
 .status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-12); margin-bottom: var(--space-16); color: var(--muted); font-size: var(--type-15); }
 .contract { background: var(--text); color: var(--background); padding: var(--space-6) var(--space-12); border-radius: var(--radius-10); font-weight: 600; }
 .tricks { margin-left: auto; background: var(--accent-soft); color: var(--accent-soft-text); padding: var(--space-8) var(--space-12); border-radius: var(--radius-10); font-weight: 600; }
-.table { background: var(--felt); color: var(--felt-text); border-radius: var(--radius-32); padding: var(--space-24); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr); grid-template-rows: auto 1fr auto; gap: var(--space-20); min-height: 690px; }
+.table { background: var(--felt); color: var(--felt-text); border-radius: var(--radius-32); padding: var(--space-16); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr); grid-template-rows: auto 1fr auto; gap: var(--space-8); }
 .dummy { grid-column: 1 / 4; text-align: center; }
 .seat-label, .opponent p { font: 500 var(--type-12) var(--font-mono); }
 .seat-label { margin-bottom: var(--space-12); }
@@ -26,9 +26,8 @@ main { max-width: 1164px; margin: auto; padding: var(--space-24) var(--space-32)
 .card-back { width: 44px; height: 60px; border-radius: var(--radius-6); background: var(--card-back); border: 2px solid var(--card-back-border); }
 .card-back + .card-back { margin-left: -32px; }
 .trick-area { grid-column: 2; grid-row: 2; width: min(100%, 200px); aspect-ratio: 1; border: 1px solid var(--felt-line); border-radius: var(--radius-pill); display: grid; place-items: center; justify-self: center; align-self: center; }
-.trick-area div { width: 66px; height: 94px; border: 2px dashed var(--card-back-border); border-radius: var(--radius-8); }
 .learner { grid-column: 1 / 4; min-width: 0; text-align: center; }
-.hand { display: flex; width: max-content; margin: auto; padding: var(--space-4) 0 var(--space-16); }
+.hand { display: flex; width: max-content; margin: auto; padding: var(--space-4) 0 var(--space-8); }
 .hand-suit { display: flex; }
 .hand-suit + .hand-suit, .hand .card + .card { margin-left: -36px; }
 .learner .seat-label { margin: 0; }
@@ -37,7 +36,7 @@ main { max-width: 1164px; margin: auto; padding: var(--space-24) var(--space-32)
   main { padding: var(--space-12); }
   .status { gap: var(--space-8); font-size: var(--type-13); }
   .tricks { padding: var(--space-6); }
-  .table { padding: var(--space-16) var(--space-8); border-radius: var(--radius-28); gap: var(--space-16) var(--space-4); min-height: 720px; grid-template-columns: 1fr 1.4fr 1fr; }
+  .table { padding: var(--space-16) var(--space-8); border-radius: var(--radius-28); gap: var(--space-8) var(--space-4); grid-template-columns: 1fr 1.4fr 1fr; }
   .trick-area { border: 0; }
   .opponent p { font-size: var(--type-11); }
 }
@@ -45,13 +44,43 @@ main { max-width: 1164px; margin: auto; padding: var(--space-24) var(--space-32)
    Add main padding (64px) and table padding (48px): one row needs 720px. */
 @media (max-width: 719px) {
   main { padding-inline: var(--space-12); }
-  .table { padding-inline: var(--space-8); }
+  .table { padding: var(--space-12) var(--space-8); }
   .hand-suit + .hand-suit, .hand .card + .card { margin-left: 0; }
   .hand { display: grid; grid-template-columns: auto auto; gap: var(--space-12) var(--space-8); }
-  .hand .card { width: 44px; height: 86px; margin: 0; border-radius: var(--radius-8); font-size: var(--type-18); padding: var(--space-4); }
+  .hand .card { width: 44px; height: 80px; margin: 0; border-radius: var(--radius-8); font-size: var(--type-18); padding: var(--space-4); }
 }
 /* Two suit columns need 4 × 44px + 3 × 44px + 8px gap = 316px.
    Add main padding (24px) and table padding (16px): two columns need 356px. */
 @media (max-width: 355px) {
   .hand { grid-template-columns: auto; }
+}
+
+/* UX §3.3: compass positions and confirmation; no legal-card styling. */
+.trick-area { position: relative; width: 220px; height: 220px; aspect-ratio: 1; }
+.played { position: absolute; width: 44px; margin: 0; }
+.played .card { width: 44px; height: 64px; padding: 4px; font-size: var(--type-18); }
+.played-north { top: 4px; left: calc(50% - 22px); }
+.played-west { top: calc(50% - 32px); left: 4px; }
+.played-east { top: calc(50% - 32px); right: 4px; }
+.played-south { bottom: 4px; left: calc(50% - 22px); }
+.led { position: absolute; bottom: -15px; left: 0; border-radius: 4px; padding: 1px 4px; background: var(--card-face); color: var(--suit-black); font: 600 var(--type-11) var(--font-mono); }
+button.card { position: relative; cursor: pointer; font-family: inherit; }
+.card[data-selected="true"] { transform: translateY(-12px); }
+.card:focus-visible { outline: 3px solid var(--felt-text); outline-offset: 2px; }
+.turn-banner { margin-bottom: var(--space-4); font-weight: 600; }
+.reason { min-height: 20px; margin-bottom: var(--space-4); }
+.action-bar { min-height: 64px; padding: var(--space-4) 0; display: flex; justify-content: flex-end; background: var(--background); }
+.action-bar button { min-width: 140px; min-height: 56px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--accent-soft); color: var(--accent-soft-text); font: 600 var(--type-18) var(--font-body); cursor: pointer; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* UX §3.1: compact phone trick area; footer stays in flow below the felt. */
+@media (max-width: 719px) {
+  .trick-area { width: 144px; height: 168px; border: 0; }
+  .played-north { top: 0; }
+  .played-south { bottom: 0; }
+  .played-west { left: 0; }
+  .played-east { right: 0; }
 }

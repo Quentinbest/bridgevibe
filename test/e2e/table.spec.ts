@@ -1,19 +1,28 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
-test('static table is accessible, responsive and follows the device theme', async ({ page }, testInfo) => {
+test('table is accessible, responsive and follows the device theme', async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   page.on('pageerror', error => errors.push(error.message));
+  await page.clock.install();
+  await page.clock.pauseAt(new Date());
   await page.goto('/');
   await page.evaluate(() => document.fonts.ready);
   await expect(page.getByRole('heading', { level: 1, name: 'BridgeVibe' })).toHaveCount(1);
-  await expect(page.getByRole('button')).toHaveCount(0);
+  await expect(page.getByText('West is playing', { exact: true })).toBeVisible();
+  await expect(page.getByText('Dummy · 13 cards', { exact: true })).toBeVisible();
   await expect(page.getByText('3NT', { exact: true })).toBeVisible();
   await expect(page.getByText('Declarer: South', { exact: true })).toBeVisible();
-  await expect(page.getByText('Tricks: 0 / 9', { exact: true })).toBeVisible();
-  const cards = page.getByRole('img');
-  await expect(cards).toHaveCount(26);
+  await expect(page.getByText('Need 9 tricks', { exact: true })).toBeVisible();
+  await expect(page.getByText('You 0 · Them 0', { exact: true })).toBeVisible();
+  await page.clock.runFor(500);
+  await expect(page.getByText('Play from dummy', { exact: true })).toBeVisible();
+  await expect(page.locator('.dummy .card')).toHaveCount(13);
+  await expect(page.locator('.hand .card')).toHaveCount(13);
+  await expect(page.locator('.trick-area .card')).toHaveCount(1);
+  const cards = page.locator('.card');
+  await expect(cards).toHaveCount(27);
   for (const card of await cards.all()) {
     const box = await card.boundingBox();
     expect(box).not.toBeNull();
@@ -38,7 +47,8 @@ test('static table is accessible, responsive and follows the device theme', asyn
     const card = el.getBoundingClientRect();
     return {
       left: card.left, right: card.right,
-      spans: [...el.querySelectorAll('span')].map(span => {
+      // The visible rank and suit; a playable card also carries a screen-reader-only name.
+      spans: [...el.querySelectorAll(':scope > span:not(.sr-only)')].map(span => {
         const box = span.getBoundingClientRect();
         return { left: box.left, right: box.right };
       }),
@@ -64,12 +74,50 @@ test('static table is accessible, responsive and follows the device theme', asyn
   const columnPositions = await columns.evaluateAll(elements => elements.map(el => { const r = el.getBoundingClientRect(); return { x: r.x, y: r.y }; }));
   expect(new Set(columnPositions.map(p => p.x)).size).toBe(4);
   expect(new Set(columnPositions.map(p => p.y)).size).toBe(1);
-  await expect(page.getByRole('region', { name: 'West', exact: true })).toHaveText('West · 13 cards');
+  await expect(page.getByRole('region', { name: 'West', exact: true })).toHaveText('West · 12 cards');
   await expect(page.getByRole('region', { name: 'East', exact: true })).toHaveText('East · 13 cards');
-  expect(await page.locator('.trick-area').innerText()).toBe('');
+  await expect(page.locator('.trick-area').getByRole('img', { name: '9 of spades' })).toBeVisible();
+  await expect(page.locator('.led')).toHaveText('LED');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  const accessibility = await new AxeBuilder({ page }).analyze();
-  expect(accessibility.violations.filter(v => ['serious', 'critical'].includes(v.impact ?? ''))).toEqual([]);
+  // UX §10: axe needs running timers; North's turn is stable without a robot timer.
+  await page.clock.resume();
+  async function checkAccessibility() {
+    const accessibility = await new AxeBuilder({ page }).analyze();
+    expect(accessibility.violations.filter(v => ['serious', 'critical'].includes(v.impact ?? ''))).toEqual([]);
+  }
+  await checkAccessibility();
+  const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });
+  await ace.click();
+  await expect(ace).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: 'Play it', exact: true })).toBeVisible();
+  if (viewportWidth !== 320) {
+    expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true);
+  }
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  const footer = await page.locator('.action-bar').boundingBox();
+  expect(footer).not.toBeNull();
+  for (const element of await page.locator('.card, .seat-label').all()) {
+    const box = await element.boundingBox();
+    expect(box).not.toBeNull();
+    const overlaps = box!.x < footer!.x + footer!.width && box!.x + box!.width > footer!.x
+      && box!.y < footer!.y + footer!.height && box!.y + box!.height > footer!.y;
+    expect(overlaps).toBe(false);
+  }
+  if (viewportWidth >= 720) {
+    const trick = await page.locator('.trick-area').boundingBox();
+    expect(trick!.width).toBe(220);
+    expect(trick!.height).toBe(trick!.width);
+  }
+  await checkAccessibility();
+  // Play North's spade, wait for East, then attempt an off-suit card from South.
+  await page.getByRole('button', { name: 'Play it', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'King of spades, playable', exact: true })).toBeVisible();
+  const heart = page.getByRole('button', { name: 'Ace of hearts', exact: true });
+  await heart.click();
+  await page.getByRole('button', { name: 'Play it', exact: true }).click();
+  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Play spades; you still have that suit.');
+  await expect(heart).toHaveAttribute('aria-pressed', 'false');
+  await checkAccessibility();
   const initial = await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor);
   expect(initial).toBe(testInfo.project.use.colorScheme === 'dark' ? 'rgb(17, 18, 26)' : 'rgb(246, 244, 238)');
   await page.emulateMedia({ colorScheme: testInfo.project.use.colorScheme === 'dark' ? 'light' : 'dark' });

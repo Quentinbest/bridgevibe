@@ -5,6 +5,16 @@ import hooks from 'eslint-plugin-react-hooks';
 import refresh from 'eslint-plugin-react-refresh';
 export default [
   { ignores: ['node_modules/**', 'dist/**', 'test-results/**', 'playwright-report/**', '.delegate-ref/**'] },
+  // ADR-0001: Seat Views can only be manufactured inside Table.
+  { files: ['**/*.{ts,tsx}'], ignores: ['src/table/**'], rules: {
+    'no-restricted-syntax': ['error', {
+      selector: ':matches(TSAsExpression, TSTypeAssertion) > TSTypeReference[typeName.name="SeatView"]',
+      message: 'Only table constructs SeatView; request one from the Table API.',
+    }],
+  } },
+  { files: ['src/robots/**'], rules: {
+    'no-restricted-imports': ['error', { patterns: [{ group: ['*'], importNames: ['Deal', 'PlaythroughRecord'], message: 'Robots receive SeatView only (ADR-0001).' }] }],
+  } },
   js.configs.recommended, ...tseslint.configs.recommended,
   { languageOptions: { globals: { ...globals.node, ...globals.browser } } },
   // App source runs in the browser only; tests and tooling also run in Node.
