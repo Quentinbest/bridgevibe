@@ -82,3 +82,12 @@ test('collection announces the winner before the next lead banner', () => {
   advance(1); expect(banner.textContent).toBe("Dummy's lead");
   expect(within(screen.getByRole('region', { name: 'North · Dummy' })).getAllByRole('button')).toHaveLength(12);
 });
+test('a rejected confirmation returns focus to the rejected card', () => {
+  vi.useFakeTimers(); render(<App />); advance(500); // West leads a spade; Dummy (North) must follow.
+  const queen = screen.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades" });
+  queen.focus(); fireEvent.click(queen);
+  const confirm = screen.getByRole('button', { name: 'Play it, Queen of hearts' });
+  confirm.focus(); fireEvent.click(confirm);
+  expect(screen.getByText('Play spades; you still have that suit.')).toBeTruthy();
+  expect(document.activeElement).toBe(screen.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades" }));
+});

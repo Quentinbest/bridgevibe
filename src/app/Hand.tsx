@@ -12,6 +12,11 @@ export function Hand({ cards, dummy = false, active, legalCards, ledSuit, select
   const clampedIndex = Math.max(0, Math.min(focusIndex, ordered.length - 1));
   const buttons = useRef<Array<HTMLButtonElement | null>>([]);
   useEffect(() => { if (active) buttons.current[clampedIndex]?.focus({ preventScroll: true }); }, [active, clampedIndex]);
+  // UX §10: when the confirmation button unmounts (a play was rejected), focus returns to the hand's tab stop,
+  // which is the card the learner last focused, unless focus is already on one of this hand's cards.
+  useEffect(() => {
+    if (active && !selected && !buttons.current.some(button => button === document.activeElement)) buttons.current[clampedIndex]?.focus({ preventScroll: true });
+  }, [active, selected, clampedIndex]);
   function choose(card: TableCard) {
     if (selected && sameCard(selected, card)) onPlay(card);
     else onSelect(card);
