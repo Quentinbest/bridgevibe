@@ -23,6 +23,7 @@ export const catalogue = {
   "led": { text: "LED", status: 'draft' },
   "trick": { text: "Current trick", status: 'draft' },
   "card.playable": { text: "{card}, playable", status: 'draft' },
+  "card.unplayable": { text: "{card}, can't play: you must follow {suit}", status: 'draft' },
   "dummy.hidden": { text: "Dummy · {count} cards", status: 'draft' },
 
   "product": { text: "BridgeVibe", status: 'draft' },

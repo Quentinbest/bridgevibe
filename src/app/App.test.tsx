@@ -25,11 +25,12 @@ test('real composition and React controls play all 52 cards under StrictMode', (
     if (entry.index % 4 === 3) advance(1000);
   }
   expect(screen.getByText('You took 6 of 13 tricks (needed 9)')).toBeTruthy();
-  expect(screen.getByRole('log').children).toHaveLength(65);
+  // 52 card plays; trick winners are announced by the banner, not the log.
+  expect(screen.getByRole('log').children).toHaveLength(52);
 });
 test('off-suit rejection lowers the selected card and roving arrows and Escape preserve the hand', () => {
   vi.useFakeTimers(); render(<App />); advance(500);
-  const queen = screen.getByRole('button', { name: 'Queen of hearts' });
+  const queen = screen.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades" });
   fireEvent.click(queen); fireEvent.click(queen);
   expect(queen.getAttribute('aria-pressed')).toBe('false');
   expect(screen.getByText('Play spades; you still have that suit.').getAttribute('aria-live')).toBe('assertive');

@@ -5,7 +5,7 @@ import { fixedDeal } from '../src/app/fixture';
 // US-01 / §5.2: shared first-legal learner strategy at Table and UI seams.
 export function firstLegal(table: Playthrough, seat: Seat) { return table.legalActions(seat)[0]; }
 export function fixedPlaythrough() {
-  return startPlaythrough({ deal: fixedDeal, contract: { level: 3, strain: 'no-trumps', declarer: 'south' } });
+  return startPlaythrough({ deal: fixedDeal, contract: { level: 3, strain: 'no-trumps', declarer: 'south' }, learnerSide: 'northSouth' });
 }
 export function completeFixedDeal() {
   const table = fixedPlaythrough();

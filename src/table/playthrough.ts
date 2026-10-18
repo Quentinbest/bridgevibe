@@ -50,14 +50,20 @@ function isAction(value: unknown): value is Action {
     && SUITS.some(suit => suit === card.suit) && RANKS.some(rank => rank === card.rank);
 }
 let nextId = 0;
-export function startPlaythrough(input: { deal: Deal; contract: Contract }) {
+export function startPlaythrough(input: { deal: Deal; contract: Contract; learnerSide: Side }) {
   // INV-2: take ownership of the input; no returned object aliases mutable Table state.
   const deal: Deal = JSON.parse(JSON.stringify(input.deal));
   const contract = { ...input.contract };
   const playthroughId = `playthrough-${++nextId}`;
   const hands = { north: [...deal.hands.north], east: [...deal.hands.east], south: [...deal.hands.south], west: [...deal.hands.west] };
   const dummySeat = nextSeat(nextSeat(contract.declarer));
-  const learnerSide = sideOf(contract.declarer);
+  // US-02.1: the learner sits South, so their side is North–South.
+  if (input.learnerSide !== 'northSouth') throw new Error('The learner sits South: learnerSide must be northSouth');
+  const learnerSide = input.learnerSide;
+  // ADR-0003: when the learner's side declares, the learner controls Declarer and Dummy; in defence,
+  // only South. Robots control every other Seat, and Dummy always follows Declarer's controller.
+  const learnerSeats: readonly Seat[] = sideOf(contract.declarer) === learnerSide ? [contract.declarer, dummySeat] : ['south'];
+  const controllerOf = (seat: Seat): Controller => (learnerSeats.includes(seat) ? 'learner' : 'robot');
   let turn: Seat | null = nextSeat(contract.declarer);
   let status: Status = 'in-progress';
   let currentTrick: PlayedCard[] = [];
@@ -88,11 +94,10 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract }) {
     if (status === 'completed') return reject('playthrough-complete');
     if (!SEATS.some(candidate => candidate === seat) || (controller !== 'learner' && controller !== 'robot') || !isAction(action)) return reject('malformed-action');
     const actingSeat = seat as Seat;
-    const expectedController = sideOf(actingSeat) === learnerSide ? 'learner' : 'robot';
-    if (actingSeat !== dummySeat && controller !== expectedController) return reject('malformed-action', { cause: 'controller' });
+    if (actingSeat !== dummySeat && controller !== controllerOf(actingSeat)) return reject('malformed-action', { cause: 'controller' });
     if (actingSeat !== turn) return reject('not-your-turn');
     // ADR-0003: Dummy belongs to Declarer's controller, never an independent robot.
-    if (actingSeat === dummySeat && controller !== 'learner') return reject('only-declarer-plays-dummy');
+    if (actingSeat === dummySeat && controller !== controllerOf(contract.declarer)) return reject('only-declarer-plays-dummy');
     const index = hands[actingSeat].findIndex(card => sameCard(card, action.card));
     if (index < 0) return reject('card-not-held');
     const led = currentTrick[0]?.card.suit;
@@ -121,6 +126,6 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract }) {
     }
     return { kind: 'accepted', events };
   }
-  return { legalActions, seatView, record, submit };
+  return { legalActions, seatView, record, submit, controllerOf };
 }
 export type Playthrough = ReturnType<typeof startPlaythrough>;

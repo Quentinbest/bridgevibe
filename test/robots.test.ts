@@ -5,7 +5,7 @@ import { card, dealWith } from './deals';
 const contract: Contract = { level: 3, strain: 'hearts', declarer: 'south' };
 function view(hand: Card[], led?: Card, strain: Contract['strain'] = 'hearts'): SeatView {
   const deal = dealWith(led ? { west: [led], north: hand } : { west: hand });
-  const table = startPlaythrough({ deal, contract: { ...contract, strain } });
+  const table = startPlaythrough({ deal, contract: { ...contract, strain }, learnerSide: 'northSouth' });
   if (led) table.submit('west', 'robot', { kind: 'play-card', card: led });
   return table.seatView(led ? 'north' : 'west');
 }
