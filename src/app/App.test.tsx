@@ -20,7 +20,7 @@ test('real composition and React controls play all 52 cards under StrictMode', (
       expect(region.contains(document.activeElement)).toBe(true);
       fireEvent.click(button);
       expect(button.getAttribute('aria-pressed')).toBe('true');
-      fireEvent.click(screen.getByRole('button', { name: 'Play it' }));
+      fireEvent.click(screen.getByRole('button', { name: /^Play it, / }));
     }
     if (entry.index % 4 === 3) advance(1000);
   }
@@ -40,7 +40,7 @@ test('off-suit rejection lowers the selected card and roving arrows and Escape p
   expect(document.activeElement).toBe(five);
   fireEvent.click(five); fireEvent.keyDown(five, { key: 'Escape' });
   expect(five.getAttribute('aria-pressed')).toBe('false');
-  expect(screen.queryByRole('button', { name: 'Play it' })).toBeNull();
+  expect(screen.queryByRole('button', { name: /^Play it, / })).toBeNull();
   expect(within(screen.getByRole('region', { name: 'North · Dummy' })).getAllByRole('button')).toHaveLength(13);
 });
 

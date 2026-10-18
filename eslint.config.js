@@ -13,7 +13,12 @@ export default [
     }],
   } },
   { files: ['src/robots/**'], rules: {
-    'no-restricted-imports': ['error', { patterns: [{ group: ['*'], importNames: ['Deal', 'PlaythroughRecord'], message: 'Robots receive SeatView only (ADR-0001).' }] }],
+    // §4.2 rule 2: no type that carries a full deal, so an allowlist rather than a blocklist.
+    'no-restricted-imports': ['error', { patterns: [{
+      group: ['**/table', '**/table/**'],
+      allowImportNames: ['SeatView', 'Card', 'Suit', 'Rank', 'Seat', 'Side', 'Contract', 'PlayedCard', 'Trick', 'SUITS', 'RANKS', 'SEATS', 'sameCard', 'sideOf'],
+      message: 'Robots receive SeatView only (ADR-0001); import only seat-view types and card helpers from table.',
+    }] }],
   } },
   js.configs.recommended, ...tseslint.configs.recommended,
   { languageOptions: { globals: { ...globals.node, ...globals.browser } } },
