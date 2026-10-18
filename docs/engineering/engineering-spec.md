@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | **Draft v0.1, for engineering lead, owner and teacher review** |
-| Date | 2026-10-18 |
+| Status | **Draft v0.2, for engineering lead, owner and teacher review** |
+| Date | 2026-10-18 (v0.2 adds the edge-case and failure-mode review, §7.4) |
 | Derived from | `docs/PRD.md` v0.2 · `GLOSSARY.md` · `docs/adr/0001`–`0004` · `docs/domain/open-questions.md` · `docs/ux/ux-spec.md` v0.1 |
 | Scope | MVP (phase **M**), with the Integration Validation Exercise (phase **V**) marked. Phase V parts are implementation-ready. Phase M parts are ready except where marked **Gate** |
 
@@ -92,8 +92,9 @@ Phase V, M · ADR-0002, INV-13, FR-R7, FR-R9
 
 - US-04.1 Each playthrough keeps a `PlaythroughRecord` (§4.4) containing every accepted action in order, with its seat, controller and provenance.
 - US-04.2 Replay rebuilds every position from the record alone. Replaying a record made with robot policy version *n* gives the identical sequence under version *n+1*.
-- US-04.3 The record can be exported as PBN (deal, contract and play) and imported again without loss (round-trip fixtures). Malformed PBN is rejected with a parse error (FR-R7, Should).
+- US-04.3 The record can be exported as PBN and imported again. Contract Bridge deals, auctions and play round-trip without loss. PBN has no tags for MiniBridge setup (announcements, objective), so those travel in a PlayBridge-specific supplemental tag and are dropped by other tools; the JSON export is the lossless format. Malformed PBN is rejected with a parse error (FR-R7, Should).
 - US-04.4 *(M)* A retry creates a new playthrough whose record starts with a copy of the parent's actions up to the chosen position, plus a link to the parent and the position.
+- US-04.5 Practice has no undo. Undoing after robots have played would reveal cards and let the learner replay with hindsight. A mis-tap is prevented by the UX's confirm-to-play (U-10), not repaired afterwards. Undo in lessons (FR-R9) steps back to an earlier step; attempts already recorded are never erased.
 
 **US-05. The rules core runs in browser and Node.** *As an engineer, I want the rules core to run unchanged in both runtimes, so that a server can become authoritative for multiplayer later.*
 Phase M (the suite runs in both runtimes from V; see §5.2) · FR-R6
@@ -130,7 +131,7 @@ Phase M · FR-R3, FR-E1, glossary *Auction*, *Double*, *Redouble*
 - US-08.2 A double is legal only when the last bid is an opponent's and has not been doubled; passes may intervene. Otherwise it is rejected with `double-not-allowed`.
 - US-08.3 A redouble is legal only when the last bid is the caller's own side's, has been doubled by an opponent, and has not been redoubled. Otherwise it is rejected with `redouble-not-allowed`.
 - US-08.4 Three initial passes do not end the auction. Four passes are a pass-out: status *passed out*, score 0, no play (Q11).
-- US-08.5 After any bid, three consecutive passes end the auction. Declarer is the first player of the declaring side to have named the final strain.
+- US-08.5 Once any bid has been made, three consecutive passes end the auction, whether the last other call was a bid, a double or a redouble (for example, 1♥ X Pass Pass Pass ends with 1♥ doubled). Declarer is the first player of the declaring side to have named the final strain.
 - US-08.6 Unknown calls, fractional levels and out-of-range input are rejected at run time with `malformed-action`.
 - US-08.7 The fixtures include pass-out, three passes followed by an opening bid, doubling partner's bid, doubling twice, and an illegal redouble.
 
@@ -153,6 +154,7 @@ Phase V, M · FR-BOT1, CI-9, ADR-0001, INV-4, VAL-05
 - US-10.1 The robot policy interface accepts only a seat view, the convention profile, a seed and a deadline (§4.3.3). It is not possible to give it a deal.
 - US-10.2 In test builds, every message sent to a robot worker is checked automatically. It must contain no card hidden from that seat (VAL-05 inspection).
 - US-10.3 F3 (20 positions × 10 permutations of hidden cards, all consistent with public information including announced HCP and revealed voids) gives identical robot actions with fixed seeds: zero failures.
+- US-10.4 Robot actions are shown after a delay that doesn't depend on how long the robot took to decide, or on whether the play was forced. Thinking time would otherwise tell the learner about hidden cards, as a hesitation does at a real table.
 
 **US-11. Robots play legal, plausible, principled cards.** *As a teacher, I want robots to follow basic beginner principles, so that finesses and other lesson points behave realistically.*
 Phase V (FR-BOT6 Should), M (Must) · FR-BOT2, FR-BOT6
@@ -167,6 +169,9 @@ Phase V, M · FR-BOT3, NFR-P4, INV-7
 - US-12.1 A robot decision takes at most 1.5 s at the 95th percentile on both reference phones (provisional budget).
 - US-12.2 When the deadline passes, the robot takes a fallback action from the fallback policy (§4.6.6). The action is marked `fallback: timeout` in its provenance.
 - US-12.3 The benchmark report states the fallback rate per device.
+- US-12.4 When the app is in the background or the screen is off, deadlines pause. On return, an interrupted decision is requested again; it is never replaced by a fallback because the phone throttled the worker.
+- US-12.5 If an engine worker crashes or runs out of memory, the robot takes a fallback action marked `fallback: engine-failure`, and the worker is restarted. After repeated failures in one session (threshold Proposed), the app stops calling that engine for the rest of the session, and every analysis statement becomes an *unavailable* abstention.
+- US-12.6 Robots and the core loop (lessons, play, rules feedback, score) work when WebAssembly is unavailable or blocked (for example, iOS Lockdown Mode or a locked-down school browser). Only analysis-backed features abstain. In V, the robot policy therefore uses no solver.
 
 **US-13. Robot calls follow the profile or say they don't.** *As a learner, I want robot calls that mean what the system says.*
 Phase M · FR-B2, FR-B3, INV-7, INV-8
@@ -187,6 +192,9 @@ Phase V (tiers a and c), M (tier b) · FR-H1–H5, CI-1, CI-4, CI-6, INV-4, INV-
 - US-14.6 Tier (c) abstains with *uncertain* when sample confidence is below the threshold (U-02), and with *unavailable* when the solver fails or misses its deadline. The abstention says which.
 - US-14.7 Each hint states a reason (principle or facts), not just a card (FR-H4, M; teacher review).
 - US-14.8 F3 permutations give identical hint statements, with fixed seeds.
+- US-14.10 In an exercise where an exposure has shown hidden cards, tier (c) is not offered, because an estimate that treats visible cards as unknown would contradict the screen. Only tier (a) is offered there.
+- US-14.11 On a forced play, the hint states that only one card (or class of equivalent cards) is legal, with no sampling. During the MiniBridge contract choice, the hint is authored (tier a) or a *not covered* abstention; tier (c) covers card play only.
+- US-14.12 A hint is tied to the position it was asked for. If the learner acts before it arrives, it is discarded, never shown against the new position.
 - US-14.9 *(M)* **Tier (b):** principle hints come from teacher-approved rules and carry their rule ID.
 
 **US-15. Lesson hints don't leak hidden cards.** *As a teacher, I want the pipeline to stop me from writing a hint that reveals hidden cards.*
@@ -203,7 +211,8 @@ Phase V, M · FR-RV1, INV-5, INV-6, INV-13
 - US-16.1 Review is available only for a playthrough whose status is *completed*. *(M)* For *passed out*, review shows the auction only.
 - US-16.2 Replay steps through setup (MiniBridge announcements; the auction in M), then trick by trick, using only the record.
 - US-16.3 Every `ALL_HANDS` statement carries the hindsight label (VAL-07: 100%).
-- US-16.4 No `ALL_HANDS` statement, and no hidden card, reaches the UI before the playthrough is completed.
+- US-16.4 No `ALL_HANDS` statement, and no hidden card, reaches the UI before the playthrough is completed. This includes the page structure and the accessibility tree: the UI is built from the learner view, which has no identities for hidden cards, so face-down cards cannot be read by a screen reader or by inspecting the page.
+- US-16.5 An *abandoned* playthrough has no review, because its hidden cards were never meant to be revealed.
 
 **US-17. See what each of my card plays cost, in hindsight.** *As a learner, I want to know how many tricks each of my plays cost with all cards visible.*
 Phase V, M · FR-RV2
@@ -221,9 +230,11 @@ Phase V (curated F4 cases), M (all deals) · FR-RV3, CI-3, INV-9, INV-11
 - US-18.2 Each key moment has an assessment of *sound*, *good decision, unlucky layout*, *lucky* or *mistake*, from decision quality and outcome (glossary *Decision Assessment*).
 - US-18.3 Decision quality comes from the teacher label for that position when one exists. Otherwise it comes from the sampled estimate on the **historical seat view** at that position, within the acceptability tolerance of the best alternative (provisional: 0.25 tricks over at least 50 samples).
 - US-18.4 If decision quality can't be established (no label, and the estimate is uncertain or unavailable), the assessment shows the outcome as an `ALL_HANDS` fact plus an *uncertain* abstention on quality. It is never *mistake* or *lucky*.
-- US-18.5 On F4, zero decisions labelled acceptable by the teachers are assessed as *mistake* (VAL-07). This includes at least five decisions where the correct play loses.
+- US-18.5 On F4, zero decisions labelled acceptable by the teachers are assessed as *mistake* (VAL-07). This includes at least five decisions where the correct play loses. Decision points on which the two teachers did not reach a resolved label are excluded from VAL-07 and listed in the report.
 - US-18.6 A *lucky* decision is never worded as praise (template review, CI-8).
 - US-18.7 *(M)* Calls can be key moments. Their quality comes from the expected call and the accepted alternatives, and their outcome is not assessed.
+- US-18.8 The review never contradicts a hint without saying so. Hints and review use the same sample derivation for a position (§4.6.5). If the learner followed a tier (c) hint and the review's larger sample would call the play *not acceptable*, decision quality is *uncertain*, and the review explains that the estimate was close.
+- US-18.9 A teacher label applies only when the playthrough reaches exactly the labelled position: the same deal and the same sequence of actions. If the learner took a different line earlier, the label is not used.
 
 **US-19. Retry from a key moment.** *As a learner, I want to try a key moment again.*
 Phase M · FR-RV4, FR-R9, INV-16, Q6
@@ -287,6 +298,8 @@ Phase V, M · FR-L5, FR-L4, ADR-0004, INV-2, INV-15
 - US-27.1 The pipeline rejects a deal that doesn't have 52 distinct cards with 13 per hand.
 - US-27.2 Every scripted action is checked **by the same rules core** (INV-1). A script that plays a card the seat doesn't hold, or that fails to follow suit, is rejected.
 - US-27.3 Every expected answer must be legal at its prompt's position, and consistent with the script.
+- US-27.3a If an expected answer differs from the script's card at that prompt (an accepted alternative), the check replays the rest of the script after that answer. The script must stay legal, and the trick winners it assumes must not change; otherwise the author must mark the alternative "accept, then continue with the scripted card".
+- US-27.3b The check warns when a card equivalent to an expected answer is not itself listed as expected. The author must accept it or record why not (Bridge-Classroom accepted only ♠J where the prose also accepted the equivalent ♠Q).
 - US-27.4 Commentary that names an answer refers to the prompt's expected answers by structured reference, so the prose cannot drift from the answers (Proposed, U-11).
 - US-27.5 A MiniBridge exercise deal that is 20–20 is rejected.
 - US-27.6 *(M)* A new version of an existing content ID that changes the deal, position, script, a prompt's question or its expected answers is rejected. Those changes need a new content ID (ADR-0004).
@@ -298,9 +311,12 @@ Phase M · FR-P1, FR-P3, FR-P4, INV-15, INV-16
 
 - US-28.1 Attempts and completions survive a reload.
 - US-28.2 Lesson completion = every prompt the lesson's current version declares has an attempt. The denominator is the lesson's declared prompts.
-- US-28.3 Export, then wipe, then import restores progress exactly. An import with an unknown schema version is rejected with a message, and existing data is left unchanged.
+- US-28.3 Export, then wipe, then import restores progress exactly. Import replaces the current progress after a confirmation, and the current progress is exported automatically first. An import file is treated as untrusted: it is size-limited and schema-validated, and every record in it is replayed through the Table. A file with an unknown or newer schema version, or any invalid record, is rejected with a message, and existing data is left unchanged.
 - US-28.4 Attempts on older content versions remain valid. When a lesson replaces an item with a new content ID, its completion counts the new item.
 - US-28.5 No UI copy or stored field uses "mastery".
+- US-28.6 The app asks the browser for persistent storage. Safari can delete a site's stored data after 7 days without a visit unless the app was added to the home screen, and school computers often wipe storage at logout. The app therefore offers "add to home screen" and the progress file as calm, optional suggestions; it never uses loss-framed copy (NFR-S). The device test plan includes a storage-eviction check on the reference iPhone.
+- US-28.7 When storage is full, the app removes the oldest recent-deal records and their cached review facts first. It never removes attempts or completions, and it tells the learner if anything was removed.
+- US-28.8 Every attempt records whether a hint was used before the answer. Whether hint use changes the outcome is U-15.
 
 **US-29. Skill tags.** Phase M (Should) · FR-P2. *As a teacher, I want items tagged with skills.* US-29.1 Every MVP item has at least one tag from the stable taxonomy, and the pipeline rejects unknown tags.
 
@@ -312,6 +328,9 @@ Phase M · FR-R10, Q7
 - US-31.1 Closing the app mid-trick and reopening it restores the same position on the same device.
 - US-31.2 A resumed playthrough's record is identical to one that was never interrupted.
 - US-31.3 The trigger that marks a playthrough *abandoned* is defined (U-09; UX proposes 7 days).
+- US-31.4 Only one tab writes progress at a time. A second tab opened on the same device becomes read-only and says so, with an option to take over.
+- US-31.5 Each accepted action is appended to the stored record atomically with the playthrough state, so a killed tab loses at most the action in flight. On load, the record is replayed through the Table. A record that no longer replays (for example, after a rules-core fix) is kept, marked as unreplayable, and stays exportable; it is never silently changed.
+- US-31.6 An app update takes effect only between playthroughs. If an in-progress playthrough's convention profile, engine or content version is no longer available after an update, it is closed as *abandoned* with a one-line explanation rather than continued under a different version (INV-8, ADR-0002).
 
 ### 3.11 Bidding explanations (M)
 
@@ -339,6 +358,7 @@ Phase M · FR-B4, CI-6
 **US-36. Age gate and privacy.** Phase M · NFR-S
 - US-36.1 First launch asks a neutral age question. Under-13s get the UX §2.2 screen and cannot continue to lessons.
 - US-36.2 No network request carries personal data. Analytics and error reporting are off until the learner consents.
+- US-36.3 The app stores only the age gate's result (13 or over), not the age itself.
 
 **US-37. Works offline after first load.** Phase M (Should) · NFR-C3. US-37.1 Lessons, practice and review work with the network disabled, if the gate selects a browser-only architecture.
 
@@ -360,6 +380,7 @@ Phase V, M · NFR-M1, NFR-M2, G5
 
 - US-41.1 Each engine adapter passes its port's contract suite (§5.2). Replacing one adapter with another needs no change outside the composition root.
 - US-41.2 Every third-party engine is pinned to an exact version or commit, and that version appears in provenance.
+- US-41.3 The main thread and each engine worker exchange a protocol version when the worker starts. On a mismatch (for example, a cached worker after an app update), the worker is reloaded before any request is sent.
 
 **US-42. Every solver candidate is proven correct.** *As an engineer, I want each solver binding checked against two references.*
 Phase V · VAL-03, F2
@@ -374,7 +395,7 @@ Phase V · T2, NFR-P1–P6, VAL-04, F7
 
 **US-44. Permutation test.** Phase V, M (re-run on full bridge in M) · CI-9, F3, VAL-05. *As an engineer, I want hidden-card leaks caught automatically.* US-44.1 The suite builds playthroughs from deals that differ only in cards hidden from the tested seat, with identical public history. Robot actions and `VISIBLE` statements are identical, with zero failures. The test runs at the composition seam, not on an isolated function (§5.3).
 
-**US-45. Fault injection.** Phase V, M · CI-4, VAL-06. *As an engineer, I want every failure to produce an honest abstention.* US-45.1 Forcing a solver timeout, a solver error, an uncovered situation and low sample confidence each produces the matching abstention reason. There are zero silent fallbacks.
+**US-45. Fault injection.** Phase V, M · CI-4, VAL-06. *As an engineer, I want every failure to produce an honest abstention.* US-45.1 Forcing a solver timeout, a solver error, a worker crash, a worker protocol mismatch, an uncovered situation, low sample confidence and a sampler that finds no consistent layout each produces the matching abstention or marked fallback. There are zero silent fallbacks.
 
 **US-46. Licence bill of materials.** *As the owner, I want every shipped artefact licensed.*
 Phase V, M · LR-1–LR-7, T3, VAL-10
@@ -383,6 +404,7 @@ Phase V, M · LR-1–LR-7, T3, VAL-10
 - US-46.2 Licences are read from the actual licence files, not from repository metadata (LR-7).
 - US-46.3 The build fails on any artefact without an explicit grant, any GPL code in the browser bundle (LR-4), or any EPBot or BBA code, binary, derived model or run-time call (LR-3).
 - US-46.4 If pons is a candidate, the built artefact is checked for the `american_bba_*` weights, and the check fails if they are present.
+- US-46.5 Card faces, suit symbols, icons and fonts are in the bill of materials like code. Free card artwork is often under copyleft or non-commercial licences.
 
 **US-47. Bidding comparison harness.** Phase V · T5, VAL-11. *As a teacher, I want the candidate bidding engines' calls side by side.* US-47.1 For each candidate and each of the 30 auctions, the harness records the call, its rule ID or *not covered*, and its explanation text, in a sheet for both teachers to grade.
 
@@ -494,6 +516,8 @@ Review accepts only a completed record. The check is structural (only **table** 
 
 - **Envelope:** request ID, operation, payload, deadline, cancellation ID.
 - **Responses:** result, abstention or error, each with provenance.
+- **Position key:** every request and response that concerns a position carries the playthrough ID and a position key (a digest of the deal and the sequence of accepted actions). A response whose key no longer matches the current position is discarded (US-14.12). Review results are cached by record ID and engine versions.
+- **Protocol version:** exchanged at worker start (US-41.3).
 - **Test builds** run an **audit hook** that, for every payload addressed to a robot or `VISIBLE` operation, checks that the payload contains only cards in the named seat's view. A violation fails the test (US-10.2).
 
 ### 4.4 Data models
@@ -512,12 +536,12 @@ Schemas are versioned. Each persisted or exported document carries a `schemaVers
 | `Statement` | fact ID or abstention, template ID, locale, rendered text, information mode, hindsight label flag | Exactly one mode (INV-5) |
 | `Abstention` | reason (`not-covered`, `uncertain`, `unavailable`), cause detail, provenance | Never replaced by a substantive default (INV-7) |
 | `DecisionAssessment` | decision index, quality (`acceptable`, `not-acceptable`, `uncertain`), quality source (`teacher-label`, `sampled`), outcome (trick cost), verdict (sound, unlucky, lucky, mistake, or none when quality is uncertain) | INV-9 |
-| `TeacherLabel` | deal ID, position index, decision candidates, label per candidate, the two graders, resolution note | F4 input (T7a) |
+| `TeacherLabel` | deal ID, position key (the sequence of actions leading to the decision, not just its index; US-18.9), decision candidates, label per candidate, the two graders, resolution note | F4 input (T7a) |
 | `Lesson` | contentId, version, game format, convention profile ref *(M)*, exercises (content ID + version), skill tags, rights record, sign-offs | |
 | `Exercise` | contentId, version, deal or starting position, script, steps, teaching claim *(optional, FR-C2)* | Validity-checked (US-27) |
 | `Step` | kind: commentary (template or string refs, answer references), exposure (cards), scripted action, prompt | |
 | `Prompt` | promptId, answer kind (card, call, number, choice), expected answers, `countsRejections` (default false), hint (text ref plus referenced cards), skill tags | Q3, Q12 |
-| `Attempt` | prompt content ID + version, outcome, time, playthrough ID | Never created in a retry (INV-16) |
+| `Attempt` | prompt content ID + version, outcome, hint used, time, playthrough ID | Appended, never overwritten; replaying a lesson adds attempts. Never created in a retry (INV-16) |
 | `SignOff` | content ID + version, teacher, date, scope | INV-12 |
 | `RightsRecord` | content ID, source, licence or written grant reference | LR-5, FR-C4 |
 | `ProgressExport` | schemaVersion, attempts, completions, settings, records of in-progress and recent playthroughs | FR-P4 |
@@ -570,7 +594,7 @@ This is one solver call per decision, at most 26 per playthrough when the learne
 #### 4.6.5 Decision quality and key moments (Proposed, U-02, U-03)
 
 1. Use the teacher label, if one exists, for (deal ID, position index).
-2. Otherwise, run the sampled estimator on the **historical** `SeatView` at that position. The decision is *acceptable* when its expected tricks are within the tolerance of the best class (provisional: 0.25 tricks over at least 50 samples, CI-3). Below the minimum number of samples, quality is *uncertain*, unless the layouts were enumerated.
+2. Otherwise, run the sampled estimator on the **historical** `SeatView` at that position. Sample seeds derive from the position key, so the review's samples include the hint's samples for the same position (US-18.8). The decision is *acceptable* when its expected tricks are within the tolerance of the best class (provisional: 0.25 tricks over at least 50 samples, CI-3). Below the minimum number of samples, quality is *uncertain*, unless the layouts were enumerated.
 3. **Budget (M):** sampling every decision is too costly on phones (50 samples × up to 26 decisions). Sample in this order, within a time budget:
    - decisions with a trick cost above zero (to separate *unlucky* from *mistake*);
    - then zero-cost decisions where the double-dummy values of the candidates differed (candidates for *lucky*).
@@ -590,8 +614,10 @@ The teachers review the fallback policy, because its actions can show up in play
 #### 4.6.7 Layout sampler
 
 - Deals the hidden cards to the hidden seats under the public constraints: exact announced HCP (V), revealed voids, cards already played, and, in M, auction-implied ranges and shapes.
-- Uses rejection sampling with a deterministic seed. When the number of consistent layouts is small enough to list (threshold Proposed), it enumerates them and sets the enumeration flag (full confidence).
-- Auction-inference constraints are an M extension (PRD §13.2).
+- Uses rejection sampling with a deterministic seed and a bounded number of tries. When the number of consistent layouts is small enough to list (threshold Proposed), it enumerates them and sets the enumeration flag (full confidence). When the tries run out, or no layout is consistent, the result is an *uncertain* abstention, never a partial answer.
+- **Fixed sample counts.** Each use (robot, hint, review) has a fixed sample count. If the deadline arrives first, the result is a fallback or abstention, never an average over however many samples a fast or slow phone managed. Otherwise outputs would differ by device and break determinism (FR-BOT4) and the permutation test.
+- **Ties** between candidates with equal value are broken by a fixed rule (Proposed: the lowest card of the class, then suit order), for robots, hints and the fallback policy.
+- Auction-inference constraints are an M extension (PRD §13.2). **Constraint reliability (M, Proposed):** only calls that matched a bidding rule create constraints; fallback calls create none. The learner often bids outside the system, so if constraints taken from the learner's calls leave no consistent layout, they are dropped for that query and the relaxation is recorded in provenance.
 
 ### 4.7 Performance and runtime constraints
 
@@ -602,13 +628,16 @@ The teachers review the fallback policy, because its actions can show up in play
 | Robot ≤ 1.5 s | NFR-P4 | Deadline plus fallback; no sampling on the robots' critical path in V (PRD §13.4) |
 | No main-thread task > 200 ms | NFR-P5 | All engines in workers; record replay is incremental |
 | Memory measured; no crash in a 100-deal soak | NFR-P6 | Worker teardown and reuse policy measured in T2 |
-| Hint tier (c) latency | **No PRD budget** | U-01 (Proposed: ≤ 3 s at the 95th percentile, with a visible "thinking" state, and the sample count set from T2's cost per sample) |
+| Hint tier (c) latency | **No PRD budget** | U-01 (Proposed: ≤ 3 s at the 95th percentile, with a visible "thinking" state, and the sample count set from T2's cost per sample). Early-trick positions are the slowest to solve, so tier (c) may start speculatively when the learner's turn begins (hints on), and is cancelled when they act. It uses only the seat view, so this is allowed by ADR-0001 |
+| Background tabs and screen-off | Mobile browsers | Deadlines pause while the page is hidden (US-12.4) |
 | Cross-origin isolation (COOP/COEP) | NFR-C2 | Needed only if a threaded build is selected (**Gate**); the V internal host serves the headers for the threaded T2 variant |
 
 ### 4.8 Determinism and versions (ADR-0002)
 
 - Every robot action and fact records the engine name and version. Records are never re-simulated.
 - Determinism tests pin the seed, learner actions and engine versions, and they disable deadlines, so no fallback can happen.
+- Replay through the Table re-checks legality. Records carry the rules-core version, so a record that a later rules fix rejects can be identified and kept (US-31.5).
+- **Solo play trusts the client (NFR-S).** The deal is in device memory and storage during play, so a determined learner can find hidden cards with developer tools. That is accepted for solo play. The UI itself never receives them (US-16.4), and future multiplayer needs server-held deals and redacted views.
 
 ### 4.9 Localisation and copy
 
@@ -648,7 +677,7 @@ The teachers review the fallback policy, because its actions can show up in play
 | **Composition seam:** table + robots + sampler + coach, with the real solver | Information boundary, hints, review facts, assessments, abstention | F3 permutations (US-44, VAL-05); F4 assessments (US-18.5, VAL-07); F5 export for teacher grading (VAL-08); fault injection (US-45, VAL-06); provenance schema check (US-40.1) |
 | **Worker boundary** | Message audit | Audit hook active in every composition and end-to-end test (US-10.2) |
 | **Pipeline CLI** | Validity checks, versioning rule, sign-off and rights gating | A corpus of good lessons and one bad lesson per rule (US-15, US-26, US-27) |
-| **Regression set** *(M)* | Coach output stability | Compares facts and template IDs, not rendered text. Rendered text changes go through teacher review (CI-8) |
+| **Regression set** *(M)* | Coach output stability | Compares facts and template IDs, not rendered text, and compares cards as equivalence classes, so a solver upgrade that lists equal cards in another order is not a diff. Rendered text changes go through teacher review (CI-8) |
 | **End-to-end UI** (headless browser) | Journeys: lesson; MiniBridge practice deal with a hint; review | A few smoke tests in V (US-21.7, US-14, US-16). In M, the §7 journeys of the PRD plus keyboard-only runs (US-39) |
 | **Device harness** (manual, reference phones) | Performance and stability | F2 timing, F7 soak, cost per sample (US-43, VAL-04) |
 | **Bidding comparison** (V) | Candidate engines on 30 auctions | Graded sheet (US-47, VAL-11) |
@@ -741,8 +770,38 @@ The teachers review the fallback policy, because its actions can show up in play
 | U-12 | How a lesson hint declares the cards it mentions (Q12) | Structured card references, checked against exposures (US-15) | Teachers + engineering lead |
 | U-13 | Review analysis only after completion (ADR-0001 §4), versus sealed precomputation during play | Start at completion and show progressively; revisit with T2 data, which would need an ADR-0001 amendment | Owner |
 | U-14 | Sampling budget and order for review decision quality in M | §4.6.5 step 3 | Teachers + engineering lead |
+| U-15 | Whether using a hint changes a lesson attempt's outcome | Record hint use (US-28.8); keep the outcome unchanged until the teachers decide | Teachers |
+| U-16 | Maximum acceptable robot fallback rate on the reference phones (the PRD only asks for it to be reported) | Treat a rate above 2% of robot decisions as a VAL-04 failure for that solver or policy | Owner + engineering lead |
+| U-17 | Whether a teacher may sign off content they authored | The second teacher signs off; the author may sign alone only for typo-level versions | Owner + teachers |
+| U-18 | Several learners sharing one device (siblings, school computers) | Known MVP limitation: progress belongs to the device; the progress file and a "reset progress" action are the workaround. Profiles on one device are a later decision | Owner |
 
-### 7.4 Architectural context
+### 7.4 Edge cases and failure modes added in v0.2
+
+A self-review looked for cases v0.1 did not handle. The ones below changed the specification; they are listed by priority.
+
+| Priority | Case | Where handled |
+|---|---|---|
+| Fairness | Hidden cards present in the page or accessibility tree, readable by a screen reader or by inspecting the page | US-16.4 |
+| Fairness | Robot thinking time revealing hidden cards | US-10.4 |
+| Fairness | Undo in practice letting the learner replay with hindsight | US-04.5 |
+| Fairness | Tier (c) estimate contradicting cards a lesson has exposed | US-14.10 |
+| Fairness | Review calling a hinted play a mistake because it used more samples | US-18.8, §4.6.5 |
+| Correctness | Teacher labels keyed by position index match the wrong position after a different line | US-18.9, `TeacherLabel` |
+| Correctness | Partial sample counts making results depend on the phone's speed | §4.6.7 |
+| Correctness | Auction constraints taken from the learner's off-system calls leaving no consistent layout (M) | §4.6.7 |
+| Correctness | Accepted alternatives breaking the rest of a lesson script; equivalent cards missing from expected answers | US-27.3a, US-27.3b |
+| Correctness | A late hint shown against a newer position | US-14.12, §4.3.6 |
+| Correctness | Auction ending after a double or redouble; MiniBridge setup not representable in PBN | US-08.5, US-04.3 |
+| Robustness | Background throttling on phones causing false timeouts and fallbacks | US-12.4 |
+| Robustness | Worker crash or out-of-memory; WebAssembly blocked; worker version skew after an update | US-12.5, US-12.6, US-41.3 |
+| Robustness | Safari or school machines deleting local progress; storage full | US-28.6, US-28.7 |
+| Robustness | Two tabs; a tab killed mid-write; a record a later rules fix rejects; an app update mid-deal | US-31.4–US-31.6 |
+| Robustness | A crafted or newer-version import file | US-28.3 |
+| Robustness | A sampler that never finds a consistent layout | §4.6.7, US-45.1 |
+| Process | Unresolved teacher disagreements; hint use in attempts; self-sign-off; fallback-rate threshold; shared devices | US-18.5, U-15–U-18 |
+| Privacy | Storing the learner's exact age | US-36.3 |
+
+### 7.5 Architectural context
 
 - **ADR-0001:** the seat view is the only input for robots, hints and decision quality. This drives §4.3, §4.5 and the F3 design.
 - **ADR-0002:** the record, not the seed, is the source of truth. This drives §4.4 and §4.8.
@@ -750,7 +809,7 @@ The teachers review the fallback policy, because its actions can show up in play
 - **ADR-0004:** content versions never change correctness. This drives US-27.6 and US-28.4.
 - **Gate outputs** that will revise this specification: solver binding and location, rules core origin, foundation, bidding engine, MVP robot policy, backend, and language-model phrasing (PRD §14). After the gate, this document is updated to v0.2, with each **Gate** marker replaced by the decision and a link to the Technology Selection Decision Record.
 
-### 7.5 Traceability (PRD requirement → stories)
+### 7.6 Traceability (PRD requirement → stories)
 
 | PRD | Stories |
 |---|---|

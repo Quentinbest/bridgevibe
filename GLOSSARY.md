@@ -55,7 +55,7 @@ UI copy for teenagers may use friendlier words ("points", "X-ray view"). Those a
 | **Action** | Anything submitted to the Table on a Seat's turn: a Call, a Card Play, or a Contract Choice. The Table **accepts** it or **rejects** it with a Reason Code. A rejected Action does not change the Playthrough. |
 | **Controller** | Who decides an Action for a Seat: the Learner or a Robot. The Controller of Dummy's cards is the Controller of Declarer. The learner controls their own Seat in Setup and in defence; when the Learner Side declares, the learner controls Declarer, whichever Seat that is (ADR-0003). |
 | **Learner Side** | The Side of the Seat the learner sits in (South in the MVP). Fixed for a Playthrough. |
-| **Auction** | The ordered sequence of Calls, starting with the Dealer and rotating clockwise. Ends after three consecutive Passes that follow a Bid, or after four Passes with no Bid (**Pass-out**). |
+| **Auction** | The ordered sequence of Calls, starting with the Dealer and rotating clockwise. Once a Bid has been made, ends after three consecutive Passes (whether the last other Call was a Bid, Double or Redouble); with no Bid, ends after four Passes (**Pass-out**). |
 | **Call** | Bid, Pass, Double or Redouble. *Avoid:* "bid" as the umbrella word. |
 | **Bid** | A Call naming a level (1 to 7) and a Strain. Must be higher than the last Bid: a higher level, or the same level in a higher Strain. |
 | **Double** | Legal only when the last Bid was made by an opponent and has not already been doubled; Passes may intervene. |
@@ -76,7 +76,7 @@ UI copy for teenagers may use friendlier words ("points", "X-ray view"). Those a
 | **MiniBridge Setup** | Each Seat **announces** its HCP in turn from the Dealer. If each Side holds 20 HCP, the Deal is **redealt**. Otherwise the Side with more HCP declares; within it, the Seat with more HCP is Declarer; on a tie, the one who announced first. Dummy is exposed. Declarer makes a **Contract Choice**: a Strain and an **Objective** (*part-score* or *game*). Each Objective maps to a trick target and score under the MiniBridge Scoring Scheme; the exact targets, whether slam is available and whether Vulnerability applies are fixed by the MiniBridge rules specification, not by this glossary. |
 | **Announcement** | A Seat's HCP total in MiniBridge Setup. Computed by the Table and always true. A learner asked to count HCP answers a Prompt; the answer is not an Announcement. |
 | **Redeal** | Replacing a 20–20 Deal in MiniBridge. The next Deal is derived deterministically from the Seed. |
-| **Position** | The state of a Playthrough after a given number of accepted Actions. A Position can be the starting point of a retry or an Exercise. |
+| **Position** | The state of a Playthrough after a given sequence of accepted Actions. Two Positions are the same only if they have the same Deal and the same sequence, not just the same number of Actions. A Position can be the starting point of a retry or an Exercise. |
 | **Reason Code** | The Table's identifier for why an Action was rejected (for example, *must follow suit*). |
 | **Playthrough Record** | The ordered list of accepted Actions of a Playthrough, with its Deal, Game Format, Convention Profile version and the versions of every engine that acted. The source of truth for replay and review (ADR-0002). |
 | **Revoke** | In the Laws, failing to follow suit when able. It cannot happen in PlayBridge, because the Table rejects the Action. Use "rejected play" instead. |
@@ -164,7 +164,7 @@ UI copy for teenagers may use friendlier words ("points", "X-ray view"). Those a
 | Term | Definition and rules |
 |---|---|
 | **Learner** | The person using the product on one device. Anonymous; has an age band from the age gate; no account in the MVP. |
-| **Attempt** | The learner's answering of one Prompt in one version of its content. Outcome: **correct** (right first time), **corrected** (wrong, then right without being shown) or **failed** (shown the answer). |
+| **Attempt** | The learner's answering of one Prompt in one version of its content. Outcome: **correct** (right first time), **corrected** (wrong, then right without being shown) or **failed** (shown the answer). Also records whether a Hint was used before answering. |
 | **Lesson Completion** | A Lesson is complete when every Prompt it declares has an Attempt. The denominator is the Lesson's declared Prompts, never what other learners saw. |
 | **Skill Tag** | A label from a stable taxonomy attached to a Prompt or Exercise, naming what it practises. |
 | **Progress Record** | The learner's Attempts, Completions and settings, exportable and importable. |
