@@ -10,6 +10,15 @@ function violations(source: string, file: string): string[] {
   function literalValue(node: ts.Node | undefined): string | undefined {
     return node && (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) ? node.text : undefined;
   }
+  // Copy kept in a variable (`const message = 'Try again'`) reaches JSX indirectly, so any literal
+  // that looks like a phrase (a letter and a space) is copy too. Class names and module paths aren't.
+  function isPhrase(node: ts.Node): node is ts.StringLiteral | ts.NoSubstitutionTemplateLiteral {
+    if (!ts.isStringLiteral(node) && !ts.isNoSubstitutionTemplateLiteral(node)) return false;
+    if (!/\p{L}/u.test(node.text) || !/\s/.test(node.text)) return false;
+    if (ts.isImportDeclaration(node.parent) || ts.isExportDeclaration(node.parent)) return false;
+    const attribute = ts.findAncestor(node, ts.isJsxAttribute);
+    return !(attribute && attribute.name.getText(ast) === 'className');
+  }
   function visit(node: ts.Node) {
     let value: string | undefined;
     if (ts.isJsxText(node)) value = node.text;
@@ -18,8 +27,10 @@ function violations(source: string, file: string): string[] {
       if (ts.isStringLiteral(node.initializer)) value = node.initializer.text;
       if (ts.isJsxExpression(node.initializer)) value = literalValue(node.initializer.expression);
     }
+    if (isPhrase(node)) value = node.text;
     if (value && /[\p{L}\p{N}]/u.test(value)) {
       found.push(`${file}:${ast.getLineAndCharacterOfPosition(node.getStart(ast)).line + 1}: ${value.trim()}`);
+      return; // Don't report the same literal again from its children.
     }
     ts.forEachChild(node, visit);
   }
@@ -29,7 +40,8 @@ function violations(source: string, file: string): string[] {
 function tsxFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
     const path = join(directory, entry.name);
-    return entry.isDirectory() ? tsxFiles(path) : path.endsWith('.tsx') ? [path] : [];
+    // Components only: tests assert on rendered copy and may spell it out.
+    return entry.isDirectory() ? tsxFiles(path) : path.endsWith('.tsx') && !path.endsWith('.test.tsx') ? [path] : [];
   });
 }
 test('catalogue guard catches text and every protected attribute, with file and line', () => {
@@ -44,6 +56,12 @@ test('catalogue guard catches text and every protected attribute, with file and 
     }
   }
   expect(violations('<div>{text("product")}</div>', 'good.tsx')).toEqual([]);
+});
+test('catalogue guard catches phrases kept outside JSX, but not class names or module paths', () => {
+  expect(violations("const message = 'Try again';\nexport const A = () => <p>{message}</p>;", 'bad.tsx')).toEqual(['bad.tsx:1: Try again']);
+  expect(violations('const message = `Try again`;', 'bad.tsx')).toEqual(['bad.tsx:1: Try again']);
+  expect(violations('<div aria-label="Try again" />', 'bad.tsx')).toEqual(['bad.tsx:1: Try again']);
+  expect(violations(`import x from './some module';\n<div className="card back" />;\n<div className={'card back'} />`, 'good.tsx')).toEqual([]);
 });
 test('every app TSX file sources learner-facing copy from the catalogue', () => {
   expect(tsxFiles('src/app').flatMap(file => violations(readFileSync(file, 'utf8'), file))).toEqual([]);
