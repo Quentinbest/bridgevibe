@@ -7,8 +7,8 @@ The longer notes behind [`AGENTS.md`](../AGENTS.md): read the part a task needs.
 | Command | What it runs |
 | --- | --- |
 | `npm run dev` | Vite dev server |
-| `npm run typecheck` | `tsc --noEmit` over `src`, `test` and root configs |
-| `npm run lint` | ESLint (typescript-eslint, react-hooks, react-refresh) |
+| `npm run typecheck` | `tsc --noEmit` over everything (with Node types), then `tsconfig.app.json` over app source with browser types only |
+| `npm run lint` | ESLint (typescript-eslint; react-hooks on all `src` files, react-refresh on components; browser globals only in app source) |
 | `npm run deps:check` | dependency-cruiser module rules over `src` |
 | `npm test` | Vitest **node** project: unit, jsdom component, catalogue guard, dependency-rule fixtures |
 | `npm run test:browser` | Vitest **browser** project (headless Chromium): `src/table/**/*.test.ts` and `src/app/**/*.browser.test.tsx` |
@@ -35,18 +35,20 @@ Rules every later module must keep:
 
 - The Table is the only authority on rules: the UI and robots only submit actions (INV-1).
 - Robots and in-play hints receive only a Seat View, never a full Deal. Only **table** constructs Seat Views and completed playthrough records (ADR-0001).
+- The UI is built from a learner view: face-up cards plus a count for each hidden hand. No hidden card identity reaches the UI, its page or its bundle before the playthrough is completed (US-16.4). Until the Table builds Seat Views, the static screen's `learnerView` in `src/app/fixture.ts` stands in for one, and the full Deal lives only in `src/app/fixture.test.ts`.
 - When the learner's side declares, the learner plays Declarer, and the display rotates so Declarer is at the bottom (ADR-0003).
 - Every engine (solver, sampler, robot policy, bidding) runs in a Web Worker behind a port interface.
 
 ## No hard-coded learner-facing text (US-38)
 
-All copy, including aria labels, comes from `text()`. `test/catalogue.test.ts` parses every non-test `src/app/**/*.tsx` file with the TypeScript compiler. It fails on:
+All copy, including aria labels, comes from `text()`. `test/catalogue.test.ts` parses every non-test `src/app/**/*.{ts,tsx}` file with the TypeScript compiler. It fails on:
 
 - JSX text, or a literal or template child, containing a letter or digit;
 - a literal or template value of `aria-label`, `aria-description`, `title`, `alt`, `placeholder` or `label`;
-- any phrase-like literal or template (a letter and a space in its fixed text) anywhere in the file, except class names and import paths.
+- any phrase-like literal or template (a letter and a space in its fixed text) anywhere in the file, except class names and import paths;
+- a JSX child or protected attribute whose type is a string literal, which catches a word kept in a constant (`const label = 'Continue'`) or imported from a helper module.
 
-A one-word literal kept in a variable (`const call = 'Pass'`) still passes; review catches those.
+A word in a widened `string` (`let label = 'Continue'`, or a value typed `string`) still passes; review catches those.
 
 ## Theme and fonts
 
