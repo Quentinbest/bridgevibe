@@ -80,11 +80,11 @@ test('all 13 tricks complete with ordered events and completion takes precedence
   for (const seat of SEATS) expect(table.legalActions(seat)).toEqual([]);
   reject(table, null, null, null, 'playthrough-complete');
 });
-test('duplicate played card is no longer held on a later turn', () => {
+test('US-01.5: replaying an already played card is malformed duplicate-card input', () => {
   const table = make(); const action = table.legalActions('west')[0];
   play(table, 'west', action);
   while (table.seatView('south').turn !== 'west') play(table, table.seatView('south').turn!);
-  reject(table, 'west', 'robot', action, 'card-not-held');
+  expect(reject(table, 'west', 'robot', action, 'malformed-action')).toMatchObject({ details: { cause: 'duplicate' } });
 });
 test('North declarer is learner-controlled and South dummy is learner-controlled', () => {
   const table = startPlaythrough({ deal: dealWith(), contract: { ...contract, declarer: 'north' }, learnerSide: 'northSouth' });

@@ -38,7 +38,8 @@ test('full fixed Deal through clicks and Play it', async ({ page }, testInfo) =>
       await expect(region.locator('button[tabindex="0"]')).toBeFocused();
       await card.click();
       await expect(card).toHaveAttribute('aria-pressed', 'true');
-      await page.getByRole('button', { name: 'Play it', exact: true }).click();
+      // UX §3.3: the confirmation names the card it plays.
+      await page.getByRole('button', { name: `Play it, ${cardName(entry.action.card)}`, exact: true }).click();
     }
     played.push(entry.action.card);
     await expect(page.getByRole('log')).toContainText(`${text(`seat.${entry.seat}`)} plays the ${cardName(entry.action.card)}`);
@@ -63,7 +64,7 @@ test('keyboard arrows, Enter, Escape and Space play from the active hand', async
   await page.keyboard.press('ArrowRight'); await expect(five).toBeFocused();
   await page.keyboard.press('Enter'); await expect(five).toHaveAttribute('aria-pressed', 'true');
   await page.keyboard.press('Escape'); await expect(five).toHaveAttribute('aria-pressed', 'false');
-  await expect(page.getByRole('button', { name: 'Play it', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^Play it, / })).toHaveCount(0);
   await page.keyboard.press('ArrowLeft'); await expect(ace).toBeFocused();
   await page.keyboard.press('Enter'); await expect(ace).toHaveAttribute('aria-pressed', 'true');
   await page.keyboard.press('Enter'); await expect(ace).toHaveCount(0);
@@ -94,7 +95,7 @@ test('blind lead and later positions never expose unplayed opponent cards', asyn
   await page.clock.runFor(500);
   await noHiddenCards(page, [{ suit: 'spades', rank: '9' }]);
   const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });
-  await ace.click(); await page.getByRole('button', { name: 'Play it', exact: true }).click();
+  await ace.click(); await page.getByRole('button', { name: /^Play it, / }).click();
   await page.clock.runFor(500);
   await noHiddenCards(page, [{ suit: 'spades', rank: '9' }, { suit: 'spades', rank: 'A' }, { suit: 'spades', rank: '3' }]);
 });

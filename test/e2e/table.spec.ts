@@ -89,7 +89,7 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
   const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });
   await ace.click();
   await expect(ace).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByRole('button', { name: 'Play it', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Play it, / })).toBeVisible();
   if (viewportWidth !== 320) {
     expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true);
   }
@@ -110,7 +110,7 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
   }
   await checkAccessibility();
   // Play North's spade, wait for East, then attempt an off-suit card from South.
-  await page.getByRole('button', { name: 'Play it', exact: true }).click();
+  await page.getByRole('button', { name: /^Play it, / }).click();
   await expect(page.getByRole('button', { name: 'King of spades, playable', exact: true })).toBeVisible();
   // Three cards are on the table (West, North, East): none may cover an opponent's backs or label.
   await expect(page.locator('.played')).toHaveCount(3);
@@ -124,7 +124,7 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
   }
   const heart = page.getByRole('button', { name: "Ace of hearts, can't play: you must follow spades", exact: true });
   await heart.click();
-  await page.getByRole('button', { name: 'Play it', exact: true }).click();
+  await page.getByRole('button', { name: /^Play it, / }).click();
   await expect(page.locator('[aria-live="assertive"]')).toHaveText('Play spades; you still have that suit.');
   await expect(heart).toHaveAttribute('aria-pressed', 'false');
   await checkAccessibility();

@@ -37,7 +37,7 @@ export type TableEvent = Readonly<{ kind: 'card-played'; seat: Seat; card: Card 
   | Readonly<{ kind: 'trick-won'; winner: Seat }>
   | Readonly<{ kind: 'status-changed'; status: 'completed' }>;
 export type Submission = { kind: 'accepted'; events: readonly TableEvent[] }
-  | { kind: 'rejected'; reason: ReasonCode; details: Readonly<{ cause?: 'controller'; suit?: Suit }> };
+  | { kind: 'rejected'; reason: ReasonCode; details: Readonly<{ cause?: 'controller' | 'duplicate'; suit?: Suit }> };
 export const sideOf = (seat: Seat): Side => seat === 'north' || seat === 'south' ? 'northSouth' : 'eastWest';
 export const sameCard = (a: Card, b: Card): boolean => a.suit === b.suit && a.rank === b.rank;
 const nextSeat = (seat: Seat): Seat => SEATS[(SEATS.indexOf(seat) + 1) % 4];
@@ -89,10 +89,12 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract; learne
     return JSON.parse(JSON.stringify({ schemaVersion: 1, playthroughId, deal, contract, learnerSide, actions, status, result: tricksWon }));
   }
   function submit(seat: unknown, controller: unknown, action: unknown): Submission {
-    const reject = (reason: ReasonCode, details: { cause?: 'controller'; suit?: Suit } = {}): Submission => ({ kind: 'rejected', reason, details });
+    const reject = (reason: ReasonCode, details: { cause?: 'controller' | 'duplicate'; suit?: Suit } = {}): Submission => ({ kind: 'rejected', reason, details });
     // US-01.6: validate everything before mutating any state, in reason-code precedence order.
     if (status === 'completed') return reject('playthrough-complete');
     if (!SEATS.some(candidate => candidate === seat) || (controller !== 'learner' && controller !== 'robot') || !isAction(action)) return reject('malformed-action');
+    // US-01.5: a card that has already been played is duplicate-card input, not merely a card not held.
+    if (actions.some(entry => sameCard(entry.action.card, action.card))) return reject('malformed-action', { cause: 'duplicate' });
     const actingSeat = seat as Seat;
     if (actingSeat !== dummySeat && controller !== controllerOf(actingSeat)) return reject('malformed-action', { cause: 'controller' });
     if (actingSeat !== turn) return reject('not-your-turn');

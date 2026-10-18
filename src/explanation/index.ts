@@ -15,6 +15,7 @@ export const catalogue = {
   "turn.west": { text: "West is playing", status: 'draft' },
   "turn.east": { text: "East is playing", status: 'draft' },
   "play": { text: "Play it", status: 'draft' },
+  "play.card": { text: "Play it, {card}", status: 'draft' },
   "target": { text: "Need {target} tricks", status: 'draft' },
   "tricks.sides": { text: "You {you} · Them {them}", status: 'draft' },
   "announce.play": { text: "{seat} plays the {card}", status: 'draft' },

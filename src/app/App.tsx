@@ -1,6 +1,6 @@
 import { useEffect, useState, useSyncExternalStore } from 'react';
 import { SUITS, type Card as TableCard } from '../table';
-import { text } from '../explanation';
+import { cardName, text } from '../explanation';
 import { Card, CardBack } from './Card';
 import { Hand } from './Hand';
 import { createPlay, type LearnerView } from './play';
@@ -59,7 +59,10 @@ function TableScreen({ view, play }: { view: LearnerView; play: (seat: 'north' |
           <p className="seat-label">{text('learner')}</p>
         </section>
       </section>
-      <footer className="action-bar">{selected && <button type="button" onClick={() => submit(selected)}>{text('play')}</button>}</footer>
+      <footer className="action-bar">{selected && <button type="button" onClick={() => submit(selected)}
+        // UX §3.3: the confirmation names the card. The visible label stays "Play it" (issue #2, design),
+        // and the name starts with it, so the visible label is part of the name (WCAG 2.5.3).
+        aria-label={text('play.card', { card: cardName(selected) })}>{text('play')}</button>}</footer>
       <div className="sr-only" role="log" aria-live="polite" aria-relevant="additions">{view.announcements.map((message, index) => <p key={index}>{message}</p>)}</div>
     </main>
   </>;
