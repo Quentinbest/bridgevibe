@@ -7,17 +7,21 @@ function violations(source: string, file: string): string[] {
   const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   const found: string[] = [];
   const attributes = new Set(['aria-label', 'aria-description', 'title', 'alt', 'placeholder', 'label']);
+  // The fixed text of a literal; for `Try ${action}`, the parts around each substitution.
   function literalValue(node: ts.Node | undefined): string | undefined {
-    return node && (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) ? node.text : undefined;
+    if (!node) return undefined;
+    if (ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node)) return node.text;
+    if (ts.isTemplateExpression(node)) return [node.head.text, ...node.templateSpans.map(span => span.literal.text)].join('');
+    return undefined;
   }
   // Copy kept in a variable (`const message = 'Try again'`) reaches JSX indirectly, so any literal
   // that looks like a phrase (a letter and a space) is copy too. Class names and module paths aren't.
-  function isPhrase(node: ts.Node): node is ts.StringLiteral | ts.NoSubstitutionTemplateLiteral {
-    if (!ts.isStringLiteral(node) && !ts.isNoSubstitutionTemplateLiteral(node)) return false;
-    if (!/\p{L}/u.test(node.text) || !/\s/.test(node.text)) return false;
-    if (ts.isImportDeclaration(node.parent) || ts.isExportDeclaration(node.parent)) return false;
+  function phraseText(node: ts.Node): string | undefined {
+    const value = literalValue(node);
+    if (!value || !/\p{L}/u.test(value) || !/\s/.test(value)) return undefined;
+    if (ts.isImportDeclaration(node.parent) || ts.isExportDeclaration(node.parent)) return undefined;
     const attribute = ts.findAncestor(node, ts.isJsxAttribute);
-    return !(attribute && attribute.name.getText(ast) === 'className');
+    return attribute && attribute.name.getText(ast) === 'className' ? undefined : value;
   }
   function visit(node: ts.Node) {
     let value: string | undefined;
@@ -27,7 +31,7 @@ function violations(source: string, file: string): string[] {
       if (ts.isStringLiteral(node.initializer)) value = node.initializer.text;
       if (ts.isJsxExpression(node.initializer)) value = literalValue(node.initializer.expression);
     }
-    if (isPhrase(node)) value = node.text;
+    value ??= phraseText(node);
     if (value && /[\p{L}\p{N}]/u.test(value)) {
       found.push(`${file}:${ast.getLineAndCharacterOfPosition(node.getStart(ast)).line + 1}: ${value.trim()}`);
       return; // Don't report the same literal again from its children.
@@ -61,6 +65,11 @@ test('catalogue guard catches phrases kept outside JSX, but not class names or m
   expect(violations("const message = 'Try again';\nexport const A = () => <p>{message}</p>;", 'bad.tsx')).toEqual(['bad.tsx:1: Try again']);
   expect(violations('const message = `Try again`;', 'bad.tsx')).toEqual(['bad.tsx:1: Try again']);
   expect(violations('<div aria-label="Try again" />', 'bad.tsx')).toEqual(['bad.tsx:1: Try again']);
+  expect(violations('const message = `Try ${action}`;', 'bad.tsx')).toEqual(['bad.tsx:1: Try']);
+  expect(violations('const count = `${n} cards left`;', 'bad.tsx')).toEqual(['bad.tsx:1: cards left']);
+  expect(violations('<div>\n{`Try ${action}`}</div>', 'bad.tsx')).toEqual(['bad.tsx:2: Try']);
+  expect(violations('<div title={`Card ${n}`} />', 'bad.tsx')).toEqual(['bad.tsx:1: Card']);
+  expect(violations('text(`rank.${rank}`);\n<div className={`opponent ${seat}`} />', 'good.tsx')).toEqual([]);
   expect(violations(`import x from './some module';\n<div className="card back" />;\n<div className={'card back'} />`, 'good.tsx')).toEqual([]);
 });
 test('every app TSX file sources learner-facing copy from the catalogue', () => {
