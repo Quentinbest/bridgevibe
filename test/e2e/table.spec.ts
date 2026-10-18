@@ -112,6 +112,16 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
   // Play North's spade, wait for East, then attempt an off-suit card from South.
   await page.getByRole('button', { name: 'Play it', exact: true }).click();
   await expect(page.getByRole('button', { name: 'King of spades, playable', exact: true })).toBeVisible();
+  // Three cards are on the table (West, North, East): none may cover an opponent's backs or label.
+  await expect(page.locator('.played')).toHaveCount(3);
+  const played = await page.locator('.played').evaluateAll(elements => elements.map(el => el.getBoundingClientRect().toJSON()));
+  const opponents = await page.locator('.opponent .backs, .opponent p').evaluateAll(elements => elements.map(el => el.getBoundingClientRect().toJSON()));
+  for (const card of played) {
+    for (const opponent of opponents) {
+      const overlaps = card.left < opponent.right && card.right > opponent.left && card.top < opponent.bottom && card.bottom > opponent.top;
+      expect(overlaps, `played card ${JSON.stringify(card)} covers ${JSON.stringify(opponent)}`).toBe(false);
+    }
+  }
   const heart = page.getByRole('button', { name: "Ace of hearts, can't play: you must follow spades", exact: true });
   await heart.click();
   await page.getByRole('button', { name: 'Play it', exact: true }).click();
