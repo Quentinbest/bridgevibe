@@ -1,4 +1,4 @@
 {
-  "packagePatterns": ["(?:^|[/@._-])(?:epbot|bba|bga|suitc)(?:$|[._-])"],
+  "packagePatterns": ["(?:^|[/@._-])(?:epbot|bba|bga|suitc)(?:$|[/._-])"],
   "byteStrings": ["american_bba_", "EPBot", "SuitC"]
 }

@@ -84,19 +84,25 @@ export function buildBom(shipped: Shipped[], allowList: Exception[], assets: Rec
     if (problem) violations.push(problem);
     const registered = source ? assets[source] : undefined;
     if ((item.kind === 'asset' || item.kind === 'wasm') && !registered) violations.push(`${item.name}: undeclared asset`);
+    // US-46.1: every non-bundler artefact records a version, commit or content hash.
+    if (item.kind !== 'bundler' && item.version === 'unknown') violations.push(`${item.name}: unknown version (US-46.1)`);
     if (denylist.packagePatterns.some(pattern => new RegExp(pattern, 'i').test(item.name))) violations.push(`${item.name}: prohibited package (LR-3)`);
-    const grants = texts.map(classifyLicence);
-    const unknownGrant = !grants.some(grant => grant !== 'no explicit grant') || grants.some((grant, index) =>
-      grant === 'no explicit grant' && !/(?:^|\/)NOTICE[^/]*$/i.test(item.licenceFiles[index] ?? ''));
+    // LR-7: a NOTICE attributes bundled code; its grants are not the artefact's own. A GPL
+    // mention there still counts (LR-4), so only permissive grants are taken from licence files.
+    const isNotice = (index: number) => /(?:^|\/)NOTICE[^/]*$/i.test(item.licenceFiles[index] ?? '');
+    const own = texts.filter((_, index) => !isNotice(index));
+    const grants = own.map(classifyLicence);
+    const unknownGrant = !grants.some(grant => grant !== 'no explicit grant') || grants.includes('no explicit grant');
+    const gpl = grants.includes('GPL-family') || texts.some((text, index) => isNotice(index) && classifyLicence(text) === 'GPL-family');
     const licence = item.kind === 'first-party' ? 'first-party (owner; distribution model D2 open)'
-      : grants.includes('GPL-family') ? 'GPL-family' : [...new Set(grants.filter(grant => grant !== 'no explicit grant'))].join(' AND ') || 'no explicit grant';
+      : gpl ? 'GPL-family' : [...new Set(grants.filter(grant => grant !== 'no explicit grant'))].join(' AND ') || 'no explicit grant';
     const artefact: Artefact = { ...fields, licence };
     if (registered && registered.licence !== licence) violations.push(`${item.name}: registered licence does not match licence file`);
     const covers = (entry: Exception) => entry.version === item.version && (entry.package === item.name || (entry.path !== undefined && entry.path === source));
     if (licence === 'GPL-family') {
       // LR-4: a dual-licensed artefact may ship under a reviewed election of a non-GPL grant that
       // its own licence files make; GPL-only code never ships.
-      const alternatives = texts.flatMap(grantsIn).filter(grant => grant !== 'GPL-family');
+      const alternatives = own.flatMap(grantsIn).filter(grant => grant !== 'GPL-family');
       const election = valid.find(entry => covers(entry) && entry.elected !== undefined && alternatives.includes(entry.elected));
       if (election) Object.assign(artefact, { licence: `${election.elected} (elected; also GPL-family)`, exception: election });
       else violations.push(`${item.name}: GPL-family licence in browser distribution (LR-4)`);

@@ -73,6 +73,26 @@ it('lets a reviewed election clear a dual-licensed package, never a GPL-only one
   expect(elected.artefacts[0]).toMatchObject({ licence: 'MIT (elected; also GPL-family)', exception: { elected: 'MIT' } });
   expect(bom([pkg('gpl')], [{ ...exception('gpl'), elected: 'MIT' }]).violations.join()).toContain('GPL-family');
 });
+// LR-7: a NOTICE's grants belong to the bundled code it attributes, not to the artefact.
+it('never takes a grant or an election from a NOTICE file', () => {
+  const withNotice = (name: string): Shipped => {
+    const item = pkg(name);
+    return { ...item, licenceFiles: [...item.licenceFiles, 'NOTICE'], texts: [...item.texts, text('MIT')], notices: [...item.notices, text('MIT')] };
+  };
+  expect(bom([withNotice('unknown')]).violations.join()).toContain('no explicit grant');
+  expect(bom([withNotice('gpl')], [{ ...exception('gpl'), elected: 'MIT' }]).violations.join()).toContain('GPL-family');
+  const mit = pkg('unknown');
+  const gplNotice: Shipped = { ...mit, licenceFiles: ['LICENSE', 'NOTICE'], texts: [text('MIT'), text('GPL-3.0')] };
+  expect(bom([gplNotice]).violations.join()).toContain('GPL-family');
+});
+// US-46.1: a plugin-generated asset is versioned by the bytes it emits.
+it('hashes a generated asset and rejects one without a version', () => {
+  const assets = { 'generated/data.bin': { licenceFile: 'test/fixtures/licences/texts/MIT.txt', licence: 'MIT', attribution: 'Fixture generator' } };
+  const hashed = bom([resolveArtefact(root, 'generated/data.bin', 'generated/data.bin', assets, Buffer.from('data'))], [], assets);
+  expect(hashed.violations).toEqual([]);
+  expect(hashed.artefacts[0].version).toMatch(/^sha256:[0-9a-f]{64}$/);
+  expect(bom([resolveArtefact(root, 'generated/data.bin', 'generated/data.bin', assets)], [], assets).violations.join()).toContain('unknown version');
+});
 it('does not let a known grant hide another unrecognised licence file', () => {
   const item = pkg('unknown');
   item.licenceFiles.push('LICENSE-MIT');
@@ -83,7 +103,7 @@ it('does not let a known grant hide another unrecognised licence file', () => {
 });
 it('rejects prohibited package segments without matching innocent substrings', () => {
   expect(bom([pkg('epbot-wasm')], [exception('epbot-wasm')]).violations.join()).toContain('prohibited package');
-  for (const name of ['bba', '@vendor/bga-engine', 'suitc.wasm', 'epbot-wasm']) {
+  for (const name of ['bba', '@vendor/bga-engine', 'suitc.wasm', 'epbot-wasm', '@bba/engine', '@epbot/runtime']) {
     expect(bom([{ ...pkg('epbot-wasm'), name }]).violations.join()).toContain('prohibited package');
   }
   expect(bom([{ ...pkg('epbot-wasm'), name: 'rabbit' }]).violations).toEqual([]);
@@ -100,7 +120,7 @@ it('requires registration and reads actual asset licences and attribution', () =
   const source = 'public/icons/suit.svg';
   expect(bom([resolveArtefact(root, source, 'icons/suit.svg', {})]).violations.join()).toContain('undeclared asset');
   const assets = { [source]: { licenceFile: 'test/fixtures/licences/texts/MIT.txt', licence: 'MIT', attribution: 'Fixture artist' } };
-  const report = bom([resolveArtefact(root, source, 'icons/suit.svg', assets)], [], assets);
+  const report = bom([resolveArtefact(root, source, 'icons/suit.svg', assets, Buffer.from('<svg/>'))], [], assets);
   expect(report.violations).toEqual([]);
   expect(report.artefacts[0]).toMatchObject({ kind: 'asset', licence: 'MIT', notices: ['Fixture artist', text('MIT')] });
   expect(bom([resolveArtefact(root, 'src/suit.svg', 'assets/suit.svg', {})]).violations.join()).toContain('undeclared asset');
