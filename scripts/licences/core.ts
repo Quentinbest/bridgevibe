@@ -5,6 +5,8 @@ export interface Exception {
   reason: string;
   reviewer: string;
   date: string;
+  // LR-4: for a dual-licensed artefact, the non-GPL alternative its own licence files grant.
+  elected?: string;
 }
 export interface Asset {
   licenceFile: string;
@@ -35,23 +37,31 @@ export interface Bom {
   violations: string[];
 }
 
-// LR-7: classify the primary grant, never package metadata or bundled licence appendices.
-export function classifyLicence(text: string): string {
+// LR-7: every grant a licence text makes, read from the primary grant, never package metadata
+// or bundled licence appendices. A dual-licensed text yields GPL-family and its alternative.
+export function grantsIn(text: string): string[] {
   const primary = text.split(/^# Licenses of bundled dependencies\s*$/m)[0];
   const t = primary.replace(/\s+/g, ' ');
-  if (/\b(?:GNU (?:Affero |Lesser |Library )?General Public License|A?GPL|LGPL)(?:\b|[- ])/i.test(t)) return 'GPL-family';
-  if (/SIL OPEN FONT LICENSE.*Version 1\.1/i.test(t)) return 'OFL-1.1';
-  if (/Apache License.*Version 2\.0/i.test(t) && /TERMS AND CONDITIONS|apache\.org\/licenses\/LICENSE-2\.0/i.test(t)) return 'Apache-2.0';
-  if (/Permission is hereby granted, free of charge/i.test(t) && /deal in the Software without restriction/i.test(t) && /this permission notice shall be included/i.test(t)) return 'MIT';
+  const grants: string[] = [];
+  if (/\b(?:GNU (?:Affero |Lesser |Library )?General Public License|A?GPL|LGPL)(?:\b|[- ])/i.test(t)) grants.push('GPL-family');
+  if (/SIL OPEN FONT LICENSE.*Version 1\.1/i.test(t)) grants.push('OFL-1.1');
+  if (/Apache License.*Version 2\.0/i.test(t) && /TERMS AND CONDITIONS|apache\.org\/licenses\/LICENSE-2\.0/i.test(t)) grants.push('Apache-2.0');
+  if (/Permission is hereby granted, free of charge/i.test(t) && /deal in the Software without restriction/i.test(t) && /this permission notice shall be included/i.test(t)) grants.push('MIT');
   if (/Permission to use, copy, modify, and(?:\/or)? distribute this software for any purpose with or without fee is hereby granted/i.test(t)) {
-    if (/copyright notice and this permission notice appear/i.test(t)) return 'ISC';
-    if (/THE SOFTWARE IS PROVIDED "AS IS"/i.test(t)) return '0BSD';
+    if (/copyright notice and this permission notice appear/i.test(t)) grants.push('ISC');
+    else if (/THE SOFTWARE IS PROVIDED "AS IS"/i.test(t)) grants.push('0BSD');
   }
   if (/Redistribution and use in source and binary forms.*are permitted/i.test(t) && /Redistributions of source code must retain/i.test(t) && /Redistributions in binary form must reproduce/i.test(t)) {
-    return /Neither the name|names of its contributors may be used/i.test(t) ? 'BSD-3-Clause' : 'BSD-2-Clause';
+    grants.push(/Neither the name|names of its contributors may be used/i.test(t) ? 'BSD-3-Clause' : 'BSD-2-Clause');
   }
-  if (/This is free and unencumbered software released into the public domain/i.test(t) && /Anyone is free to copy, modify, publish, use, compile, sell, or distribute/i.test(t)) return 'Unlicense';
-  return 'no explicit grant';
+  if (/This is free and unencumbered software released into the public domain/i.test(t) && /Anyone is free to copy, modify, publish, use, compile, sell, or distribute/i.test(t)) grants.push('Unlicense');
+  return grants;
+}
+
+// LR-4: any GPL-family grant outranks the others until an owner-reviewed election says otherwise.
+export function classifyLicence(text: string): string {
+  const grants = grantsIn(text);
+  return grants.includes('GPL-family') ? 'GPL-family' : grants[0] ?? 'no explicit grant';
 }
 
 // LR-3 / US-46.4: these tripwires are never eligible for an exception.
@@ -82,9 +92,17 @@ export function buildBom(shipped: Shipped[], allowList: Exception[], assets: Rec
       : grants.includes('GPL-family') ? 'GPL-family' : [...new Set(grants.filter(grant => grant !== 'no explicit grant'))].join(' AND ') || 'no explicit grant';
     const artefact: Artefact = { ...fields, licence };
     if (registered && registered.licence !== licence) violations.push(`${item.name}: registered licence does not match licence file`);
-    if (licence === 'GPL-family') violations.push(`${item.name}: GPL-family licence in browser distribution (LR-4)`);
+    const covers = (entry: Exception) => entry.version === item.version && (entry.package === item.name || (entry.path !== undefined && entry.path === source));
+    if (licence === 'GPL-family') {
+      // LR-4: a dual-licensed artefact may ship under a reviewed election of a non-GPL grant that
+      // its own licence files make; GPL-only code never ships.
+      const alternatives = texts.flatMap(grantsIn).filter(grant => grant !== 'GPL-family');
+      const election = valid.find(entry => covers(entry) && entry.elected !== undefined && alternatives.includes(entry.elected));
+      if (election) Object.assign(artefact, { licence: `${election.elected} (elected; also GPL-family)`, exception: election });
+      else violations.push(`${item.name}: GPL-family licence in browser distribution (LR-4)`);
+    }
     if (item.kind !== 'first-party' && licence !== 'GPL-family' && unknownGrant) {
-      const exception = valid.find(entry => entry.version === item.version && (entry.package === item.name || (entry.path !== undefined && entry.path === source)));
+      const exception = valid.find(covers);
       if (exception) artefact.exception = exception;
       else violations.push(`${item.name}: no explicit grant (LR-2 / LR-7)`);
     }

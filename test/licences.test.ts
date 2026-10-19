@@ -3,7 +3,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } f
 import os from 'node:os';
 import path from 'node:path';
 import { build } from 'vite';
-import { buildBom, classifyLicence, renderNotice, scanBytes } from '../scripts/licences/core';
+import { buildBom, classifyLicence, grantsIn, renderNotice, scanBytes } from '../scripts/licences/core';
 import type { Asset, Bom, Exception, Shipped } from '../scripts/licences/core';
 import { filesIn, licences, resolveArtefact } from '../scripts/licences/plugin';
 import denylist from '../scripts/licences/denylist.json';
@@ -59,6 +59,19 @@ it('requires reviewed exceptions, records them, and never exempts GPL', () => {
   }
   expect(bom([item], [{ ...exception('unknown'), version: '2.0.0' }]).violations.join()).toContain('no explicit grant');
   expect(bom([pkg('gpl')], [exception('gpl')]).violations.join()).toContain('GPL-family');
+});
+// LR-4: a dual-licensed package ships only under a reviewed election of a grant its files make.
+it('lets a reviewed election clear a dual-licensed package, never a GPL-only one', () => {
+  const dual = pkg('dual');
+  expect(grantsIn(dual.texts[0])).toEqual(['GPL-family', 'MIT']);
+  expect(bom([dual]).violations.join()).toContain('GPL-family');
+  expect(bom([dual], [exception('dual')]).violations.join()).toContain('GPL-family');
+  expect(bom([dual], [{ ...exception('dual'), elected: 'Apache-2.0' }]).violations.join()).toContain('GPL-family');
+  expect(bom([dual], [{ ...exception('dual'), elected: 'MIT', reviewer: '' }]).violations.join()).toContain('GPL-family');
+  const elected = bom([dual], [{ ...exception('dual'), elected: 'MIT' }]);
+  expect(elected.violations).toEqual([]);
+  expect(elected.artefacts[0]).toMatchObject({ licence: 'MIT (elected; also GPL-family)', exception: { elected: 'MIT' } });
+  expect(bom([pkg('gpl')], [{ ...exception('gpl'), elected: 'MIT' }]).violations.join()).toContain('GPL-family');
 });
 it('does not let a known grant hide another unrecognised licence file', () => {
   const item = pkg('unknown');

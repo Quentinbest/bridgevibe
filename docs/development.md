@@ -43,10 +43,13 @@ First-party code is recorded separately with distribution model D2 still open.
 Track unanswered DEP-08 questions in `licences/open-items.json`; these are copied
 into the BOM, not treated as grants.
 
-Only an owner-reviewed missing-grant exception may be added to
-`licences/allow-list.json`: provide exactly one `package` or `path`, the exact
-`version`, `reason`, `reviewer` and `date`. Obtain review before adding an entry;
-GPL and LR-3 violations cannot be exempted. The list starts empty.
+Only owner-reviewed exceptions may be added to `licences/allow-list.json`:
+provide exactly one `package` or `path`, the exact `version`, `reason`, `reviewer`
+and `date`. Obtain review before adding an entry. An entry covers a missing or
+unrecognised grant, or, with `elected`, a dual-licensed artefact: `elected` names
+the non-GPL grant its own licence files make (for example `"MIT"` for "MIT or GPL"),
+and the BOM records that election. GPL-only artefacts and LR-3 violations cannot be
+exempted. The list starts empty.
 For isolated builds, `licences({ reportPath })` or the
 `BRIDGEVIBE_LICENCE_REPORT` environment variable redirects the BOM destination.
 

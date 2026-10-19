@@ -50,4 +50,4 @@ Node 24. Each check also runs on its own (`npm run lint`, `npm run test:e2e`…)
 - Check the change against the spec sections, ADRs and acceptance criteria its ticket cites; say when the code and the cited rule disagree.
 - P0/P1: hidden cards reaching a robot, a hint or the in-play UI (ADR-0001, the Seat View boundary); the Table getting legality, turns, tricks or scores wrong, or anything other than the Table deciding them (INV-1); a coach statement claiming certainty it doesn't have, or hindsight not labelled as such (CI-1 to CI-3); a secret in the repository.
 - Learner-facing text that bypasses the catalogue and a broken module boundary (spec §4.2) are P2 even when CI misses them.
-- Skip formatting and anything CI already enforces (tsc, ESLint, dependency-cruiser, axe). Don't flag a check whose ticket hasn't landed yet (licence check: #3).
+- Skip formatting and anything CI already enforces (tsc, ESLint, dependency-cruiser, axe, the licence check in the build). Don't flag a check whose ticket hasn't landed yet (provenance logging: #9).
