@@ -8,6 +8,9 @@ import denylist from './denylist.json' with { type: 'json' };
 
 const relative = (root: string, file: string) => path.relative(root, file).split(path.sep).join('/');
 const hashOf = (bytes?: Uint8Array) => bytes ? `sha256:${createHash('sha256').update(bytes).digest('hex')}` : 'unknown';
+// US-46.1: licence and notice files, including third-party collections such as THIRD-PARTY-LICENSE
+// or THIRD_PARTY_NOTICES.txt, but not code or data that merely mentions a licence.
+export const isLicenceFile = (name: string) => /^(?:[^.]*[-_. ])?(?:licen[cs]es?|copying|notices?)(?:[-_. ][^/]*)?$/i.test(name) && !/\.(?:[cm]?[jt]sx?|json|map)$/i.test(name);
 const readJson = <T>(file: string): T => JSON.parse(readFileSync(file, 'utf8')) as T;
 export function filesIn(dir: string): string[] {
   if (!existsSync(dir)) return [];
@@ -35,7 +38,7 @@ export function resolveArtefact(root: string, id: string, shippedFile: string, a
     if (existsSync(manifest)) {
       const pkg = readJson<{ name?: string; version?: string }>(manifest);
       if (pkg.name && pkg.version) {
-        const licenceFiles = readdirSync(dir, { withFileTypes: true }).filter(entry => entry.isFile() && /^(?:licen[cs]e|copying|notice)/i.test(entry.name))
+        const licenceFiles = readdirSync(dir, { withFileTypes: true }).filter(entry => entry.isFile() && isLicenceFile(entry.name))
           .map(entry => path.join(dir, entry.name)).sort();
         const texts = licenceFiles.map(name => readFileSync(name, 'utf8'));
         return { name: pkg.name, kind: bundler ? 'bundler' : pkg.name.startsWith('@fontsource/') ? 'font' : 'npm', version: pkg.version,

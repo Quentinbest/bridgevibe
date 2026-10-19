@@ -93,9 +93,9 @@ export function buildBom(shipped: Shipped[], allowList: Exception[], assets: Rec
     // US-46.1: every non-bundler artefact records a version, commit or content hash.
     if (item.kind !== 'bundler' && item.version === 'unknown') violations.push(`${item.name}: unknown version (US-46.1)`);
     if (denylist.packagePatterns.some(pattern => new RegExp(pattern, 'i').test(item.name))) violations.push(`${item.name}: prohibited package (LR-3)`);
-    // LR-7: a NOTICE attributes bundled code; its grants are not the artefact's own. A GPL
+    // LR-7: a NOTICE or third-party file attributes bundled code; its grants are not the artefact's own. A GPL
     // mention there still counts (LR-4), so only permissive grants are taken from licence files.
-    const isNotice = (index: number) => /(?:^|\/)NOTICE[^/]*$/i.test(item.licenceFiles[index] ?? '');
+    const isNotice = (index: number) => /(?:^|\/)(?:NOTICE|[^/]*THIRD[-_ ]?PARTY)[^/]*$/i.test(item.licenceFiles[index] ?? '');
     const own = texts.filter((_, index) => !isNotice(index));
     const grants = own.map(classifyLicence);
     const unknownGrant = !grants.some(grant => grant !== 'no explicit grant') || grants.includes('no explicit grant');

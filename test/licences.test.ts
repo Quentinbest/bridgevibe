@@ -5,7 +5,7 @@ import path from 'node:path';
 import { build } from 'vite';
 import { buildBom, classifyLicence, grantsIn, prohibitedPaths, renderNotice, scanBytes } from '../scripts/licences/core';
 import type { Asset, Bom, Exception, Shipped } from '../scripts/licences/core';
-import { filesIn, licences, resolveArtefact } from '../scripts/licences/plugin';
+import { filesIn, isLicenceFile, licences, resolveArtefact } from '../scripts/licences/plugin';
 import denylist from '../scripts/licences/denylist.json';
 
 const root = process.cwd();
@@ -91,6 +91,20 @@ it('never takes a grant or an election from a NOTICE file', () => {
   const gplNotice: Shipped = { ...mit, licenceFiles: ['LICENSE', 'NOTICE'], texts: [text('MIT'), text('GPL-3.0')] };
   expect(bom([gplNotice]).violations.join()).toContain('GPL-family');
   expect(bom([gplNotice], [{ ...exception('unknown'), elected: 'MIT' }]).violations.join()).toContain('GPL-family');
+});
+// US-46.1: third-party notice collections are attributed in NOTICE but grant nothing themselves.
+it('ships third-party notice files without taking grants from them', () => {
+  expect(['THIRD-PARTY-LICENSE', 'THIRD_PARTY_NOTICES.txt', 'LICENSE-MIT', 'COPYING.LESSER'].every(isLicenceFile)).toBe(true);
+  expect(['license-checker.js', 'licenses.json', 'noticeboard.js', 'README.md'].some(isLicenceFile)).toBe(false);
+  const item = pkg('third-party');
+  expect(item.licenceFiles.map(file => path.basename(file))).toEqual(['LICENSE', 'THIRD_PARTY_NOTICES.txt']);
+  const report = bom([item]);
+  expect(report.violations).toEqual([]);
+  expect(renderNotice(report)).toContain('Bundled component: tiny-helper 2.0.0');
+  const onlyThirdParty: Shipped = { ...item, licenceFiles: ['THIRD-PARTY-LICENSE'], texts: [text('MIT')] };
+  expect(bom([onlyThirdParty]).violations.join()).toContain('no explicit grant');
+  const gplThirdParty: Shipped = { ...item, licenceFiles: ['LICENSE', 'THIRD-PARTY-LICENSE'], texts: [text('MIT'), text('GPL-3.0')] };
+  expect(bom([gplThirdParty]).violations.join()).toContain('GPL-family');
 });
 // US-46.1: a plugin-generated asset is versioned by the bytes it emits.
 it('hashes a generated asset and rejects one without a version', () => {
