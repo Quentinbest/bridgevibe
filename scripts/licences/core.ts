@@ -22,7 +22,7 @@ export interface Artefact {
   licenceFiles: string[];
   notices: string[];
   shippedFiles: string[];
-  exception?: Exception;
+  exceptions?: Exception[];
 }
 export interface Shipped extends Omit<Artefact, 'licence'> {
   source?: string;
@@ -70,6 +70,12 @@ export function scanBytes(files: { path: string; bytes: Uint8Array }[], denylist
     .map(value => `${file.path}: prohibited bytes ${value}`));
 }
 
+// LR-3: a prohibited name anywhere in a shipped module's path, not only in its package name.
+export function prohibitedPaths(paths: string[], denylist: Denylist): string[] {
+  return [...new Set(paths)].filter(file => denylist.packagePatterns.some(pattern => new RegExp(pattern, 'i').test(file)))
+    .map(file => `${file}: prohibited path (LR-3)`);
+}
+
 export function buildBom(shipped: Shipped[], allowList: Exception[], assets: Record<string, Asset>, openItems: OpenItem[], denylist: Denylist, generated = new Date().toISOString()): Bom {
   const violations: string[] = [];
   const valid = allowList.filter(entry => {
@@ -93,25 +99,34 @@ export function buildBom(shipped: Shipped[], allowList: Exception[], assets: Rec
     const own = texts.filter((_, index) => !isNotice(index));
     const grants = own.map(classifyLicence);
     const unknownGrant = !grants.some(grant => grant !== 'no explicit grant') || grants.includes('no explicit grant');
-    const gpl = grants.includes('GPL-family') || texts.some((text, index) => isNotice(index) && classifyLicence(text) === 'GPL-family');
+    const noticeGpl = texts.some((text, index) => isNotice(index) && classifyLicence(text) === 'GPL-family');
+    const gpl = grants.includes('GPL-family') || noticeGpl;
     const licence = item.kind === 'first-party' ? 'first-party (owner; distribution model D2 open)'
       : gpl ? 'GPL-family' : [...new Set(grants.filter(grant => grant !== 'no explicit grant'))].join(' AND ') || 'no explicit grant';
     const artefact: Artefact = { ...fields, licence };
     if (registered && registered.licence !== licence) violations.push(`${item.name}: registered licence does not match licence file`);
     const covers = (entry: Exception) => entry.version === item.version && (entry.package === item.name || (entry.path !== undefined && entry.path === source));
-    if (licence === 'GPL-family') {
+    const applied: Exception[] = [];
+    let cleared = !gpl;
+    if (gpl) {
       // LR-4: a dual-licensed artefact may ship under a reviewed election of a non-GPL grant that
-      // its own licence files make; GPL-only code never ships.
+      // its own licence files make; GPL-only code, and GPL found in a NOTICE, never ships.
       const alternatives = own.flatMap(grantsIn).filter(grant => grant !== 'GPL-family');
-      const election = valid.find(entry => covers(entry) && entry.elected !== undefined && alternatives.includes(entry.elected));
-      if (election) Object.assign(artefact, { licence: `${election.elected} (elected; also GPL-family)`, exception: election });
-      else violations.push(`${item.name}: GPL-family licence in browser distribution (LR-4)`);
+      const election = noticeGpl ? undefined : valid.find(entry => covers(entry) && entry.elected !== undefined && alternatives.includes(entry.elected));
+      if (election) {
+        artefact.licence = `${election.elected} (elected; also GPL-family)`;
+        applied.push(election);
+        cleared = true;
+      } else violations.push(`${item.name}: GPL-family licence in browser distribution (LR-4)`);
     }
-    if (item.kind !== 'first-party' && licence !== 'GPL-family' && unknownGrant) {
-      const exception = valid.find(covers);
-      if (exception) artefact.exception = exception;
+    // LR-2: an election covers the GPL alternative only; an unrecognised licence file still needs
+    // its own missing-grant exception.
+    if (item.kind !== 'first-party' && cleared && unknownGrant) {
+      const exception = valid.find(entry => covers(entry) && entry.elected === undefined);
+      if (exception) applied.push(exception);
       else violations.push(`${item.name}: no explicit grant (LR-2 / LR-7)`);
     }
+    if (applied.length) artefact.exceptions = applied;
     return artefact;
   });
   return { generated, artefacts, openItems, violations };

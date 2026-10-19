@@ -3,7 +3,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } f
 import os from 'node:os';
 import path from 'node:path';
 import { build } from 'vite';
-import { buildBom, classifyLicence, grantsIn, renderNotice, scanBytes } from '../scripts/licences/core';
+import { buildBom, classifyLicence, grantsIn, prohibitedPaths, renderNotice, scanBytes } from '../scripts/licences/core';
 import type { Asset, Bom, Exception, Shipped } from '../scripts/licences/core';
 import { filesIn, licences, resolveArtefact } from '../scripts/licences/plugin';
 import denylist from '../scripts/licences/denylist.json';
@@ -53,7 +53,7 @@ it('requires reviewed exceptions, records them, and never exempts GPL', () => {
   expect(bom([item]).violations.join()).toContain('no explicit grant');
   const allowed = bom([item], [exception('unknown')]);
   expect(allowed.violations).toEqual([]);
-  expect(allowed.artefacts[0].exception).toEqual(exception('unknown'));
+  expect(allowed.artefacts[0].exceptions).toEqual([exception('unknown')]);
   for (const field of ['reviewer', 'reason'] as const) {
     expect(bom([item], [{ ...exception('unknown'), [field]: '' }]).violations.join()).toContain('Invalid allow-list');
   }
@@ -70,8 +70,14 @@ it('lets a reviewed election clear a dual-licensed package, never a GPL-only one
   expect(bom([dual], [{ ...exception('dual'), elected: 'MIT', reviewer: '' }]).violations.join()).toContain('GPL-family');
   const elected = bom([dual], [{ ...exception('dual'), elected: 'MIT' }]);
   expect(elected.violations).toEqual([]);
-  expect(elected.artefacts[0]).toMatchObject({ licence: 'MIT (elected; also GPL-family)', exception: { elected: 'MIT' } });
+  expect(elected.artefacts[0]).toMatchObject({ licence: 'MIT (elected; also GPL-family)', exceptions: [{ elected: 'MIT' }] });
   expect(bom([pkg('gpl')], [{ ...exception('gpl'), elected: 'MIT' }]).violations.join()).toContain('GPL-family');
+  // LR-2: an election does not vouch for another, unrecognised licence file.
+  const extra: Shipped = { ...dual, licenceFiles: [...dual.licenceFiles, 'LICENSE-EXTRA'], texts: [...dual.texts, text('unknown')] };
+  expect(bom([extra], [{ ...exception('dual'), elected: 'MIT' }]).violations.join()).toContain('no explicit grant');
+  const both = bom([extra], [{ ...exception('dual'), elected: 'MIT' }, exception('dual')]);
+  expect(both.violations).toEqual([]);
+  expect(both.artefacts[0].exceptions).toHaveLength(2);
 });
 // LR-7: a NOTICE's grants belong to the bundled code it attributes, not to the artefact.
 it('never takes a grant or an election from a NOTICE file', () => {
@@ -84,6 +90,7 @@ it('never takes a grant or an election from a NOTICE file', () => {
   const mit = pkg('unknown');
   const gplNotice: Shipped = { ...mit, licenceFiles: ['LICENSE', 'NOTICE'], texts: [text('MIT'), text('GPL-3.0')] };
   expect(bom([gplNotice]).violations.join()).toContain('GPL-family');
+  expect(bom([gplNotice], [{ ...exception('unknown'), elected: 'MIT' }]).violations.join()).toContain('GPL-family');
 });
 // US-46.1: a plugin-generated asset is versioned by the bytes it emits.
 it('hashes a generated asset and rejects one without a version', () => {
@@ -92,6 +99,9 @@ it('hashes a generated asset and rejects one without a version', () => {
   expect(hashed.violations).toEqual([]);
   expect(hashed.artefacts[0].version).toMatch(/^sha256:[0-9a-f]{64}$/);
   expect(bom([resolveArtefact(root, 'generated/data.bin', 'generated/data.bin', assets)], [], assets).violations.join()).toContain('unknown version');
+  // A same-named repository file must not stand in for the emitted bytes.
+  const emitted = resolveArtefact(root, 'package.json', 'package.json', {}, Buffer.from('data'));
+  expect(emitted.version).toBe(hashed.artefacts[0].version);
 });
 it('does not let a known grant hide another unrecognised licence file', () => {
   const item = pkg('unknown');
@@ -107,6 +117,9 @@ it('rejects prohibited package segments without matching innocent substrings', (
     expect(bom([{ ...pkg('epbot-wasm'), name }]).violations.join()).toContain('prohibited package');
   }
   expect(bom([{ ...pkg('epbot-wasm'), name: 'rabbit' }]).violations).toEqual([]);
+  // LR-3: a prohibited file inside an innocently named package is still caught by its path.
+  expect(prohibitedPaths(['node_modules/innocent/vendor/bba.wasm', 'node_modules/react/index.js', 'assets/rabbit.svg'], denylist))
+    .toEqual(['node_modules/innocent/vendor/bba.wasm: prohibited path (LR-3)']);
 });
 it('scans binary pons weights and clean wasm without an exception bypass', () => {
   const files = filesIn(path.join(fixtures, 'output')).map(file => ({ path: file, bytes: readFileSync(file) }));

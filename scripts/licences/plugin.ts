@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync, mkdirSync, writeFileSync } from 
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import type { Plugin, ResolvedConfig } from 'vite';
-import { buildBom, renderNotice, scanBytes } from './core.js';
+import { buildBom, prohibitedPaths, renderNotice, scanBytes } from './core.js';
 import type { Asset, Exception, OpenItem, Shipped } from './core.js';
 import denylist from './denylist.json' with { type: 'json' };
 
@@ -52,7 +52,7 @@ export function resolveArtefact(root: string, id: string, shippedFile: string, a
   }
   const licencePath = registered && path.resolve(root, registered.licenceFile);
   const texts = licencePath && existsSync(licencePath) ? [readFileSync(licencePath, 'utf8')] : [];
-  return { name: repoPath, source: assets[repoPath] ? repoPath : shippedFile, kind: /\.wasm$/i.test(file) ? 'wasm' : 'asset', version: hashOf(existsSync(file) ? readFileSync(file) : emitted),
+  return { name: repoPath, source: assets[repoPath] ? repoPath : shippedFile, kind: /\.wasm$/i.test(file) ? 'wasm' : 'asset', version: hashOf(emitted ?? (existsSync(file) ? readFileSync(file) : undefined)),
     licenceFiles: licencePath ? [relative(root, licencePath)] : [], texts,
     notices: registered ? [registered.attribution, ...texts] : [], shippedFiles: [shippedFile] };
 }
@@ -61,9 +61,13 @@ export interface LicenceOptions { reportPath?: string }
 export function licences(options: LicenceOptions = {}): Plugin {
   let config: ResolvedConfig;
   const shipped = new Map<string, Shipped>();
+  const paths = new Set<string>();
   let assets: Record<string, Asset>;
   const add = (id: string, output: string, emitted?: Uint8Array) => {
     const item = resolveArtefact(config.root, id, output, assets, emitted);
+    // LR-3: keep every module and output path, which grouping by package would hide.
+    if (!id.startsWith('\0')) paths.add(relative(config.root, path.resolve(config.root, id.replace(/[?#].*$/, ''))));
+    paths.add(output);
     const key = `${item.name}@${item.version}:${item.licenceFiles.join(',')}`;
     const previous = shipped.get(key);
     if (previous) previous.shippedFiles = [...new Set([...previous.shippedFiles, output])].sort();
@@ -76,6 +80,7 @@ export function licences(options: LicenceOptions = {}): Plugin {
     configResolved(resolved) { config = resolved; },
     buildStart() {
       shipped.clear();
+      paths.clear();
       assets = readJson<Record<string, Asset>>(path.join(config.root, 'licences/assets.json'));
     },
     generateBundle: {
@@ -108,6 +113,7 @@ export function licences(options: LicenceOptions = {}): Plugin {
           const name = relative(outDir, file);
           if (name !== 'NOTICE.txt' && !covered.has(name)) bom.violations.push(`${name}: unattributed shipped file`);
         }
+        bom.violations.push(...prohibitedPaths([...paths], denylist));
         bom.violations.push(...scanBytes(filesIn(outDir).map(file => ({ path: relative(outDir, file), bytes: readFileSync(file) })), denylist));
         const report = path.resolve(config.root, options.reportPath ?? process.env.BRIDGEVIBE_LICENCE_REPORT ?? 'licence-report/bom.json');
         mkdirSync(path.dirname(report), { recursive: true });
