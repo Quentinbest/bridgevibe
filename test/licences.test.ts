@@ -1,0 +1,175 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { build } from 'vite';
+import { buildBom, classifyLicence, renderNotice, scanBytes } from '../scripts/licences/core';
+import type { Asset, Bom, Exception, Shipped } from '../scripts/licences/core';
+import { filesIn, licences, resolveArtefact } from '../scripts/licences/plugin';
+import denylist from '../scripts/licences/denylist.json';
+
+const root = process.cwd();
+const fixtures = path.join(root, 'test/fixtures/licences');
+const text = (name: string) => readFileSync(path.join(fixtures, 'texts', `${name}.txt`), 'utf8');
+const temps: string[] = [];
+function temp() {
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'bridgevibe-licences-'));
+  temps.push(dir);
+  return dir;
+}
+afterEach(() => { vi.unstubAllEnvs(); for (const dir of temps.splice(0)) rmSync(dir, { recursive: true, force: true }); });
+function pkg(name: string): Shipped {
+  const dir = temp();
+  cpSync(path.join(fixtures, 'packages'), path.join(dir, 'node_modules'), { recursive: true });
+  return resolveArtefact(dir, path.join(dir, 'node_modules', name, 'index.js'), 'assets/app.js', {});
+}
+const exception = (name: string): Exception => ({ package: name, version: '1.0.0', reason: 'Fixture review', reviewer: 'Fixture reviewer', date: '2026-10-19' });
+const bom = (items: Shipped[], exceptions: Exception[] = [], assets: Record<string, Asset> = {}) => buildBom(items, exceptions, assets, [], denylist);
+
+// LR-7: real licence texts, including Vite's bundled third-party appendix.
+describe('licence classification', () => {
+  it.each(['MIT', 'ISC', 'Apache-2.0', 'BSD-3-Clause', 'OFL-1.1'])('%s', name => {
+    expect(classifyLicence(text(name))).toBe(name);
+  });
+  it.each(['GPL-3.0', 'LGPL-2.1', 'AGPL-3.0'])('rejects %s', name => {
+    expect(classifyLicence(text(name))).toBe('GPL-family');
+  });
+  it('classifies Vite by its primary MIT grant', () => {
+    expect(classifyLicence(readFileSync('node_modules/vite/LICENSE.md', 'utf8'))).toBe('MIT');
+  });
+  it('recognises BSD-2, 0BSD and Unlicense grants', () => {
+    expect(classifyLicence('Redistribution and use in source and binary forms are permitted. Redistributions of source code must retain copyright. Redistributions in binary form must reproduce copyright.')).toBe('BSD-2-Clause');
+    expect(classifyLicence('Permission to use, copy, modify, and/or distribute this software for any purpose with or without fee is hereby granted. THE SOFTWARE IS PROVIDED "AS IS"')).toBe('0BSD');
+    expect(classifyLicence('This is free and unencumbered software released into the public domain. Anyone is free to copy, modify, publish, use, compile, sell, or distribute')).toBe('Unlicense');
+  });
+});
+
+it('ignores the MIT metadata when no licence file exists, or the file is GPL', () => {
+  expect(bom([pkg('metadata-only')]).violations.join()).toContain('no explicit grant');
+  expect(bom([pkg('gpl')]).violations.join()).toContain('GPL-family');
+});
+it('requires reviewed exceptions, records them, and never exempts GPL', () => {
+  const item = pkg('unknown');
+  expect(bom([item]).violations.join()).toContain('no explicit grant');
+  const allowed = bom([item], [exception('unknown')]);
+  expect(allowed.violations).toEqual([]);
+  expect(allowed.artefacts[0].exception).toEqual(exception('unknown'));
+  for (const field of ['reviewer', 'reason'] as const) {
+    expect(bom([item], [{ ...exception('unknown'), [field]: '' }]).violations.join()).toContain('Invalid allow-list');
+  }
+  expect(bom([item], [{ ...exception('unknown'), version: '2.0.0' }]).violations.join()).toContain('no explicit grant');
+  expect(bom([pkg('gpl')], [exception('gpl')]).violations.join()).toContain('GPL-family');
+});
+it('does not let a known grant hide another unrecognised licence file', () => {
+  const item = pkg('unknown');
+  item.licenceFiles.push('LICENSE-MIT');
+  item.texts.push(text('MIT'));
+  expect(bom([item]).violations.join()).toContain('no explicit grant');
+  item.licenceFiles[0] = 'NOTICE';
+  expect(bom([item]).violations).toEqual([]);
+});
+it('rejects prohibited package segments without matching innocent substrings', () => {
+  expect(bom([pkg('epbot-wasm')], [exception('epbot-wasm')]).violations.join()).toContain('prohibited package');
+  for (const name of ['bba', '@vendor/bga-engine', 'suitc.wasm', 'epbot-wasm']) {
+    expect(bom([{ ...pkg('epbot-wasm'), name }]).violations.join()).toContain('prohibited package');
+  }
+  expect(bom([{ ...pkg('epbot-wasm'), name: 'rabbit' }]).violations).toEqual([]);
+});
+it('scans binary pons weights and clean wasm without an exception bypass', () => {
+  const files = filesIn(path.join(fixtures, 'output')).map(file => ({ path: file, bytes: readFileSync(file) }));
+  expect(scanBytes(files.filter(file => file.path.endsWith('clean.wasm')), denylist)).toEqual([]);
+  expect(scanBytes(files, denylist).join()).toContain('american_bba_');
+  const report = bom([pkg('unknown')], [exception('unknown')]);
+  report.violations.push(...scanBytes(files, denylist));
+  expect(report.violations.join()).toContain('american_bba_');
+});
+it('requires registration and reads actual asset licences and attribution', () => {
+  const source = 'public/icons/suit.svg';
+  expect(bom([resolveArtefact(root, source, 'icons/suit.svg', {})]).violations.join()).toContain('undeclared asset');
+  const assets = { [source]: { licenceFile: 'test/fixtures/licences/texts/MIT.txt', licence: 'MIT', attribution: 'Fixture artist' } };
+  const report = bom([resolveArtefact(root, source, 'icons/suit.svg', assets)], [], assets);
+  expect(report.violations).toEqual([]);
+  expect(report.artefacts[0]).toMatchObject({ kind: 'asset', licence: 'MIT', notices: ['Fixture artist', text('MIT')] });
+  expect(bom([resolveArtefact(root, 'src/suit.svg', 'assets/suit.svg', {})]).violations.join()).toContain('undeclared asset');
+  expect(bom([resolveArtefact(root, '\0unrecognised-helper', 'assets/app.js', {})]).violations.join()).toContain('unknown virtual module');
+});
+it('preserves DEP-08 open items and deduplicates full licence notices', () => {
+  const openItems = JSON.parse(readFileSync(path.join(fixtures, 'open-items.json'), 'utf8'));
+  const item = pkg('epbot-wasm');
+  const report = buildBom([{ ...item, name: 'allowed' }, { ...item, name: 'another' }], [], {}, openItems, denylist);
+  expect(report.openItems).toEqual(openItems);
+  const notice = renderNotice(report);
+  expect(notice.split(text('MIT'))).toHaveLength(2);
+});
+
+it('builds the real app with complete attribution and distributable notices', async () => {
+  const dir = temp();
+  const reportPath = path.join(dir, 'report/bom.json');
+  // US-46.1: exercise the unchanged repository config with an isolated report destination.
+  vi.stubEnv('BRIDGEVIBE_LICENCE_REPORT', reportPath);
+  await build({ configFile: path.join(root, 'vite.config.ts'), logLevel: 'silent',
+    build: { outDir: path.join(dir, 'dist') } });
+  const report: Bom = JSON.parse(readFileSync(reportPath, 'utf8'));
+  expect(report.violations).toEqual([]);
+  for (const name of ['react', 'react-dom', 'scheduler', 'first-party', 'vite', 'rolldown']) {
+    expect(report.artefacts.some(item => item.name === name)).toBe(true);
+  }
+  for (const name of ['bricolage-grotesque', 'ibm-plex-mono', 'ibm-plex-sans']) {
+    const font = report.artefacts.find(item => item.name === `@fontsource/${name}`);
+    expect(font).toMatchObject({ kind: 'font', licence: 'OFL-1.1' });
+    expect(font?.shippedFiles.some(file => file.endsWith('.woff2'))).toBe(true);
+  }
+  const notice = readFileSync(path.join(dir, 'dist/NOTICE.txt'), 'utf8');
+  expect(notice).toContain('SIL OPEN FONT LICENSE');
+  expect(notice).toContain('Copyright (c) Facebook, Inc. and its affiliates.');
+  for (const item of report.artefacts) for (const file of item.licenceFiles) {
+    expect(notice).toContain(readFileSync(file, 'utf8'));
+  }
+}, 60_000);
+
+it('writes a failing build BOM before throwing, including a binary tripwire', async () => {
+  const dir = temp();
+  writeFileSync(path.join(dir, 'index.html'), '<script type="module" src="/main.js"></script>');
+  writeFileSync(path.join(dir, 'main.js'), 'console.log("fixture");');
+  writeFileSync(path.join(dir, 'package.json'), '{"version":"1.0.0"}');
+  cpSync(path.join(root, 'licences'), path.join(dir, 'licences'), { recursive: true });
+  const reportPath = path.join(dir, 'bom.json');
+  await expect(build({ root: dir, configFile: false, logLevel: 'silent', plugins: [licences({ reportPath }), {
+    name: 'binary-fixture', generateBundle() { this.emitFile({ type: 'asset', fileName: 'pons.wasm', source: readFileSync(path.join(fixtures, 'output/pons.wasm')) }); },
+  }] })).rejects.toThrow('Licence check failed');
+  const report: Bom = JSON.parse(readFileSync(reportPath, 'utf8'));
+  expect(report.violations.join()).toContain('american_bba_');
+}, 60_000);
+
+// US-46.5: small CSS images must be attributed even below Vite's inline threshold.
+it('rejects an undeclared small CSS image and accepts it once registered', async () => {
+  const dir = temp();
+  mkdirSync(path.join(dir, 'src'));
+  writeFileSync(path.join(dir, 'index.html'), '<script type="module" src="/src/main.js"></script>');
+  writeFileSync(path.join(dir, 'src/main.js'), 'import "./styles.css";');
+  writeFileSync(path.join(dir, 'src/styles.css'), 'body { background-image: url("./suit.svg"); }');
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0h8v8H0z"/></svg>';
+  expect(Buffer.byteLength(svg)).toBeLessThan(1024);
+  writeFileSync(path.join(dir, 'src/suit.svg'), svg);
+  writeFileSync(path.join(dir, 'package.json'), '{"version":"1.0.0"}');
+  cpSync(path.join(root, 'licences'), path.join(dir, 'licences'), { recursive: true });
+  writeFileSync(path.join(dir, 'licences/assets.json'), '{}');
+  const reportPath = path.join(dir, 'bom.json');
+  const runBuild = () => build({ root: dir, configFile: false, logLevel: 'silent',
+    plugins: [licences({ reportPath })], build: { modulePreload: false, assetsInlineLimit: 4096 } });
+  await expect(runBuild()).rejects.toThrow('Licence check failed');
+  const failed: Bom = JSON.parse(readFileSync(reportPath, 'utf8'));
+  expect(failed.violations).toContain('src/suit.svg: undeclared asset');
+
+  writeFileSync(path.join(dir, 'licences/suit-LICENSE.txt'), text('MIT'));
+  writeFileSync(path.join(dir, 'licences/assets.json'), JSON.stringify({
+    'src/suit.svg': { licenceFile: 'licences/suit-LICENSE.txt', licence: 'MIT', attribution: 'Fixture artist' },
+  }));
+  await runBuild();
+  const report: Bom = JSON.parse(readFileSync(reportPath, 'utf8'));
+  expect(report.violations).toEqual([]);
+  const asset = report.artefacts.find(item => item.name === 'src/suit.svg');
+  expect(asset).toMatchObject({ kind: 'asset', licence: 'MIT' });
+  expect(asset?.shippedFiles).toHaveLength(1);
+  expect(readFileSync(path.join(dir, 'dist', asset!.shippedFiles[0]), 'utf8')).toBe(svg);
+}, 60_000);
