@@ -19,11 +19,17 @@ export function Hand({ cards, dummy = false, active, legalCards, ledSuit, select
   // UX §10: keep a tab stop when the previously focused last card is removed.
   const clampedIndex = Math.max(0, Math.min(focusIndex, ordered.length - 1));
   const buttons = useRef<Array<HTMLButtonElement | null>>([]);
-  useEffect(() => { if (active) buttons.current[clampedIndex]?.focus({ preventScroll: true }); }, [active, clampedIndex]);
+  // UX §10: when the turn reaches this hand, focus moves into it only from nowhere or from the table,
+  // never away from a control the learner is using (the header's deal controls or an open dialog).
+  const mayTakeFocus = () => {
+    const current = document.activeElement;
+    return !current || current === document.body || !!current.closest('main');
+  };
+  useEffect(() => { if (active && mayTakeFocus()) buttons.current[clampedIndex]?.focus({ preventScroll: true }); }, [active, clampedIndex]);
   // UX §10: when the confirmation button unmounts (a play was rejected), focus returns to the hand's tab stop,
   // which is the card the learner last focused, unless focus is already on one of this hand's cards.
   useEffect(() => {
-    if (active && !selected && !buttons.current.some(button => button === document.activeElement)) buttons.current[clampedIndex]?.focus({ preventScroll: true });
+    if (active && !selected && mayTakeFocus() && !buttons.current.some(button => button === document.activeElement)) buttons.current[clampedIndex]?.focus({ preventScroll: true });
   }, [active, selected, clampedIndex]);
   // UX §3.4: restart even when React batches clearing and repeating the same rejection.
   useEffect(() => {

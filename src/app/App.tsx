@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { SUITS, type Card as TableCard } from '../table';
+import { SUITS, type Card as TableCard, type Deal } from '../table';
 import { cardName, text } from '../explanation';
 import { Card, CardBack } from './Card';
 import { Hand } from './Hand';
-import { createPlay, type LearnerView } from './play';
+import { type LearnerView } from './play';
+import { dealFromUrl, dealSession } from './deals';
+import { DealControls } from './DealControls';
 
 function Opponent({ seat, count }: { seat: 'west' | 'east'; count: number }) {
   return <section className={`opponent ${seat}`} aria-label={text(`seat.${seat}`)}>
@@ -11,7 +13,8 @@ function Opponent({ seat, count }: { seat: 'west' | 'east'; count: number }) {
     <p>{text('opponent', { seat: text(`seat.${seat}`), count })}</p>
   </section>;
 }
-function TableScreen({ view, play, clearRejection }: { view: LearnerView; clearRejection: () => void; play: (seat: 'north' | 'south', card: TableCard) => void }) {
+// ADR-0001, US-16.4: the UI gets deal metadata only, never the play session or its record of all four hands.
+export function TableScreen({ view, play, clearRejection, info, invalid, onNew }: { info: Pick<Deal, 'dealId' | 'origin'>; invalid: boolean; onNew: () => void; view: LearnerView; clearRejection: () => void; play: (seat: 'north' | 'south', card: TableCard) => void }) {
   const [selected, setSelected] = useState<TableCard | null>(null);
   const [ruleOpen, setRuleOpen] = useState(false);
   const tableElement = useRef<HTMLElement | null>(null);
@@ -42,7 +45,11 @@ function TableScreen({ view, play, clearRejection }: { view: LearnerView; clearR
     if (view.turn === 'north' || view.turn === 'south') play(view.turn, card);
   }
   return <>
-    <header className="header"><h1 aria-label={text('product')}><span>{text('product.first')}</span><span className="wordmark-accent">{text('product.second')}</span></h1></header>
+    <header className="header"><div className="header-row">
+      <h1 className={invalid ? 'sr-only' : undefined} aria-label={text('product')}><span>{text('product.first')}</span><span className="wordmark-accent">{text('product.second')}</span></h1>
+      {invalid && <p className="deal-notice" role="status">{text('deal.invalid')}</p>}
+      <DealControls info={info} onNew={onNew} />
+    </div></header>
     <main onKeyDown={event => { if (event.key === 'Escape') select(null); }}>
       <section className="status" aria-label={text('status')}>
         <span className="contract">{text('contract.3nt')}</span>
@@ -90,8 +97,12 @@ function TableScreen({ view, play, clearRejection }: { view: LearnerView; clearR
   </>;
 }
 export function App() {
-  const [play] = useState(createPlay);
+  const [session, setSession] = useState(() => {
+    const initial = dealFromUrl(window.location.search);
+    return dealSession(initial.deal, initial.invalid);
+  });
+  const play = session.play;
   const view = useSyncExternalStore(play.subscribe, play.getSnapshot);
   useEffect(() => play.start(), [play]);
-  return <TableScreen view={view} play={play.play} clearRejection={play.clearRejection} />;
+  return <TableScreen key={session.info.dealId} view={view} play={play.play} clearRejection={play.clearRejection} info={session.info} invalid={session.invalid} onNew={() => setSession(session.next())} />;
 }

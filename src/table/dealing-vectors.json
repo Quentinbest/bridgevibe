@@ -1,0 +1,90 @@
+[
+  {
+    "seed": "abc",
+    "index": 1,
+    "pbn": "N:AQ84.T953.75.QJ3 J7.AKQ86.Q932.T7 KT932.J4.6.A9654 65.72.AKJT84.K82",
+    "dealer": "north",
+    "vulnerability": {
+      "northSouth": false,
+      "eastWest": false
+    },
+    "dealId": "deal-c18bf2f5864ceb78"
+  },
+  {
+    "seed": "abc",
+    "index": 2,
+    "pbn": "N:QJ2.Q984.632.T74 K63.52.97.AKQJ82 A974.KJ76.A85.65 T85.AT3.KQJT4.93",
+    "dealer": "east",
+    "vulnerability": {
+      "northSouth": true,
+      "eastWest": false
+    },
+    "dealId": "deal-5169b91b7ff60baf"
+  },
+  {
+    "seed": "abc",
+    "index": 3,
+    "pbn": "N:AK653.96.QT6.KJT Q4.QJT5.84.Q8432 JT972.7.AK93.A96 8.AK8432.J752.75",
+    "dealer": "south",
+    "vulnerability": {
+      "northSouth": false,
+      "eastWest": true
+    },
+    "dealId": "deal-28f827a36edee154"
+  },
+  {
+    "seed": "abc",
+    "index": 16,
+    "pbn": "N:K984.T942.KT.K72 A5.AK7.AJ65.QT96 QJ.QJ865.98432.J T7632.3.Q7.A8543",
+    "dealer": "west",
+    "vulnerability": {
+      "northSouth": false,
+      "eastWest": true
+    },
+    "dealId": "deal-5254a0a95665333f"
+  },
+  {
+    "seed": "abc",
+    "index": 17,
+    "pbn": "N:T98532.K842.2.A5 QJ764.Q976.K98.4 .J3.AQ76.KQ98762 AK.AT5.JT543.JT3",
+    "dealer": "north",
+    "vulnerability": {
+      "northSouth": false,
+      "eastWest": false
+    },
+    "dealId": "deal-31a33f5614946bda"
+  },
+  {
+    "seed": "Bridge_2026-test",
+    "index": 1000000,
+    "pbn": "N:.AKJ92.3.KQJ7632 J753.Q874.Q982.5 QT986.T.64.AT984 AK42.653.AKJT75.",
+    "dealer": "west",
+    "vulnerability": {
+      "northSouth": false,
+      "eastWest": true
+    },
+    "dealId": "deal-03b3f48f1623d6b9"
+  },
+  {
+    "seed": "0",
+    "index": 1,
+    "pbn": "N:K863.AJ3.J94.KQJ A952.QT82.K532.4 QJ74.K9.6.A96532 T.7654.AQT87.T87",
+    "dealer": "north",
+    "vulnerability": {
+      "northSouth": false,
+      "eastWest": false
+    },
+    "dealId": "deal-0ce854bb1d125996"
+  },
+  {
+    "seed": "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ",
+    "index": 9007199254740991,
+    "pbn": "N:KT.A.KQJT9.KJT72 AJ42.QT64.A732.8 9.KJ98532.54.AQ4 Q87653.7.86.9653",
+    "dealer": "south",
+    "vulnerability": {
+      "northSouth": true,
+      "eastWest": false
+    },
+    "dealId": "deal-a04b34060ead71b1"
+  }
+]

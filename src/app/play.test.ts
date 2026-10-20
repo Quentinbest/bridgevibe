@@ -1,3 +1,4 @@
+import { fixedDeal } from './fixture';
 import { afterEach, expect, test, vi } from 'vitest';
 import { completeFixedDeal } from '../../test/strategy';
 import { createPlay } from './play';
@@ -11,7 +12,7 @@ test('full fixed Deal with fallback defenders and first-legal learner completes 
 });
 test('composition delays blind lead, exposes Dummy, and stops its timers', () => {
   vi.useFakeTimers();
-  const play = createPlay();
+  const play = createPlay({}, fixedDeal);
   expect(play.getSnapshot().dummy).toBeNull();
   const stop = play.start();
   vi.advanceTimersByTime(499);
@@ -24,7 +25,7 @@ test('composition delays blind lead, exposes Dummy, and stops its timers', () =>
   expect(play.getSnapshot().positionIndex).toBe(2);
 });
 test('composition retains completed trick for 1 second and gates the next play', () => {
-  vi.useFakeTimers(); const play = createPlay(); const stop = play.start();
+  vi.useFakeTimers(); const play = createPlay({}, fixedDeal); const stop = play.start();
   vi.advanceTimersByTime(500);
   play.play('north', play.getSnapshot().legalCards[0]);
   vi.advanceTimersByTime(500);
@@ -39,7 +40,7 @@ test('composition retains completed trick for 1 second and gates the next play',
   expect(play.getSnapshot()).toMatchObject({ collecting: false, displayedTrick: [] }); stop();
 });
 test('composition retains reason until the next action and publishes each play and winner', () => {
-  vi.useFakeTimers(); const play = createPlay(); const stop = play.start();
+  vi.useFakeTimers(); const play = createPlay({}, fixedDeal); const stop = play.start();
   vi.advanceTimersByTime(500);
   play.play('north', { suit: 'hearts', rank: 'Q' });
   expect(play.getSnapshot().reason).toBe('Not that one. You still have spades.');

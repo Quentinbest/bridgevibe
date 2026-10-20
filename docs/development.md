@@ -96,8 +96,19 @@ A word in a widened `string` (`let label = 'Continue'`, or a value typed `string
 Every card keeps at least a 44 px touch target, or a 44 px exposed edge when overlapped (ux-spec §3.1 and §10). The layout depends on width:
 
 - **720 px and wider:** one overlapping row.
-- **Below 720 px:** two suit columns.
-- **Below 356 px:** one suit per row.
+- **Below 720 px:** two suit columns; long seeded suits wrap within their column.
+- **Below 356 px:** one suit column; a long suit can occupy multiple rows.
+
+These breakpoints are unchanged: 720 px fits the 608 px overlapping row plus padding;
+356 px fits the authored fixture's 316 px two-column hand plus padding. A seven-card
+suit needs 308 px without overlap. Below 720 px, each card remains a non-shrinking
+44 × 80 px box and the suit wraps when its grid track is narrower than 308 px
+(at 320 px, the single track is at most 280 px, so seven cards require two rows).
+At 720 px and wider, 80 px cards overlap by 36 px, leaving a 44 px exposed edge.
+
+Deal controls occupy a single 44 px header row with 8 px vertical padding (none below
+400 px, where the wordmark is hidden). Invalid-link feedback replaces the wordmark
+inside that row, so neither controls nor feedback add rows to the deal status.
 
 The breakpoints are derived in comments in `src/app/styles.css`, and `test/e2e/table.spec.ts` checks the same arithmetic. If card sizes or padding change, update both.
 
@@ -129,3 +140,30 @@ The standalone duplicate scorer is `src/table/scoring.ts`, exported by Table (US
 F1 in `src/table/playthrough.test.ts` runs unchanged in Node and Chromium. It checks reason precedence, rejection immutability, controller rules, blind leads, trick winners, completion and snapshot isolation. `test/boundaries.test.ts` checks the private SeatView brand at typecheck time and exercises ESLint restrictions through its API. Dependency fixtures include a robot importing explanation.
 
 The shared first-legal learner strategy completes the fixed Deal with 6 declaring-side tricks against fallback defenders. Node tests cover the Table and timer composition seams. Playwright uses its clock for a full Deal on `390-light` and `1440-dark`; keyboard, rejection, hidden-card, layout, theme and axe checks run on every project. Layout checks advance through the opening lead to expose Dummy, then resume timers before axe audits the initial, raised-card and rejected-card states. They also check viewport height and footer overlap. Browser checks require permission to bind local ports; in a sandbox that blocks ports, leave them for an unrestricted runner.
+
+## Dealing
+
+US-03.1/03.4, approved U-04 (2026-10-20): `bv-deal-1` uses xoshiro128** 1.1.
+The generator choice is delegated to the implementer. SHA-256 of UTF-8 `${seed}:${index}`
+initialises its four words from the first 16 digest bytes, big-endian; an all-zero state
+becomes `[1, 0, 0, 0]`. No warm-up steps are discarded. All generator operations use
+32-bit integer arithmetic. Fisher–Yates shuffles `SUITS × RANKS`, using rejection sampling
+before bounded reduction. Consecutive blocks of 13 go to North, East, South, West;
+each hand is sorted back into canonical order. Dealer and vulnerability repeat the
+standard duplicate board cycle 1–16. Indices are positive safe integers; the final
+safe index cannot advance further (New deal is disabled).
+
+Content IDs are `deal-` plus the first 16 hex digits of SHA-256 of compact JSON:
+`[hands, dealer, northSouthVulnerable, eastWestVulnerable]`. Hands are four arrays in
+North/East/South/West order of sorted canonical card indices (0 = spade Ace, 51 = club 2).
+Origin is excluded. The synchronous SHA-256 has standard digest tests.
+`src/table/dealing-vectors.json` publishes full PBN Deals and IDs, pinned by the same
+suite in Node and Chromium. Changes to this algorithm require a new identifier.
+
+Links use `?seed=abc&deal=3`. Seeds contain 1–64 ASCII letters, digits, `_` or `-`;
+indices use positive decimal notation. Missing both parameters retains the authored
+fixture; malformed or incomplete links show the fixture with feedback. New deal advances
+a seeded index, or creates a 12-character seed with `crypto.getRandomValues` for an
+authored Deal, and replaces the URL. Play remains 3NT by South until #12.
+Deal info displays metadata only. Copy remains draft (CI-8); replay still reads the
+Playthrough Record, never regenerated actions (ADR-0002).

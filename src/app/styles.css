@@ -1,7 +1,9 @@
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--background); color: var(--text); font-family: var(--font-body); font-size: var(--type-16); }
 p, h1 { margin: 0; }
-.header { background: var(--surface); border-bottom: 1px solid var(--border); padding: var(--space-16) var(--space-32); }
+.header { background: var(--surface); border-bottom: 1px solid var(--border); padding: var(--space-8) var(--space-32); }
+.header-row { display: flex; align-items: center; gap: var(--space-8); max-width: 1100px; height: 44px; margin: auto; }
+.header-row h1 { margin: 0; }
 h1 { font: 800 var(--type-24) var(--font-display); letter-spacing: -.03em; max-width: 1100px; margin: auto; }
 .wordmark-accent { color: var(--accent-text); }
 main { max-width: 1164px; margin: auto; padding: var(--space-16) var(--space-32); }
@@ -32,7 +34,8 @@ main { max-width: 1164px; margin: auto; padding: var(--space-16) var(--space-32)
 .hand-suit + .hand-suit, .hand .card + .card { margin-left: -36px; }
 .learner .seat-label { margin: 0; }
 @media (max-width: 399px) {
-  .header { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); padding: 0; border: 0; }
+  .header { padding: 0 var(--space-12); }
+  .header h1 { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   main { padding: var(--space-12); }
   .status { gap: var(--space-8); font-size: var(--type-13); }
   .tricks { padding: var(--space-6); }
@@ -49,8 +52,9 @@ main { max-width: 1164px; margin: auto; padding: var(--space-16) var(--space-32)
   .hand { display: grid; grid-template-columns: auto auto; gap: var(--space-12) var(--space-8); }
   .hand .card { width: 44px; height: 80px; margin: 0; border-radius: var(--radius-8); font-size: var(--type-18); padding: var(--space-4); }
 }
-/* Two suit columns need 4 × 44px + 3 × 44px + 8px gap = 316px.
-   Add main padding (24px) and table padding (16px): two columns need 356px. */
+/* The fixture's two suit columns need 4 × 44px + 3 × 44px + 8px gap = 316px.
+   Add main padding (24px) and table padding (16px): 356px avoids wrapping this fixture.
+   Longer seeded suits wrap within their column; cards never shrink below 44px. */
 @media (max-width: 355px) {
   .hand { grid-template-columns: auto; }
 }
@@ -83,6 +87,29 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
   .played-south { bottom: 0; }
   .played-west { left: 0; }
   .played-east { right: 0; }
+}
+
+/* US-03, UX §10: a 44px header row replaces the status controls' extra row.
+   At 600px, 536px inside header padding fits the wordmark and two buttons without wrapping.
+   Invalid-link feedback replaces the wordmark within the same fixed-height row. */
+.deal-controls { display: flex; flex: none; gap: var(--space-8); margin-left: auto; font-size: var(--type-15); }
+.deal-controls > button { white-space: nowrap; }
+.deal-notice { min-width: 0; font-size: var(--type-12); line-height: 14px; }
+.deal-controls button { min-height: 44px; padding: var(--space-8); border: 1px solid var(--border); border-radius: var(--radius-8); background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
+.deal-controls button:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 2px; }
+.deal-controls button:disabled { cursor: default; opacity: .6; }
+.deal-info { max-width: min(440px, calc(100vw - 24px)); border: 1px solid var(--border); border-radius: var(--radius-10); background: var(--surface); color: var(--text); padding: var(--space-16); }
+.deal-info::backdrop { background: var(--background); opacity: .8; }
+.deal-info dl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-12); }
+.deal-info dd { margin: 0; overflow-wrap: anywhere; font-family: var(--font-mono); }
+
+/* US-03.1: seeded Deals can have longer suits than the authored fixture. */
+@media (max-width: 719px) {
+  .hand { max-width: 100%; grid-template-columns: repeat(2, minmax(0, auto)); }
+  .hand-suit { min-width: 0; flex-wrap: wrap; }
+}
+@media (max-width: 355px) {
+  .hand { grid-template-columns: minmax(0, auto); }
 }
 
 /* US-01 / UX §3.4: only the returned card moves; transforms preserve the hand layout. */

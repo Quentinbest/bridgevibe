@@ -8,7 +8,10 @@ export type Card = Readonly<{ suit: Suit; rank: Rank }>;
 export type Hand = readonly [Card, Card, Card, Card, Card, Card, Card, Card, Card, Card, Card, Card, Card];
 export type Side = 'northSouth' | 'eastWest';
 export type Vulnerability = Readonly<Record<Side, boolean>>;
-export type Deal = Readonly<{ hands: Readonly<Record<Seat, Hand>>; dealer: Seat; vulnerability: Vulnerability }>;
+export type DealOrigin = Readonly<{ kind: 'seed'; seed: string; index: number; rotation: 0; algorithm: 'bv-deal-1' }>
+  | Readonly<{ kind: 'authored'; contentId: string; version: number }>;
+export type Deal = Readonly<{ dealId: string; origin: DealOrigin; hands: Readonly<Record<Seat, Hand>>; dealer: Seat; vulnerability: Vulnerability }>;
 export * from './playthrough';
+export { DEALING_ALGORITHM, dealFromSeed, dealIdOf, redeal } from './dealing';
 export { encodeSeatView, decodeSeatView, seatViewSeed, type SeatViewMessage } from './seatViewMessage';
 export * from './scoring';
