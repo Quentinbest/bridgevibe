@@ -1,0 +1,953 @@
+{
+  "schemaVersion": 2,
+  "appVersion": "unknown",
+  "engineVersions": {},
+  "rulesCoreVersion": "1",
+  "playthroughId": "playthrough-1",
+  "deal": {
+    "hands": {
+      "north": [
+        {
+          "suit": "spades",
+          "rank": "A"
+        },
+        {
+          "suit": "spades",
+          "rank": "5"
+        },
+        {
+          "suit": "spades",
+          "rank": "2"
+        },
+        {
+          "suit": "hearts",
+          "rank": "Q"
+        },
+        {
+          "suit": "hearts",
+          "rank": "4"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "K"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "Q"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "9"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "7"
+        },
+        {
+          "suit": "clubs",
+          "rank": "A"
+        },
+        {
+          "suit": "clubs",
+          "rank": "9"
+        },
+        {
+          "suit": "clubs",
+          "rank": "6"
+        },
+        {
+          "suit": "clubs",
+          "rank": "4"
+        }
+      ],
+      "east": [
+        {
+          "suit": "spades",
+          "rank": "8"
+        },
+        {
+          "suit": "spades",
+          "rank": "7"
+        },
+        {
+          "suit": "spades",
+          "rank": "3"
+        },
+        {
+          "suit": "hearts",
+          "rank": "8"
+        },
+        {
+          "suit": "hearts",
+          "rank": "6"
+        },
+        {
+          "suit": "hearts",
+          "rank": "5"
+        },
+        {
+          "suit": "hearts",
+          "rank": "2"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "10"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "6"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "4"
+        },
+        {
+          "suit": "clubs",
+          "rank": "5"
+        },
+        {
+          "suit": "clubs",
+          "rank": "3"
+        },
+        {
+          "suit": "clubs",
+          "rank": "2"
+        }
+      ],
+      "south": [
+        {
+          "suit": "spades",
+          "rank": "K"
+        },
+        {
+          "suit": "spades",
+          "rank": "6"
+        },
+        {
+          "suit": "spades",
+          "rank": "4"
+        },
+        {
+          "suit": "hearts",
+          "rank": "A"
+        },
+        {
+          "suit": "hearts",
+          "rank": "7"
+        },
+        {
+          "suit": "hearts",
+          "rank": "3"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "A"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "J"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "5"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "2"
+        },
+        {
+          "suit": "clubs",
+          "rank": "K"
+        },
+        {
+          "suit": "clubs",
+          "rank": "Q"
+        },
+        {
+          "suit": "clubs",
+          "rank": "8"
+        }
+      ],
+      "west": [
+        {
+          "suit": "spades",
+          "rank": "Q"
+        },
+        {
+          "suit": "spades",
+          "rank": "J"
+        },
+        {
+          "suit": "spades",
+          "rank": "10"
+        },
+        {
+          "suit": "spades",
+          "rank": "9"
+        },
+        {
+          "suit": "hearts",
+          "rank": "K"
+        },
+        {
+          "suit": "hearts",
+          "rank": "J"
+        },
+        {
+          "suit": "hearts",
+          "rank": "10"
+        },
+        {
+          "suit": "hearts",
+          "rank": "9"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "8"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "3"
+        },
+        {
+          "suit": "clubs",
+          "rank": "J"
+        },
+        {
+          "suit": "clubs",
+          "rank": "10"
+        },
+        {
+          "suit": "clubs",
+          "rank": "7"
+        }
+      ]
+    },
+    "dealer": "south",
+    "vulnerability": {
+      "northSouth": false,
+      "eastWest": false
+    },
+    "dealId": "deal-f8f0ed5fd32029c7",
+    "origin": {
+      "kind": "authored",
+      "contentId": "fixture.issue-2",
+      "version": 1
+    }
+  },
+  "contract": {
+    "level": 3,
+    "strain": "no-trumps",
+    "declarer": "south"
+  },
+  "learnerSide": "northSouth",
+  "actions": [
+    {
+      "index": 0,
+      "seat": "west",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "spades",
+          "rank": "9"
+        }
+      }
+    },
+    {
+      "index": 1,
+      "seat": "north",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "spades",
+          "rank": "A"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 2,
+      "seat": "east",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "spades",
+          "rank": "3"
+        }
+      }
+    },
+    {
+      "index": 3,
+      "seat": "south",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "spades",
+          "rank": "K"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 4,
+      "seat": "north",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "spades",
+          "rank": "5"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 5,
+      "seat": "east",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "spades",
+          "rank": "7"
+        }
+      }
+    },
+    {
+      "index": 6,
+      "seat": "south",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "spades",
+          "rank": "6"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 7,
+      "seat": "west",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "spades",
+          "rank": "10"
+        }
+      }
+    },
+    {
+      "index": 8,
+      "seat": "west",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "hearts",
+          "rank": "9"
+        }
+      }
+    },
+    {
+      "index": 9,
+      "seat": "north",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "hearts",
+          "rank": "Q"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 10,
+      "seat": "east",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "hearts",
+          "rank": "2"
+        }
+      }
+    },
+    {
+      "index": 11,
+      "seat": "south",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "hearts",
+          "rank": "A"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 12,
+      "seat": "south",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "spades",
+          "rank": "4"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 13,
+      "seat": "west",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "spades",
+          "rank": "J"
+        }
+      }
+    },
+    {
+      "index": 14,
+      "seat": "north",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "spades",
+          "rank": "2"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 15,
+      "seat": "east",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "spades",
+          "rank": "8"
+        }
+      }
+    },
+    {
+      "index": 16,
+      "seat": "west",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "hearts",
+          "rank": "10"
+        }
+      }
+    },
+    {
+      "index": 17,
+      "seat": "north",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "hearts",
+          "rank": "4"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 18,
+      "seat": "east",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "hearts",
+          "rank": "5"
+        }
+      }
+    },
+    {
+      "index": 19,
+      "seat": "south",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "hearts",
+          "rank": "7"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 20,
+      "seat": "west",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "clubs",
+          "rank": "7"
+        }
+      }
+    },
+    {
+      "index": 21,
+      "seat": "north",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "clubs",
+          "rank": "A"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 22,
+      "seat": "east",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "clubs",
+          "rank": "2"
+        }
+      }
+    },
+    {
+      "index": 23,
+      "seat": "south",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "clubs",
+          "rank": "K"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 24,
+      "seat": "north",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "diamonds",
+          "rank": "K"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 25,
+      "seat": "east",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "diamonds",
+          "rank": "4"
+        }
+      }
+    },
+    {
+      "index": 26,
+      "seat": "south",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "diamonds",
+          "rank": "A"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 27,
+      "seat": "west",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "diamonds",
+          "rank": "3"
+        }
+      }
+    },
+    {
+      "index": 28,
+      "seat": "south",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "hearts",
+          "rank": "3"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 29,
+      "seat": "west",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "hearts",
+          "rank": "J"
+        }
+      }
+    },
+    {
+      "index": 30,
+      "seat": "north",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "diamonds",
+          "rank": "Q"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 31,
+      "seat": "east",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "hearts",
+          "rank": "6"
+        }
+      }
+    },
+    {
+      "index": 32,
+      "seat": "west",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "clubs",
+          "rank": "10"
+        }
+      }
+    },
+    {
+      "index": 33,
+      "seat": "north",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "clubs",
+          "rank": "9"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 34,
+      "seat": "east",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "clubs",
+          "rank": "3"
+        }
+      }
+    },
+    {
+      "index": 35,
+      "seat": "south",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "clubs",
+          "rank": "Q"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 36,
+      "seat": "south",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "diamonds",
+          "rank": "J"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 37,
+      "seat": "west",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "diamonds",
+          "rank": "8"
+        }
+      }
+    },
+    {
+      "index": 38,
+      "seat": "north",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "diamonds",
+          "rank": "9"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 39,
+      "seat": "east",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "diamonds",
+          "rank": "6"
+        }
+      }
+    },
+    {
+      "index": 40,
+      "seat": "south",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "diamonds",
+          "rank": "5"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 41,
+      "seat": "west",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "spades",
+          "rank": "Q"
+        }
+      }
+    },
+    {
+      "index": 42,
+      "seat": "north",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "diamonds",
+          "rank": "7"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 43,
+      "seat": "east",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "diamonds",
+          "rank": "10"
+        }
+      }
+    },
+    {
+      "index": 44,
+      "seat": "east",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "hearts",
+          "rank": "8"
+        }
+      }
+    },
+    {
+      "index": 45,
+      "seat": "south",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "diamonds",
+          "rank": "2"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 46,
+      "seat": "west",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "hearts",
+          "rank": "K"
+        }
+      }
+    },
+    {
+      "index": 47,
+      "seat": "north",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "clubs",
+          "rank": "6"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 48,
+      "seat": "west",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "clubs",
+          "rank": "J"
+        }
+      }
+    },
+    {
+      "index": 49,
+      "seat": "north",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "clubs",
+          "rank": "4"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    },
+    {
+      "index": 50,
+      "seat": "east",
+      "controller": "robot",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "clubs",
+          "rank": "5"
+        }
+      }
+    },
+    {
+      "index": 51,
+      "seat": "south",
+      "controller": "learner",
+      "action": {
+        "kind": "play-card",
+        "card": {
+          "suit": "clubs",
+          "rank": "8"
+        }
+      },
+      "provenance": {
+        "kind": "learner"
+      }
+    }
+  ],
+  "status": "completed",
+  "result": {
+    "northSouth": 6,
+    "eastWest": 7
+  }
+}
