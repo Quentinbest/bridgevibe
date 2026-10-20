@@ -1,4 +1,4 @@
-import { startPlaythrough, type Card, type SeatView, type Seat, type PlayedCard } from '../table';
+import { startPlaythrough, type Card, type SeatView, type Seat, type PlayedCard, type ReasonCode } from '../table';
 import { fallbackPolicy } from '../robots';
 import { cardName, reasonStrings, text } from '../explanation';
 import { fixedDeal } from './fixture';
@@ -10,6 +10,10 @@ export type LearnerView = Readonly<Pick<SeatView,
   collecting: boolean;
   lastTrickWinner: Seat | null;
   reason: string;
+  reasonCode: ReasonCode | null;
+  rejectionId: number;
+  rejectedCard: Card | null;
+  rejectedSeat: Seat | null;
   announcements: readonly string[];
 }>;
 
@@ -21,6 +25,11 @@ export function createPlay() {
   let collecting = false;
   let displayedTrick: readonly PlayedCard[] = [];
   let reason = '';
+  let rejectionId = 0;
+  let reasonCode: ReasonCode | null = null;
+  let rejectedCard: Card | null = null;
+  let rejectedSeat: Seat | null = null;
+  function clearRejection() { reason = ''; reasonCode = null; rejectedCard = null; rejectedSeat = null; }
   const announcements: string[] = [];
   function learnerView(): LearnerView {
     // ADR-0001, US-16.4: UI data comes exclusively from Declarer's Seat View.
@@ -28,7 +37,7 @@ export function createPlay() {
     return { positionIndex, hand, dummy, contract, turn, tricksWon, cardCounts, status,
       legalCards: turn === 'south' || turn === 'north' ? table.legalActions(turn).map(action => action.card) : [],
       lastTrickWinner: tricks.at(-1)?.winner ?? null,
-      displayedTrick, collecting, reason, announcements: [...announcements] };
+      displayedTrick, collecting, reason, reasonCode, rejectionId, rejectedCard, rejectedSeat, announcements: [...announcements] };
   }
   let snapshot = learnerView();
   function publish() { snapshot = learnerView(); listeners.forEach(listener => listener()); }
@@ -46,8 +55,10 @@ export function createPlay() {
   }
   function accept(seat: 'north' | 'south' | 'east' | 'west', card: Card, controller: 'learner' | 'robot') {
     const result = table.submit(seat, controller, { kind: 'play-card', card });
-    reason = '';
+    if (controller === 'learner') clearRejection();
     if (result.kind === 'rejected') {
+      rejectionId++;
+      reasonCode = result.reason; rejectedCard = card; rejectedSeat = seat;
       reason = text(reasonStrings[result.reason], result.details.suit ? { suit: text(`suit.${result.details.suit}`) } : {});
     } else {
       for (const event of result.events) {
@@ -62,6 +73,7 @@ export function createPlay() {
   }
   return {
     getSnapshot: () => snapshot,
+    clearRejection() { clearRejection(); publish(); },
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
     start() { running = true; schedule(); return () => { running = false; clearTimeout(timer); }; },
     play(seat: 'north' | 'south', card: Card) { if (!collecting) accept(seat, card, 'learner'); },

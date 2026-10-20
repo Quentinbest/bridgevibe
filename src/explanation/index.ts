@@ -2,12 +2,19 @@ import type { Card, ReasonCode } from '../table';
 
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
-  "reason.playthrough-complete": { text: "This deal is finished.", status: 'draft' },
+  "reason.playthrough-complete": { text: "This playthrough is finished.", status: 'draft' },
   "reason.malformed-action": { text: "Choose a card from the hand you control.", status: 'draft' },
   "reason.not-your-turn": { text: "Wait for your turn to play.", status: 'draft' },
-  "reason.only-declarer-plays-dummy": { text: "You choose the cards for dummy.", status: 'draft' },
+  "reason.only-declarer-plays-dummy": { text: "Only declarer chooses dummy’s cards.", status: 'draft' },
   "reason.card-not-held": { text: "Choose a card still in this hand.", status: 'draft' },
-  "reason.must-follow-suit": { text: "Play {suit}; you still have that suit.", status: 'draft' },
+  "reason.must-follow-suit": { text: "Not that one. You still have {suit}.", status: 'draft' },
+  "rule.playthrough-complete": { text: "All 13 tricks have been played. No more cards can be played in this playthrough.", status: 'draft' },
+  "rule.malformed-action": { text: "Choose a card still in the hand you control. Each card can be played only once.", status: 'draft' },
+  "rule.not-your-turn": { text: "Players take turns clockwise around the table. The winner of a trick leads the next one.", status: 'draft' },
+  "rule.only-declarer-plays-dummy": { text: "Dummy’s cards are face up, but declarer chooses which one to play. Dummy still plays in turn.", status: 'draft' },
+  "rule.card-not-held": { text: "Play a card from the hand whose turn it is. A card in another hand cannot be played from this one.", status: 'draft' },
+  "rule.must-follow-suit": { text: "The first card of a trick sets the suit to follow. Play that suit if you have it. Only when you have none left may you play another suit.", status: 'draft' },
+  "rule.why": { text: "Why is that the rule?", status: 'draft' },
   "turn.lead": { text: "Your lead", status: 'draft' },
   "turn.play": { text: "Your turn", status: 'draft' },
   "turn.dummy": { text: "Play from dummy", status: 'draft' },
@@ -79,7 +86,7 @@ export const catalogue = {
   "face.3": { text: "3", status: 'draft' },
   "rank.2": { text: "2", status: 'draft' },
   "face.2": { text: "2", status: 'draft' },
-} as const;
+} as const satisfies Record<`reason.${ReasonCode}` | `rule.${ReasonCode}`, { text: string; status: 'draft' }> & Record<string, { text: string; status: 'draft' }>;
 export type StringId = keyof typeof catalogue;
 export function text(id: StringId, params: Readonly<Record<string, string | number>> = {}): string {
   return catalogue[id].text.replace(/\{(\w+)\}/g, (match, key: string) => String(params[key] ?? match));

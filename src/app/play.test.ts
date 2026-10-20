@@ -42,10 +42,10 @@ test('composition retains reason until the next action and publishes each play a
   vi.useFakeTimers(); const play = createPlay(); const stop = play.start();
   vi.advanceTimersByTime(500);
   play.play('north', { suit: 'hearts', rank: 'Q' });
-  expect(play.getSnapshot().reason).toBe('Play spades; you still have that suit.');
+  expect(play.getSnapshot().reason).toBe('Not that one. You still have spades.');
   expect(play.getSnapshot().positionIndex).toBe(1);
   vi.advanceTimersByTime(2000);
-  expect(play.getSnapshot().reason).toBe('Play spades; you still have that suit.');
+  expect(play.getSnapshot().reason).toBe('Not that one. You still have spades.');
   play.play('north', play.getSnapshot().legalCards[0]);
   expect(play.getSnapshot().reason).toBe('');
   vi.advanceTimersByTime(500); play.play('south', play.getSnapshot().legalCards[0]);

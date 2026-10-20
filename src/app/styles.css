@@ -84,3 +84,27 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
   .played-west { left: 0; }
   .played-east { right: 0; }
 }
+
+/* US-01 / UX §3.4: only the returned card moves; transforms preserve the hand layout. */
+@keyframes rejected-card-shake {
+  0%, 100% { transform: translateX(0); }
+  25%, 75% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+}
+.rejected-card { animation: rejected-card-shake 180ms ease-out; }
+.rejection-panel { text-align: left; }
+.rejection-panel[data-visible="true"] { margin-bottom: var(--space-12); padding: var(--space-12) var(--space-16); border: 1px solid var(--border); border-radius: var(--radius-20); background: var(--surface); color: var(--text); }
+.rejection-panel[data-visible="true"] .reason { font-weight: 600; }
+.rule-disclosure { display: block; min-height: 44px; padding: var(--space-4) 0; border: 0; background: transparent; color: var(--accent-text); font: 600 var(--type-14) var(--font-body); text-align: left; cursor: pointer; }
+.rule-disclosure:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
+.rule-reference { font-size: var(--type-14); line-height: 1.5; }
+/* UX §3.4: desktop reference has a 340px side panel, 24px gap and 64px outer padding.
+   Preserve the 608px hand + 32px felt padding: 608 + 32 + 340 + 24 + 64 = 1068px.
+   The mock-up's 560px table basis would compress the required 44px exposed card edges. */
+@media (min-width: 1068px) {
+  main { max-width: 1440px; }
+  .table { position: relative; margin-right: 364px; }
+  .rejection-panel { position: absolute; left: calc(100% + 24px); top: 0; width: 340px; }
+  .rejection-panel[data-visible="true"] { padding: var(--space-20); }
+  .rejection-panel .reason { font: 800 var(--type-24) var(--font-display); }
+}
