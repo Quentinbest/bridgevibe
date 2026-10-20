@@ -37,6 +37,10 @@ test('US-40.1, F5: complete real-policy Playthrough and learner rejection have c
     expect(entries).toHaveLength(27);
     expect(entries[0]).toMatchObject({ kind: 'statement', text: reason, provenance: { sourceKind: 'template', templateId: 'reason.not-your-turn' } });
     const robots = play.record().actions.filter(action => action.controller === 'robot');
+    const robotEntries = entries.filter(entry => entry.kind === 'robot-action');
+    expect(robotEntries[0].positionIndex).toBe(0);
+    expect(robotEntries.map(entry => entry.positionIndex)).toEqual(robots.map(action => action.index));
+    expect(entries[0].positionIndex).toBe(0);
     expect(entries.filter(entry => entry.kind === 'robot-action').map(entry => entry.provenance))
       .toEqual(robots.map(action => ({ sourceKind: 'robot', ...action.provenance })));
     expect(entries.map(entry => entry.playthroughId)).toEqual(Array(27).fill(play.record().playthroughId));
@@ -62,4 +66,27 @@ test('US-40.1: disclosed rule text is also a statement, with its own catalogue k
   expect(play.provenanceLog.entries()[1]).toMatchObject({ kind: 'statement', informationMode: 'VISIBLE',
     provenance: { sourceKind: 'template', templateId: 'rule.not-your-turn' } });
   expect(validateEntry(play.provenanceLog.entries()[1])).toEqual([]);
+});
+
+test('US-01.6, US-40.1: unexpected worker provenance cannot commit a card then break logging', () => {
+  vi.useFakeTimers();
+  const worker = new PolicyWorker();
+  worker.postMessage = message => {
+    setTimeout(() => handleRobotMessage(message, data => {
+      if (data.type === 'decided') Object.assign(data.provenance, { sourceKind: 'template' });
+      worker.onmessage?.({ data } as MessageEvent);
+    }), 1);
+  };
+  const play = createPlay({ createWorker: () => worker });
+  const stop = play.start();
+  try {
+    expect(() => vi.advanceTimersByTime(500)).not.toThrow();
+    expect(play.record().actions).toHaveLength(1);
+    expect(play.record().actions[0].provenance).toMatchObject({ kind: 'robot', policy: 'bv-fallback', fallback: 'engine-failure' });
+    const entries = play.provenanceLog.entries();
+    expect(entries).toHaveLength(1);
+    expect(entries[0]).toMatchObject({ positionIndex: 0, provenance: { sourceKind: 'robot', policy: 'bv-fallback' } });
+    expect(validateEntry(entries[0])).toEqual([]);
+    expect(play.getSnapshot().positionIndex).toBe(1);
+  } finally { stop(); }
 });

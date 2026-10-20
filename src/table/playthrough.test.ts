@@ -189,3 +189,14 @@ test('US-01.6, CI-5: robot provenance is mandatory, complete, and matches the co
   expect(state(table)).toEqual(before);
   play(table, 'north'); expect(table.record().actions[1].provenance).toEqual({ kind: 'learner' });
 });
+
+test('US-01.6, CI-5: unknown robot provenance fields are rejected before any state changes', () => {
+  const table = make();
+  const before = state(table); const key = table.positionKey();
+  for (const extra of [{ sourceKind: 'template' }, { unexpected: true }, { [Symbol('extra')]: true }]) {
+    const provenance = { kind: 'robot' as const, policy: 'bv-basic', version: '1', durationMs: 1, ...extra };
+    expect(table.submit('west', 'robot', table.legalActions('west')[0], provenance))
+      .toMatchObject({ kind: 'rejected', reason: 'malformed-action' });
+    expect(state(table)).toEqual(before); expect(table.positionKey()).toBe(key);
+  }
+});

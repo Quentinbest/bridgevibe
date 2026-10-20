@@ -86,6 +86,9 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract; learne
     if (!SEATS.some(candidate => candidate === seat) || (controller !== 'learner' && controller !== 'robot') || !isAction(action)) return reject('malformed-action');
     // US-01.6, CI-5: controller and complete provenance must agree before any mutation.
     if ((controller === 'robot' && !provenance) || (provenance && provenance.kind !== controller)) return reject('malformed-action');
+    // US-01.6, CI-5: unknown fields must not escape into downstream provenance records.
+    if (provenance?.kind === 'robot' && Reflect.ownKeys(provenance).some(key =>
+      !['kind', 'policy', 'version', 'fallback', 'durationMs'].includes(key as string))) return reject('malformed-action');
     if (provenance?.kind === 'robot' && (typeof provenance.policy !== 'string' || !provenance.policy.trim()
       || typeof provenance.version !== 'string' || !provenance.version.trim()
       || !Number.isFinite(provenance.durationMs) || provenance.durationMs < 0

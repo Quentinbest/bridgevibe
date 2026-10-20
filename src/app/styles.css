@@ -147,7 +147,10 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
 .debug-panel pre, .debug-panel p { white-space: pre-wrap; overflow-wrap: anywhere; }
 .debug-panel button, .debug-panel select { min-height: 44px; padding: 8px; margin: 4px; background: var(--raised); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-8); }
 .debug-panel label { display: inline; }
-@media (min-width: 1200px) {
+/* US-40.2, UX §3.1: keep the 1068px table/rejection layout (608px hand + 32px felt
+   padding + 340px rejection panel + 24px gap + 64px main padding), plus the 420px
+   debug column: 1068 + 420 = 1488px. Below this, the debug panel stays below the table. */
+@media (min-width: 1488px) {
   .debug-layout { display: grid; grid-template-columns: minmax(0, 1fr) 420px; align-items: start; }
   .debug-layout > .header { grid-column: 1 / -1; }
   .debug-panel { grid-column: 2; grid-row: 2; margin-left: 0; max-height: calc(100vh - 110px); overflow: auto; }

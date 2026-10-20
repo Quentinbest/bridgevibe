@@ -31,5 +31,13 @@ test('US-40.1–3: entries, counters, grading download and current Seat Views', 
     expect(view.seat).toBe(seat); expect(view.positionIndex).toBe(1);
     expect(view.hand).toHaveLength(seat === 'west' ? 12 : 13);
   }
-  if (page.viewportSize()!.width === 1440) expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  if (page.viewportSize()!.width === 1440) {
+    // US-40.2, UX §3.1: the debug panel must leave room for the 608px hand and 32px felt padding.
+    const felt = await page.locator('.table').boundingBox();
+    const hand = await page.locator('.hand').boundingBox();
+    expect(felt!.width).toBeGreaterThanOrEqual(640);
+    expect(hand!.x).toBeGreaterThanOrEqual(felt!.x + 16);
+    expect(hand!.x + hand!.width).toBeLessThanOrEqual(felt!.x + felt!.width - 16);
+    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  }
 });

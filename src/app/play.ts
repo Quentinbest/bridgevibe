@@ -24,9 +24,9 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
   const table = startPlaythrough({ deal, contract: { level: 3, strain: 'no-trumps', declarer: 'south' }, learnerSide: 'northSouth' });
   const provenanceLog = createProvenanceLog('0.0.0');
   let entryId = 0;
-  function log(entry: Pick<LogEntry, 'kind' | 'summary' | 'text' | 'provenance'>) {
+  function log(entry: Pick<LogEntry, 'kind' | 'summary' | 'text' | 'provenance' | 'positionIndex'>) {
     provenanceLog.record({ ...entry, id: `${table.record().playthroughId}-${++entryId}`, playthroughId: table.record().playthroughId,
-      positionIndex: table.seatView('south').positionIndex, informationMode: 'VISIBLE', at: new Date().toISOString() });
+      informationMode: 'VISIBLE', at: new Date().toISOString() });
   }
   let options = robotOptions;
   // US-10.2, §4.3.6, US-40.2: every build that can show the debug panel's hidden-card counter
@@ -78,6 +78,8 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     }
   }
   function accept(seat: 'north' | 'south' | 'east' | 'west', card: Card, controller: 'learner' | 'robot', provenance?: RobotProvenance) {
+    // US-40.1: provenance refers to the position where the action was decided.
+    const positionIndex = table.seatView(seat).positionIndex;
     const result = table.submit(seat, controller, { kind: 'play-card', card }, provenance);
     // US-11.1: a rejected robot action goes back to the host, which falls back; it is never learner feedback.
     if (result.kind === 'rejected' && controller === 'robot') return false;
@@ -86,10 +88,11 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
       rejectionId++;
       reasonCode = result.reason; rejectedCard = card; rejectedSeat = seat;
       reason = text(reasonStrings[result.reason], result.details.suit ? { suit: text(`suit.${result.details.suit}`) } : {});
-      log({ kind: 'statement', summary: result.reason, text: reason, provenance: { sourceKind: 'template', templateId: reasonStrings[result.reason] } });
+      log({ positionIndex, kind: 'statement', summary: result.reason, text: reason, provenance: { sourceKind: 'template', templateId: reasonStrings[result.reason] } });
     } else {
-      if (controller === 'robot' && provenance) log({ kind: 'robot-action', summary: JSON.stringify({ seat, action: { kind: 'play-card', card } }),
-        provenance: { sourceKind: 'robot', ...provenance } });
+      if (controller === 'robot' && provenance) log({ positionIndex, kind: 'robot-action', summary: JSON.stringify({ seat, action: { kind: 'play-card', card } }),
+        provenance: { sourceKind: 'robot', kind: 'robot', policy: provenance.policy, version: provenance.version,
+          durationMs: provenance.durationMs, ...(provenance.fallback ? { fallback: provenance.fallback } : {}) } });
       for (const event of result.events) {
         if (event.kind === 'card-played') announcements.push(text('announce.play', { seat: text(`seat.${event.seat}`), card: cardName(event.card) }));
         // The winner is announced once, by the turn banner's live region during collection (UX §10).
@@ -110,7 +113,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     showRule() {
       if (!reasonCode) return;
       const templateId = `rule.${reasonCode}` as const;
-      log({ kind: 'statement', summary: reasonCode, text: text(templateId), provenance: { sourceKind: 'template', templateId } });
+      log({ positionIndex: table.seatView('south').positionIndex, kind: 'statement', summary: reasonCode, text: text(templateId), provenance: { sourceKind: 'template', templateId } });
       publish();
     },
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },

@@ -185,6 +185,8 @@ support the panel. The production build removes the dynamic panel import. The
 panel lists newest entries first, reports hidden-card audit violations and unmarked
 `bv-fallback` actions, and can inspect any current Seat View. That deliberately
 reveals hidden cards and is restricted to these internal debugging builds.
+Internal, audit and development builds must never be served to learners, because
+`?debug=1` shows every hand.
 Audits report violations into the counter before throwing, so unsafe inputs still
 cannot reach a robot. A new Playthrough starts a new log; nothing is persisted.
 
