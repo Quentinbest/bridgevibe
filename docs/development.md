@@ -120,6 +120,10 @@ Every issue repeats this list. A ticket is done when:
 - the UI works at 390×844 and 1440×900, in light and dark themes, with keyboard, screen reader and reduced motion;
 - nothing outside the ticket's scope is built, and gaps are raised as issue comments.
 
+## Scoring
+
+The standalone duplicate scorer is `src/table/scoring.ts`, exported by Table (US-09.1–2, A-01). Its ordered, numeric breakdown is ready for later explanation templates. F6 uses `src/table/f6-reference.json` (2,940 cases from two pinned reference scorers) and `src/table/f6-law77.ts` (16 hand-calculated examples), with the same suite configured for Node and Chromium. To regenerate offline, place the MIT `packages/ts-contractbridge` sources from RalphLipe/ts-contractbridge commit `8a788cf0a926ea0413f9d21091858bf4dc95bcfc` in `.reference-scorers/ts-contractbridge/` and npm `contract-bridge@3.2.1` in `.reference-scorers/contract-bridge/`, then run `node scripts/scoring/generate-f6-reference.ts` with Node 24. The script uses the installed TypeScript compiler and Node module hooks to load the TypeScript reference's `.js` imports; it writes deterministic JSON with source/version/licence metadata and preserves both scores on disagreement. Reference sources are ignored by Git and ESLint; neither they nor the generator enter the app bundle.
+
 ## Gameplay checks
 
 F1 in `src/table/playthrough.test.ts` runs unchanged in Node and Chromium. It checks reason precedence, rejection immutability, controller rules, blind leads, trick winners, completion and snapshot isolation. `test/boundaries.test.ts` checks the private SeatView brand at typecheck time and exercises ESLint restrictions through its API. Dependency fixtures include a robot importing explanation.
