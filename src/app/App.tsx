@@ -1,4 +1,4 @@
-import { useEffect, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { SUITS, type Card as TableCard } from '../table';
 import { cardName, text } from '../explanation';
 import { Card, CardBack } from './Card';
@@ -13,8 +13,22 @@ function Opponent({ seat, count }: { seat: 'west' | 'east'; count: number }) {
     <p>{text('opponent', { seat: text(`seat.${seat}`), count })}</p>
   </section>;
 }
-function TableScreen({ view, play, session, onNew }: { session: ReturnType<typeof dealSession>; onNew: () => void; view: LearnerView; play: (seat: 'north' | 'south', card: TableCard) => void }) {
+function TableScreen({ view, play, clearRejection, session, onNew }: { session: ReturnType<typeof dealSession>; onNew: () => void; view: LearnerView; clearRejection: () => void; play: (seat: 'north' | 'south', card: TableCard) => void }) {
   const [selected, setSelected] = useState<TableCard | null>(null);
+  const [ruleOpen, setRuleOpen] = useState(false);
+  const tableElement = useRef<HTMLElement | null>(null);
+  const disclosureElement = useRef<HTMLButtonElement | null>(null);
+  // UX §10: restore focus before a focused disclosure is removed, on every dismissal path.
+  const disclosureRef = useCallback((element: HTMLButtonElement | null) => {
+    if (!element && disclosureElement.current === document.activeElement) {
+      const hand = tableElement.current?.querySelector(view.rejectedSeat === 'north' ? '.dummy' : '.hand');
+      const card = view.rejectedCard;
+      const returned = card && hand?.querySelector<HTMLButtonElement>(`button[data-suit="${card.suit}"][data-rank="${card.rank}"]`);
+      (returned || hand?.querySelector<HTMLButtonElement>('button[tabindex="0"]'))?.focus({ preventScroll: true });
+    }
+    disclosureElement.current = element;
+  }, [view.rejectedCard, view.rejectedSeat]);
+  function select(card: TableCard | null) { setSelected(card); setRuleOpen(false); clearRejection(); }
   const active = !view.collecting && view.status !== 'completed';
   const target = view.contract.level + 6;
   // UX §10: an illegal card's name says which suit it must follow.
@@ -26,6 +40,7 @@ function TableScreen({ view, play, session, onNew }: { session: ReturnType<typeo
       : text(view.displayedTrick.length ? 'turn.play' : 'turn.lead');
   function submit(card: TableCard) {
     setSelected(null);
+    setRuleOpen(false);
     if (view.turn === 'north' || view.turn === 'south') play(view.turn, card);
   }
   return <>
@@ -34,18 +49,18 @@ function TableScreen({ view, play, session, onNew }: { session: ReturnType<typeo
       {session.invalid && <p className="deal-notice" role="status">{text('deal.invalid')}</p>}
       <DealControls info={session.info} onNew={onNew} />
     </div></header>
-    <main>
+    <main onKeyDown={event => { if (event.key === 'Escape') select(null); }}>
       <section className="status" aria-label={text('status')}>
         <span className="contract">{text('contract.3nt')}</span>
         <span>{text('declarer', { seat: text(`seat.${view.contract.declarer}`) })}</span>
         <span>{text('target', { target })}</span>
         <span className="tricks">{text('tricks.sides', { you: view.tricksWon.northSouth, them: view.tricksWon.eastWest })}</span>
       </section>
-      <section className="table" aria-label={text('table')}>
+      <section ref={tableElement} className="table" aria-label={text('table')}>
         <section className="dummy" aria-label={text('dummy')}>
           <p className="seat-label">{text('dummy')}</p>
           {view.dummy ? <Hand cards={view.dummy} dummy active={active && view.turn === 'north'} legalCards={view.legalCards} ledSuit={ledSuit}
-            selected={selected} onSelect={setSelected} onPlay={submit} /> : <>
+            rejectionId={view.rejectionId} rejectedCard={view.rejectedSeat === 'north' ? view.rejectedCard : null} selected={selected} onSelect={select} onPlay={submit} /> : <>
             <div className="suit-columns">{SUITS.map(suit => <div className="suit-column" key={suit}><CardBack /></div>)}</div>
             <p>{text('dummy.hidden', { count: view.cardCounts.north })}</p>
           </>}
@@ -59,9 +74,16 @@ function TableScreen({ view, play, session, onNew }: { session: ReturnType<typeo
         <Opponent seat="east" count={view.cardCounts.east} />
         <section className="learner" aria-label={text('hand')}>
           <p className="turn-banner" aria-live="polite">{view.status === 'completed' && !view.collecting ? text('result', { won: view.tricksWon.northSouth, target }) : banner}</p>
-          <p className="reason" aria-live="assertive">{view.reason}</p>
+          <div className="rejection-panel" data-visible={!!view.reason}>
+            <p className="reason" aria-live="assertive" aria-atomic="true">{view.reason}</p>
+            {view.reasonCode && <>
+              <button ref={disclosureRef} type="button" className="rule-disclosure" aria-expanded={ruleOpen} aria-controls="rule-reference"
+                onClick={() => setRuleOpen(open => !open)}>{text('rule.why')}</button>
+              <p id="rule-reference" className="rule-reference" hidden={!ruleOpen}>{text(`rule.${view.reasonCode}`)}</p>
+            </>}
+          </div>
           <Hand cards={view.hand} active={active && view.turn === 'south'} legalCards={view.legalCards} ledSuit={ledSuit}
-            selected={selected} onSelect={setSelected} onPlay={submit} />
+            rejectionId={view.rejectionId} rejectedCard={view.rejectedSeat === 'south' ? view.rejectedCard : null} selected={selected} onSelect={select} onPlay={submit} />
           <p className="seat-label">{text('learner')}</p>
         </section>
       </section>
@@ -81,5 +103,5 @@ export function App() {
   const play = session.play;
   const view = useSyncExternalStore(play.subscribe, play.getSnapshot);
   useEffect(() => play.start(), [play]);
-  return <TableScreen key={session.info.dealId} view={view} play={play.play} session={session} onNew={() => setSession(session.next())} />;
+  return <TableScreen key={session.info.dealId} view={view} play={play.play} clearRejection={play.clearRejection} session={session} onNew={() => setSession(session.next())} />;
 }

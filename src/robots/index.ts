@@ -1,4 +1,4 @@
-import { RANKS, SUITS, type Card, type SeatView } from '../table';
+import { RANKS, SUITS, type Action, type Card, type SeatView } from '../table';
 
 // Engineering §4.6.6: deterministic fallback using only this Seat's information.
 export function fallbackPolicy(view: SeatView): Card {
@@ -15,3 +15,11 @@ export function fallbackPolicy(view: SeatView): Card {
   if (!lowest) throw new Error('Fallback requires a nonempty acting hand');
   return { ...lowest };
 }
+
+// §4.3.3: policies receive only one Seat View and reproducibility/time inputs.
+export type RobotPolicy = { name: string; version: string; decide(view: SeatView, seed: string, deadline: number): Action };
+export const fallbackRobotPolicy: RobotPolicy = {
+  name: 'bv-fallback', version: '1', decide: view => ({ kind: 'play-card', card: fallbackPolicy(view) }),
+};
+// US-10.1: teacher-approved rules arrive with #13.
+export const basicPolicy: RobotPolicy = { ...fallbackRobotPolicy, name: 'bv-basic' };

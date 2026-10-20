@@ -33,7 +33,7 @@ test('off-suit rejection lowers the selected card and roving arrows and Escape p
   const queen = screen.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades" });
   fireEvent.click(queen); fireEvent.click(queen);
   expect(queen.getAttribute('aria-pressed')).toBe('false');
-  expect(screen.getByText('Play spades; you still have that suit.').getAttribute('aria-live')).toBe('assertive');
+  expect(screen.getByText('Not that one. You still have spades.').getAttribute('aria-live')).toBe('assertive');
   const ace = screen.getByRole('button', { name: 'Ace of spades, playable' });
   fireEvent.keyDown(ace, { key: 'ArrowRight' });
   const five = screen.getByRole('button', { name: '5 of spades, playable' });
@@ -88,6 +88,6 @@ test('a rejected confirmation returns focus to the rejected card', () => {
   queen.focus(); fireEvent.click(queen);
   const confirm = screen.getByRole('button', { name: 'Play it, Queen of hearts' });
   confirm.focus(); fireEvent.click(confirm);
-  expect(screen.getByText('Play spades; you still have that suit.')).toBeTruthy();
+  expect(screen.getByText('Not that one. You still have spades.')).toBeTruthy();
   expect(document.activeElement).toBe(screen.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades" }));
 });

@@ -4,7 +4,7 @@ import globals from 'globals';
 import hooks from 'eslint-plugin-react-hooks';
 import refresh from 'eslint-plugin-react-refresh';
 export default [
-  { ignores: ['node_modules/**', 'dist/**', 'test-results/**', 'playwright-report/**', '.delegate-ref/**'] },
+  { ignores: ['node_modules/**', 'dist/**', 'test-results/**', 'playwright-report/**', '.delegate-ref/**', '.reference-scorers/**'] },
   // ADR-0001: Seat Views can only be manufactured inside Table.
   { files: ['**/*.{ts,tsx}'], ignores: ['src/table/**'], rules: {
     'no-restricted-syntax': ['error', {
@@ -16,7 +16,7 @@ export default [
     // §4.2 rule 2: no type that carries a full deal, so an allowlist rather than a blocklist.
     'no-restricted-imports': ['error', { patterns: [{
       group: ['**/table', '**/table/**'],
-      allowImportNames: ['SeatView', 'Card', 'Suit', 'Rank', 'Seat', 'Side', 'Contract', 'PlayedCard', 'Trick', 'SUITS', 'RANKS', 'SEATS', 'sameCard', 'sideOf'],
+      allowImportNames: ['Action', 'SeatView', 'Card', 'Suit', 'Rank', 'Seat', 'Side', 'Contract', 'PlayedCard', 'Trick', 'SUITS', 'RANKS', 'SEATS', 'sameCard', 'sideOf'],
       message: 'Robots receive SeatView only (ADR-0001); import only seat-view types and card helpers from table.',
     }] }],
   } },

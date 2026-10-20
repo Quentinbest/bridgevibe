@@ -9,6 +9,12 @@ async function open(page: Page) {
   await page.clock.pauseAt(new Date());
   await page.goto('/');
 }
+// US-10.2: assert real-worker audit coverage, not just absence of visible leaks.
+async function robotAuditPassed(page: Page) {
+  const audit = await page.evaluate(() => ({ count: window.__robotAuditCount, violations: window.__robotAuditViolations }));
+  expect(audit.count).toBeGreaterThan(0);
+  expect(audit.violations).toEqual([]);
+}
 async function noHiddenCards(page: Page, played: readonly Card[]) {
   const pageText = await page.locator('body').textContent();
   const names = await page.locator('[aria-label]').evaluateAll(elements => elements.map(element => element.getAttribute('aria-label')).join('\n'));
@@ -55,6 +61,7 @@ test('full fixed Deal through clicks and Play it', async ({ page }, testInfo) =>
   }
   await expect(page.getByText('You took 6 of 13 tricks (needed 9)', { exact: true })).toBeVisible();
   await expect(page.locator('.hand .card, .suit-column .card')).toHaveCount(0);
+  await robotAuditPassed(page);
 });
 test('keyboard arrows, Enter, Escape and Space play from the active hand', async ({ page }) => {
   await open(page); await page.clock.runFor(500);
@@ -80,11 +87,11 @@ test('off-suit card is rejected, retained and announced until the next action', 
   const queen = page.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades", exact: true });
   await queen.click(); await queen.click();
   await expect(queen).toHaveAttribute('aria-pressed', 'false');
-  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Play spades; you still have that suit.');
+  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Not that one. You still have spades.');
   await expect(page.locator('.dummy .card')).toHaveCount(13);
   await expect(page.locator('.trick-area .card')).toHaveCount(1);
   await page.clock.runFor(2000);
-  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Play spades; you still have that suit.');
+  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Not that one. You still have spades.');
   const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });
   await ace.click(); await ace.click();
   await expect(page.locator('[aria-live="assertive"]')).toBeEmpty();
@@ -98,4 +105,5 @@ test('blind lead and later positions never expose unplayed opponent cards', asyn
   await ace.click(); await page.getByRole('button', { name: /^Play it, / }).click();
   await page.clock.runFor(500);
   await noHiddenCards(page, [{ suit: 'spades', rank: '9' }, { suit: 'spades', rank: 'A' }, { suit: 'spades', rank: '3' }]);
+  await robotAuditPassed(page);
 });

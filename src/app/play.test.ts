@@ -12,7 +12,7 @@ test('full fixed Deal with fallback defenders and first-legal learner completes 
 });
 test('composition delays blind lead, exposes Dummy, and stops its timers', () => {
   vi.useFakeTimers();
-  const play = createPlay(fixedDeal);
+  const play = createPlay({}, fixedDeal);
   expect(play.getSnapshot().dummy).toBeNull();
   const stop = play.start();
   vi.advanceTimersByTime(499);
@@ -25,7 +25,7 @@ test('composition delays blind lead, exposes Dummy, and stops its timers', () =>
   expect(play.getSnapshot().positionIndex).toBe(2);
 });
 test('composition retains completed trick for 1 second and gates the next play', () => {
-  vi.useFakeTimers(); const play = createPlay(fixedDeal); const stop = play.start();
+  vi.useFakeTimers(); const play = createPlay({}, fixedDeal); const stop = play.start();
   vi.advanceTimersByTime(500);
   play.play('north', play.getSnapshot().legalCards[0]);
   vi.advanceTimersByTime(500);
@@ -40,13 +40,13 @@ test('composition retains completed trick for 1 second and gates the next play',
   expect(play.getSnapshot()).toMatchObject({ collecting: false, displayedTrick: [] }); stop();
 });
 test('composition retains reason until the next action and publishes each play and winner', () => {
-  vi.useFakeTimers(); const play = createPlay(fixedDeal); const stop = play.start();
+  vi.useFakeTimers(); const play = createPlay({}, fixedDeal); const stop = play.start();
   vi.advanceTimersByTime(500);
   play.play('north', { suit: 'hearts', rank: 'Q' });
-  expect(play.getSnapshot().reason).toBe('Play spades; you still have that suit.');
+  expect(play.getSnapshot().reason).toBe('Not that one. You still have spades.');
   expect(play.getSnapshot().positionIndex).toBe(1);
   vi.advanceTimersByTime(2000);
-  expect(play.getSnapshot().reason).toBe('Play spades; you still have that suit.');
+  expect(play.getSnapshot().reason).toBe('Not that one. You still have spades.');
   play.play('north', play.getSnapshot().legalCards[0]);
   expect(play.getSnapshot().reason).toBe('');
   vi.advanceTimersByTime(500); play.play('south', play.getSnapshot().legalCards[0]);

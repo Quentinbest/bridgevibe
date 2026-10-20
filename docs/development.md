@@ -12,21 +12,53 @@ The longer notes behind [`AGENTS.md`](../AGENTS.md): read the part a task needs.
 | `npm run deps:check` | dependency-cruiser module rules over `src` |
 | `npm test` | Vitest **node** project: unit, jsdom component, catalogue guard, dependency-rule fixtures |
 | `npm run test:browser` | Vitest **browser** project (headless Chromium): `src/table/**/*.test.ts` and `src/app/**/*.browser.test.tsx` |
-| `npm run build` | Production Vite build |
+| `npm run build` | Production Vite build, licence BOM and NOTICE; fails on licence violations |
 | `npm run test:e2e` | Playwright with axe; builds first, then serves `vite preview` on 127.0.0.1:4173 |
 | `npm run check` | All of the above, in CI order |
 
 - One Vitest test: `npx vitest run --project node <file>`, with `-t "<name>"` to filter by test name.
 - One Playwright project: `npx playwright test --project 390-dark`. Projects are `<width>-<light|dark>` for widths 320, 390, 600 and 1440.
 
-CI (`.github/workflows/ci.yml`) runs each check as its own step.
+CI (`.github/workflows/ci.yml`) runs each check as its own step. E2e runs `vite build --mode audit`, auditing every real robot worker message against the Table record and exposing counts and violations for assertions (US-10.2). Production builds remove this audit code.
+
+## Licences
+
+Every production build runs `scripts/licences/` (US-46, LR-1–LR-7). It writes
+`licence-report/bom.json` and ships `dist/NOTICE.txt` with full third-party licence
+texts, including the font OFL notices. CI uploads both files, including after a
+failed build. Only shipped modules and assets are attributed; development-only
+packages are excluded unless their helpers reach the bundle.
+Assets are never inlined, so each is attributed.
+
+Package versions come from `package.json`, but grants come from actual licence
+files. Missing or unrecognised grants, GPL-family licences, unknown virtual
+modules, undeclared assets and prohibited package names or output bytes fail the
+build. `scripts/licences/denylist.json` holds the LR-3 / US-46.4 tripwires; every
+file in the output directory is scanned, including binaries and NOTICE.
+
+Declare public files and imported artwork, icons or WebAssembly in
+`licences/assets.json` with their source or shipped path, repository licence file,
+licence name and attribution. The declared licence must match the file's grant.
+First-party code is recorded separately with distribution model D2 still open.
+Track unanswered DEP-08 questions in `licences/open-items.json`; these are copied
+into the BOM, not treated as grants.
+
+Only owner-reviewed exceptions may be added to `licences/allow-list.json`:
+provide exactly one `package` or `path`, the exact `version`, `reason`, `reviewer`
+and `date`. Obtain review before adding an entry. An entry covers a missing or
+unrecognised grant, or, with `elected`, a dual-licensed artefact: `elected` names
+the non-GPL grant its own licence files make (for example `"MIT"` for "MIT or GPL"),
+and the BOM records that election. GPL-only artefacts and LR-3 violations cannot be
+exempted. The list starts empty.
+For isolated builds, `licences({ reportPath })` or the
+`BRIDGEVIBE_LICENCE_REPORT` environment variable redirects the BOM destination.
 
 ## Modules
 
 `src/<module>/` follows engineering spec §4.2: one module per bounded context, created by the ticket that needs it. Today there are four:
 
 - **table**: the authoritative rules core. `startPlaythrough({ deal, contract })` returns a handle with `legalActions(seat)`, `submit(seat, controller, action)`, `seatView(seat)` and `record()`. It checks card plays, owns turns and trick winners, exposes Dummy after the opening lead, and completes after 13 tricks. Rejections preserve all state. It **may depend on nothing**: no other module, package or Node builtin (its tests may import Vitest).
-- **robots**: deterministic fallback card policy (§4.6.6), receiving only a branded `SeatView`. It imports only Table. ESLint prohibits full-Deal types and SeatView assertions outside Table.
+- **robots**: the `RobotPolicy` port, `bv-basic` and deterministic `bv-fallback` (§4.6.6), receiving only a branded `SeatView`, seed and deadline. Both policies currently use the same card rule; #13 replaces the basic policy rules. It imports only Table. ESLint prohibits full-Deal types and SeatView assertions outside Table.
 - **explanation**: the string catalogue (`catalogue` keyed by ID, `text(id, params)` with `{param}` interpolation). Every entry carries `status: 'draft'` until a teacher signs it off (CI-8).
 - **app**: the composition root and all UI. Only **app** may import **app**.
 
@@ -38,7 +70,7 @@ Rules every later module must keep:
 - Robots and in-play hints receive only a Seat View, never a full Deal. Only **table** constructs Seat Views and completed playthrough records (ADR-0001).
 - The UI is built from a learner view: face-up cards plus a count for each hidden hand. No hidden card identity reaches React props, page text or accessibility names (US-16.4). The fixed Deal lives in `src/app/fixture.ts` for composition; `src/app/play.ts` projects South’s SeatView into the learner view. The authored Deal is necessarily present in the client bundle in this fixed-Deal slice.
 - When the learner's side declares, the learner plays Declarer, and the display rotates so Declarer is at the bottom (ADR-0003).
-- Robots run on the main thread for issue #2, with 500 ms `setTimeout` delays and a 1 s trick collection delay. Workers arrive with #8.
+- Robots run `bv-basic` in a versioned Web Worker from an encoded Seat View (#8). The host enforces a 400 ms deadline and a constant 500 ms display delay, records marked timeout/engine-failure fallbacks, and disables the worker after three session failures. Hidden pages cancel pending requests; interrupted decisions restart with fresh deadline and display windows on return. Trick collection remains 1 s. The trivial fallback uses the same Seat View on the main thread; neither policy needs WebAssembly.
 
 ## No hard-coded learner-facing text (US-38)
 
@@ -98,6 +130,10 @@ Every issue repeats this list. A ticket is done when:
 - all copy comes from the catalogue, marked as a draft;
 - the UI works at 390×844 and 1440×900, in light and dark themes, with keyboard, screen reader and reduced motion;
 - nothing outside the ticket's scope is built, and gaps are raised as issue comments.
+
+## Scoring
+
+The standalone duplicate scorer is `src/table/scoring.ts`, exported by Table (US-09.1–2, A-01). Its ordered, numeric breakdown is ready for later explanation templates. F6 uses `src/table/f6-reference.json` (2,940 cases from two pinned reference scorers) and `src/table/f6-law77.ts` (16 hand-calculated examples), with the same suite configured for Node and Chromium. To regenerate offline, place the MIT `packages/ts-contractbridge` sources from RalphLipe/ts-contractbridge commit `8a788cf0a926ea0413f9d21091858bf4dc95bcfc` in `.reference-scorers/ts-contractbridge/` and npm `contract-bridge@3.2.1` in `.reference-scorers/contract-bridge/`, then run `node scripts/scoring/generate-f6-reference.ts` with Node 24. The script uses the installed TypeScript compiler and Node module hooks to load the TypeScript reference's `.js` imports; it writes deterministic JSON with source/version/licence metadata and preserves both scores on disagreement. Reference sources are ignored by Git and ESLint; neither they nor the generator enter the app bundle.
 
 ## Gameplay checks
 

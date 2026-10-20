@@ -23,7 +23,7 @@ export function nextDeal(deal: Deal): Deal {
 }
 // US-16.4: only metadata and the Seat View projection reach React, never four hands.
 export function dealSession(deal: Deal, invalid = false) {
-  return { info: { dealId: deal.dealId, origin: deal.origin }, invalid, play: createPlay(deal),
+  return { info: { dealId: deal.dealId, origin: deal.origin }, invalid, play: createPlay({}, deal),
     next() {
       const next = nextDeal(deal);
       if (next.origin.kind === 'seed') {

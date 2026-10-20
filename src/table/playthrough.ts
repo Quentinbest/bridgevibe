@@ -1,5 +1,10 @@
 import { RANKS, SEATS, SUITS, type Card, type Deal, type Seat, type Side, type Suit } from './index';
 
+import { decodeSeatView, type SeatView } from './seatViewMessage';
+import { positionDigest } from './positionKey';
+
+export type RobotProvenance = Readonly<{ kind: 'robot'; policy: string; version: string; fallback?: 'timeout' | 'engine-failure'; durationMs: number }>;
+export type ActionProvenance = RobotProvenance | Readonly<{ kind: 'learner' }>;
 export type Contract = Readonly<{ level: number; strain: Suit | 'no-trumps'; declarer: Seat }>;
 export type Controller = 'learner' | 'robot';
 export type Action = Readonly<{ kind: 'play-card'; card: Card }>;
@@ -8,28 +13,14 @@ export const REASON_CODES = ['playthrough-complete', 'malformed-action', 'not-yo
 export type ReasonCode = typeof REASON_CODES[number];
 export type PlayedCard = Readonly<{ seat: Seat; card: Card }>;
 export type Trick = Readonly<{ cards: readonly PlayedCard[]; winner: Seat }>;
-const seatViewBrand: unique symbol = Symbol('SeatView');
-export type SeatView = Readonly<{
-  [seatViewBrand]: true;
-  seat: Seat;
-  positionIndex: number;
-  hand: readonly Card[];
-  dummy: readonly Card[] | null;
-  contract: Contract;
-  tricks: readonly Trick[];
-  currentTrick: readonly PlayedCard[];
-  turn: Seat | null;
-  tricksWon: Readonly<Record<Side, number>>;
-  cardCounts: Readonly<Record<Seat, number>>;
-  status: Status;
-}>;
+export type { SeatView } from './seatViewMessage';
 export type PlaythroughRecord = Readonly<{
   schemaVersion: 1;
   playthroughId: string;
   deal: Deal;
   contract: Contract;
   learnerSide: Side;
-  actions: readonly Readonly<{ index: number; seat: Seat; controller: Controller; action: Action }>[];
+  actions: readonly Readonly<{ index: number; seat: Seat; controller: Controller; action: Action; provenance?: ActionProvenance }>[];
   status: Status;
   result: Readonly<Record<Side, number>>;
 }>;
@@ -77,18 +68,18 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract; learne
     return (following.length ? following : hands[seat]).map(card => ({ kind: 'play-card', card: copyCard(card) }));
   }
   function seatView(seat: Seat): SeatView {
-    return {
-      [seatViewBrand]: true, seat, positionIndex: actions.length,
+    return decodeSeatView({
+      seat, positionIndex: actions.length,
       hand: hands[seat].map(copyCard), dummy: actions.length ? hands[dummySeat].map(copyCard) : null,
       contract: { ...contract }, tricks: tricks.map(trick => ({ cards: trick.cards.map(copyPlay), winner: trick.winner })),
       currentTrick: currentTrick.map(copyPlay), turn, tricksWon: { ...tricksWon },
       cardCounts: { north: hands.north.length, east: hands.east.length, south: hands.south.length, west: hands.west.length }, status,
-    };
+    });
   }
   function record(): PlaythroughRecord {
     return JSON.parse(JSON.stringify({ schemaVersion: 1, playthroughId, deal, contract, learnerSide, actions, status, result: tricksWon }));
   }
-  function submit(seat: unknown, controller: unknown, action: unknown): Submission {
+  function submit(seat: unknown, controller: unknown, action: unknown, provenance?: ActionProvenance): Submission {
     const reject = (reason: ReasonCode, details: { cause?: 'controller' | 'duplicate'; suit?: Suit } = {}): Submission => ({ kind: 'rejected', reason, details });
     // US-01.6: validate everything before mutating any state, in reason-code precedence order.
     if (status === 'completed') return reject('playthrough-complete');
@@ -106,7 +97,9 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract; learne
     if (led && action.card.suit !== led && hands[actingSeat].some(card => card.suit === led)) return reject('must-follow-suit', { suit: led });
     const card = copyCard(action.card);
     hands[actingSeat].splice(index, 1);
-    actions.push({ index: actions.length, seat: actingSeat, controller, action: { kind: 'play-card', card } });
+    // US-04.1: every accepted learner action records its provenance even when the caller omits it.
+    const recorded: ActionProvenance | undefined = provenance ?? (controller === 'learner' ? { kind: 'learner' } : undefined);
+    actions.push({ index: actions.length, seat: actingSeat, controller, action: { kind: 'play-card', card }, ...(recorded ? { provenance: { ...recorded } } : {}) });
     currentTrick.push({ seat: actingSeat, card });
     const events: TableEvent[] = [{ kind: 'card-played', seat: actingSeat, card: copyCard(card) }];
     turn = nextSeat(actingSeat);
@@ -128,6 +121,7 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract; learne
     }
     return { kind: 'accepted', events };
   }
-  return { legalActions, seatView, record, submit, controllerOf };
+  const positionKey = () => positionDigest({ deal, contract, actions: actions.map(({ seat, action }) => ({ seat, action })) });
+  return { legalActions, seatView, record, submit, controllerOf, positionKey };
 }
 export type Playthrough = ReturnType<typeof startPlaythrough>;

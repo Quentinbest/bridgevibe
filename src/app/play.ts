@@ -1,6 +1,8 @@
-import { startPlaythrough, type Deal, type Card, type SeatView, type Seat, type PlayedCard } from '../table';
-import { fallbackPolicy } from '../robots';
+import { startPlaythrough, seatViewSeed, type Card, type Deal, type SeatView, type Seat, type PlayedCard, type ReasonCode, type RobotProvenance } from '../table';
+import { createRobotHost, type RobotHostOptions } from './robotHost';
 import { cardName, reasonStrings, text } from '../explanation';
+import { fixedDeal } from './fixture';
+import { browserRobotAudit, robotAudit } from './robotAudit';
 
 export type LearnerView = Readonly<Pick<SeatView,
   'positionIndex' | 'hand' | 'dummy' | 'contract' | 'turn' | 'tricksWon' | 'cardCounts' | 'status'> & {
@@ -9,44 +11,70 @@ export type LearnerView = Readonly<Pick<SeatView,
   collecting: boolean;
   lastTrickWinner: Seat | null;
   reason: string;
+  reasonCode: ReasonCode | null;
+  rejectionId: number;
+  rejectedCard: Card | null;
+  rejectedSeat: Seat | null;
   announcements: readonly string[];
 }>;
 
-export function createPlay(deal: Deal) {
+// The learner declares 3NT from South until the table turns for other declarers (#16, ADR-0003).
+export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fixedDeal) {
   const table = startPlaythrough({ deal, contract: { level: 3, strain: 'no-trumps', declarer: 'south' }, learnerSide: 'northSouth' });
+  let options = robotOptions;
+  // US-10.2, §4.3.6: audit and test builds audit every robot message; this constant guard
+  // removes the audit from production builds.
+  if (import.meta.env.MODE === 'audit' || import.meta.env.MODE === 'test') {
+    const audit = import.meta.env.MODE === 'audit' ? browserRobotAudit(table.record().deal, table.record) : robotAudit(table.record().deal, table.record);
+    options = { ...robotOptions, audit(message, seat) { audit(message, seat); robotOptions.audit?.(message, seat); } };
+  }
+  const robots = createRobotHost(options);
   const listeners = new Set<() => void>();
   let timer: ReturnType<typeof setTimeout> | undefined;
   let running = false;
   let collecting = false;
   let displayedTrick: readonly PlayedCard[] = [];
   let reason = '';
+  let rejectionId = 0;
+  let reasonCode: ReasonCode | null = null;
+  let rejectedCard: Card | null = null;
+  let rejectedSeat: Seat | null = null;
+  function clearRejection() { reason = ''; reasonCode = null; rejectedCard = null; rejectedSeat = null; }
   const announcements: string[] = [];
   function learnerView(): LearnerView {
     // ADR-0001, US-16.4: UI data comes exclusively from Declarer's Seat View.
     const { positionIndex, hand, dummy, contract, turn, tricksWon, cardCounts, status, tricks } = table.seatView('south');
     return { positionIndex, hand, dummy, contract, turn, tricksWon, cardCounts, status,
-      legalCards: turn === 'south' || turn === 'north' ? table.legalActions(turn).map(action => action.card) : [],
+      // ADR-0001: only seats the learner controls expose legal cards to the UI.
+      legalCards: turn && table.controllerOf(turn) === 'learner' ? table.legalActions(turn).map(action => action.card) : [],
       lastTrickWinner: tricks.at(-1)?.winner ?? null,
-      displayedTrick, collecting, reason, announcements: [...announcements] };
+      displayedTrick, collecting, reason, reasonCode, rejectionId, rejectedCard, rejectedSeat, announcements: [...announcements] };
   }
   let snapshot = learnerView();
   function publish() { snapshot = learnerView(); listeners.forEach(listener => listener()); }
   function schedule() {
     clearTimeout(timer);
+    robots.cancel();
     if (!running) return;
     if (collecting) {
       timer = setTimeout(() => { collecting = false; displayedTrick = []; publish(); schedule(); }, 1000);
-    } else if (snapshot.turn === 'east' || snapshot.turn === 'west') {
-      timer = setTimeout(() => {
-        const seat = snapshot.turn;
-        if (seat === 'east' || seat === 'west') accept(seat, fallbackPolicy(table.seatView(seat)), 'robot');
-      }, 500);
+    } else if (snapshot.turn && table.controllerOf(snapshot.turn) === 'robot') {
+      // ADR-0003: the Table decides which seats robots control.
+      const seat = snapshot.turn;
+      const view = table.seatView(seat);
+      robots.decide({ view, seed: seatViewSeed(view),
+        playthroughId: table.record().playthroughId, positionKey: table.positionKey(), currentPositionKey: table.positionKey,
+        submit: (action, provenance) => accept(seat, action.card, 'robot', provenance) });
     }
   }
-  function accept(seat: 'north' | 'south' | 'east' | 'west', card: Card, controller: 'learner' | 'robot') {
-    const result = table.submit(seat, controller, { kind: 'play-card', card });
-    reason = '';
+  function accept(seat: 'north' | 'south' | 'east' | 'west', card: Card, controller: 'learner' | 'robot', provenance?: RobotProvenance) {
+    const result = table.submit(seat, controller, { kind: 'play-card', card }, provenance);
+    // US-11.1: a rejected robot action goes back to the host, which falls back; it is never learner feedback.
+    if (result.kind === 'rejected' && controller === 'robot') return false;
+    if (controller === 'learner') clearRejection();
     if (result.kind === 'rejected') {
+      rejectionId++;
+      reasonCode = result.reason; rejectedCard = card; rejectedSeat = seat;
       reason = text(reasonStrings[result.reason], result.details.suit ? { suit: text(`suit.${result.details.suit}`) } : {});
     } else {
       for (const event of result.events) {
@@ -58,11 +86,14 @@ export function createPlay(deal: Deal) {
       displayedTrick = collecting ? view.tricks[view.tricks.length - 1].cards : view.currentTrick;
     }
     publish(); schedule();
+    return true;
   }
   return {
+    record: table.record,
     getSnapshot: () => snapshot,
+    clearRejection() { clearRejection(); publish(); },
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
-    start() { running = true; schedule(); return () => { running = false; clearTimeout(timer); }; },
+    start() { running = true; schedule(); return () => { running = false; clearTimeout(timer); robots.stop(); }; },
     play(seat: 'north' | 'south', card: Card) { if (!collecting) accept(seat, card, 'learner'); },
   };
 }

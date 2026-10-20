@@ -13,3 +13,5 @@ export type DealOrigin = Readonly<{ kind: 'seed'; seed: string; index: number; r
 export type Deal = Readonly<{ dealId: string; origin: DealOrigin; hands: Readonly<Record<Seat, Hand>>; dealer: Seat; vulnerability: Vulnerability }>;
 export * from './playthrough';
 export { DEALING_ALGORITHM, dealFromSeed, dealIdOf, redeal } from './dealing';
+export { encodeSeatView, decodeSeatView, seatViewSeed, type SeatViewMessage } from './seatViewMessage';
+export * from './scoring';
