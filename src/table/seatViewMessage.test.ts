@@ -32,7 +32,7 @@ test('§4.3.6: key is deterministic, rejection-stable, and changes only with acc
   first.submit('south', 'learner', first.legalActions('west')[0]); expect(first.positionKey()).toBe(key);
   const action = first.legalActions('west')[0];
   const provenance = { kind: 'robot', policy: 'bv-fallback', version: '1', fallback: 'timeout', durationMs: 400 } as const;
-  first.submit('west', 'robot', action, provenance); second.submit('west', 'robot', action);
+  first.submit('west', 'robot', action, provenance); second.submit('west', 'robot', action, { kind: 'robot', policy: 'test-policy', version: '1', durationMs: 0 });
   expect(first.positionKey()).not.toBe(key); expect(second.positionKey()).toBe(first.positionKey());
   expect(first.record().actions[0].provenance).toEqual(provenance);
   Object.assign(provenance, { policy: 'mutated' });
@@ -41,7 +41,20 @@ test('§4.3.6: key is deterministic, rejection-stable, and changes only with acc
 });
 test('US-04.1: learner actions record learner provenance when the caller omits it', () => {
   const table = fixedPlaythrough();
-  table.submit('west', 'robot', table.legalActions('west')[0]);
+  table.submit('west', 'robot', table.legalActions('west')[0], { kind: 'robot', policy: 'test-policy', version: '1', durationMs: 0 });
   table.submit('north', 'learner', table.legalActions('north')[0]);
   expect(table.record().actions[1].provenance).toEqual({ kind: 'learner' });
+});
+
+// US-04.3: the Table accepts imported provenance for any controller, but only in its exact shape.
+test('imported provenance is accepted only as { kind: imported, format: pbn }', () => {
+  for (const provenance of [{ kind: 'imported', format: 'json' }, { kind: 'imported', format: 'pbn', extra: 1 }]) {
+    const table = fixedPlaythrough();
+    const before = table.record();
+    expect(table.submit('west', 'robot', table.legalActions('west')[0], provenance as never)).toMatchObject({ kind: 'rejected', reason: 'malformed-action' });
+    expect(table.record()).toEqual(before);
+  }
+  const table = fixedPlaythrough();
+  expect(table.submit('west', 'robot', table.legalActions('west')[0], { kind: 'imported', format: 'pbn' }).kind).toBe('accepted');
+  expect(table.submit('north', 'learner', table.legalActions('north')[0], { kind: 'imported', format: 'pbn' }).kind).toBe('accepted');
 });

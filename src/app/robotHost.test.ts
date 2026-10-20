@@ -55,7 +55,7 @@ test('US-10.4: forced final play uses the same display delay', () => {
   const table = fixedPlaythrough();
   while (table.record().actions.length < 48 || table.controllerOf(table.seatView('south').turn!) !== 'robot') {
     const seat = table.seatView('south').turn!;
-    table.submit(seat, table.controllerOf(seat), table.legalActions(seat)[0]);
+    table.submit(seat, table.controllerOf(seat), table.legalActions(seat)[0], table.controllerOf(seat) === 'robot' ? { kind: 'robot', policy: 'test-policy', version: '1', durationMs: 0 } : undefined);
   }
   expect(table.legalActions(table.seatView('south').turn!)).toHaveLength(1);
   const { submit } = setup(1, {}, table);
@@ -119,7 +119,7 @@ test('§4.3.6: stale position and request IDs are discarded', () => {
 });
 test('§4.3.6: an actual Table position change discards an already decided action', () => {
   const { table, submit } = setup(1);
-  vi.advanceTimersByTime(20); table.submit('west', 'robot', table.legalActions('west')[0]);
+  vi.advanceTimersByTime(20); table.submit('west', 'robot', table.legalActions('west')[0], { kind: 'robot', policy: 'test-policy', version: '1', durationMs: 0 });
   vi.advanceTimersByTime(500); expect(submit).not.toHaveBeenCalled();
 });
 test('US-12.4: visibility events cancel, pause, and re-request with a fresh deadline', () => {

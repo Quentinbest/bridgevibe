@@ -1,5 +1,5 @@
 import { ReviewScreen } from './ReviewScreen';
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { SUITS, type Card as TableCard, type Deal, type CompletedPlaythroughRecord } from '../table';
 import { cardName, text } from '../explanation';
 import { Card, CardBack } from './Card';
@@ -8,6 +8,10 @@ import { type LearnerView } from './play';
 import { dealFromUrl, dealSession } from './deals';
 import { DealControls } from './DealControls';
 
+// US-40.2: the constant build guard removes the entire debug import from production.
+const DebugPanel = import.meta.env.MODE === 'internal' || import.meta.env.MODE === 'audit' || import.meta.env.MODE === 'development'
+  ? lazy(() => import('./DebugPanel')) : null;
+
 function Opponent({ seat, count }: { seat: 'west' | 'east'; count: number }) {
   return <section className={`opponent ${seat}`} aria-label={text(`seat.${seat}`)}>
     <div className="backs">{Array.from({ length: Math.min(count, 3) }, (_, index) => <CardBack key={index} />)}</div>
@@ -15,7 +19,7 @@ function Opponent({ seat, count }: { seat: 'west' | 'east'; count: number }) {
   </section>;
 }
 // ADR-0001, US-16.4: the UI gets deal metadata only, never the play session or its record of all four hands.
-export function TableScreen({ view, play, clearRejection, info, invalid, onNew }: { info: Pick<Deal, 'dealId' | 'origin'>; invalid: boolean; onNew: () => void; view: LearnerView; clearRejection: () => void; play: (seat: 'north' | 'south', card: TableCard) => void }) {
+export function TableScreen({ view, play, clearRejection, info, invalid, onNew, onShowRule }: { onShowRule?: () => void; info: Pick<Deal, 'dealId' | 'origin'>; invalid: boolean; onNew: () => void; view: LearnerView; clearRejection: () => void; play: (seat: 'north' | 'south', card: TableCard) => void }) {
   const [selected, setSelected] = useState<TableCard | null>(null);
   const [ruleOpen, setRuleOpen] = useState(false);
   const tableElement = useRef<HTMLElement | null>(null);
@@ -80,7 +84,7 @@ export function TableScreen({ view, play, clearRejection, info, invalid, onNew }
             <p className="reason" aria-live="assertive" aria-atomic="true">{view.reason}</p>
             {view.reasonCode && <>
               <button ref={disclosureRef} type="button" className="rule-disclosure" aria-expanded={ruleOpen} aria-controls="rule-reference"
-                onClick={() => setRuleOpen(open => !open)}>{text('rule.why')}</button>
+                onClick={() => { if (!ruleOpen) onShowRule?.(); setRuleOpen(open => !open); }}>{text('rule.why')}</button>
               <p id="rule-reference" className="rule-reference" hidden={!ruleOpen}>{text(`rule.${view.reasonCode}`)}</p>
             </>}
           </div>
@@ -109,7 +113,9 @@ export function App() {
   useEffect(() => play.start(), [play]);
   useEffect(() => { if (!review && view.status === 'completed') reviewButton.current?.focus(); }, [review, view.status]);
   if (review) return <ReviewScreen record={review} onBack={() => setReview(null)} />;
-  return <><TableScreen key={session.info.dealId} view={view} play={play.play} clearRejection={play.clearRejection} info={session.info} invalid={session.invalid} onNew={() => setSession(session.next())} />
+  const debug = DebugPanel && new URLSearchParams(window.location.search).get('debug') === '1';
+  return <div className={debug ? 'debug-layout' : undefined}><TableScreen key={session.info.dealId} view={view} play={play.play} clearRejection={play.clearRejection} onShowRule={play.showRule} info={session.info} invalid={session.invalid} onNew={() => setSession(session.next())} />
     {view.status === 'completed' && <div className="review-entry"><button ref={reviewButton} type="button" onClick={() => setReview(play.completedRecord())}>{text('review.title')}</button></div>}
-  </>;
+    {debug && <Suspense fallback={null}><DebugPanel key={session.info.dealId} play={play} /></Suspense>}
+  </div>;
 }

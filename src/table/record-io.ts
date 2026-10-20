@@ -23,7 +23,9 @@ function schemas() {
   const dealShape = object({ dealId: string, origin, dealer: seat,
     vulnerability: object({ northSouth: choice([true, false]), eastWest: choice([true, false]) }),
     hands: object({ north: hand, east: hand, south: hand, west: hand }) });
+  // US-04.1, CI-5: every action carries provenance, including plays imported from PBN.
   const provenance: Check = value => object({ kind: choice(['learner']) })(value)
+    || object({ kind: choice(['imported']), format: choice(['pbn']) })(value)
     || object({ kind: choice(['robot']), policy: string, version: string, fallback: choice(['timeout', 'engine-failure']),
       durationMs: value => typeof value === 'number' && Number.isFinite(value) && value >= 0 }, ['fallback'])(value);
   const recordShape = object({ schemaVersion: choice([2]), playthroughId: string, deal: dealShape,
@@ -33,7 +35,7 @@ function schemas() {
     appVersion: string, rulesCoreVersion: string,
     engineVersions: value => !!value && typeof value === 'object' && !Array.isArray(value) && Object.values(value).every(string),
     actions: array(object({ index: integer(0, 51), seat, controller: choice(['learner', 'robot']),
-      action: object({ kind: choice(['play-card']), card }), provenance }, ['provenance']), 52),
+      action: object({ kind: choice(['play-card']), card }), provenance }), 52),
   });
 
   return { dealShape, recordShape };
@@ -176,7 +178,8 @@ export function importPbn(text: string): CompletedPlaythroughRecord {
       const cards = playedCards.slice(trick * 4, trick * 4 + 4);
       for (let index = 0; index < 4; index++) {
         const seat = table.seatView('south').turn!;
-        const result = table.submit(seat, table.controllerOf(seat), { kind: 'play-card', card: cards[(SEATS.indexOf(seat) - first + 4) % 4] });
+        const result = table.submit(seat, table.controllerOf(seat), { kind: 'play-card', card: cards[(SEATS.indexOf(seat) - first + 4) % 4] },
+          { kind: 'imported', format: 'pbn' });
         if (result.kind === 'rejected') throw new Error(`Illegal play: ${result.reason}`);
       }
     }

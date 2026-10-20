@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import clean from '../../test/fixtures/records/column-order.pbn?raw';
 import annotated from '../../test/fixtures/records/column-order-annotated.pbn?raw';
+import fixed from '../../test/fixtures/records/fixed.json';
 import { dealFromSeed, dealIdOf, exportPbn, exportRecordJson, importPbn, importRecordJson, SEATS, startPlaythrough, type Deal } from './index';
 
 // US-04.3: rotating columns must not make an incorrect opening leader acceptable.
@@ -67,4 +68,25 @@ test('PBN exports South-dealt hands clockwise from South and still imports North
   expect(exported).toContain('[Deal "S:Q..QJT98765432.A 2...KQJT98765432 AJT9876543.AKQ.. K.JT98765432.AK."]');
   const imported = importPbn(exported);
   expect({ ...imported, playthroughId: original.playthroughId }).toEqual(original);
+});
+
+// US-04.3, CI-5: PBN carries no provenance, so imported plays say they were imported.
+test('PBN-imported plays carry imported provenance, whatever their controller', () => {
+  const record = importPbn(clean);
+  expect(record.actions).toHaveLength(52);
+  for (const entry of record.actions) expect(entry.provenance).toEqual({ kind: 'imported', format: 'pbn' });
+  expect(new Set(record.actions.map(entry => entry.controller))).toEqual(new Set(['learner', 'robot']));
+});
+
+// US-04.3: JSON is lossless for every record the public APIs produce, PBN imports included.
+test('a PBN-imported record round-trips through JSON', () => {
+  const imported = importPbn(clean);
+  expect(importRecordJson(exportRecordJson(imported))).toEqual(JSON.parse(exportRecordJson(imported)));
+});
+// US-04.1: JSON import requires provenance on every action.
+test('JSON import rejects an action without provenance', () => {
+  const record = structuredClone(fixed) as { actions: { provenance?: unknown }[] };
+  expect(() => importRecordJson(JSON.stringify(record))).not.toThrow();
+  delete record.actions[1].provenance;
+  expect(() => importRecordJson(JSON.stringify(record))).toThrow(/Invalid record schema/);
 });

@@ -252,6 +252,12 @@
           "suit": "spades",
           "rank": "9"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -279,6 +285,12 @@
           "suit": "spades",
           "rank": "3"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -321,6 +333,12 @@
           "suit": "spades",
           "rank": "7"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -348,6 +366,12 @@
           "suit": "spades",
           "rank": "10"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -360,6 +384,12 @@
           "suit": "hearts",
           "rank": "9"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -387,6 +417,12 @@
           "suit": "hearts",
           "rank": "2"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -429,6 +465,12 @@
           "suit": "spades",
           "rank": "J"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -456,6 +498,12 @@
           "suit": "spades",
           "rank": "8"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -468,6 +516,12 @@
           "suit": "hearts",
           "rank": "10"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -495,6 +549,12 @@
           "suit": "hearts",
           "rank": "5"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -522,6 +582,12 @@
           "suit": "clubs",
           "rank": "7"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -549,6 +615,12 @@
           "suit": "clubs",
           "rank": "2"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -591,6 +663,12 @@
           "suit": "diamonds",
           "rank": "4"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -618,6 +696,12 @@
           "suit": "diamonds",
           "rank": "3"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -645,6 +729,12 @@
           "suit": "hearts",
           "rank": "J"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -672,6 +762,12 @@
           "suit": "hearts",
           "rank": "6"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -684,6 +780,12 @@
           "suit": "clubs",
           "rank": "10"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -711,6 +813,12 @@
           "suit": "clubs",
           "rank": "3"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -753,6 +861,12 @@
           "suit": "diamonds",
           "rank": "8"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -780,6 +894,12 @@
           "suit": "diamonds",
           "rank": "6"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -807,6 +927,12 @@
           "suit": "spades",
           "rank": "Q"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -834,6 +960,12 @@
           "suit": "diamonds",
           "rank": "10"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -846,6 +978,12 @@
           "suit": "hearts",
           "rank": "8"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -873,6 +1011,12 @@
           "suit": "hearts",
           "rank": "K"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -900,6 +1044,12 @@
           "suit": "clubs",
           "rank": "J"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {
@@ -927,6 +1077,12 @@
           "suit": "clubs",
           "rank": "5"
         }
+      },
+      "provenance": {
+        "kind": "robot",
+        "policy": "test-policy",
+        "version": "1",
+        "durationMs": 0
       }
     },
     {

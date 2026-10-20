@@ -2,6 +2,17 @@ import type { Card, ReasonCode } from '../table';
 
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
+  "debug.entries": { text: "Provenance entries", status: 'draft' },
+  "debug.title": { text: "Provenance log", status: 'draft' },
+  "debug.internal": { text: "Internal build only", status: 'draft' },
+  "debug.hidden": { text: "Hidden cards in VISIBLE inputs", status: 'draft' },
+  "debug.fallbacks": { text: "Silent fallbacks", status: 'draft' },
+  "debug.mode": { text: "Information mode", status: 'draft' },
+  "debug.source": { text: "Source kind", status: 'draft' },
+  "debug.export": { text: "Export log (JSON)", status: 'draft' },
+  "debug.seat": { text: "Seat", status: 'draft' },
+  "debug.show": { text: "Show seat view", status: 'draft' },
+  "debug.value": { text: "{value}", status: 'draft' },
   "review.title": { text: "Hand review", status: 'draft' },
   "review.back": { text: "Back to table", status: 'draft' },
   "review.xray": { text: "X-ray view: now you can see all 4 hands. You couldn't while playing.", status: 'draft' },
