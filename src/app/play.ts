@@ -1,4 +1,4 @@
-import { startPlaythrough, seatViewSeed, type Card, type Deal, type SeatView, type Seat, type PlayedCard, type RobotProvenance } from '../table';
+import { startPlaythrough, seatViewSeed, type Card, type Deal, type SeatView, type Seat, type PlayedCard, type ReasonCode, type RobotProvenance } from '../table';
 import { createRobotHost, type RobotHostOptions } from './robotHost';
 import { cardName, reasonStrings, text } from '../explanation';
 import { fixedDeal } from './fixture';
@@ -11,6 +11,10 @@ export type LearnerView = Readonly<Pick<SeatView,
   collecting: boolean;
   lastTrickWinner: Seat | null;
   reason: string;
+  reasonCode: ReasonCode | null;
+  rejectionId: number;
+  rejectedCard: Card | null;
+  rejectedSeat: Seat | null;
   announcements: readonly string[];
 }>;
 
@@ -31,6 +35,11 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
   let collecting = false;
   let displayedTrick: readonly PlayedCard[] = [];
   let reason = '';
+  let rejectionId = 0;
+  let reasonCode: ReasonCode | null = null;
+  let rejectedCard: Card | null = null;
+  let rejectedSeat: Seat | null = null;
+  function clearRejection() { reason = ''; reasonCode = null; rejectedCard = null; rejectedSeat = null; }
   const announcements: string[] = [];
   function learnerView(): LearnerView {
     // ADR-0001, US-16.4: UI data comes exclusively from Declarer's Seat View.
@@ -39,7 +48,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
       // ADR-0001: only seats the learner controls expose legal cards to the UI.
       legalCards: turn && table.controllerOf(turn) === 'learner' ? table.legalActions(turn).map(action => action.card) : [],
       lastTrickWinner: tricks.at(-1)?.winner ?? null,
-      displayedTrick, collecting, reason, announcements: [...announcements] };
+      displayedTrick, collecting, reason, reasonCode, rejectionId, rejectedCard, rejectedSeat, announcements: [...announcements] };
   }
   let snapshot = learnerView();
   function publish() { snapshot = learnerView(); listeners.forEach(listener => listener()); }
@@ -62,8 +71,10 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     const result = table.submit(seat, controller, { kind: 'play-card', card }, provenance);
     // US-11.1: a rejected robot action goes back to the host, which falls back; it is never learner feedback.
     if (result.kind === 'rejected' && controller === 'robot') return false;
-    reason = '';
+    if (controller === 'learner') clearRejection();
     if (result.kind === 'rejected') {
+      rejectionId++;
+      reasonCode = result.reason; rejectedCard = card; rejectedSeat = seat;
       reason = text(reasonStrings[result.reason], result.details.suit ? { suit: text(`suit.${result.details.suit}`) } : {});
     } else {
       for (const event of result.events) {
@@ -80,6 +91,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
   return {
     record: table.record,
     getSnapshot: () => snapshot,
+    clearRejection() { clearRejection(); publish(); },
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
     start() { running = true; schedule(); return () => { running = false; clearTimeout(timer); robots.stop(); }; },
     play(seat: 'north' | 'south', card: Card) { if (!collecting) accept(seat, card, 'learner'); },

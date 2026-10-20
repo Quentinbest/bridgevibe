@@ -11,3 +11,4 @@ export type Vulnerability = Readonly<Record<Side, boolean>>;
 export type Deal = Readonly<{ hands: Readonly<Record<Seat, Hand>>; dealer: Seat; vulnerability: Vulnerability }>;
 export * from './playthrough';
 export { encodeSeatView, decodeSeatView, seatViewSeed, type SeatViewMessage } from './seatViewMessage';
+export * from './scoring';

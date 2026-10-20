@@ -116,3 +116,59 @@ test('ADR-0003, US-02.1: in defence the learner controls only South; Dummy follo
 test('the learner sits South, so only North–South can be the learner side', () => {
   expect(() => startPlaythrough({ deal: dealWith(), contract, learnerSide: 'eastWest' })).toThrow();
 });
+
+// F1 / US-01.1–US-01.7: suit and seat variants exercise the public Table seam.
+for (const suit of ['spades', 'hearts', 'diamonds', 'clubs'] as const) {
+  const other = suit === 'clubs' ? 'diamonds' : 'clubs';
+  test(`F1 rejects an off-suit card while holding ${suit}, even when it is trump`, () => {
+    const deal = dealWith({ west: [card(suit, '2')], north: [card(suit, '3'), card(other, 'A')] });
+    const table = startPlaythrough({ deal, contract: { ...contract, strain: other }, learnerSide: 'northSouth' });
+    play(table, 'west', { kind: 'play-card', card: card(suit, '2') });
+    expect(reject(table, 'north', 'learner', { kind: 'play-card', card: card(other, 'A') }, 'must-follow-suit')).toMatchObject({ details: { suit } });
+    expect(table.legalActions('north').every(action => action.card.suit === suit)).toBe(true);
+  });
+  test(`F1 accepts following ${suit} and advances clockwise`, () => {
+    const deal = dealWith({ west: [card(suit, '2')], north: [card(suit, '3')] });
+    const table = startPlaythrough({ deal, contract, learnerSide: 'northSouth' });
+    play(table, 'west', { kind: 'play-card', card: card(suit, '2') });
+    play(table, 'north', { kind: 'play-card', card: card(suit, '3') });
+    expect(table.seatView('north').turn).toBe('east');
+    expect(table.seatView('north').hand).not.toContainEqual(card(suit, '3'));
+    expect(table.record().actions).toHaveLength(2);
+  });
+  test(`F1 highest ${suit} trump beats the led ace and lower trumps`, () => {
+    const deal = dealWith({ west: RANKS.map(rank => card(other, rank)), north: [card(suit, '2')], east: [card(suit, 'K')], south: [card(suit, '3')] });
+    const table = startPlaythrough({ deal, contract: { ...contract, strain: suit }, learnerSide: 'northSouth' });
+    for (const seat of ['west', 'north', 'east', 'south'] as const) play(table, seat, { kind: 'play-card', card: deal.hands[seat][0] });
+    expect(table.seatView('south')).toMatchObject({ turn: 'east', tricksWon: { eastWest: 1, northSouth: 0 }, tricks: [{ winner: 'east' }] });
+  });
+}
+for (const seat of SEATS) {
+  test(`F1 ${seat} cannot play another hand's card on its turn`, () => {
+    const table = make();
+    while (table.seatView('south').turn !== seat) play(table, table.seatView('south').turn!);
+    const other = SEATS.find(candidate => candidate !== seat)!;
+    reject(table, seat, table.controllerOf(seat), { kind: 'play-card', card: table.seatView(other).hand[0] }, 'card-not-held');
+  });
+  test(`F1 ${seat} cannot play out of turn`, () => {
+    const declarer = SEATS[(SEATS.indexOf(seat) + 1) % 4];
+    const table = startPlaythrough({ deal: dealWith(), contract: { ...contract, declarer }, learnerSide: 'northSouth' });
+    reject(table, seat, table.controllerOf(seat), { kind: 'play-card', card: table.seatView(seat).hand[0] }, 'not-your-turn');
+  });
+}
+test('F1 the final trick stays in progress until its fourth card; completion empties every hand', () => {
+  const table = make();
+  for (let index = 0; index < 48; index++) play(table, table.seatView('south').turn!);
+  for (const seat of SEATS) expect(table.seatView(seat).hand).toHaveLength(1);
+  for (let index = 0; index < 3; index++) {
+    play(table, table.seatView('south').turn!);
+    expect(table.seatView('south').status).toBe('in-progress');
+    expect(table.seatView('south').tricks).toHaveLength(12);
+  }
+  play(table, table.seatView('south').turn!);
+  expect(table.record().status).toBe('completed');
+  for (const seat of SEATS) {
+    expect(table.seatView(seat).hand).toEqual([]);
+    reject(table, seat, table.controllerOf(seat), { kind: 'play-card', card: card('spades', 'A') }, 'playthrough-complete');
+  }
+});

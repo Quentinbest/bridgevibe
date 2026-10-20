@@ -125,7 +125,7 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
   const heart = page.getByRole('button', { name: "Ace of hearts, can't play: you must follow spades", exact: true });
   await heart.click();
   await page.getByRole('button', { name: /^Play it, / }).click();
-  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Play spades; you still have that suit.');
+  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Not that one. You still have spades.');
   await expect(heart).toHaveAttribute('aria-pressed', 'false');
   await checkAccessibility();
   const initial = await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor);

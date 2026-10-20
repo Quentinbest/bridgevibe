@@ -1,0 +1,2 @@
+Bundled component: tiny-helper 2.0.0
+Copyright (c) Fixture Authors. Attribution required in distributions.

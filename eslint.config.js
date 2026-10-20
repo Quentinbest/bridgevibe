@@ -4,7 +4,7 @@ import globals from 'globals';
 import hooks from 'eslint-plugin-react-hooks';
 import refresh from 'eslint-plugin-react-refresh';
 export default [
-  { ignores: ['node_modules/**', 'dist/**', 'test-results/**', 'playwright-report/**', '.delegate-ref/**'] },
+  { ignores: ['node_modules/**', 'dist/**', 'test-results/**', 'playwright-report/**', '.delegate-ref/**', '.reference-scorers/**'] },
   // ADR-0001: Seat Views can only be manufactured inside Table.
   { files: ['**/*.{ts,tsx}'], ignores: ['src/table/**'], rules: {
     'no-restricted-syntax': ['error', {

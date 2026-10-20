@@ -87,11 +87,11 @@ test('off-suit card is rejected, retained and announced until the next action', 
   const queen = page.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades", exact: true });
   await queen.click(); await queen.click();
   await expect(queen).toHaveAttribute('aria-pressed', 'false');
-  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Play spades; you still have that suit.');
+  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Not that one. You still have spades.');
   await expect(page.locator('.dummy .card')).toHaveCount(13);
   await expect(page.locator('.trick-area .card')).toHaveCount(1);
   await page.clock.runFor(2000);
-  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Play spades; you still have that suit.');
+  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Not that one. You still have spades.');
   const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });
   await ace.click(); await ace.click();
   await expect(page.locator('[aria-live="assertive"]')).toBeEmpty();
