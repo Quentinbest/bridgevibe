@@ -1,4 +1,4 @@
-import { RANKS, SEATS, SUITS, dealIdOf, type Card, type Deal, type Hand, type Seat } from './index';
+import { RANKS, SEATS, SUITS, dealFromSeed, dealIdOf, type Card, type Deal, type Hand, type Seat } from './index';
 import { sameCard, sideOf, startPlaythrough, type CompletedPlaythroughRecord, type PlaythroughRecord } from './playthrough';
 import { reconstruct, replay } from './replay';
 
@@ -52,6 +52,17 @@ export function importRecordJson(text: string): PlaythroughRecord {
     if (!schemas().recordShape(value)) throw new Error('Invalid record schema (expected schemaVersion 2, deal, contract, versions and actions)');
     const record = value as PlaythroughRecord;
     validateDeal(record.deal);
+    // US-03.4, US-04.3: stored identity and origin must describe the actual Deal.
+    const deal = record.deal;
+    if (deal.dealId !== dealIdOf(deal)) throw new Error('Invalid dealId: does not match deal content');
+    if (deal.origin.kind === 'seed') {
+      const generated = dealFromSeed(deal.origin.seed, deal.origin.index);
+      if (generated.dealer !== deal.dealer || generated.vulnerability.northSouth !== deal.vulnerability.northSouth
+        || generated.vulnerability.eastWest !== deal.vulnerability.eastWest
+        || SEATS.some(seat => deal.hands[seat].some(card => !generated.hands[seat].some(other => sameCard(card, other))))) {
+        throw new Error('Deal seed and index do not reproduce its hands, dealer and vulnerability');
+      }
+    }
     reconstruct(record);
     return record;
   } catch (error) { throw new Error(`JSON parse error: ${error instanceof Error ? error.message : String(error)}`, { cause: error }); }
@@ -68,6 +79,39 @@ function parseSeat(value: string): Seat {
 function parseCard(value: string): Card {
   if (!/^[SHDC][AKQJT2-9]$/.test(value)) throw new Error(`Invalid card ${value}`);
   return { suit: SUITS[suits.indexOf(value[0])], rank: value[1] === 'T' ? '10' : value[1] as Card['rank'] };
+}
+// US-04.3: comment delimiters inside quoted tag values are literal text.
+function withoutComments(text: string): string {
+  let state: 'plain' | 'quoted' | 'brace' | 'line' = 'plain';
+  let result = '';
+  for (const char of text) {
+    if (state === 'brace') {
+      if (char === '}') state = 'plain';
+    } else if (state === 'line') {
+      if (char === '\n' || char === '\r') { state = 'plain'; result += char; }
+    } else if (state === 'quoted') {
+      result += char;
+      if (char === '"') state = 'plain';
+    } else if (char === '{' || char === ';') {
+      result += ' ';
+      state = char === '{' ? 'brace' : 'line';
+    } else {
+      result += char;
+      if (char === '"') state = 'quoted';
+    }
+  }
+  if (state === 'brace') throw new Error('Unterminated PBN comment');
+  return result;
+}
+function parsePlay(lines: readonly string[]): Card[] {
+  const cards: Card[] = [];
+  // PBN 2.1 §3.6.2: annotations can wrap play across lines; only cards count.
+  for (const token of lines.join(' ').replace(/\$/g, ' $').split(/\s+/).filter(Boolean)) {
+    if (cards.length && /^(?:\$\d+|!!|\?\?|!\?|\?!|!|\?)$/.test(token)) continue;
+    cards.push(parseCard(token.replace(/(?:!!|\?\?|!\?|\?!|!|\?)$/, '')));
+  }
+  if (cards.length !== 52) throw new Error('Expected 13 complete tricks');
+  return cards;
 }
 export function exportPbn(record: CompletedPlaythroughRecord): string {
   const tricks = replay(record);
@@ -88,9 +132,9 @@ export function exportPbn(record: CompletedPlaythroughRecord): string {
 export function importPbn(text: string): CompletedPlaythroughRecord {
   try {
     const tags: Record<string, string> = Object.create(null);
-    const rows: string[][] = [];
+    const playLines: string[] = [];
     let playing = false;
-    for (const line of text.trim().split(/\r?\n/).map(line => line.trim()).filter(Boolean)) {
+    for (const line of withoutComments(text).trim().split(/\r?\n/).map(line => line.trim()).filter(Boolean)) {
       if (line.startsWith('[')) {
         const match = /^\[([A-Za-z]+) "([^"\\]*)"\]$/.exec(line);
         if (!match || playing || Object.hasOwn(tags, match[1])) throw new Error('Malformed or misplaced tag');
@@ -98,11 +142,11 @@ export function importPbn(text: string): CompletedPlaythroughRecord {
         if (match[1] === 'Play') playing = true;
       } else {
         if (!playing) throw new Error('Play must follow the Play tag');
-        rows.push(line.split(/\s+/));
+        playLines.push(line);
       }
     }
     if (!['Event', 'Deal', 'Declarer', 'Contract', 'Result', 'Play'].every(key => Object.hasOwn(tags, key))) throw new Error('Missing required tag');
-    if (rows.length !== 13 || rows.some(row => row.length !== 4)) throw new Error('Expected 13 complete tricks');
+    const playedCards = parsePlay(playLines);
     const match = /^([NESW]):([^ ]+) ([^ ]+) ([^ ]+) ([^ ]+)$/.exec(tags.Deal);
     if (!match) throw new Error('Invalid Deal tag');
     const start = SEATS.indexOf(parseSeat(match[1]));
@@ -123,8 +167,9 @@ export function importPbn(text: string): CompletedPlaythroughRecord {
     const table = startPlaythrough({ deal, learnerSide: 'northSouth', contract: { level: Number(contract[1]),
       strain: contract[2] === 'NT' ? 'no-trumps' : SUITS[suits.indexOf(contract[2])], declarer: parseSeat(tags.Declarer) } });
     const first = SEATS.indexOf(parseSeat(tags.Play));
-    for (const row of rows) {
-      const cards = row.map(parseCard);
+    if (SEATS[first] !== table.seatView('south').turn) throw new Error('Play tag must match the opening leader');
+    for (let trick = 0; trick < 13; trick++) {
+      const cards = playedCards.slice(trick * 4, trick * 4 + 4);
       for (let index = 0; index < 4; index++) {
         const seat = table.seatView('south').turn!;
         const result = table.submit(seat, table.controllerOf(seat), { kind: 'play-card', card: cards[(SEATS.indexOf(seat) - first + 4) % 4] });
