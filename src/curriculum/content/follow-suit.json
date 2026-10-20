@@ -251,20 +251,10 @@
       "contract": {
         "level": 1,
         "strain": "no-trumps",
-        "declarer": "south"
+        "declarer": "west"
       },
       "learnerSide": "northSouth",
       "script": [
-        {
-          "seat": "west",
-          "action": {
-            "kind": "play-card",
-            "card": {
-              "suit": "hearts",
-              "rank": "J"
-            }
-          }
-        },
         {
           "seat": "north",
           "action": {
@@ -286,12 +276,12 @@
           }
         },
         {
-          "seat": "south",
+          "seat": "west",
           "action": {
             "kind": "play-card",
             "card": {
-              "suit": "spades",
-              "rank": "6"
+              "suit": "hearts",
+              "rank": "4"
             }
           }
         }
@@ -305,8 +295,7 @@
           "kind": "scripted-action",
           "scriptIndices": [
             0,
-            1,
-            2
+            1
           ]
         },
         {
@@ -351,7 +340,7 @@
         {
           "kind": "scripted-action",
           "scriptIndices": [
-            3
+            2
           ]
         },
         {

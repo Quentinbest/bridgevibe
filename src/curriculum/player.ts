@@ -4,6 +4,8 @@ import type { Attempt, AttemptSink, Exercise, Provenance } from './model';
 // US-21: deterministic transitions, no timers, React, or robot policies. The caller supplies time.
 export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: string) {
   const table = startPlaythrough(exercise);
+  // US-02, ADR-0003: Script contains only Robot actions; learner actions come from Prompts.
+  if (exercise.script.some(play => table.controllerOf(play.seat) !== 'robot')) throw new Error('Script contains a learner-controlled seat');
   let stepIndex = 0;
   let scriptOffset = 0;
   let wrongAnswers = 0;
@@ -50,7 +52,7 @@ export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: 
     if (current.kind !== 'prompt' || outcome || wrongAnswers >= 2 || !seat) return snapshot();
     // INV-1: probe the real Table on a replay, so a legal but unexpected answer cannot derail the Script.
     const trial = startPlaythrough(exercise);
-    for (const played of table.record().actions) trial.submit(played.seat, played.controller, played.action);
+    for (const played of table.record().actions) trial.submit(played.seat, played.controller, played.action, played.provenance);
     const result = trial.submit(seat, 'learner', { kind: 'play-card', card });
     rejection = result.kind === 'rejected' ? result : null;
     if (result.kind === 'rejected' && !current.prompt.countsRejections) return snapshot();
@@ -80,7 +82,8 @@ export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: 
     const current = step();
     if (current.kind !== 'scripted-action') return snapshot();
     const scripted = exercise.script[current.scriptIndices[scriptOffset]];
-    const result = table.submit(scripted.seat, table.controllerOf(scripted.seat), scripted.action);
+    const result = table.submit(scripted.seat, table.controllerOf(scripted.seat), scripted.action, {
+      kind: 'authored', contentId: exercise.contentId, version: exercise.version });
     if (result.kind === 'rejected') throw new Error('Authored script rejected by Table');
     if (++scriptOffset === current.scriptIndices.length) enterStep(stepIndex + 1);
     return snapshot();
@@ -95,5 +98,5 @@ export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: 
     }
     return snapshot();
   }
-  return { snapshot, answer, showAnswer, next, advanceScript, showHint };
+  return { record: table.record, snapshot, answer, showAnswer, next, advanceScript, showHint };
 }

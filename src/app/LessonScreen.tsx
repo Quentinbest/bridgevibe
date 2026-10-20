@@ -13,6 +13,9 @@ export function LessonScreen({ onClose }: { onClose: () => void }) {
   const [selected, setSelected] = useState<TableCard | null>(null);
   const [ruleOpen, setRuleOpen] = useState(false);
   const showMe = useRef<HTMLButtonElement>(null);
+  const continuation = useRef<HTMLButtonElement>(null);
+  // UX §10: resolving a Prompt removes its controls; focus the continuation.
+  useEffect(() => { if (state.outcome) continuation.current?.focus(); }, [state.outcome]);
   const offerShowMe = state.wrongAnswers >= 2 && !state.outcome;
   // UX §10: the second wrong answer removes the focused card controls, so focus moves to Show me.
   useEffect(() => { if (offerShowMe) showMe.current?.focus(); }, [offerShowMe]);
@@ -46,7 +49,8 @@ export function LessonScreen({ onClose }: { onClose: () => void }) {
       <section className="lesson-table" aria-label={text('table')}>
         {/* UX §3.1, §6.2: lessons use the normal table, so exposed Dummy shows face up, on its own
             full-width row as on the practice table. */}
-        {state.view.dummy && <section className="lesson-dummy" aria-label={text('dummy')}>
+        {state.view.dummy && <section className="lesson-dummy" aria-label={text('dummy.seat', { seat: text(`seat.${dummySeat}`) })}>
+          <p>{text('dummy.seat', { seat: text(`seat.${dummySeat}`) })}</p>
           <Hand cards={state.view.dummy} dummy active={active && state.view.turn === dummySeat} legalCards={[]}
             selected={selected} onSelect={setSelected} onPlay={answer} />
         </section>}
@@ -65,13 +69,15 @@ export function LessonScreen({ onClose }: { onClose: () => void }) {
         <p className="lesson-persona">{text('lesson.persona')}</p>
         {state.textRef && <p>{text(state.textRef as StringId)}</p>}
         {state.kind === 'scripted-action' && <p role="status">{text('lesson.watch')}</p>}
+        <div role="alert" aria-atomic="true">
+          {state.rejection && <p>{text(`reason.${state.rejection.reason}`, { suit: state.rejection.details.suit ? text(`suit.${state.rejection.details.suit}`) : '' })}</p>}
+        </div>
         {state.prompt && <>
           <p>{text(state.prompt.commentaryRef as StringId)}</p>
           <h2>{text(state.prompt.textRef as StringId)}</h2>
           <div role="status" aria-live="polite" aria-atomic="true">
             {state.outcome ? <p>{text((state.outcome === 'failed' ? state.prompt.shownRef : state.prompt.correctRef) as StringId, { answers })}</p>
               : state.wrongAnswers > 0 && <p>{text(state.prompt.wrongRef as StringId)} {state.wrongAnswers === 1 && text('lesson.retry')}</p>}
-            {state.rejection && <p>{text(`reason.${state.rejection.reason}`, { suit: state.rejection.details.suit ? text(`suit.${state.rejection.details.suit}`) : '' })}</p>}
           </div>
           {state.rejection && <>
             <button type="button" aria-expanded={ruleOpen} aria-controls="lesson-rule" onClick={() => setRuleOpen(!ruleOpen)}>{text('rule.why')}</button>
@@ -84,7 +90,7 @@ export function LessonScreen({ onClose }: { onClose: () => void }) {
             <small>{text('lesson.provenance', state.hint.provenance)}</small></section>}
         </>}
         {(state.kind === 'commentary' || state.outcome && state.kind === 'prompt') &&
-          <button type="button" onClick={() => state.stepIndex === state.totalSteps - 1 ? onClose() : setState(player.next())}>
+          <button ref={continuation} type="button" onClick={() => state.stepIndex === state.totalSteps - 1 ? onClose() : setState(player.next())}>
             {text(state.stepIndex === state.totalSteps - 1 ? 'lesson.done' : 'lesson.next')}</button>}
         <p className="lesson-keys">{text('lesson.keys')}</p>
         <small>{text('lesson.draft')}</small>

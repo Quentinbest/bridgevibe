@@ -6,7 +6,7 @@ async function openPrompt(page: import('@playwright/test').Page) {
   await page.goto('/?lesson=follow-suit');
   await expect(page.getByText('1/5', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Next step' }).click();
-  await page.clock.runFor(1500);
+  await page.clock.runFor(1000);
   await expect(page.getByText('3/5', { exact: true })).toBeVisible();
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '3');
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuetext', 'Step 3 of 5');
@@ -17,6 +17,7 @@ test('lesson accepts alternatives, keeps progress synchronized, and closes to pr
   await card.click();
   await page.getByRole('button', { name: 'Play it, King of hearts', exact: true }).click();
   await expect(page.getByText('Nice. You followed suit. Any of these works: Ace of hearts, King of hearts, Queen of hearts.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Next step' })).toBeFocused();
   await page.getByRole('button', { name: 'Next step' }).click();
   await expect(page.getByText('4/5', { exact: true })).toBeVisible();
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '4');
@@ -31,7 +32,8 @@ test('wrong twice, rules feedback, hint provenance, Show me and script continuat
   await openPrompt(page);
   const wrong = page.locator('.hand button[data-suit="spades"]').first();
   for (let i = 0; i < 2; i++) { await wrong.click(); await page.getByRole('button', { name: /^Play it,/ }).click(); }
-  await expect(page.getByText('Not that one. You still have hearts.')).toBeVisible();
+  await expect(page.getByRole('alert')).toHaveCount(1);
+  await expect(page.getByRole('alert')).toHaveText('Not that one. You still have hearts.');
   await page.getByRole('button', { name: 'Why is that the rule?' }).click();
   await expect(page.getByText(/The first card of a trick sets the suit/)).toBeVisible();
   await page.getByRole('button', { name: 'Hint', exact: true }).click();
@@ -39,6 +41,7 @@ test('wrong twice, rules feedback, hint provenance, Show me and script continuat
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole('button', { name: 'Show me' }).click();
   await expect(page.getByText(/These answers follow suit: Ace of hearts, King of hearts, Queen of hearts/)).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Next step' })).toBeFocused();
   await page.getByRole('button', { name: 'Next step' }).click();
   await page.clock.runFor(500);
   await expect(page.getByText('5/5', { exact: true })).toBeVisible();

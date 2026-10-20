@@ -175,7 +175,10 @@ The design's Level means Module, with one Lesson per Module for now. Its five do
 are the Exercise's five Steps; the fraction and accessible progress value share
 one step index (correcting the design's mismatched success-screen fraction).
 `src/curriculum/` owns the JSON content, the Attempt model and the player's transitions.
-It imports only Table; scripted actions never invoke robot policies. `src/progress/`
+It imports only Table; the Script contains Robot moves only and never invokes robot policies.
+The learner defends South against 1NT by West; North leads and East is Dummy.
+Every scripted action records authored provenance with the Exercise content ID and version;
+trial replay preserves each recorded action’s provenance. `src/progress/`
 owns the append-only session Attempts store (§4.2) and may import only curriculum;
 the player appends through curriculum's `AttemptSink` type.
 The UI schedules scripted plays at 500 ms and renders South's Seat View. Authored
