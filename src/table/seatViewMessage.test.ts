@@ -1,5 +1,6 @@
 import { expect, test } from 'vitest';
 import { dealWith } from '../../test/deals';
+import { fixedPlaythrough } from '../../test/strategy';
 import { decodeSeatView, encodeSeatView, startPlaythrough } from './index';
 const make = () => startPlaythrough({ deal: dealWith(), contract: { level: 3, strain: 'no-trumps', declarer: 'south' }, learnerSide: 'northSouth' });
 test('ADR-0001: wire data roundtrips and reconstructs the private Seat View brand', () => {
@@ -37,4 +38,10 @@ test('§4.3.6: key is deterministic, rejection-stable, and changes only with acc
   Object.assign(provenance, { policy: 'mutated' });
   expect(first.record().actions[0].provenance?.kind).toBe('robot');
   expect(first.record().actions[0].provenance).toMatchObject({ policy: 'bv-fallback' });
+});
+test('US-04.1: learner actions record learner provenance when the caller omits it', () => {
+  const table = fixedPlaythrough();
+  table.submit('west', 'robot', table.legalActions('west')[0]);
+  table.submit('north', 'learner', table.legalActions('north')[0]);
+  expect(table.record().actions[1].provenance).toEqual({ kind: 'learner' });
 });

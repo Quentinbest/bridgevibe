@@ -2,7 +2,7 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { robotAudit, hiddenCard } from '../../test/robotAudit';
 import { fixedPlaythrough } from '../../test/strategy';
 import { basicPolicy } from '../robots';
-import { seatViewSeed, type Hand, type Playthrough, type RobotProvenance } from '../table';
+import { seatViewSeed, type Action, type Hand, type Playthrough, type RobotProvenance } from '../table';
 import { fixedDeal } from './fixture';
 import { createRobotHost, type RobotHostOptions, type RobotWorker } from './robotHost';
 import { handleRobotMessage } from './robotWorker';
@@ -32,7 +32,7 @@ afterEach(() => { hosts.forEach(host => host.stop()); hosts.length = 0; vi.useRe
 function setup(latency?: number, options: RobotHostOptions = {}, table: Playthrough = fixedPlaythrough()) {
   vi.useFakeTimers();
   const workers: FakeWorker[] = [];
-  const submit = vi.fn();
+  const submit = vi.fn<(action: Action, provenance: RobotProvenance) => boolean>(() => true);
   const audit = vi.fn(robotAudit(fixedDeal, table.record));
   const host = createRobotHost({ createWorker: () => { const worker = new FakeWorker(latency); workers.push(worker); return worker; }, audit, ...options });
   hosts.push(host);
@@ -65,15 +65,18 @@ test('US-10.4: forced final play uses the same display delay', () => {
 test('US-12.2: deadline timeout is marked, cancelled, and late answers discarded', () => {
   const { submit, workers, audit } = setup();
   vi.advanceTimersByTime(400);
-  expect(workers[0].messages.at(-1)).toEqual({ type: 'cancel', cancellationId: workers[0].request.cancellationId });
+  // §4.3: a synchronous policy can't read a cancel message, so the in-flight worker is terminated.
+  expect(workers[0].terminated).toBe(true);
   workers[0].answer(); vi.advanceTimersByTime(100);
   expect(submit).toHaveBeenCalledOnce();
   expect(submit.mock.calls[0][1]).toMatchObject({ policy: 'bv-fallback', fallback: 'timeout', durationMs: 400 });
-  expect(audit).toHaveBeenCalledTimes(2);
+  expect(audit).toHaveBeenCalledOnce();
 });
 for (const event of ['error', 'messageerror', 'response'] as const) test(`US-12.5: ${event} restarts and records engine-failure`, () => {
   const { workers, submit } = setup();
-  if (event === 'response') workers[0].emit({ type: 'error', requestId: workers[0].request.requestId, message: 'failed' });
+  const { requestId, playthroughId, positionKey } = workers[0].request;
+  if (event === 'response') workers[0].emit({ type: 'error', requestId, playthroughId, positionKey, message: 'failed',
+    provenance: { kind: 'robot', policy: 'bv-basic', version: '1', durationMs: 1 } });
   else if (event === 'error') workers[0].onerror?.({} as ErrorEvent);
   else workers[0].onmessageerror?.({} as MessageEvent);
   expect(workers).toHaveLength(2); expect(workers[0].terminated).toBe(true);
@@ -127,10 +130,12 @@ test('US-12.4: visibility events cancel, pause, and re-request with a fresh dead
   const first = workers[0].request;
   vi.advanceTimersByTime(300); hidden = true; target.dispatchEvent(new Event('visibilitychange'));
   workers[0].answer(first); vi.advanceTimersByTime(5000); expect(submit).not.toHaveBeenCalled();
+  expect(workers[0].terminated).toBe(true);
   hidden = false; target.dispatchEvent(new Event('visibilitychange'));
-  const next = workers[0].messages.at(-1) as RobotRequest;
+  const resumed = Date.now(); vi.advanceTimersByTime(0);
+  const next = workers[1].request;
   expect(next.positionKey).toBe(first.positionKey); expect(next.requestId).not.toBe(first.requestId);
-  expect(next.deadline).toBe(Date.now() + 400); workers[0].answer(next);
+  expect(next.deadline).toBe(resumed + 400); workers[1].answer(next);
   vi.advanceTimersByTime(499); expect(submit).not.toHaveBeenCalled();
   vi.advanceTimersByTime(1); expect(submit.mock.calls[0][1].fallback).toBeUndefined();
 });
@@ -205,7 +210,7 @@ test('composition: timeout provenance survives Table submission into the record'
   const play = createPlay({ createWorker: () => new FakeWorker(), audit });
   const stop = play.start(); vi.advanceTimersByTime(500);
   expect(play.record().actions[0].provenance).toMatchObject({ kind: 'robot', policy: 'bv-fallback', fallback: 'timeout', durationMs: 400 });
-  expect(audit).toHaveBeenCalledTimes(2); stop();
+  expect(audit).toHaveBeenCalledOnce(); stop();
 });
 
 test('US-10.3, US-44: composition seed and view ignore cards hidden from West', () => {
@@ -232,4 +237,39 @@ test('US-10.3, US-44: composition seed and view ignore cards hidden from West', 
   expect(requests[1].view).toEqual(requests[0].view);
   expect(requests[1].seed).toBe(requests[0].seed);
   expect(requests[1].positionKey).not.toBe(requests[0].positionKey);
+});
+test('§4.3.6: a response for another playthrough is ignored, not accepted or failed', () => {
+  const { workers, submit } = setup();
+  const request = workers[0].request;
+  handleRobotMessage({ ...request, playthroughId: 'playthrough-other' }, response => workers[0].emit(response));
+  vi.advanceTimersByTime(500);
+  expect(workers).toHaveLength(1);
+  expect(submit.mock.calls[0][1]).toMatchObject({ fallback: 'timeout' });
+});
+test('US-11.1: a robot action the Table rejects becomes a marked engine-failure fallback, not a loop', () => {
+  const { workers, submit, table } = setup();
+  submit.mockImplementationOnce(() => false);
+  const { requestId, playthroughId, positionKey } = workers[0].request;
+  const wrong = table.seatView('south').hand[0];
+  workers[0].emit({ type: 'decided', requestId, playthroughId, positionKey, action: { kind: 'play-card', card: wrong },
+    provenance: { kind: 'robot', policy: 'bv-basic', version: '1', durationMs: 1 } });
+  vi.advanceTimersByTime(500);
+  expect(submit).toHaveBeenCalledTimes(2);
+  expect(submit.mock.calls[1][1]).toMatchObject({ policy: 'bv-fallback', fallback: 'engine-failure' });
+  expect(workers[0].terminated).toBe(true);
+});
+test('US-11.1: in the composition a rejected robot card shows no learner message and play continues', () => {
+  vi.useFakeTimers();
+  const worker = new FakeWorker();
+  const play = createPlay({ createWorker: () => worker });
+  const stop = play.start();
+  try {
+    vi.advanceTimersByTime(0);
+    const { requestId, playthroughId, positionKey } = worker.request;
+    worker.emit({ type: 'decided', requestId, playthroughId, positionKey,
+      action: { kind: 'play-card', card: fixedDeal.hands.south[0] }, provenance: { kind: 'robot', policy: 'bv-basic', version: '1', durationMs: 1 } });
+    vi.advanceTimersByTime(500);
+    expect(play.getSnapshot().reason).toBe('');
+    expect(play.record().actions[0]).toMatchObject({ seat: 'west', provenance: { fallback: 'engine-failure' } });
+  } finally { stop(); }
 });

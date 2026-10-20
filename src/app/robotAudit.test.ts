@@ -37,7 +37,8 @@ for (const mode of ['audit', 'production']) test(`composition installs real-host
     if (mode === 'audit') {
       expect(window.__robotAuditCount).toBe(1); expect(window.__robotAuditViolations).toEqual([]);
       vi.advanceTimersByTime(400);
-      expect(window.__robotAuditCount).toBe(2);
+      // The timeout terminates the in-flight worker; no further message is posted or audited.
+      expect(window.__robotAuditCount).toBe(1); expect(worker.terminate).toHaveBeenCalled();
     } else {
       expect(window.__robotAuditCount).toBeUndefined(); expect(window.__robotAuditViolations).toBeUndefined();
     }

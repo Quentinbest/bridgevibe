@@ -97,7 +97,9 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract; learne
     if (led && action.card.suit !== led && hands[actingSeat].some(card => card.suit === led)) return reject('must-follow-suit', { suit: led });
     const card = copyCard(action.card);
     hands[actingSeat].splice(index, 1);
-    actions.push({ index: actions.length, seat: actingSeat, controller, action: { kind: 'play-card', card }, ...(provenance ? { provenance: { ...provenance } } : {}) });
+    // US-04.1: every accepted learner action records its provenance even when the caller omits it.
+    const recorded: ActionProvenance | undefined = provenance ?? (controller === 'learner' ? { kind: 'learner' } : undefined);
+    actions.push({ index: actions.length, seat: actingSeat, controller, action: { kind: 'play-card', card }, ...(recorded ? { provenance: { ...recorded } } : {}) });
     currentTrick.push({ seat: actingSeat, card });
     const events: TableEvent[] = [{ kind: 'card-played', seat: actingSeat, card: copyCard(card) }];
     turn = nextSeat(actingSeat);

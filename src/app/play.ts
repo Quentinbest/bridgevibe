@@ -60,6 +60,8 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
   }
   function accept(seat: 'north' | 'south' | 'east' | 'west', card: Card, controller: 'learner' | 'robot', provenance?: RobotProvenance) {
     const result = table.submit(seat, controller, { kind: 'play-card', card }, provenance);
+    // US-11.1: a rejected robot action goes back to the host, which falls back; it is never learner feedback.
+    if (result.kind === 'rejected' && controller === 'robot') return false;
     reason = '';
     if (result.kind === 'rejected') {
       reason = text(reasonStrings[result.reason], result.details.suit ? { suit: text(`suit.${result.details.suit}`) } : {});
@@ -73,6 +75,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
       displayedTrick = collecting ? view.tricks[view.tricks.length - 1].cards : view.currentTrick;
     }
     publish(); schedule();
+    return true;
   }
   return {
     record: table.record,

@@ -8,5 +8,5 @@ export type RobotRequest = {
 };
 export type RobotMessage = RobotRequest | { type: 'cancel'; cancellationId: string };
 export type RobotResponse = { type: 'hello'; protocolVersion: number }
-  | { type: 'decided'; requestId: string; positionKey: string; action: Action; provenance: RobotProvenance }
-  | { type: 'error'; requestId: string; message: string };
+  | { type: 'decided'; requestId: string; playthroughId: string; positionKey: string; action: Action; provenance: RobotProvenance }
+  | { type: 'error'; requestId: string; playthroughId: string; positionKey: string; message: string; provenance: RobotProvenance };

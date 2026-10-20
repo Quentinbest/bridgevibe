@@ -12,10 +12,12 @@ export function handleRobotMessage(message: RobotMessage, post: (response: Robot
     const view = decodeSeatView(message.view);
     if (view.seat !== message.seat) throw new Error('seat-mismatch');
     const action = policy.decide(view, message.seed, message.deadline);
-    post({ type: 'decided', requestId: message.requestId, positionKey: message.positionKey, action,
+    post({ type: 'decided', requestId: message.requestId, playthroughId: message.playthroughId, positionKey: message.positionKey, action,
       provenance: { kind: 'robot', policy: policy.name, version: policy.version, durationMs: now() - started } });
   } catch {
-    post({ type: 'error', requestId: message.requestId, message: 'robot-policy-failed' });
+    // §4.3.6: errors carry the position identity and the engine's provenance too.
+    post({ type: 'error', requestId: message.requestId, playthroughId: message.playthroughId, positionKey: message.positionKey,
+      message: 'robot-policy-failed', provenance: { kind: 'robot', policy: policy.name, version: policy.version, durationMs: now() - started } });
   }
 }
 // §4.1.3: guard permits direct handler tests without starting a Worker.

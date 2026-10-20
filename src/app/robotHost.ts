@@ -17,7 +17,7 @@ export type RobotHostOptions = {
   audit?: (message: RobotMessage, seat: Seat) => void;
 };
 type Decision = { view: SeatView; seed: string; playthroughId: string; positionKey: string;
-  currentPositionKey(): string; submit(action: Action, provenance: RobotProvenance): void };
+  currentPositionKey(): string; submit(action: Action, provenance: RobotProvenance): boolean };
 export function createRobotHost(options: RobotHostOptions = {}) {
   const clock = options.clock ?? { now: Date.now, setTimeout: (callback, ms) => setTimeout(callback, ms), clearTimeout };
   const visibility = options.visibility ?? {
@@ -41,6 +41,7 @@ export function createRobotHost(options: RobotHostOptions = {}) {
   let sequence = 0;
   let active: Decision | undefined;
   let request: RobotRequest | undefined;
+  let inFlight = false;
   let result: { action: Action; provenance: RobotProvenance } | undefined;
   let started = 0;
   let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
@@ -57,12 +58,14 @@ export function createRobotHost(options: RobotHostOptions = {}) {
     try { worker.postMessage(message); } catch { fail(); }
   }
   function cancelRequest() {
-    const previous = request; request = undefined;
+    request = undefined;
     clock.clearTimeout(deadlineTimer);
-    if (previous) post({ type: 'cancel', cancellationId: previous.cancellationId });
+    // §4.3: a synchronous policy can't read a cancel message until it returns, so cancelling an
+    // in-flight decision terminates the worker; the next decision starts a fresh one. Not a failure.
+    if (inFlight) { inFlight = false; terminate(); }
   }
   function terminate() {
-    const previous = worker; worker = undefined; ready = false;
+    const previous = worker; worker = undefined; ready = false; inFlight = false;
     if (previous) { previous.onmessage = null; previous.onerror = null; previous.onmessageerror = null; previous.terminate(); }
   }
   function fallback(reason: 'timeout' | 'engine-failure') {
@@ -94,9 +97,11 @@ export function createRobotHost(options: RobotHostOptions = {}) {
         ready = true; send(); return;
       }
       if (!active || !request || message.requestId !== request.requestId || visibility.hidden()) return;
+      // §4.3.6: only a response for this exact position counts, success or error.
+      if (message.playthroughId !== request.playthroughId || message.positionKey !== request.positionKey) return;
+      inFlight = false;
       if (active.currentPositionKey() !== request.positionKey) { cancel(); return; }
       if (message.type === 'error') { fail(); return; }
-      if (message.positionKey !== request.positionKey) return;
       if (clock.now() >= request.deadline) { fallback('timeout'); return; }
       result = { action: message.action, provenance: message.provenance };
       request = undefined; clock.clearTimeout(deadlineTimer);
@@ -104,7 +109,8 @@ export function createRobotHost(options: RobotHostOptions = {}) {
     owned.onerror = owned.onmessageerror = () => { if (worker === owned) fail(); };
   }
   function send() {
-    if (!ready || !active || !request || result || visibility.hidden()) return;
+    if (!ready || !active || !request || result || inFlight || visibility.hidden()) return;
+    inFlight = true;
     post(request);
   }
   function display() {
@@ -113,7 +119,11 @@ export function createRobotHost(options: RobotHostOptions = {}) {
     if (!result) fallback('timeout');
     const decision = active; const chosen = result;
     active = undefined; result = undefined; request = undefined; clearTimers();
-    if (chosen) decision.submit(chosen.action, chosen.provenance);
+    if (!chosen || decision.submit(chosen.action, chosen.provenance) || chosen.provenance.fallback) return;
+    // US-11.1, INV-7: an action the Table rejects is an engine failure, never a retry loop.
+    failures++; terminate();
+    decision.submit(fallbackRobotPolicy.decide(decision.view, decision.seed, clock.now()), { kind: 'robot',
+      policy: fallbackRobotPolicy.name, version: fallbackRobotPolicy.version, fallback: 'engine-failure', durationMs: clock.now() - started });
   }
   function begin() {
     if (!active || visibility.hidden()) return;
