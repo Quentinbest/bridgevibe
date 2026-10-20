@@ -273,3 +273,31 @@ test('US-11.1: in the composition a rejected robot card shows no learner message
     expect(play.record().actions[0]).toMatchObject({ seat: 'west', provenance: { fallback: 'engine-failure' } });
   } finally { stop(); }
 });
+test('US-12.2: an error arriving after the deadline is a timeout, not an engine failure', () => {
+  const { workers, submit } = setup();
+  const { requestId, playthroughId, positionKey } = workers[0].request;
+  vi.setSystemTime(Date.now() + 400);
+  workers[0].emit({ type: 'error', requestId, playthroughId, positionKey, message: 'late',
+    provenance: { kind: 'robot', policy: 'bv-basic', version: '1', durationMs: 400 } });
+  vi.advanceTimersByTime(500);
+  expect(submit.mock.calls[0][1]).toMatchObject({ fallback: 'timeout' });
+});
+test('US-41.3, US-12.5: a worker that never sends hello is replaced and eventually disabled', () => {
+  vi.useFakeTimers();
+  const created: RobotWorker[] = [];
+  const table = fixedPlaythrough();
+  const submit = vi.fn<(action: Action, provenance: RobotProvenance) => boolean>(() => true);
+  const host = createRobotHost({ createWorker: () => {
+    const worker: RobotWorker = { onmessage: null, onerror: null, onmessageerror: null, postMessage: vi.fn(), terminate: vi.fn() };
+    created.push(worker); return worker;
+  } });
+  hosts.push(host);
+  for (let decision = 0; decision < 5; decision++) {
+    host.decide({ view: table.seatView('west'), seed: seatViewSeed(table.seatView('west')), playthroughId: table.record().playthroughId,
+      positionKey: table.positionKey(), currentPositionKey: table.positionKey, submit });
+    vi.advanceTimersByTime(500);
+  }
+  expect(created).toHaveLength(3);
+  for (const worker of created) expect(worker.terminate).toHaveBeenCalled();
+  expect(submit.mock.calls.map(call => call[1].fallback)).toEqual(['timeout', 'timeout', 'timeout', 'engine-failure', 'engine-failure']);
+});

@@ -70,6 +70,9 @@ export function createRobotHost(options: RobotHostOptions = {}) {
   }
   function fallback(reason: 'timeout' | 'engine-failure') {
     if (!active || result || visibility.hidden()) return;
+    // US-41.3, US-12.5: a worker still without its handshake at the deadline is replaced, and
+    // counts toward the failure threshold, so a stale or hung worker can't time out forever.
+    if (reason === 'timeout' && worker && !ready) { failures++; terminate(); }
     result = { action: fallbackRobotPolicy.decide(active.view, active.seed, clock.now()),
       provenance: { kind: 'robot', policy: fallbackRobotPolicy.name, version: fallbackRobotPolicy.version,
         fallback: reason, durationMs: clock.now() - started } };
@@ -101,8 +104,9 @@ export function createRobotHost(options: RobotHostOptions = {}) {
       if (message.playthroughId !== request.playthroughId || message.positionKey !== request.positionKey) return;
       inFlight = false;
       if (active.currentPositionKey() !== request.positionKey) { cancel(); return; }
-      if (message.type === 'error') { fail(); return; }
+      // US-12.2: anything arriving after the deadline is a timeout, even an error.
       if (clock.now() >= request.deadline) { fallback('timeout'); return; }
+      if (message.type === 'error') { fail(); return; }
       result = { action: message.action, provenance: message.provenance };
       request = undefined; clock.clearTimeout(deadlineTimer);
     };
