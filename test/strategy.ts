@@ -13,7 +13,7 @@ export function completeFixedDeal() {
     const seat = table.seatView('south').turn!;
     const controller = seat === 'north' || seat === 'south' ? 'learner' : 'robot';
     const action = controller === 'learner' ? firstLegal(table, seat) : { kind: 'play-card', card: fallbackPolicy(table.seatView(seat)) };
-    const result = table.submit(seat, controller, action);
+    const result = table.submit(seat, controller, action, controller === 'robot' ? { kind: 'robot', policy: 'test-policy', version: '1', durationMs: 0 } : undefined);
     if (result.kind !== 'accepted') throw new Error(result.reason);
   }
   return table.record();

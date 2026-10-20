@@ -1,6 +1,7 @@
 import { spawnSync } from 'node:child_process';
 import { expect, test } from 'vitest';
 for (const [fixture, rule] of [
+  ['coach-to-explanation', 'coach-only-table'],
   ['table-to-explanation', 'table-is-independent'],
   ['table-to-package', 'table-is-independent'],
   ['table-to-builtin', 'table-is-independent'],

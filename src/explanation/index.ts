@@ -2,6 +2,17 @@ import type { Card, ReasonCode } from '../table';
 
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
+  "debug.entries": { text: "Provenance entries", status: 'draft' },
+  "debug.title": { text: "Provenance log", status: 'draft' },
+  "debug.internal": { text: "Internal build only", status: 'draft' },
+  "debug.hidden": { text: "Hidden cards in VISIBLE inputs", status: 'draft' },
+  "debug.fallbacks": { text: "Silent fallbacks", status: 'draft' },
+  "debug.mode": { text: "Information mode", status: 'draft' },
+  "debug.source": { text: "Source kind", status: 'draft' },
+  "debug.export": { text: "Export log (JSON)", status: 'draft' },
+  "debug.seat": { text: "Seat", status: 'draft' },
+  "debug.show": { text: "Show seat view", status: 'draft' },
+  "debug.value": { text: "{value}", status: 'draft' },
   "deal.new": { text: "New deal", status: 'draft' },
   "deal.info": { text: "Deal info", status: 'draft' },
   "deal.id": { text: "Deal ID", status: 'draft' },

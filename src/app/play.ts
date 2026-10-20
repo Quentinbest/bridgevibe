@@ -1,3 +1,4 @@
+import { createProvenanceLog, type LogEntry } from '../coach/provenance';
 import { startPlaythrough, seatViewSeed, type Card, type Deal, type SeatView, type Seat, type PlayedCard, type ReasonCode, type RobotProvenance } from '../table';
 import { createRobotHost, type RobotHostOptions } from './robotHost';
 import { cardName, reasonStrings, text } from '../explanation';
@@ -21,11 +22,20 @@ export type LearnerView = Readonly<Pick<SeatView,
 // The learner declares 3NT from South until the table turns for other declarers (#16, ADR-0003).
 export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fixedDeal) {
   const table = startPlaythrough({ deal, contract: { level: 3, strain: 'no-trumps', declarer: 'south' }, learnerSide: 'northSouth' });
+  const provenanceLog = createProvenanceLog('0.0.0');
+  let entryId = 0;
+  function log(entry: Pick<LogEntry, 'kind' | 'summary' | 'text' | 'provenance'>) {
+    provenanceLog.record({ ...entry, id: `${table.record().playthroughId}-${++entryId}`, playthroughId: table.record().playthroughId,
+      positionIndex: table.seatView('south').positionIndex, informationMode: 'VISIBLE', at: new Date().toISOString() });
+  }
   let options = robotOptions;
-  // US-10.2, §4.3.6: audit and test builds audit every robot message; this constant guard
-  // removes the audit from production builds.
-  if (import.meta.env.MODE === 'audit' || import.meta.env.MODE === 'test') {
-    const audit = import.meta.env.MODE === 'audit' ? browserRobotAudit(table.record().deal, table.record) : robotAudit(table.record().deal, table.record);
+  // US-10.2, §4.3.6, US-40.2: every build that can show the debug panel's hidden-card counter
+  // (development, internal, audit) audits robot messages, as test builds do; this guard removes
+  // the audit from production builds.
+  if (import.meta.env.MODE === 'audit' || import.meta.env.MODE === 'test' || import.meta.env.MODE === 'internal'
+    || import.meta.env.MODE === 'development') {
+    const hiddenCardFound = () => { provenanceLog.hiddenCardFound(); publish(); };
+    const audit = import.meta.env.MODE === 'audit' ? browserRobotAudit(table.record().deal, table.record, hiddenCardFound) : robotAudit(table.record().deal, table.record, hiddenCardFound);
     options = { ...robotOptions, audit(message, seat) { audit(message, seat); robotOptions.audit?.(message, seat); } };
   }
   const robots = createRobotHost(options);
@@ -76,7 +86,10 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
       rejectionId++;
       reasonCode = result.reason; rejectedCard = card; rejectedSeat = seat;
       reason = text(reasonStrings[result.reason], result.details.suit ? { suit: text(`suit.${result.details.suit}`) } : {});
+      log({ kind: 'statement', summary: result.reason, text: reason, provenance: { sourceKind: 'template', templateId: reasonStrings[result.reason] } });
     } else {
+      if (controller === 'robot' && provenance) log({ kind: 'robot-action', summary: JSON.stringify({ seat, action: { kind: 'play-card', card } }),
+        provenance: { sourceKind: 'robot', ...provenance } });
       for (const event of result.events) {
         if (event.kind === 'card-played') announcements.push(text('announce.play', { seat: text(`seat.${event.seat}`), card: cardName(event.card) }));
         // The winner is announced once, by the turn banner's live region during collection (UX §10).
@@ -90,8 +103,16 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
   }
   return {
     record: table.record,
+    provenanceLog,
+    seatView: table.seatView,
     getSnapshot: () => snapshot,
     clearRejection() { clearRejection(); publish(); },
+    showRule() {
+      if (!reasonCode) return;
+      const templateId = `rule.${reasonCode}` as const;
+      log({ kind: 'statement', summary: reasonCode, text: text(templateId), provenance: { sourceKind: 'template', templateId } });
+      publish();
+    },
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
     start() { running = true; schedule(); return () => { running = false; clearTimeout(timer); robots.stop(); }; },
     play(seat: 'north' | 'south', card: Card) { if (!collecting) accept(seat, card, 'learner'); },

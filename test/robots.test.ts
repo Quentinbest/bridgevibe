@@ -6,7 +6,7 @@ const contract: Contract = { level: 3, strain: 'hearts', declarer: 'south' };
 function view(hand: Card[], led?: Card, strain: Contract['strain'] = 'hearts'): SeatView {
   const deal = dealWith(led ? { west: [led], north: hand } : { west: hand });
   const table = startPlaythrough({ deal, contract: { ...contract, strain }, learnerSide: 'northSouth' });
-  if (led) table.submit('west', 'robot', { kind: 'play-card', card: led });
+  if (led) table.submit('west', 'robot', { kind: 'play-card', card: led }, { kind: 'robot', policy: 'test-policy', version: '1', durationMs: 0 });
   return table.seatView(led ? 'north' : 'west');
 }
 const suit = (name: Card['suit'], ranks: Card['rank'][] = [...RANKS]) => ranks.map(rank => card(name, rank));

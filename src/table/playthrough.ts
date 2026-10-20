@@ -20,7 +20,7 @@ export type PlaythroughRecord = Readonly<{
   deal: Deal;
   contract: Contract;
   learnerSide: Side;
-  actions: readonly Readonly<{ index: number; seat: Seat; controller: Controller; action: Action; provenance?: ActionProvenance }>[];
+  actions: readonly Readonly<{ index: number; seat: Seat; controller: Controller; action: Action; provenance: ActionProvenance }>[];
   status: Status;
   result: Readonly<Record<Side, number>>;
 }>;
@@ -84,6 +84,12 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract; learne
     // US-01.6: validate everything before mutating any state, in reason-code precedence order.
     if (status === 'completed') return reject('playthrough-complete');
     if (!SEATS.some(candidate => candidate === seat) || (controller !== 'learner' && controller !== 'robot') || !isAction(action)) return reject('malformed-action');
+    // US-01.6, CI-5: controller and complete provenance must agree before any mutation.
+    if ((controller === 'robot' && !provenance) || (provenance && provenance.kind !== controller)) return reject('malformed-action');
+    if (provenance?.kind === 'robot' && (typeof provenance.policy !== 'string' || !provenance.policy.trim()
+      || typeof provenance.version !== 'string' || !provenance.version.trim()
+      || !Number.isFinite(provenance.durationMs) || provenance.durationMs < 0
+      || (provenance.fallback !== undefined && provenance.fallback !== 'timeout' && provenance.fallback !== 'engine-failure'))) return reject('malformed-action');
     // US-01.5: a card that has already been played is duplicate-card input, not merely a card not held.
     if (actions.some(entry => sameCard(entry.action.card, action.card))) return reject('malformed-action', { cause: 'duplicate' });
     const actingSeat = seat as Seat;
@@ -98,8 +104,8 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract; learne
     const card = copyCard(action.card);
     hands[actingSeat].splice(index, 1);
     // US-04.1: every accepted learner action records its provenance even when the caller omits it.
-    const recorded: ActionProvenance | undefined = provenance ?? (controller === 'learner' ? { kind: 'learner' } : undefined);
-    actions.push({ index: actions.length, seat: actingSeat, controller, action: { kind: 'play-card', card }, ...(recorded ? { provenance: { ...recorded } } : {}) });
+    const recorded: ActionProvenance = provenance ?? { kind: 'learner' };
+    actions.push({ index: actions.length, seat: actingSeat, controller, action: { kind: 'play-card', card }, provenance: { ...recorded } });
     currentTrick.push({ seat: actingSeat, card });
     const events: TableEvent[] = [{ kind: 'card-played', seat: actingSeat, card: copyCard(card) }];
     turn = nextSeat(actingSeat);

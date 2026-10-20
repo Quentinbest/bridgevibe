@@ -167,3 +167,35 @@ a seeded index, or creates a 12-character seed with `crypto.getRandomValues` for
 authored Deal, and replaces the URL. Play remains 3NT by South until #12.
 Deal info displays metadata only. Copy remains draft (CI-8); replay still reads the
 Playthrough Record, never regenerated actions (ADR-0002).
+
+## Provenance
+
+US-40 / CI-5: `src/coach/provenance.ts` owns the session-only log and validates every
+entry on recording. Coach currently depends only on Table. Composition records
+rendered reason-code statements and accepted robot actions; later coach features
+use the same API. Each entry carries its Playthrough ID, position index, timestamp,
+plain-data summary, information mode and source-specific provenance. Robot actions
+use source kind `robot` with the host's policy, version, optional fallback reason
+and duration. Statements also require rendered text. Source kinds are separate
+from the only information modes, `VISIBLE` and `ALL_HANDS`; the design's `RULE`
+and `AUTHORED` mode badges are not used.
+
+Use `npm run build:internal` (or the dev server) with `?debug=1`. Audit builds also
+support the panel. The production build removes the dynamic panel import. The
+panel lists newest entries first, reports hidden-card audit violations and unmarked
+`bv-fallback` actions, and can inspect any current Seat View. That deliberately
+reveals hidden cards and is restricted to these internal debugging builds.
+Audits report violations into the counter before throwing, so unsafe inputs still
+cannot reach a robot. A new Playthrough starts a new log; nothing is persisted.
+
+F5 export is a JSON document with `schemaVersion: 1`, `format: 'bridgevibe-f5'`,
+ISO `exportedAt`, `appVersion`, and `entries`. Composition stamps the current package
+version as a literal (checked against `package.json` by the composition test), so
+the package manifest is not shipped as an undeclared asset. Each exported entry contains
+all logged fields plus `grade: null` and `graderNote: null` for teacher completion.
+Exports and reads are independent snapshots. The filename is `bridgevibe-f5.json`.
+
+Open question (F5 / VAL-08): teachers should confirm this proposed grading format,
+including the vocabulary for `grade` and how two teachers' resolved grades are
+combined. Recommendation: retain these nullable fields until the grading rubric
+is agreed; do not infer grading values or a sign-off process in this ticket.

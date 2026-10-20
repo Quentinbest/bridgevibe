@@ -12,11 +12,12 @@ vi.mock('./robotAudit', async original => {
 });
 const { createPlay } = await import('./play');
 
-afterEach(() => { vi.useRealTimers(); inspected.length = 0; });
+afterEach(() => { vi.useRealTimers(); vi.unstubAllEnvs(); inspected.length = 0; });
 
-// US-10.2, §4.3.6: test builds audit robot messages even when a test passes no audit hook.
-test('test mode installs the robot audit automatically', async () => {
-  vi.useFakeTimers();
+// US-10.2, §4.3.6, US-40.2: test builds, and every build that shows the debug panel's hidden-card
+// counter, audit robot messages even when no audit hook is passed.
+for (const mode of ['test', 'development', 'internal']) test(`${mode} mode installs the robot audit automatically`, async () => {
+  vi.useFakeTimers(); vi.stubEnv('MODE', mode);
   const posted: RobotMessage[] = [];
   const worker: RobotWorker = { onmessage: null, onerror: null, onmessageerror: null, terminate() {},
     postMessage(message) { posted.push(message); } };
