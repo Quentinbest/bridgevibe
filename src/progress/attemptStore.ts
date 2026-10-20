@@ -1,7 +1,8 @@
-import type { Attempt } from './model';
+import type { Attempt, AttemptSink } from '../curriculum/model';
 
-// US-28.8: append-only session data; replaying a lesson adds another Attempt.
-export function createAttemptStore() {
+// §4.2, US-28.8: progress owns the session Attempts store (V: memory only). Append-only:
+// replaying a lesson adds another Attempt.
+export function createAttemptStore(): AttemptSink & { snapshot(): readonly Attempt[] } {
   const attempts: Attempt[] = [];
   return {
     append(attempt: Attempt) { attempts.push(Object.freeze({ ...attempt })); },

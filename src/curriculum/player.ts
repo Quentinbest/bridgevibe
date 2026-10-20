@@ -1,9 +1,8 @@
 import { sameCard, startPlaythrough, type Card, type Submission } from '../table';
-import type { Attempt, Exercise, Provenance } from './model';
-import type { AttemptStore } from './attemptStore';
+import type { Attempt, AttemptSink, Exercise, Provenance } from './model';
 
 // US-21: deterministic transitions, no timers, React, or robot policies. The caller supplies time.
-export function createPlayer(exercise: Exercise, store: AttemptStore, learnerId: string) {
+export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: string) {
   const table = startPlaythrough(exercise);
   let stepIndex = 0;
   let scriptOffset = 0;
@@ -40,25 +39,32 @@ export function createPlayer(exercise: Exercise, store: AttemptStore, learnerId:
     store.append({ learnerId, promptContentId: current.prompt.contentId, version: current.prompt.version,
       outcome: result, hintTier: hint ? 'a' : 'none', hintTiming, time, playthroughId: table.record().playthroughId });
   }
+  // US-02.2: when the learner's side declares, the learner also plays Dummy, so answer for the seat on turn.
+  function learnerSeat() {
+    const turn = table.seatView('south').turn;
+    return turn && table.controllerOf(turn) === 'learner' ? turn : null;
+  }
   function answer(card: Card, time: number) {
     const current = step();
-    if (current.kind !== 'prompt' || outcome || wrongAnswers >= 2) return snapshot();
+    const seat = learnerSeat();
+    if (current.kind !== 'prompt' || outcome || wrongAnswers >= 2 || !seat) return snapshot();
     // INV-1: probe the real Table on a replay, so a legal but unexpected answer cannot derail the Script.
     const trial = startPlaythrough(exercise);
     for (const played of table.record().actions) trial.submit(played.seat, played.controller, played.action);
-    const result = trial.submit('south', 'learner', { kind: 'play-card', card });
+    const result = trial.submit(seat, 'learner', { kind: 'play-card', card });
     rejection = result.kind === 'rejected' ? result : null;
     if (result.kind === 'rejected' && !current.prompt.countsRejections) return snapshot();
     if (result.kind === 'accepted' && current.prompt.expectedAnswers.some(expected => sameCard(expected, card))) {
-      table.submit('south', 'learner', { kind: 'play-card', card });
+      table.submit(seat, 'learner', { kind: 'play-card', card });
       finish(wrongAnswers ? 'corrected' : 'correct', time);
     } else wrongAnswers++;
     return snapshot();
   }
   function showAnswer(time: number) {
     const current = step();
-    if (current.kind !== 'prompt' || outcome || wrongAnswers < 2) return snapshot();
-    const result = table.submit('south', 'learner', { kind: 'play-card', card: current.prompt.expectedAnswers[0] });
+    const seat = learnerSeat();
+    if (current.kind !== 'prompt' || outcome || wrongAnswers < 2 || !seat) return snapshot();
+    const result = table.submit(seat, 'learner', { kind: 'play-card', card: current.prompt.expectedAnswers[0] });
     if (result.kind === 'rejected') throw new Error('Authored answer rejected by Table');
     rejection = null;
     finish('failed', time);
@@ -81,7 +87,7 @@ export function createPlayer(exercise: Exercise, store: AttemptStore, learnerId:
   }
   function showHint() {
     const current = step();
-    if (current.kind === 'prompt' && !outcome && !hint) {
+    if (current.kind === 'prompt' && current.prompt.hint && !outcome && !hint) {
       hintTiming = wrongAnswers ? 'after-wrong-answer' : 'before-first-answer';
       // US-14.4: expose authored provenance; #9 wires this to the coach log after both tickets land.
       hint = { textRef: current.prompt.hint.textRef, provenance: {

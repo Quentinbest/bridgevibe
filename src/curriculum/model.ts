@@ -5,7 +5,8 @@ export type Provenance = Readonly<{ sourceKind: 'authored'; contentId: string; v
 export type Prompt = Content & Readonly<{
   promptId: string; answerKind: 'card'; textRef: string; commentaryRef: string;
   expectedAnswers: readonly Card[]; countsRejections?: boolean;
-  hint: { textRef: string; referencedCards: readonly Card[] }; skillTags: readonly string[];
+  // US-28.8: authors leave the hint out where they need an unaided measure.
+  hint?: { textRef: string; referencedCards: readonly Card[] }; skillTags: readonly string[];
   correctRef: string; wrongRef: string; shownRef: string;
 }>;
 export type ScriptAction = Readonly<{ seat: Seat; action: Action }>;
@@ -24,3 +25,5 @@ export type Attempt = Readonly<{
   hintTier: 'none' | 'a'; hintTiming: 'before-first-answer' | 'after-wrong-answer' | null;
   time: number; playthroughId: string;
 }>;
+// §4.2: the progress module owns the session store; the player only appends to it.
+export type AttemptSink = Readonly<{ append(attempt: Attempt): void }>;

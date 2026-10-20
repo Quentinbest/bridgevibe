@@ -2,7 +2,7 @@ import { describe, expect, test, vi } from 'vitest';
 import { dealIdOf, sameCard, startPlaythrough, type Card } from '../table';
 import { catalogue } from '../explanation';
 import { followSuit } from './content';
-import { createAttemptStore } from './attemptStore';
+import { createAttemptStore } from '../progress/attemptStore';
 import { createPlayer } from './player';
 import type { Exercise, Prompt, ScriptAction } from './model';
 
@@ -181,4 +181,36 @@ test.each([
       hintTier: secondHint ? 'a' : 'none', hintTiming: secondHint ? 'after-wrong-answer' : null, time: 6 },
   ]);
   expect(player.next().stepIndex).toBe(secondIndex + 1);
+});
+
+// US-02.2: the learner also plays Dummy, so a prompt on Dummy's turn is answered from Dummy's seat.
+test('a prompt on Dummy’s turn submits for Dummy, including Show me', () => {
+  const lead = exercise.script[0];
+  const dummyFollows = exercise.deal.hands.north.filter(card => card.suit === lead.action.card.suit);
+  const dummyOther = exercise.deal.hands.north.find(card => card.suit !== lead.action.card.suit)!;
+  expect(dummyFollows.length).toBeGreaterThan(0);
+  const prompt = exercise.steps.find(step => step.kind === 'prompt')!;
+  if (prompt.kind !== 'prompt') throw new Error('fixture');
+  const dummyExercise = (countsRejections: boolean): Exercise => ({ ...exercise, script: [lead], steps: [
+    { kind: 'scripted-action', scriptIndices: [0] },
+    { kind: 'prompt', prompt: { ...prompt.prompt, expectedAnswers: dummyFollows, countsRejections } },
+  ] });
+  const right = createPlayer(dummyExercise(false), createAttemptStore(), 'learner-1');
+  right.advanceScript();
+  expect(right.answer(dummyFollows[0], 1).outcome).toBe('correct');
+  expect(right.snapshot().view.currentTrick.at(-1)).toEqual({ seat: 'north', card: dummyFollows[0] });
+  const shown = createPlayer(dummyExercise(true), createAttemptStore(), 'learner-1');
+  shown.advanceScript();
+  shown.answer(dummyOther, 1); shown.answer(dummyOther, 2);
+  expect(() => shown.showAnswer(3)).not.toThrow();
+  expect(shown.snapshot()).toMatchObject({ outcome: 'failed' });
+  expect(shown.snapshot().view.currentTrick.at(-1)).toEqual({ seat: 'north', card: dummyFollows[0] });
+});
+
+// US-28.8: authors can leave a prompt unaided; it then has no hint and records tier none.
+test('a prompt without a hint offers none and records hint tier none', () => {
+  const { player, store } = setup({ hint: undefined });
+  expect(player.showHint().hint).toBeNull();
+  player.answer(heart('A'), 1);
+  expect(store.snapshot().at(-1)).toMatchObject({ outcome: 'correct', hintTier: 'none', hintTiming: null });
 });

@@ -1,5 +1,7 @@
 module.exports = {
   forbidden: [
+    // §4.2: progress owns the Attempts store and may depend on curriculum (types) only.
+    { name: 'progress-only-curriculum', severity: 'error', from: { path: '(^|/)src/progress/', pathNot: '\\.test\\.ts$' }, to: { pathNot: '(^|/)src/(progress|curriculum)/' } },
     { name: 'curriculum-only-table', severity: 'error', from: { path: '(^|/)src/curriculum/', pathNot: '\\.test\\.ts$' }, to: { pathNot: '(^|/)src/(table|curriculum)/' } },
     { name: 'robots-only-table', severity: 'error', from: { path: '(^|/)src/robots/', pathNot: '\\.test\\.ts$' }, to: { pathNot: '(^|/)src/table/' } },
     // table may depend on nothing: no other module, package or Node builtin. Its tests may import the test runner.

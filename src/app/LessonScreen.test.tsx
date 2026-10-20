@@ -2,7 +2,7 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
 import { LessonScreen } from './LessonScreen';
-import { sessionAttempts } from '../curriculum/attemptStore';
+import { sessionAttempts } from '../progress/attemptStore';
 
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 function openPrompt() {
@@ -48,4 +48,11 @@ test('US-21: wrong twice exposes Show me, records failure and offers script cont
   fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
   act(() => { vi.advanceTimersByTime(500); });
   expect(screen.getByText('5/5')).toBeTruthy();
+});
+
+// UX §3.1, §6.2: the lesson table shows exposed Dummy face up, like the practice table.
+test('Dummy is face up in the lesson table after the opening lead', () => {
+  openPrompt();
+  const dummy = screen.getByRole('region', { name: 'North · Dummy' });
+  expect(dummy.querySelectorAll('.card')).toHaveLength(12);
 });

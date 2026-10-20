@@ -150,6 +150,8 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
 .lesson-trick { display: flex; justify-content: center; gap: 8px; min-height: 190px; align-items: center; }
 .lesson-trick article p { font-size: var(--type-12); margin: 4px 0; }
 .lesson-table .hand { margin-top: 12px; }
+.lesson-dummy { margin-bottom: 12px; text-align: center; }
+.lesson-dummy .hand { margin-top: 0; }
 .lesson-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-20); padding: 16px; }
 .lesson-panel h2 { font-size: var(--type-18); }
 .lesson-panel p { margin-bottom: 12px; }
