@@ -49,7 +49,8 @@ export function resolveArtefact(root: string, id: string, shippedFile: string, a
   }
   const repoPath = relative(root, file);
   const registered = assets[repoPath] ?? assets[shippedFile];
-  if (!registered && (repoPath === 'index.html' || /^src\/.*\.(?:[cm]?[jt]sx?|css)$/.test(repoPath))) {
+  // LR-5: authored content under src/ is first-party; rights records arrive with the content pipeline (#15).
+  if (!registered && (repoPath === 'index.html' || /^src\/.*\.(?:[cm]?[jt]sx?|css|json)$/.test(repoPath))) {
     return { name: 'first-party', kind: 'first-party', version: readJson<{ version: string }>(path.join(root, 'package.json')).version,
       licenceFiles: [], texts: [], notices: [], shippedFiles: [shippedFile] };
   }

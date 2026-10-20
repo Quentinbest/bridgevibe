@@ -26,6 +26,22 @@ function pkg(name: string): Shipped {
 const exception = (name: string): Exception => ({ package: name, version: '1.0.0', reason: 'Fixture review', reviewer: 'Fixture reviewer', date: '2026-10-19' });
 const bom = (items: Shipped[], exceptions: Exception[] = [], assets: Record<string, Asset> = {}) => buildBom(items, exceptions, assets, [], denylist);
 
+it('attributes source JSON to first-party and package JSON to its npm package', () => {
+  const dir = temp();
+  mkdirSync(path.join(dir, 'src/content'), { recursive: true });
+  writeFileSync(path.join(dir, 'package.json'), '{"version":"1.0.0"}');
+  writeFileSync(path.join(dir, 'src/content/lesson.json'), '{}');
+  cpSync(path.join(fixtures, 'packages'), path.join(dir, 'node_modules'), { recursive: true });
+  writeFileSync(path.join(dir, 'node_modules/third-party/data.json'), '{}');
+  const authored = resolveArtefact(dir, 'src/content/lesson.json', 'assets/app.js', {});
+  expect(authored).toMatchObject({ name: 'first-party', kind: 'first-party', version: '1.0.0' });
+  expect(bom([authored]).violations).toEqual([]);
+  const packaged = resolveArtefact(dir, 'node_modules/third-party/data.json', 'assets/app.js', {});
+  expect(packaged).toMatchObject({ name: 'third-party', kind: 'npm', version: '1.0.0' });
+  expect(packaged.licenceFiles).toContain('node_modules/third-party/LICENSE');
+  expect(bom([packaged]).violations).toEqual([]);
+});
+
 // LR-7: real licence texts, including Vite's bundled third-party appendix.
 describe('licence classification', () => {
   it.each(['MIT', 'ISC', 'Apache-2.0', 'BSD-3-Clause', 'OFL-1.1'])('%s', name => {

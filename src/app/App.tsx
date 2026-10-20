@@ -6,6 +6,7 @@ import { Hand } from './Hand';
 import { type LearnerView } from './play';
 import { dealFromUrl, dealSession } from './deals';
 import { DealControls } from './DealControls';
+import { LessonScreen } from './LessonScreen';
 
 function Opponent({ seat, count }: { seat: 'west' | 'east'; count: number }) {
   return <section className={`opponent ${seat}`} aria-label={text(`seat.${seat}`)}>
@@ -96,7 +97,7 @@ export function TableScreen({ view, play, clearRejection, info, invalid, onNew }
     </main>
   </>;
 }
-export function App() {
+function PracticeScreen() {
   const [session, setSession] = useState(() => {
     const initial = dealFromUrl(window.location.search);
     return dealSession(initial.deal, initial.invalid);
@@ -105,4 +106,14 @@ export function App() {
   const view = useSyncExternalStore(play.subscribe, play.getSnapshot);
   useEffect(() => play.start(), [play]);
   return <TableScreen key={session.info.dealId} view={view} play={play.play} clearRejection={play.clearRejection} info={session.info} invalid={session.invalid} onNew={() => setSession(session.next())} />;
+}
+
+export function App() {
+  const [lesson, setLesson] = useState(() => new URLSearchParams(window.location.search).get('lesson') === 'follow-suit');
+  return lesson ? <LessonScreen onClose={() => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('lesson');
+    window.history.replaceState(null, '', url);
+    setLesson(false);
+  }} /> : <PracticeScreen />;
 }

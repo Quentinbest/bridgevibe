@@ -135,3 +135,36 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
   .rejection-panel[data-visible="true"] { padding: var(--space-20); }
   .rejection-panel .reason { font: 800 var(--type-24) var(--font-display); }
 }
+
+/* US-21, UX §6.2: commentary sits beside the table on desktop. */
+.lesson-header { display: flex; align-items: center; gap: 12px; padding: 16px; max-width: 1400px; margin: auto; }
+.lesson-header h1 { font-size: var(--type-18); flex: 1; margin: 0; }
+.lesson-header button, .lesson-panel button { min-width: 44px; min-height: 44px; border: 1px solid var(--border); border-radius: var(--radius-8); padding: 8px 12px; background: var(--accent-soft); color: var(--accent-soft-text); font: inherit; cursor: pointer; }
+.lesson-header button:focus-visible, .lesson-panel button:focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
+.lesson-dots { display: flex; gap: 6px; }
+.lesson-dots span { width: 9px; height: 9px; border: 1px solid var(--muted); border-radius: 50%; }
+.lesson-dots [data-reached="true"] { background: var(--accent-text); border-color: var(--accent-text); }
+.lesson-layout { display: grid; gap: 16px; max-width: 1400px; margin: auto; padding: 12px; }
+.lesson-table { min-width: 0; border-radius: var(--radius-20); background: var(--felt); color: var(--felt-text); padding: 12px; }
+.lesson-seats { display: flex; justify-content: space-between; font-size: var(--type-12); gap: 8px; }
+.lesson-trick { display: flex; justify-content: center; gap: 8px; min-height: 190px; align-items: center; }
+.lesson-trick article p { font-size: var(--type-12); margin: 4px 0; }
+.lesson-table .hand { margin-top: 12px; }
+.lesson-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-20); padding: 16px; }
+.lesson-panel h2 { font-size: var(--type-18); }
+.lesson-panel p { margin-bottom: 12px; }
+.lesson-panel button { margin: 4px; }
+.lesson-persona { color: var(--accent-text); font-weight: 600; }
+.lesson-hint { border-left: 3px solid var(--accent-text); padding-left: 12px; }
+.lesson-panel small { color: var(--muted); overflow-wrap: anywhere; }
+.lesson-keys { display: none; }
+/* UX §3.1: four played cards fit the phone felt while keeping faces at least 44px wide. */
+@media (max-width: 719px) {
+  .lesson-trick .card { width: 56px; height: 80px; }
+}
+@media (min-width: 1100px) {
+  .lesson-layout { grid-template-columns: minmax(680px, 2fr) minmax(300px, 1fr); align-items: start; }
+  .lesson-table { padding: 24px; }
+  .lesson-trick { min-height: 350px; }
+  .lesson-keys { display: block; color: var(--muted); font-size: var(--type-13); }
+}
