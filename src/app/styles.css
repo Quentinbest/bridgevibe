@@ -170,3 +170,56 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
   .lesson-trick { min-height: 350px; }
   .lesson-keys { display: block; color: var(--muted); font-size: var(--type-13); }
 }
+
+/* US-40.2: internal gallery side panel, using the shared light/dark tokens. */
+.debug-panel { margin: 24px 16px; padding: 20px; min-width: 0; border: 1px solid var(--accent-text); border-radius: var(--radius-20); background: var(--surface); color: var(--text); font: var(--type-12) var(--font-mono); }
+.debug-panel h2 { font: 600 var(--type-18) var(--font-body); }
+.debug-badge { padding: 8px; border-radius: var(--radius-6); background: var(--accent-soft); color: var(--accent-soft-text); }
+.debug-counters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.debug-panel dd { margin: 4px 0 12px; }
+.debug-panel ol { list-style: none; padding: 0; max-height: 360px; overflow: auto; }
+.debug-panel li { background: var(--raised); border: 1px solid var(--border); border-radius: var(--radius-12); padding: 12px; margin-bottom: 8px; }
+.debug-panel pre, .debug-panel p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.debug-panel button, .debug-panel select { min-height: 44px; padding: 8px; margin: 4px; background: var(--raised); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-8); }
+.debug-panel label { display: inline; }
+/* US-40.2, UX §3.1: keep the 1068px table/rejection layout (608px hand + 32px felt
+   padding + 340px rejection panel + 24px gap + 64px main padding), plus the 420px
+   debug column: 1068 + 420 = 1488px. Below this, the debug panel stays below the table. */
+@media (min-width: 1488px) {
+  .debug-layout { display: grid; grid-template-columns: minmax(0, 1fr) 420px; align-items: start; }
+  .debug-layout > .header { grid-column: 1 / -1; }
+  .debug-panel { grid-column: 2; grid-row: 2; margin-left: 0; max-height: calc(100vh - 110px); overflow: auto; }
+}
+
+/* US-16: completed-record replay, with the design's felt and four-hand compass layout. */
+.review-entry { position: fixed; bottom: 12px; left: 50%; transform: translateX(-50%); z-index: 5; }
+.review-screen { max-width: 1100px; margin: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+.review-screen button, .review-entry button { min-height: 44px; min-width: 44px; padding: 8px 16px; border: 1px solid var(--border); border-radius: var(--radius-pill); background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
+.review-screen button:disabled { opacity: .5; cursor: default; }
+.review-screen button:focus-visible, .review-entry button:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 3px; }
+.review-header, .review-exports { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+.review-header h1 { font-size: var(--type-24); margin: 0; }
+.review-xray { background: var(--accent-soft); color: var(--accent-soft-text); border: 1px solid var(--accent-text); border-radius: var(--radius-12); padding: 12px 16px; margin: 0; display: flex; gap: 12px; }
+.review-replay { background: var(--felt); color: var(--felt-text); border-radius: var(--radius-20); padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+.review-stepper { display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: center; }
+.review-stepper h2 { font-size: var(--type-18); margin: 0; }
+.review-stepper p { margin: 4px 0; }
+.review-plays { display: flex; justify-content: space-around; gap: 8px; list-style: none; padding: 0; margin: 16px 0; }
+.review-plays li { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.review-plays .card { width: 48px; height: 66px; font-size: var(--type-18); }
+.review-hands { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.review-hand h3 { font-size: var(--type-14); margin: 4px 0; }
+.review-hand > div { background: var(--card-face); color: var(--suit-black); border-radius: var(--radius-12); padding: 8px; }
+.review-hand p { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0; min-height: 24px; }
+.review-strip { display: none; }
+@media (min-width: 1000px) {
+  .review-layout[data-hands="true"] { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; gap: 16px; }
+  .review-layout[data-hands="true"] .review-plays { grid-column: 2; grid-row: 2; flex-wrap: wrap; }
+  .review-hands { display: contents; }
+  .review-north { grid-column: 2; grid-row: 1; }
+  .review-west { grid-column: 1; grid-row: 2; }
+  .review-east { grid-column: 3; grid-row: 2; }
+  .review-south { grid-column: 2; grid-row: 3; }
+  .review-strip { display: flex; flex-wrap: wrap; gap: 6px; }
+  .review-strip button[aria-current="step"] { background: var(--accent-soft); color: var(--accent-soft-text); border-color: var(--accent-text); }
+}

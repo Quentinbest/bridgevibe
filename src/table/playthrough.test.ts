@@ -6,13 +6,13 @@ const make = () => startPlaythrough({ deal: dealWith(), contract, learnerSide: '
 const state = (table: Playthrough) => ({ record: table.record(), turn: table.seatView('south').turn, views: SEATS.map(seat => table.seatView(seat)) });
 function reject(table: Playthrough, seat: unknown, controller: unknown, action: unknown, reason: ReasonCode) {
   const before = state(table);
-  const result = table.submit(seat, controller, action);
+  const result = table.submit(seat, controller, action, controller === 'robot' ? { kind: 'robot', policy: 'test-policy', version: '1', durationMs: 0 } : undefined);
   expect(result).toMatchObject({ kind: 'rejected', reason });
   expect(state(table)).toEqual(before);
   return result;
 }
 function play(table: Playthrough, seat: Seat, chosen = table.legalActions(seat)[0]) {
-  const result = table.submit(seat, table.controllerOf(seat), chosen);
+  const result = table.submit(seat, table.controllerOf(seat), chosen, table.controllerOf(seat) === 'robot' ? { kind: 'robot', policy: 'test-policy', version: '1', durationMs: 0 } : undefined);
   expect(result.kind).toBe('accepted'); return result;
 }
 // F1 / US-01: run these identical card-play cases in Node and Chromium.
@@ -170,5 +170,33 @@ test('F1 the final trick stays in progress until its fourth card; completion emp
   for (const seat of SEATS) {
     expect(table.seatView(seat).hand).toEqual([]);
     reject(table, seat, table.controllerOf(seat), { kind: 'play-card', card: card('spades', 'A') }, 'playthrough-complete');
+  }
+});
+
+test('US-01.6, CI-5: robot provenance is mandatory, complete, and matches the controller without mutation', () => {
+  const table = make(); const action = table.legalActions('west')[0];
+  for (const provenance of [undefined, { kind: 'learner' } as const,
+    { kind: 'robot', policy: '', version: '1', durationMs: 0 } as const,
+    { kind: 'robot', policy: 'bv-basic', version: '1', durationMs: NaN } as const]) {
+    const before = state(table); const key = table.positionKey();
+    expect(table.submit('west', 'robot', action, provenance)).toMatchObject({ kind: 'rejected', reason: 'malformed-action' });
+    expect(state(table)).toEqual(before); expect(table.positionKey()).toBe(key);
+  }
+  play(table, 'west');
+  const before = state(table);
+  expect(table.submit('north', 'learner', table.legalActions('north')[0], { kind: 'robot', policy: 'bv-basic', version: '1', durationMs: 1 }))
+    .toMatchObject({ kind: 'rejected', reason: 'malformed-action' });
+  expect(state(table)).toEqual(before);
+  play(table, 'north'); expect(table.record().actions[1].provenance).toEqual({ kind: 'learner' });
+});
+
+test('US-01.6, CI-5: unknown robot provenance fields are rejected before any state changes', () => {
+  const table = make();
+  const before = state(table); const key = table.positionKey();
+  for (const extra of [{ sourceKind: 'template' }, { unexpected: true }, { [Symbol('extra')]: true }]) {
+    const provenance = { kind: 'robot' as const, policy: 'bv-basic', version: '1', durationMs: 1, ...extra };
+    expect(table.submit('west', 'robot', table.legalActions('west')[0], provenance))
+      .toMatchObject({ kind: 'rejected', reason: 'malformed-action' });
+    expect(state(table)).toEqual(before); expect(table.positionKey()).toBe(key);
   }
 });

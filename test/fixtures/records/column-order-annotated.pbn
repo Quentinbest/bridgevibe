@@ -1,0 +1,32 @@
+% PBN 2.1
+% EXPORT
+; PBN 2.1: the same Deal and play as column-order.pbn.
+{ Comments can span
+  multiple lines; a semicolon inside braces is just comment text. }
+[Event "Hand-checked column order"] ; the event is unchanged
+[Dealer "N"]
+[Vulnerable "None"]
+[Deal "N:AJT9876543.AKQ.. K.JT98765432.AK. Q..QJT98765432.A 2...KQJT98765432"]
+[Declarer "S"]
+[Contract "1NT"]
+[Result "13"]
+% play metadata
+[Play "W"] { Columns remain W,N,E,S. }
+S2! SA? SK!! SQ?? ; opening trick
+CK!? SJ?! HJ $1 DQ
+CQ { North leads the ten.
+This comment splits a trick across physical lines. } ST HT DJ
+CJ S9 $2
+H9 DT
+CT S8 H8 D9
+C9 S7 H7 D8
+% metadata within play
+C8 S6 H6 D7
+C7 S5 H5 D6
+C6 S4 H4 D5
+C5 S3 H3 D4
+C4 HA H2 D3
+C3 HK DA D2
+C2 HQ DK CA$1
+; End of play { braces here remain part of the line comment.
+% end of record
