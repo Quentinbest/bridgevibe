@@ -1,0 +1,27 @@
+import { decodeSeatView } from '../table';
+import { basicPolicy, type RobotPolicy } from '../robots';
+import { ROBOT_PROTOCOL_VERSION, type RobotMessage, type RobotResponse } from './robotProtocol';
+
+// US-12.6: pure TypeScript policy; no solver or WebAssembly dependency.
+export function handleRobotMessage(message: RobotMessage, post: (response: RobotResponse) => void,
+  policy: RobotPolicy = basicPolicy, now: () => number = Date.now) {
+  // §4.3.6: synchronous policies cannot be interrupted; the host discards cancelled results.
+  if (message.type === 'cancel') return;
+  const started = now();
+  try {
+    const view = decodeSeatView(message.view);
+    if (view.seat !== message.seat) throw new Error('seat-mismatch');
+    const action = policy.decide(view, message.seed, message.deadline);
+    post({ type: 'decided', requestId: message.requestId, playthroughId: message.playthroughId, positionKey: message.positionKey, action,
+      provenance: { kind: 'robot', policy: policy.name, version: policy.version, durationMs: now() - started } });
+  } catch {
+    // §4.3.6: errors carry the position identity and the engine's provenance too.
+    post({ type: 'error', requestId: message.requestId, playthroughId: message.playthroughId, positionKey: message.positionKey,
+      message: 'robot-policy-failed', provenance: { kind: 'robot', policy: policy.name, version: policy.version, durationMs: now() - started } });
+  }
+}
+// §4.1.3: guard permits direct handler tests without starting a Worker.
+if (typeof self !== 'undefined' && typeof document === 'undefined') {
+  self.onmessage = (event: MessageEvent<RobotMessage>) => handleRobotMessage(event.data, response => self.postMessage(response));
+  self.postMessage({ type: 'hello', protocolVersion: ROBOT_PROTOCOL_VERSION });
+}

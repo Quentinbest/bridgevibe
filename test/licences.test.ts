@@ -233,3 +233,29 @@ it('rejects an undeclared small CSS image and accepts it once registered', async
   expect(asset?.shippedFiles).toHaveLength(1);
   expect(readFileSync(path.join(dir, 'dist', asset!.shippedFiles[0]), 'utf8')).toBe(svg);
 }, 60_000);
+
+// US-46.1, LR-2: a Web Worker is bundled separately; its packages are checked like the app's.
+it('attributes packages bundled into a Web Worker, and fails on an unlicensed one', async () => {
+  for (const licensed of [true, false]) {
+    const dir = temp();
+    mkdirSync(path.join(dir, 'src'));
+    writeFileSync(path.join(dir, 'index.html'), '<script type="module" src="/src/main.js"></script>');
+    writeFileSync(path.join(dir, 'src/main.js'), "new Worker(new URL('./worker.js', import.meta.url), { type: 'module' });");
+    writeFileSync(path.join(dir, 'src/worker.js'), "import value from 'worker-dep'; postMessage(value());");
+    writeFileSync(path.join(dir, 'package.json'), '{"version":"1.0.0"}');
+    const pkg = path.join(dir, 'node_modules/worker-dep');
+    mkdirSync(pkg, { recursive: true });
+    writeFileSync(path.join(pkg, 'package.json'), '{"name":"worker-dep","version":"2.0.0","main":"index.js","license":"MIT"}');
+    writeFileSync(path.join(pkg, 'index.js'), 'export default function value() { return Date.now() % 7; }');
+    if (licensed) writeFileSync(path.join(pkg, 'LICENSE'), text('MIT'));
+    cpSync(path.join(root, 'licences'), path.join(dir, 'licences'), { recursive: true });
+    const reportPath = path.join(dir, 'bom.json');
+    const run = build({ root: dir, configFile: false, logLevel: 'silent', plugins: [licences({ reportPath })], build: { modulePreload: false } });
+    if (licensed) await run; else await expect(run).rejects.toThrow('Licence check failed');
+    const report: Bom = JSON.parse(readFileSync(reportPath, 'utf8'));
+    const dep = report.artefacts.find(item => item.name === 'worker-dep');
+    expect(dep?.shippedFiles.some(file => /worker-[\w-]+\.js$/.test(file))).toBe(true);
+    if (licensed) expect(report.violations).toEqual([]);
+    else expect(report.violations.join()).toContain('worker-dep: no explicit grant');
+  }
+}, 60_000);
