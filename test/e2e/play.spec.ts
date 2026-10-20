@@ -9,6 +9,12 @@ async function open(page: Page) {
   await page.clock.pauseAt(new Date());
   await page.goto('/');
 }
+// US-10.2: assert real-worker audit coverage, not just absence of visible leaks.
+async function robotAuditPassed(page: Page) {
+  const audit = await page.evaluate(() => ({ count: window.__robotAuditCount, violations: window.__robotAuditViolations }));
+  expect(audit.count).toBeGreaterThan(0);
+  expect(audit.violations).toEqual([]);
+}
 async function noHiddenCards(page: Page, played: readonly Card[]) {
   const pageText = await page.locator('body').textContent();
   const names = await page.locator('[aria-label]').evaluateAll(elements => elements.map(element => element.getAttribute('aria-label')).join('\n'));
@@ -55,6 +61,7 @@ test('full fixed Deal through clicks and Play it', async ({ page }, testInfo) =>
   }
   await expect(page.getByText('You took 6 of 13 tricks (needed 9)', { exact: true })).toBeVisible();
   await expect(page.locator('.hand .card, .suit-column .card')).toHaveCount(0);
+  await robotAuditPassed(page);
 });
 test('keyboard arrows, Enter, Escape and Space play from the active hand', async ({ page }) => {
   await open(page); await page.clock.runFor(500);
@@ -98,4 +105,5 @@ test('blind lead and later positions never expose unplayed opponent cards', asyn
   await ace.click(); await page.getByRole('button', { name: /^Play it, / }).click();
   await page.clock.runFor(500);
   await noHiddenCards(page, [{ suit: 'spades', rank: '9' }, { suit: 'spades', rank: 'A' }, { suit: 'spades', rank: '3' }]);
+  await robotAuditPassed(page);
 });

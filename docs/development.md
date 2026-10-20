@@ -19,14 +19,14 @@ The longer notes behind [`AGENTS.md`](../AGENTS.md): read the part a task needs.
 - One Vitest test: `npx vitest run --project node <file>`, with `-t "<name>"` to filter by test name.
 - One Playwright project: `npx playwright test --project 390-dark`. Projects are `<width>-<light|dark>` for widths 320, 390, 600 and 1440.
 
-CI (`.github/workflows/ci.yml`) runs each check as its own step.
+CI (`.github/workflows/ci.yml`) runs each check as its own step. E2e runs `vite build --mode audit`, auditing every real robot worker message against the Table record and exposing counts and violations for assertions (US-10.2). Production builds remove this audit code.
 
 ## Modules
 
 `src/<module>/` follows engineering spec §4.2: one module per bounded context, created by the ticket that needs it. Today there are four:
 
 - **table**: the authoritative rules core. `startPlaythrough({ deal, contract })` returns a handle with `legalActions(seat)`, `submit(seat, controller, action)`, `seatView(seat)` and `record()`. It checks card plays, owns turns and trick winners, exposes Dummy after the opening lead, and completes after 13 tricks. Rejections preserve all state. It **may depend on nothing**: no other module, package or Node builtin (its tests may import Vitest).
-- **robots**: deterministic fallback card policy (§4.6.6), receiving only a branded `SeatView`. It imports only Table. ESLint prohibits full-Deal types and SeatView assertions outside Table.
+- **robots**: the `RobotPolicy` port, `bv-basic` and deterministic `bv-fallback` (§4.6.6), receiving only a branded `SeatView`, seed and deadline. Both policies currently use the same card rule; #13 replaces the basic policy rules. It imports only Table. ESLint prohibits full-Deal types and SeatView assertions outside Table.
 - **explanation**: the string catalogue (`catalogue` keyed by ID, `text(id, params)` with `{param}` interpolation). Every entry carries `status: 'draft'` until a teacher signs it off (CI-8).
 - **app**: the composition root and all UI. Only **app** may import **app**.
 
@@ -38,7 +38,7 @@ Rules every later module must keep:
 - Robots and in-play hints receive only a Seat View, never a full Deal. Only **table** constructs Seat Views and completed playthrough records (ADR-0001).
 - The UI is built from a learner view: face-up cards plus a count for each hidden hand. No hidden card identity reaches React props, page text or accessibility names (US-16.4). The fixed Deal lives in `src/app/fixture.ts` for composition; `src/app/play.ts` projects South’s SeatView into the learner view. The authored Deal is necessarily present in the client bundle in this fixed-Deal slice.
 - When the learner's side declares, the learner plays Declarer, and the display rotates so Declarer is at the bottom (ADR-0003).
-- Robots run on the main thread for issue #2, with 500 ms `setTimeout` delays and a 1 s trick collection delay. Workers arrive with #8.
+- Robots run `bv-basic` in a versioned Web Worker from an encoded Seat View (#8). The host enforces a 400 ms deadline and a constant 500 ms display delay, records marked timeout/engine-failure fallbacks, and disables the worker after three session failures. Hidden pages cancel pending requests; interrupted decisions restart with fresh deadline and display windows on return. Trick collection remains 1 s. The trivial fallback uses the same Seat View on the main thread; neither policy needs WebAssembly.
 
 ## No hard-coded learner-facing text (US-38)
 

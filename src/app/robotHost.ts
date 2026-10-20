@@ -1,0 +1,153 @@
+import { encodeSeatView, type Action, type RobotProvenance, type Seat, type SeatView } from '../table';
+import { fallbackRobotPolicy } from '../robots';
+import { ROBOT_PROTOCOL_VERSION, type RobotMessage, type RobotRequest, type RobotResponse } from './robotProtocol';
+
+export interface RobotWorker {
+  postMessage(message: RobotMessage): void;
+  terminate(): void;
+  onmessage: ((event: MessageEvent<RobotResponse>) => void) | null;
+  onerror: ((event: ErrorEvent) => void) | null;
+  onmessageerror: ((event: MessageEvent) => void) | null;
+}
+export type RobotHostOptions = {
+  createWorker?: () => RobotWorker;
+  clock?: { now(): number; setTimeout(callback: () => void, ms: number): ReturnType<typeof setTimeout>; clearTimeout(timer: ReturnType<typeof setTimeout> | undefined): void };
+  visibility?: { hidden(): boolean; subscribe(callback: () => void): () => void };
+  policyDeadlineMs?: number; displayDelayMs?: number; failureThreshold?: number;
+  audit?: (message: RobotMessage, seat: Seat) => void;
+};
+type Decision = { view: SeatView; seed: string; playthroughId: string; positionKey: string;
+  currentPositionKey(): string; submit(action: Action, provenance: RobotProvenance): void };
+export function createRobotHost(options: RobotHostOptions = {}) {
+  const clock = options.clock ?? { now: Date.now, setTimeout: (callback, ms) => setTimeout(callback, ms), clearTimeout };
+  const visibility = options.visibility ?? {
+    hidden: () => typeof document !== 'undefined' && document.visibilityState === 'hidden',
+    subscribe: (callback: () => void) => {
+      if (typeof document === 'undefined') return () => {};
+      document.addEventListener('visibilitychange', callback);
+      return () => document.removeEventListener('visibilitychange', callback);
+    },
+  };
+  // US-10.4: NFR-P4's later 1.5 s policies will need a longer display delay.
+  const deadlineMs = options.policyDeadlineMs ?? 400;
+  const displayMs = options.displayDelayMs ?? 500;
+  const threshold = options.failureThreshold ?? 3;
+  if (!Number.isFinite(deadlineMs) || deadlineMs <= 0 || !Number.isFinite(displayMs) || deadlineMs >= displayMs
+    || !Number.isInteger(threshold) || threshold < 1) throw new Error('invalid-robot-timing');
+  const createWorker = options.createWorker ?? (() => new Worker(new URL('./robotWorker.ts', import.meta.url), { type: 'module' }));
+  let worker: RobotWorker | undefined;
+  let ready = false;
+  let failures = 0;
+  let sequence = 0;
+  let active: Decision | undefined;
+  let request: RobotRequest | undefined;
+  let result: { action: Action; provenance: RobotProvenance } | undefined;
+  let started = 0;
+  let displayAt = 0;
+  let remaining = displayMs;
+  let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
+  let displayTimer: ReturnType<typeof setTimeout> | undefined;
+  let unsubscribe: (() => void) | undefined;
+  function clearTimers() { clock.clearTimeout(deadlineTimer); clock.clearTimeout(displayTimer); }
+  function post(message: RobotMessage) {
+    if (!active || !worker) return;
+    // US-10.2: audit failures propagate to the test, never become engine fallbacks.
+    try { options.audit?.(message, active.view.seat); } catch (error) {
+      clearTimers(); active = undefined; request = undefined; result = undefined;
+      throw error;
+    }
+    try { worker.postMessage(message); } catch { fail(); }
+  }
+  function cancelRequest() {
+    const previous = request; request = undefined;
+    clock.clearTimeout(deadlineTimer);
+    if (previous) post({ type: 'cancel', cancellationId: previous.cancellationId });
+  }
+  function terminate() {
+    const previous = worker; worker = undefined; ready = false;
+    if (previous) { previous.onmessage = null; previous.onerror = null; previous.onmessageerror = null; previous.terminate(); }
+  }
+  function fallback(reason: 'timeout' | 'engine-failure') {
+    if (!active || result || visibility.hidden()) return;
+    result = { action: fallbackRobotPolicy.decide(active.view, active.seed, clock.now()),
+      provenance: { kind: 'robot', policy: fallbackRobotPolicy.name, version: fallbackRobotPolicy.version,
+        fallback: reason, durationMs: clock.now() - started } };
+    cancelRequest();
+  }
+  function fail() {
+    failures++; terminate();
+    fallback('engine-failure');
+    ensureWorker();
+  }
+  function ensureWorker() {
+    if (worker || failures >= threshold || !active) return;
+    try { worker = createWorker(); } catch { fail(); return; }
+    const owned = worker;
+    owned.onmessage = event => {
+      if (worker !== owned) return;
+      const message = event.data;
+      if (message.type === 'hello') {
+        if (message.protocolVersion !== ROBOT_PROTOCOL_VERSION) {
+          failures++; terminate();
+          if (failures >= threshold) fallback('engine-failure');
+          else ensureWorker();
+          return;
+        }
+        ready = true; send(); return;
+      }
+      if (!active || !request || message.requestId !== request.requestId || visibility.hidden()) return;
+      if (active.currentPositionKey() !== request.positionKey) { cancel(); return; }
+      if (message.type === 'error') { fail(); return; }
+      if (message.positionKey !== request.positionKey) return;
+      if (clock.now() >= request.deadline) { fallback('timeout'); return; }
+      result = { action: message.action, provenance: message.provenance };
+      request = undefined; clock.clearTimeout(deadlineTimer);
+    };
+    owned.onerror = owned.onmessageerror = () => { if (worker === owned) fail(); };
+  }
+  function send() {
+    if (!ready || !active || !request || result || visibility.hidden()) return;
+    post(request);
+  }
+  function display() {
+    if (!active || visibility.hidden()) return;
+    if (active.currentPositionKey() !== active.positionKey) { cancel(); return; }
+    if (!result) fallback('timeout');
+    const decision = active; const chosen = result;
+    active = undefined; result = undefined; request = undefined; clearTimers();
+    if (chosen) decision.submit(chosen.action, chosen.provenance);
+  }
+  function begin() {
+    if (!active || visibility.hidden()) return;
+    started = clock.now(); displayAt = started + remaining;
+    displayTimer = clock.setTimeout(display, remaining);
+    if (result) return;
+    request = { type: 'decide', requestId: String(++sequence), cancellationId: String(sequence),
+      playthroughId: active.playthroughId, positionKey: active.positionKey, deadline: started + deadlineMs,
+      seat: active.view.seat, view: encodeSeatView(active.view), seed: active.seed };
+    deadlineTimer = clock.setTimeout(() => fallback('timeout'), deadlineMs);
+    if (failures >= threshold) fallback('engine-failure');
+    else { ensureWorker(); send(); }
+  }
+  function cancel() { cancelRequest(); clearTimers(); active = undefined; result = undefined; }
+  function visibilityChanged() {
+    if (!active) return;
+    if (visibility.hidden()) {
+      remaining = Math.max(0, displayAt - clock.now());
+      cancelRequest(); clearTimers();
+    } else {
+      // US-12.4: an interrupted attempt gets fresh deadline AND constant display window.
+      if (!result) remaining = displayMs;
+      begin();
+    }
+  }
+  return {
+    decide(decision: Decision) {
+      cancel(); active = decision; remaining = displayMs;
+      unsubscribe ??= visibility.subscribe(visibilityChanged);
+      begin();
+    },
+    cancel,
+    stop() { cancel(); terminate(); unsubscribe?.(); unsubscribe = undefined; },
+  };
+}
