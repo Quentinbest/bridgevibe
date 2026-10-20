@@ -1,3 +1,4 @@
+import { basicPolicy, fallbackRobotPolicy } from '../robots';
 import { startPlaythrough, seatViewSeed, type Card, type Deal, type SeatView, type Seat, type PlayedCard, type ReasonCode, type RobotProvenance } from '../table';
 import { createRobotHost, type RobotHostOptions } from './robotHost';
 import { cardName, reasonStrings, text } from '../explanation';
@@ -20,7 +21,8 @@ export type LearnerView = Readonly<Pick<SeatView,
 
 // The learner declares 3NT from South until the table turns for other declarers (#16, ADR-0003).
 export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fixedDeal) {
-  const table = startPlaythrough({ deal, contract: { level: 3, strain: 'no-trumps', declarer: 'south' }, learnerSide: 'northSouth' });
+  const table = startPlaythrough({ deal, contract: { level: 3, strain: 'no-trumps', declarer: 'south' }, learnerSide: 'northSouth',
+    versions: { appVersion: '0.0.0', engineVersions: { [basicPolicy.name]: basicPolicy.version, [fallbackRobotPolicy.name]: fallbackRobotPolicy.version } } });
   let options = robotOptions;
   // US-10.2, §4.3.6: audit and test builds audit every robot message; this constant guard
   // removes the audit from production builds.
@@ -90,6 +92,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
   }
   return {
     record: table.record,
+    completedRecord: table.completedRecord,
     getSnapshot: () => snapshot,
     clearRejection() { clearRejection(); publish(); },
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },

@@ -2,6 +2,22 @@ import type { Card, ReasonCode } from '../table';
 
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
+  "review.title": { text: "Hand review", status: 'draft' },
+  "review.back": { text: "Back to table", status: 'draft' },
+  "review.xray": { text: "X-ray view: now you can see all 4 hands. You couldn't while playing.", status: 'draft' },
+  "review.replay": { text: "Trick replay", status: 'draft' },
+  "review.previous": { text: "Previous trick", status: 'draft' },
+  "review.next": { text: "Next trick", status: 'draft' },
+  "review.position": { text: "Trick {n} of 13", status: 'draft' },
+  "review.winner": { text: "{seat} won it", status: 'draft' },
+  "review.hands": { text: "Show all 4 hands", status: 'draft' },
+  "review.hide-hands": { text: "Hide all 4 hands", status: 'draft' },
+  "review.hands-at": { text: "Hands as trick {n} began", status: 'draft' },
+  "review.tricks": { text: "Tricks", status: 'draft' },
+  "review.trick": { text: "Trick {n}", status: 'draft' },
+  "review.number": { text: "{n}", status: 'draft' },
+  "review.json": { text: "Export JSON", status: 'draft' },
+  "review.pbn": { text: "Export PBN", status: 'draft' },
   "deal.new": { text: "New deal", status: 'draft' },
   "deal.info": { text: "Deal info", status: 'draft' },
   "deal.id": { text: "Deal ID", status: 'draft' },

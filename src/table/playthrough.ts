@@ -15,7 +15,10 @@ export type PlayedCard = Readonly<{ seat: Seat; card: Card }>;
 export type Trick = Readonly<{ cards: readonly PlayedCard[]; winner: Seat }>;
 export type { SeatView } from './seatViewMessage';
 export type PlaythroughRecord = Readonly<{
-  schemaVersion: 1;
+  schemaVersion: 2;
+  appVersion: string;
+  engineVersions: Readonly<Record<string, string>>;
+  rulesCoreVersion: string;
   playthroughId: string;
   deal: Deal;
   contract: Contract;
@@ -24,6 +27,14 @@ export type PlaythroughRecord = Readonly<{
   status: Status;
   result: Readonly<Record<Side, number>>;
 }>;
+// §4.3.5: only Table can construct the completion capability.
+const completedRecordBrand: unique symbol = Symbol('CompletedPlaythroughRecord');
+export type CompletedPlaythroughRecord = PlaythroughRecord & { readonly status: 'completed'; readonly [completedRecordBrand]: true };
+export const RULES_CORE_VERSION = '1';
+export function completedRecord(record: PlaythroughRecord): CompletedPlaythroughRecord {
+  if (record.status !== 'completed') throw new Error('Review requires a completed Playthrough Record');
+  return { ...JSON.parse(JSON.stringify(record)), [completedRecordBrand]: true };
+}
 export type TableEvent = Readonly<{ kind: 'card-played'; seat: Seat; card: Card }>
   | Readonly<{ kind: 'trick-won'; winner: Seat }>
   | Readonly<{ kind: 'status-changed'; status: 'completed' }>;
@@ -41,10 +52,12 @@ function isAction(value: unknown): value is Action {
     && SUITS.some(suit => suit === card.suit) && RANKS.some(rank => rank === card.rank);
 }
 let nextId = 0;
-export function startPlaythrough(input: { deal: Deal; contract: Contract; learnerSide: Side }) {
+export function startPlaythrough(input: { deal: Deal; contract: Contract; learnerSide: Side; versions?: { appVersion: string; engineVersions: Readonly<Record<string, string>> } }) {
   // INV-2: take ownership of the input; no returned object aliases mutable Table state.
   const deal: Deal = JSON.parse(JSON.stringify(input.deal));
   const contract = { ...input.contract };
+  const appVersion = input.versions?.appVersion ?? 'unknown';
+  const engineVersions = { ...input.versions?.engineVersions };
   const playthroughId = `playthrough-${++nextId}`;
   const hands = { north: [...deal.hands.north], east: [...deal.hands.east], south: [...deal.hands.south], west: [...deal.hands.west] };
   const dummySeat = nextSeat(nextSeat(contract.declarer));
@@ -77,7 +90,7 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract; learne
     });
   }
   function record(): PlaythroughRecord {
-    return JSON.parse(JSON.stringify({ schemaVersion: 1, playthroughId, deal, contract, learnerSide, actions, status, result: tricksWon }));
+    return JSON.parse(JSON.stringify({ schemaVersion: 2, appVersion, engineVersions, rulesCoreVersion: RULES_CORE_VERSION, playthroughId, deal, contract, learnerSide, actions, status, result: tricksWon }));
   }
   function submit(seat: unknown, controller: unknown, action: unknown, provenance?: ActionProvenance): Submission {
     const reject = (reason: ReasonCode, details: { cause?: 'controller' | 'duplicate'; suit?: Suit } = {}): Submission => ({ kind: 'rejected', reason, details });
@@ -122,6 +135,6 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract; learne
     return { kind: 'accepted', events };
   }
   const positionKey = () => positionDigest({ deal, contract, actions: actions.map(({ seat, action }) => ({ seat, action })) });
-  return { legalActions, seatView, record, submit, controllerOf, positionKey };
+  return { legalActions, seatView, record, completedRecord: () => completedRecord(record()), submit, controllerOf, positionKey };
 }
 export type Playthrough = ReturnType<typeof startPlaythrough>;

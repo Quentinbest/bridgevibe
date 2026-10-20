@@ -1,5 +1,6 @@
+import { ReviewScreen } from './ReviewScreen';
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { SUITS, type Card as TableCard, type Deal } from '../table';
+import { SUITS, type Card as TableCard, type Deal, type CompletedPlaythroughRecord } from '../table';
 import { cardName, text } from '../explanation';
 import { Card, CardBack } from './Card';
 import { Hand } from './Hand';
@@ -101,8 +102,14 @@ export function App() {
     const initial = dealFromUrl(window.location.search);
     return dealSession(initial.deal, initial.invalid);
   });
+  const [review, setReview] = useState<CompletedPlaythroughRecord | null>(null);
+  const reviewButton = useRef<HTMLButtonElement>(null);
   const play = session.play;
   const view = useSyncExternalStore(play.subscribe, play.getSnapshot);
   useEffect(() => play.start(), [play]);
-  return <TableScreen key={session.info.dealId} view={view} play={play.play} clearRejection={play.clearRejection} info={session.info} invalid={session.invalid} onNew={() => setSession(session.next())} />;
+  useEffect(() => { if (!review && view.status === 'completed') reviewButton.current?.focus(); }, [review, view.status]);
+  if (review) return <ReviewScreen record={review} onBack={() => setReview(null)} />;
+  return <><TableScreen key={session.info.dealId} view={view} play={play.play} clearRejection={play.clearRejection} info={session.info} invalid={session.invalid} onNew={() => setSession(session.next())} />
+    {view.status === 'completed' && <div className="review-entry"><button ref={reviewButton} type="button" onClick={() => setReview(play.completedRecord())}>{text('review.title')}</button></div>}
+  </>;
 }
