@@ -19,7 +19,10 @@ export type RobotHostOptions = {
 type Decision = { view: SeatView; seed: string; playthroughId: string; positionKey: string;
   currentPositionKey(): string; submit(action: Action, provenance: RobotProvenance): boolean };
 export function createRobotHost(options: RobotHostOptions = {}) {
-  const clock = options.clock ?? { now: Date.now, setTimeout: (callback, ms) => setTimeout(callback, ms), clearTimeout };
+  // Browser timer functions throw "Illegal invocation" when called as methods of another object,
+  // so the default clock wraps each one instead of storing the bare function.
+  const clock = options.clock ?? { now: () => Date.now(), setTimeout: (callback, ms) => setTimeout(callback, ms),
+    clearTimeout: timer => clearTimeout(timer) };
   const visibility = options.visibility ?? {
     hidden: () => typeof document !== 'undefined' && document.visibilityState === 'hidden',
     subscribe: (callback: () => void) => {
