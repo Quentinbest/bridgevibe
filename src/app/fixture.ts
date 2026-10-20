@@ -1,7 +1,7 @@
-import type { Deal } from '../table';
+import { dealIdOf, type Deal } from '../table';
 
 // INV-2: authored fixed Deal, owned by the app composition root.
-export const fixedDeal = {
+const content = {
   hands: {
     north: [
       { suit: 'spades', rank: 'A' },
@@ -66,4 +66,6 @@ export const fixedDeal = {
   },
   dealer: 'south',
   vulnerability: { northSouth: false, eastWest: false },
-} as const satisfies Deal;
+} as const satisfies Pick<Deal, 'hands' | 'dealer' | 'vulnerability'>;
+export const fixedDeal: Deal = { ...content, dealId: dealIdOf(content),
+  origin: { kind: 'authored', contentId: 'fixture.issue-2', version: 1 } };

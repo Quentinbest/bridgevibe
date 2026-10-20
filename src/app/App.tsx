@@ -3,7 +3,9 @@ import { SUITS, type Card as TableCard } from '../table';
 import { cardName, text } from '../explanation';
 import { Card, CardBack } from './Card';
 import { Hand } from './Hand';
-import { createPlay, type LearnerView } from './play';
+import { type LearnerView } from './play';
+import { dealFromUrl, dealSession } from './deals';
+import { DealControls } from './DealControls';
 
 function Opponent({ seat, count }: { seat: 'west' | 'east'; count: number }) {
   return <section className={`opponent ${seat}`} aria-label={text(`seat.${seat}`)}>
@@ -11,7 +13,7 @@ function Opponent({ seat, count }: { seat: 'west' | 'east'; count: number }) {
     <p>{text('opponent', { seat: text(`seat.${seat}`), count })}</p>
   </section>;
 }
-function TableScreen({ view, play }: { view: LearnerView; play: (seat: 'north' | 'south', card: TableCard) => void }) {
+function TableScreen({ view, play, session, onNew }: { session: ReturnType<typeof dealSession>; onNew: () => void; view: LearnerView; play: (seat: 'north' | 'south', card: TableCard) => void }) {
   const [selected, setSelected] = useState<TableCard | null>(null);
   const active = !view.collecting && view.status !== 'completed';
   const target = view.contract.level + 6;
@@ -27,7 +29,11 @@ function TableScreen({ view, play }: { view: LearnerView; play: (seat: 'north' |
     if (view.turn === 'north' || view.turn === 'south') play(view.turn, card);
   }
   return <>
-    <header className="header"><h1 aria-label={text('product')}><span>{text('product.first')}</span><span className="wordmark-accent">{text('product.second')}</span></h1></header>
+    <header className="header"><div className="header-row">
+      <h1 className={session.invalid ? 'sr-only' : undefined} aria-label={text('product')}><span>{text('product.first')}</span><span className="wordmark-accent">{text('product.second')}</span></h1>
+      {session.invalid && <p className="deal-notice" role="status">{text('deal.invalid')}</p>}
+      <DealControls info={session.info} onNew={onNew} />
+    </div></header>
     <main>
       <section className="status" aria-label={text('status')}>
         <span className="contract">{text('contract.3nt')}</span>
@@ -68,8 +74,12 @@ function TableScreen({ view, play }: { view: LearnerView; play: (seat: 'north' |
   </>;
 }
 export function App() {
-  const [play] = useState(createPlay);
+  const [session, setSession] = useState(() => {
+    const initial = dealFromUrl(window.location.search);
+    return dealSession(initial.deal, initial.invalid);
+  });
+  const play = session.play;
   const view = useSyncExternalStore(play.subscribe, play.getSnapshot);
   useEffect(() => play.start(), [play]);
-  return <TableScreen view={view} play={play.play} />;
+  return <TableScreen key={session.info.dealId} view={view} play={play.play} session={session} onNew={() => setSession(session.next())} />;
 }

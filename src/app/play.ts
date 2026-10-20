@@ -1,7 +1,6 @@
-import { startPlaythrough, type Card, type SeatView, type Seat, type PlayedCard } from '../table';
+import { startPlaythrough, type Deal, type Card, type SeatView, type Seat, type PlayedCard } from '../table';
 import { fallbackPolicy } from '../robots';
 import { cardName, reasonStrings, text } from '../explanation';
-import { fixedDeal } from './fixture';
 
 export type LearnerView = Readonly<Pick<SeatView,
   'positionIndex' | 'hand' | 'dummy' | 'contract' | 'turn' | 'tricksWon' | 'cardCounts' | 'status'> & {
@@ -13,8 +12,8 @@ export type LearnerView = Readonly<Pick<SeatView,
   announcements: readonly string[];
 }>;
 
-export function createPlay() {
-  const table = startPlaythrough({ deal: fixedDeal, contract: { level: 3, strain: 'no-trumps', declarer: 'south' }, learnerSide: 'northSouth' });
+export function createPlay(deal: Deal) {
+  const table = startPlaythrough({ deal, contract: { level: 3, strain: 'no-trumps', declarer: 'south' }, learnerSide: 'northSouth' });
   const listeners = new Set<() => void>();
   let timer: ReturnType<typeof setTimeout> | undefined;
   let running = false;

@@ -77,7 +77,7 @@ test('collection announces the winner before the next lead banner', () => {
   fireEvent.click(king); fireEvent.click(king);
   const banner = document.querySelector('.turn-banner')!;
   expect(banner.textContent).toBe('North wins the trick');
-  expect(screen.queryAllByRole('button')).toHaveLength(0);
+  expect(document.querySelectorAll('button.card')).toHaveLength(0);
   advance(999); expect(banner.textContent).toBe('North wins the trick');
   advance(1); expect(banner.textContent).toBe("Dummy's lead");
   expect(within(screen.getByRole('region', { name: 'North · Dummy' })).getAllByRole('button')).toHaveLength(12);

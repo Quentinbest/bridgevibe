@@ -2,6 +2,20 @@ import type { Card, ReasonCode } from '../table';
 
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
+  "deal.new": { text: "New deal", status: 'draft' },
+  "deal.info": { text: "Deal info", status: 'draft' },
+  "deal.id": { text: "Deal ID", status: 'draft' },
+  "deal.origin": { text: "Origin", status: 'draft' },
+  "deal.seed": { text: "Seed", status: 'draft' },
+  "deal.authored": { text: "Authored", status: 'draft' },
+  "deal.index": { text: "Deal index", status: 'draft' },
+  "deal.algorithm": { text: "Algorithm ID", status: 'draft' },
+  "deal.content": { text: "Content ID", status: 'draft' },
+  "deal.version": { text: "Version", status: 'draft' },
+  "deal.close": { text: "Close", status: 'draft' },
+  "deal.value": { text: "{value}", status: 'draft' },
+  "deal.invalid": { text: "Invalid seed link. Showing the practice deal.", status: 'draft' },
+
   "reason.playthrough-complete": { text: "This deal is finished.", status: 'draft' },
   "reason.malformed-action": { text: "Choose a card from the hand you control.", status: 'draft' },
   "reason.not-your-turn": { text: "Wait for your turn to play.", status: 'draft' },
