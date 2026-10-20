@@ -174,8 +174,10 @@ Playthrough Record, never regenerated actions (ADR-0002).
 The design's Level means Module, with one Lesson per Module for now. Its five dots
 are the Exercise's five Steps; the fraction and accessible progress value share
 one step index (correcting the design's mismatched success-screen fraction).
-`src/curriculum/` owns the JSON content, player transitions and append-only session
-Attempts. It imports only Table; scripted actions never invoke robot policies.
+`src/curriculum/` owns the JSON content, the Attempt model and the player's transitions.
+It imports only Table; scripted actions never invoke robot policies. `src/progress/`
+owns the append-only session Attempts store (§4.2) and may import only curriculum;
+the player appends through curriculum's `AttemptSink` type.
 The UI schedules scripted plays at 500 ms and renders South's Seat View. Authored
 hint provenance is exposed as data; wiring it to #9's coach log is deferred until
 both tickets land. Hints do not change outcomes. No persistence or level-complete

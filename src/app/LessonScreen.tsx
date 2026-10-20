@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { followSuit } from '../curriculum/content';
 import { createPlayer } from '../curriculum/player';
 import { sessionAttempts } from '../progress/attemptStore';
@@ -12,6 +12,10 @@ export function LessonScreen({ onClose }: { onClose: () => void }) {
   const [state, setState] = useState(player.snapshot);
   const [selected, setSelected] = useState<TableCard | null>(null);
   const [ruleOpen, setRuleOpen] = useState(false);
+  const showMe = useRef<HTMLButtonElement>(null);
+  const offerShowMe = state.wrongAnswers >= 2 && !state.outcome;
+  // UX §10: the second wrong answer removes the focused card controls, so focus moves to Show me.
+  useEffect(() => { if (offerShowMe) showMe.current?.focus(); }, [offerShowMe]);
   useEffect(() => {
     if (state.kind !== 'scripted-action') return;
     // UX §6.2: each authored play uses the normal 500 ms display delay.
@@ -75,7 +79,7 @@ export function LessonScreen({ onClose }: { onClose: () => void }) {
           </>}
           {!state.outcome && state.prompt.hint && <button type="button" onClick={hint}>{text('lesson.hint')}</button>}
           {selected && active && <button type="button" onClick={() => answer(selected)} aria-label={text('play.card', { card: cardName(selected) })}>{text('play')}</button>}
-          {state.wrongAnswers >= 2 && !state.outcome && <button type="button" onClick={() => setState(player.showAnswer(Date.now()))}>{text('lesson.show')}</button>}
+          {offerShowMe && <button ref={showMe} type="button" onClick={() => setState(player.showAnswer(Date.now()))}>{text('lesson.show')}</button>}
           {state.hint && <section className="lesson-hint" role="status"><p>{text(state.hint.textRef as StringId)}</p>
             <small>{text('lesson.provenance', state.hint.provenance)}</small></section>}
         </>}

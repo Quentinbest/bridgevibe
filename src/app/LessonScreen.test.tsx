@@ -3,6 +3,8 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, expect, test, vi } from 'vitest';
 import { LessonScreen } from './LessonScreen';
 import { sessionAttempts } from '../progress/attemptStore';
+import { followSuit } from '../curriculum/content';
+import { cardName } from '../explanation';
 
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 function openPrompt() {
@@ -64,4 +66,17 @@ test('scripted lesson plays are announced in a polite live log', () => {
   expect(log.getAttribute('aria-live')).toBe('polite');
   expect(log.textContent).toMatch(/West plays the .* of hearts/);
   expect(log.querySelectorAll('p')).toHaveLength(3);
+});
+
+// UX §10: the second wrong answer removes the card controls, so keyboard focus moves to Show me.
+test('after the second wrong answer, focus moves to Show me', () => {
+  openPrompt();
+  const offSuit = followSuit.exercises[0].deal.hands.south.find(card => card.suit !== 'hearts')!;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const card = screen.getByRole('button', { name: cardName(offSuit) });
+    card.focus();
+    fireEvent.keyDown(card, { key: 'Enter' });
+    fireEvent.keyDown(card, { key: 'Enter' });
+  }
+  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Show me' }));
 });
