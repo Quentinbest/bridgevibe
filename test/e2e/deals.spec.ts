@@ -94,3 +94,19 @@ test('header controls and invalid-link feedback preserve the fixed Deal height',
     }
   }
 });
+
+// UX §10: the learner's turn arriving never pulls focus away from the header's deal controls.
+test('a robot play reaching the learner keeps focus on Deal info', async ({ page }) => {
+  await page.clock.install();
+  await page.clock.pauseAt(new Date(Date.now() + 1000));
+  await page.goto('/?seed=abc&deal=3');
+  const trigger = page.getByRole('button', { name: 'Deal info', exact: true });
+  await trigger.focus();
+  await page.clock.runFor(600);
+  await expect(page.locator('.trick-area .card')).toHaveCount(1);
+  await expect(trigger).toBeFocused();
+  await page.keyboard.press('Enter');
+  await page.clock.runFor(600);
+  await page.keyboard.press('Escape');
+  await expect(trigger).toBeFocused();
+});
