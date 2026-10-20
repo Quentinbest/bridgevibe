@@ -23,7 +23,9 @@ function schemas() {
   const dealShape = object({ dealId: string, origin, dealer: seat,
     vulnerability: object({ northSouth: choice([true, false]), eastWest: choice([true, false]) }),
     hands: object({ north: hand, east: hand, south: hand, west: hand }) });
+  // US-04.1, CI-5: every action carries provenance, including plays imported from PBN.
   const provenance: Check = value => object({ kind: choice(['learner']) })(value)
+    || object({ kind: choice(['imported']), format: choice(['pbn']) })(value)
     || object({ kind: choice(['robot']), policy: string, version: string, fallback: choice(['timeout', 'engine-failure']),
       durationMs: value => typeof value === 'number' && Number.isFinite(value) && value >= 0 }, ['fallback'])(value);
   const recordShape = object({ schemaVersion: choice([2]), playthroughId: string, deal: dealShape,
@@ -33,7 +35,7 @@ function schemas() {
     appVersion: string, rulesCoreVersion: string,
     engineVersions: value => !!value && typeof value === 'object' && !Array.isArray(value) && Object.values(value).every(string),
     actions: array(object({ index: integer(0, 51), seat, controller: choice(['learner', 'robot']),
-      action: object({ kind: choice(['play-card']), card }), provenance }, ['provenance']), 52),
+      action: object({ kind: choice(['play-card']), card }), provenance }), 52),
   });
 
   return { dealShape, recordShape };
