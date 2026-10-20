@@ -11,6 +11,7 @@ export const catalogue = {
   "review.position": { text: "Trick {n} of 13", status: 'draft' },
   "review.winner": { text: "{seat} won it", status: 'draft' },
   "review.hands": { text: "Show all 4 hands", status: 'draft' },
+  "review.hide-hands": { text: "Hide all 4 hands", status: 'draft' },
   "review.hands-at": { text: "Hands as trick {n} began", status: 'draft' },
   "review.tricks": { text: "Tricks", status: 'draft' },
   "review.trick": { text: "Trick {n}", status: 'draft' },

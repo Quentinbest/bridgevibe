@@ -41,7 +41,7 @@ export function ReviewScreen({ record, onBack }: { record: CompletedPlaythroughR
           </section>)}
         </section>}
       </div>
-      <button type="button" aria-expanded={showHands} onClick={() => setShowHands(!showHands)}>{text('review.hands')}</button>
+      <button type="button" aria-expanded={showHands} onClick={() => setShowHands(!showHands)}>{text(showHands ? 'review.hide-hands' : 'review.hands')}</button>
     </section>
     <nav className="review-strip" aria-label={text('review.tricks')}>{tricks.map((_, n) => <button key={n} type="button"
       aria-label={text('review.trick', { n: n + 1 })} aria-current={n === index ? 'step' : undefined} onClick={() => setIndex(n)}>{text('review.number', { n: n + 1 })}</button>)}</nav>

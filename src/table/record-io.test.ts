@@ -1,7 +1,7 @@
 import { expect, test } from 'vitest';
 import clean from '../../test/fixtures/records/column-order.pbn?raw';
 import annotated from '../../test/fixtures/records/column-order-annotated.pbn?raw';
-import { dealFromSeed, dealIdOf, exportRecordJson, importPbn, importRecordJson, SEATS, startPlaythrough, type Deal } from './index';
+import { dealFromSeed, dealIdOf, exportPbn, exportRecordJson, importPbn, importRecordJson, SEATS, startPlaythrough, type Deal } from './index';
 
 // US-04.3: rotating columns must not make an incorrect opening leader acceptable.
 test.each(['N', 'E', 'S'])('PBN rejects Play %s when South declares', leader => {
@@ -53,4 +53,18 @@ test.each(['SZ!', 'S10?', 'S!2', 'S2???', '$x', 'S2junk!', 'S2$1junk'])('PBN ann
 });
 test('PBN rejects unterminated brace comments', () => {
   expect(() => importPbn(clean + '\n{unfinished')).toThrow(/PBN parse error/);
+});
+
+test('PBN escape lines anywhere preserve the imported record', () => {
+  const escaped = '% PBN 2.1\n' + clean.replace('[Dealer', '% EXPORT\n[Dealer')
+    .replace('CK SJ HJ DQ', '% metadata { unclosed quote " must be ignored\nCK SJ HJ DQ') + '% end\n';
+  const original = importPbn(clean), imported = importPbn(escaped);
+  expect({ ...imported, playthroughId: original.playthroughId }).toEqual(original);
+});
+test('PBN exports South-dealt hands clockwise from South and still imports North-first', () => {
+  const original = importPbn(clean.replace('[Dealer "N"]', '[Dealer "S"]'));
+  const exported = exportPbn(original);
+  expect(exported).toContain('[Deal "S:Q..QJT98765432.A 2...KQJT98765432 AJT9876543.AKQ.. K.JT98765432.AK."]');
+  const imported = importPbn(exported);
+  expect({ ...imported, playthroughId: original.playthroughId }).toEqual(original);
 });

@@ -1,3 +1,5 @@
+% PBN 2.1
+% EXPORT
 ; PBN 2.1: the same Deal and play as column-order.pbn.
 { Comments can span
   multiple lines; a semicolon inside braces is just comment text. }
@@ -8,6 +10,7 @@
 [Declarer "S"]
 [Contract "1NT"]
 [Result "13"]
+% play metadata
 [Play "W"] { Columns remain W,N,E,S. }
 S2! SA? SK!! SQ?? ; opening trick
 CK!? SJ?! HJ $1 DQ
@@ -17,6 +20,7 @@ CJ S9 $2
 H9 DT
 CT S8 H8 D9
 C9 S7 H7 D8
+% metadata within play
 C8 S6 H6 D7
 C7 S5 H5 D6
 C6 S4 H4 D5
@@ -25,3 +29,4 @@ C4 HA H2 D3
 C3 HK DA D2
 C2 HQ DK CA$1
 ; End of play { braces here remain part of the line comment.
+% end of record

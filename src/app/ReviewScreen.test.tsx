@@ -44,3 +44,16 @@ test('US-16.2: stepper, winner and start-of-trick hands follow the completed rec
   fireEvent.click(screen.getByRole('button', { name: 'Previous trick' }));
   expect(screen.getByText('Trick 12 of 13')).toBeTruthy();
 });
+
+test('US-16: the hand disclosure names its next action in both states', () => {
+  render(<ReviewScreen record={completedRecord(completeFixedDeal())} onBack={() => {}} />);
+  const show = screen.getByRole('button', { name: 'Show all 4 hands', expanded: false });
+  expect(show.textContent).toBe('Show all 4 hands');
+  fireEvent.click(show);
+  const hide = screen.getByRole('button', { name: 'Hide all 4 hands', expanded: true });
+  expect(hide.textContent).toBe('Hide all 4 hands');
+  expect(screen.getByRole('region', { name: 'Hands as trick 1 began' })).toBeTruthy();
+  fireEvent.click(hide);
+  expect(screen.getByRole('button', { name: 'Show all 4 hands', expanded: false }).textContent).toBe('Show all 4 hands');
+  expect(screen.queryByRole('region', { name: 'Hands as trick 1 began' })).toBeNull();
+});

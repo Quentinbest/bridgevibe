@@ -118,11 +118,13 @@ export function exportPbn(record: CompletedPlaythroughRecord): string {
   const { deal, contract } = record;
   const leader = SEATS[(SEATS.indexOf(contract.declarer) + 1) % 4];
   const columns = SEATS.map((_, index) => SEATS[(SEATS.indexOf(leader) + index) % 4]);
-  const hands = SEATS.map(seat => SUITS.map(suit => RANKS.filter(rank => deal.hands[seat].some(card => card.suit === suit && card.rank === rank))
+  // US-04.3, PBN 2.1 §3.4.11: export starts with Dealer, then clockwise.
+  const handOrder = SEATS.map((_, index) => SEATS[(SEATS.indexOf(deal.dealer) + index) % 4]);
+  const hands = handOrder.map(seat => SUITS.map(suit => RANKS.filter(rank => deal.hands[seat].some(card => card.suit === suit && card.rank === rank))
     .map(rank => rank === '10' ? 'T' : rank).join('')).join('.')).join(' ');
   const vulnerable = deal.vulnerability.northSouth ? (deal.vulnerability.eastWest ? 'All' : 'NS') : (deal.vulnerability.eastWest ? 'EW' : 'None');
   const tags = { Event: 'BridgeVibe', Site: '?', Date: '????.??.??', Board: '?', West: '?', North: '?', East: '?', South: '?',
-    Dealer: direction(deal.dealer), Vulnerable: vulnerable, Deal: `N:${hands}`, Scoring: '?', Declarer: direction(contract.declarer),
+    Dealer: direction(deal.dealer), Vulnerable: vulnerable, Deal: `${direction(deal.dealer)}:${hands}`, Scoring: '?', Declarer: direction(contract.declarer),
     Contract: `${contract.level}${contract.strain === 'no-trumps' ? 'NT' : suits[SUITS.indexOf(contract.strain)]}`,
     Result: String(record.result[sideOf(contract.declarer)]), Play: direction(leader) };
   // PBN 2.1 §3.6: columns remain fixed at the Play tag's seat, even when the lead changes.
@@ -134,7 +136,9 @@ export function importPbn(text: string): CompletedPlaythroughRecord {
     const tags: Record<string, string> = Object.create(null);
     const playLines: string[] = [];
     let playing = false;
-    for (const line of withoutComments(text).trim().split(/\r?\n/).map(line => line.trim()).filter(Boolean)) {
+    // US-04.3: escape lines are ignored before even interpreting comment delimiters.
+    const content = text.split(/\r?\n/).filter(line => !line.startsWith('%')).join('\n');
+    for (const line of withoutComments(content).trim().split(/\r?\n/).map(line => line.trim()).filter(Boolean)) {
       if (line.startsWith('[')) {
         const match = /^\[([A-Za-z]+) "([^"\\]*)"\]$/.exec(line);
         if (!match || playing || Object.hasOwn(tags, match[1])) throw new Error('Malformed or misplaced tag');

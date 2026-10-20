@@ -41,10 +41,16 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
   await expect(page.getByRole('heading', { name: 'Hand review' })).toBeFocused();
   await expect(page.getByRole('note')).toContainText('X-ray view: now you can see all 4 hands');
   await expect(page.getByRole('button', { name: 'Previous trick' })).toBeDisabled();
-  const toggle = page.getByRole('button', { name: 'Show all 4 hands' });
+  const toggle = page.getByRole('button', { name: /^(Show|Hide) all 4 hands$/ });
   if (await toggle.getAttribute('aria-expanded') === 'true') await toggle.click();
   await expect(page.locator('#review-hands')).toHaveCount(0);
+  await expect(toggle).toHaveText('Show all 4 hands');
+  await expect(toggle).toHaveAccessibleName('Show all 4 hands');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await toggle.focus(); await page.keyboard.press('Space');
+  await expect(toggle).toHaveText('Hide all 4 hands');
+  await expect(toggle).toHaveAccessibleName('Hide all 4 hands');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await expect(page.getByRole('region', { name: 'Hands as trick 1 began' })).toBeVisible();
   const next = page.getByRole('button', { name: 'Next trick' });
   await next.focus(); await page.keyboard.press('Enter');
@@ -79,6 +85,8 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await toggle.click();
+  await expect(toggle).toHaveAccessibleName('Show all 4 hands');
+  await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole('button', { name: 'Back to table' }).click();
   await expect(page.getByRole('button', { name: 'Hand review', exact: true })).toBeVisible();
