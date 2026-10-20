@@ -1,0 +1,17 @@
+{
+  "public/licences/fonts/bricolage-grotesque-LICENSE.txt": {
+    "licenceFile": "public/licences/fonts/bricolage-grotesque-LICENSE.txt",
+    "licence": "OFL-1.1",
+    "attribution": "Bricolage Grotesque font licence notice"
+  },
+  "public/licences/fonts/ibm-plex-mono-LICENSE.txt": {
+    "licenceFile": "public/licences/fonts/ibm-plex-mono-LICENSE.txt",
+    "licence": "OFL-1.1",
+    "attribution": "IBM Plex Mono font licence notice"
+  },
+  "public/licences/fonts/ibm-plex-sans-LICENSE.txt": {
+    "licenceFile": "public/licences/fonts/ibm-plex-sans-LICENSE.txt",
+    "licence": "OFL-1.1",
+    "attribution": "IBM Plex Sans font licence notice"
+  }
+}
