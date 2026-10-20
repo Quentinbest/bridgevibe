@@ -189,12 +189,12 @@ test('US-10.2: a throwing audit fails directly instead of producing a fallback',
   expect(() => setup(undefined, { audit: (message, seat) => inspect(message.type === 'decide' ? { message, leak: hiddenCard(fixedDeal, seat) } : message, seat) }))
     .toThrow('robot-audit-hidden-card');
 });
-test('US-12.4: completed decisions pause display while hidden without another request', () => {
+test('US-10.4, US-12.4: completed decisions wait a full display window after the page returns', () => {
   let hidden = false; let change = () => {};
   const { workers, submit } = setup(1, { visibility: { hidden: () => hidden, subscribe: callback => { change = callback; return () => {}; } } });
   vi.advanceTimersByTime(300); hidden = true; change();
   vi.advanceTimersByTime(5000); expect(submit).not.toHaveBeenCalled();
-  hidden = false; change(); vi.advanceTimersByTime(199); expect(submit).not.toHaveBeenCalled();
+  hidden = false; change(); vi.advanceTimersByTime(499); expect(submit).not.toHaveBeenCalled();
   vi.advanceTimersByTime(1); expect(submit).toHaveBeenCalledOnce();
   expect(workers[0].messages).toHaveLength(1);
   expect(submit.mock.calls[0][1].fallback).toBeUndefined();
@@ -208,21 +208,21 @@ test('composition: timeout provenance survives Table submission into the record'
   expect(audit).toHaveBeenCalledTimes(2); stop();
 });
 
-test('US-10.3, US-44: composition seed and view ignore cards hidden from East', () => {
+test('US-10.3, US-44: composition seed and view ignore cards hidden from West', () => {
   vi.useFakeTimers();
+  // Before the opening lead, East's and North's (Dummy's) cards are both hidden from West.
   const changed = structuredClone(fixedDeal);
-  const west: [...Hand] = [...changed.hands.west]; const south: [...Hand] = [...changed.hands.south];
-  [west[0], south[0]] = [south[0], west[0]];
-  const permuted = { ...changed, hands: { ...changed.hands, west, south } };
+  const east: [...Hand] = [...changed.hands.east]; const north: [...Hand] = [...changed.hands.north];
+  [east[0], north[0]] = [north[0], east[0]];
+  const permuted = { ...changed, hands: { ...changed.hands, east, north } };
   const requests = [fixedDeal, permuted].map(deal => {
     const worker = new FakeWorker();
     const audit = vi.fn(robotAudit(deal, () => play.record()));
-    const play = createPlay({ createWorker: () => worker, audit },
-      { deal, contract: { level: 3, strain: 'no-trumps', declarer: 'north' }, learnerSide: 'northSouth' });
+    const play = createPlay({ createWorker: () => worker, audit }, deal);
     const stop = play.start();
     try {
       vi.advanceTimersByTime(0);
-      expect(worker.request.seat).toBe('east');
+      expect(worker.request.seat).toBe('west');
       expect(worker.request.view.positionIndex).toBe(0);
       expect(worker.request.view.dummy).toBeNull();
       expect(audit).toHaveBeenCalledOnce();

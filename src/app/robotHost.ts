@@ -43,8 +43,6 @@ export function createRobotHost(options: RobotHostOptions = {}) {
   let request: RobotRequest | undefined;
   let result: { action: Action; provenance: RobotProvenance } | undefined;
   let started = 0;
-  let displayAt = 0;
-  let remaining = displayMs;
   let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
   let displayTimer: ReturnType<typeof setTimeout> | undefined;
   let unsubscribe: (() => void) | undefined;
@@ -119,8 +117,8 @@ export function createRobotHost(options: RobotHostOptions = {}) {
   }
   function begin() {
     if (!active || visibility.hidden()) return;
-    started = clock.now(); displayAt = started + remaining;
-    displayTimer = clock.setTimeout(display, remaining);
+    started = clock.now();
+    displayTimer = clock.setTimeout(display, displayMs);
     if (result) return;
     request = { type: 'decide', requestId: String(++sequence), cancellationId: String(sequence),
       playthroughId: active.playthroughId, positionKey: active.positionKey, deadline: started + deadlineMs,
@@ -133,17 +131,16 @@ export function createRobotHost(options: RobotHostOptions = {}) {
   function visibilityChanged() {
     if (!active) return;
     if (visibility.hidden()) {
-      remaining = Math.max(0, displayAt - clock.now());
       cancelRequest(); clearTimers();
     } else {
-      // US-12.4: an interrupted attempt gets fresh deadline AND constant display window.
-      if (!result) remaining = displayMs;
+      // US-10.4, US-12.4: every resume restarts the whole display window, whether or not the
+      // decision finished before the page was hidden, so display time never reveals decision time.
       begin();
     }
   }
   return {
     decide(decision: Decision) {
-      cancel(); active = decision; remaining = displayMs;
+      cancel(); active = decision;
       unsubscribe ??= visibility.subscribe(visibilityChanged);
       begin();
     },
