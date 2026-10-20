@@ -1,11 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { SUITS, sameCard, type Card as TableCard, type Suit } from '../table';
 import { cardName, text } from '../explanation';
 import { Card } from './Card';
 
 type Props = { cards: readonly TableCard[]; dummy?: boolean; active: boolean; legalCards: readonly TableCard[]; ledSuit?: Suit;
-  selected: TableCard | null; onSelect: (card: TableCard | null) => void; onPlay: (card: TableCard) => void };
-export function Hand({ cards, dummy = false, active, legalCards, ledSuit, selected, onSelect, onPlay }: Props) {
+  rejectionId?: number; rejectedCard?: TableCard | null; selected: TableCard | null; onSelect: (card: TableCard | null) => void; onPlay: (card: TableCard) => void };
+// UX §10: track system changes as well as the initial reduced-motion preference.
+const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion:reduce)').matches ?? false;
+function subscribeMotion(listener: () => void) {
+  const query = window.matchMedia?.('(prefers-reduced-motion:reduce)');
+  query?.addEventListener('change', listener);
+  return () => query?.removeEventListener('change', listener);
+}
+export function Hand({ cards, dummy = false, active, legalCards, ledSuit, selected, onSelect, onPlay, rejectedCard, rejectionId = 0 }: Props) {
+  const reduceMotion = useSyncExternalStore(subscribeMotion, reducedMotion);
   const ordered = SUITS.flatMap(suit => cards.filter(card => card.suit === suit));
   const [focusIndex, setFocusIndex] = useState(0);
   // UX §10: keep a tab stop when the previously focused last card is removed.
@@ -17,6 +25,12 @@ export function Hand({ cards, dummy = false, active, legalCards, ledSuit, select
   useEffect(() => {
     if (active && !selected && !buttons.current.some(button => button === document.activeElement)) buttons.current[clampedIndex]?.focus({ preventScroll: true });
   }, [active, selected, clampedIndex]);
+  // UX §3.4: restart even when React batches clearing and repeating the same rejection.
+  useEffect(() => {
+    if (reduceMotion || !rejectedCard) return;
+    const button = buttons.current.find(button => button?.dataset.suit === rejectedCard.suit && button.dataset.rank === rejectedCard.rank);
+    for (const animation of button?.getAnimations?.() ?? []) { animation.cancel(); animation.play(); }
+  }, [rejectionId, rejectedCard, reduceMotion]);
   function choose(card: TableCard) {
     if (selected && sameCard(selected, card)) onPlay(card);
     else onSelect(card);
@@ -26,7 +40,7 @@ export function Hand({ cards, dummy = false, active, legalCards, ledSuit, select
       const index = ordered.indexOf(card);
       const raised = !!selected && sameCard(selected, card);
       const legal = legalCards.some(candidate => sameCard(candidate, card));
-      return active ? <button key={card.rank} type="button" className="card" data-suit={card.suit} data-selected={raised}
+      return active ? <button key={card.rank} type="button" className={rejectedCard && sameCard(rejectedCard, card) && !reduceMotion ? 'card rejected-card' : 'card'} data-suit={card.suit} data-rank={card.rank} data-rejection-id={rejectedCard && sameCard(rejectedCard, card) ? rejectionId : undefined} data-selected={raised}
         ref={element => { buttons.current[index] = element; }} tabIndex={index === clampedIndex ? 0 : -1}
         aria-pressed={raised}
         onFocus={() => setFocusIndex(index)} onClick={() => choose(card)} onKeyDown={event => {
