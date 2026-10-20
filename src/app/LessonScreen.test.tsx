@@ -56,3 +56,12 @@ test('Dummy is face up in the lesson table after the opening lead', () => {
   const dummy = screen.getByRole('region', { name: 'North · Dummy' });
   expect(dummy.querySelectorAll('.card')).toHaveLength(12);
 });
+
+// UX §10: scripted plays are announced to screen readers through a polite log.
+test('scripted lesson plays are announced in a polite live log', () => {
+  openPrompt();
+  const log = screen.getByRole('log');
+  expect(log.getAttribute('aria-live')).toBe('polite');
+  expect(log.textContent).toMatch(/West plays the .* of hearts/);
+  expect(log.querySelectorAll('p')).toHaveLength(3);
+});

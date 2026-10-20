@@ -1,7 +1,7 @@
 import { describe, expect, test, vi } from 'vitest';
 import { dealIdOf, sameCard, startPlaythrough, type Card } from '../table';
 import { catalogue } from '../explanation';
-import { followSuit } from './content';
+import { followSuit, loadLesson } from './content';
 import { createAttemptStore } from '../progress/attemptStore';
 import { createPlayer } from './player';
 import type { Exercise, Prompt, ScriptAction } from './model';
@@ -213,4 +213,11 @@ test('a prompt without a hint offers none and records hint tier none', () => {
   expect(player.showHint().hint).toBeNull();
   player.answer(heart('A'), 1);
   expect(store.snapshot().at(-1)).toMatchObject({ outcome: 'correct', hintTier: 'none', hintTiming: null });
+});
+
+// US-02, ADR-0003: until the table turns (#16), lesson content can't ask for a North declarer the screen can't show.
+test('content with a declarer other than South is rejected at load', () => {
+  const north = { ...followSuit, exercises: [{ ...exercise, contract: { ...exercise.contract, declarer: 'north' } }] };
+  expect(() => loadLesson(north)).toThrow('must be declared by South');
+  expect(loadLesson(followSuit)).toBe(followSuit);
 });

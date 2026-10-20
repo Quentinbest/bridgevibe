@@ -85,6 +85,15 @@ export function LessonScreen({ onClose }: { onClose: () => void }) {
         <p className="lesson-keys">{text('lesson.keys')}</p>
         <small>{text('lesson.draft')}</small>
       </aside>
+      {/* UX §10: every play and trick winner is announced, scripted plays included. Built from the
+          learner's Seat View, so it holds only public information. */}
+      <div className="sr-only" role="log" aria-live="polite" aria-relevant="additions">
+        {[...state.view.tricks.flatMap(trick => [...trick.cards.map(played =>
+          text('announce.play', { seat: text(`seat.${played.seat}`), card: cardName(played.card) })),
+          text('announce.winner', { seat: text(`seat.${trick.winner}`) })]),
+        ...state.view.currentTrick.map(played => text('announce.play', { seat: text(`seat.${played.seat}`), card: cardName(played.card) })),
+        ].map((message, index) => <p key={index}>{message}</p>)}
+      </div>
     </main>
   </div>;
 }
