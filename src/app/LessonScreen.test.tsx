@@ -5,6 +5,7 @@ import { LessonScreen } from './LessonScreen';
 import { sessionAttempts } from '../progress/attemptStore';
 import { followSuit } from '../curriculum/content';
 import { cardName } from '../explanation';
+import { createProvenanceLog, validateEntry } from '../coach/provenance';
 
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 function openPrompt() {
@@ -85,4 +86,29 @@ test('after the second wrong answer, focus moves to Show me', () => {
     fireEvent.keyDown(card, { key: 'Enter' });
   }
   expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Show me' }));
+});
+
+// US-14.4, US-40, CI-5: a shown authored hint is logged as a statement with authored provenance.
+test('showing the hint records one authored statement in the provenance log', () => {
+  const log = createProvenanceLog('0.0.0');
+  vi.useFakeTimers();
+  render(<LessonScreen onClose={vi.fn()} provenanceLog={log} />);
+  fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
+  for (let i = 0; i < 2; i++) act(() => { vi.advanceTimersByTime(500); });
+  fireEvent.click(screen.getByRole('button', { name: 'Hint' }));
+  const entries = log.entries();
+  expect(entries).toHaveLength(1);
+  expect(validateEntry(entries[0])).toEqual([]);
+  expect(entries[0]).toMatchObject({ kind: 'statement', informationMode: 'VISIBLE',
+    provenance: { sourceKind: 'authored', contentId: 'follow-suit.prompt', version: '1' } });
+});
+// UX §10: after the last scripted play, focus moves to the newly shown continuation.
+test('focus moves to Return to practice after the scripted play that ends the exercise', () => {
+  openPrompt();
+  const card = screen.getByRole('button', { name: 'Ace of hearts' });
+  fireEvent.keyDown(card, { key: 'Enter' });
+  fireEvent.keyDown(card, { key: 'Enter' });
+  fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
+  act(() => { vi.advanceTimersByTime(500); });
+  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Return to practice' }));
 });

@@ -2,20 +2,30 @@ import { useEffect, useRef, useState } from 'react';
 import { followSuit } from '../curriculum/content';
 import { createPlayer } from '../curriculum/player';
 import { sessionAttempts } from '../progress/attemptStore';
+import { createProvenanceLog } from '../coach/provenance';
+type ProvenanceLog = ReturnType<typeof createProvenanceLog>;
 import { cardName, text, type StringId } from '../explanation';
 import { SEATS, type Card as TableCard } from '../table';
 import { Card } from './Card';
 import { Hand } from './Hand';
 
-export function LessonScreen({ onClose }: { onClose: () => void }) {
+export function LessonScreen({ onClose, provenanceLog }: { onClose: () => void; provenanceLog?: ProvenanceLog }) {
   const [player] = useState(() => createPlayer(followSuit.exercises[0], sessionAttempts, 'session-learner'));
+  // US-40, CI-5: lesson statements are logged like the practice table's; #49 replaces the literal version.
+  const [log] = useState(() => provenanceLog ?? createProvenanceLog('0.0.0'));
   const [state, setState] = useState(player.snapshot);
   const [selected, setSelected] = useState<TableCard | null>(null);
   const [ruleOpen, setRuleOpen] = useState(false);
   const showMe = useRef<HTMLButtonElement>(null);
   const continuation = useRef<HTMLButtonElement>(null);
-  // UX §10: resolving a Prompt removes its controls; focus the continuation.
-  useEffect(() => { if (state.outcome) continuation.current?.focus(); }, [state.outcome]);
+  const started = useRef(false);
+  // UX §10: whenever the continuation newly appears (a resolved Prompt, or a commentary step reached
+  // after a scripted play), the control that had focus is gone, so focus moves to it.
+  const continuationShown = state.kind === 'commentary' || (state.kind === 'prompt' && !!state.outcome);
+  useEffect(() => {
+    if (continuationShown && started.current) continuation.current?.focus();
+    started.current = true;
+  }, [continuationShown]);
   const offerShowMe = state.wrongAnswers >= 2 && !state.outcome;
   // UX §10: the second wrong answer removes the focused card controls, so focus moves to Show me.
   useEffect(() => { if (offerShowMe) showMe.current?.focus(); }, [offerShowMe]);
@@ -31,7 +41,18 @@ export function LessonScreen({ onClose }: { onClose: () => void }) {
   const dummySeat = SEATS[(SEATS.indexOf(state.view.contract.declarer) + 2) % 4];
   const answers = state.prompt?.expectedAnswers.map(cardName).join(', ') ?? '';
   function answer(card: TableCard) { setSelected(null); setRuleOpen(false); setState(player.answer(card, Date.now())); }
-  const hint = () => setState(player.showHint());
+  function hint() {
+    const next = player.showHint();
+    // US-14.4, US-40: the first showing of an authored hint is a statement with authored provenance.
+    if (!state.hint && next.hint) {
+      const { playthroughId } = player.record();
+      log.record({ id: `${playthroughId}-hint-${next.stepIndex}`, playthroughId, positionIndex: next.view.positionIndex,
+        kind: 'statement', summary: `hint:${next.prompt?.promptId}`, text: text(next.hint.textRef as StringId),
+        informationMode: 'VISIBLE', at: new Date().toISOString(),
+        provenance: { sourceKind: 'authored', contentId: next.hint.provenance.contentId, version: String(next.hint.provenance.version) } });
+    }
+    setState(next);
+  }
   return <div className="lesson-screen" onKeyDown={event => {
     if (event.key.toLowerCase() === 'h' && !event.ctrlKey && !event.metaKey && !event.altKey) { event.preventDefault(); hint(); }
   }}>
