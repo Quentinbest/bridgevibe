@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
 import { StrictMode } from 'react';
+import type { ComponentProps } from 'react';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
 import { cardName } from '../explanation';
 import { completeFixedDeal } from '../../test/strategy';
-import { App } from './App';
+import { App, TableScreen } from './App';
 
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 const advance = (ms: number) => act(() => vi.advanceTimersByTime(ms));
@@ -90,4 +91,14 @@ test('a rejected confirmation returns focus to the rejected card', () => {
   confirm.focus(); fireEvent.click(confirm);
   expect(screen.getByText('Not that one. You still have spades.')).toBeTruthy();
   expect(document.activeElement).toBe(screen.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades" }));
+});
+
+// ADR-0001, US-16.4: the play session holds a record of all four hands, so it never becomes a UI prop.
+test('TableScreen props carry deal metadata only, never the play session', () => {
+  type Props = ComponentProps<typeof TableScreen>;
+  const keys: (keyof Props)[] = ['view', 'play', 'clearRejection', 'info', 'invalid', 'onNew'];
+  expect(keys).toHaveLength(6);
+  // @ts-expect-error the play session and its record must not be a TableScreen prop
+  const leak: Props['session'] = undefined;
+  expect(leak).toBeUndefined();
 });
