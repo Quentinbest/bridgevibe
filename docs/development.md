@@ -201,3 +201,23 @@ Open question (F5 / VAL-08): teachers should confirm this proposed grading forma
 including the vocabulary for `grade` and how two teachers' resolved grades are
 combined. Recommendation: retain these nullable fields until the grading rubric
 is agreed; do not infer grading values or a sign-off process in this ticket.
+
+## Review and export
+
+US-04, US-16: **Hand review** becomes available only after completion. Table's
+`completedRecord()` returns the branded record accepted by `replay` and the review
+screen; an incomplete record is refused at runtime too. Replay submits the stored
+actions through Table to re-check legality, without consulting robot policies.
+Each trick includes its starting hands, play order and winner. The persistent
+X-ray note marks the revealed cards; all new copy remains draft (CI-8).
+
+Schema 2 records carry `appVersion`, `engineVersions` and `rulesCoreVersion`.
+JSON export/import preserves the entire record and validates its shape and actions.
+PBN exports deal, contract and play; it cannot preserve provenance or engine versions.
+The current importer accepts complete 13-trick play with undoubled contracts, matching
+Table's current contract model. Play columns stay fixed at the `[Play]` seat (PBN
+2.1 §3.6), regardless of subsequent trick leaders. `column-order.pbn` is hand-checked:
+West leads S2, North wins SA then leads SJ; the second row remains W,N,E,S
+(`CK SJ HJ DQ`). North wins all 13 tricks. The other fixtures use `test/strategy.ts`.
+The review reuses existing theme tokens; result, trick cost and key moments remain
+owned by their separate tickets.

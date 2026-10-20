@@ -15,3 +15,5 @@ export * from './playthrough';
 export { DEALING_ALGORITHM, dealFromSeed, dealIdOf, redeal } from './dealing';
 export { encodeSeatView, decodeSeatView, seatViewSeed, type SeatViewMessage } from './seatViewMessage';
 export * from './scoring';
+export { replay, type ReplayTrick } from './replay';
+export { exportRecordJson, importRecordJson, exportPbn, importPbn } from './record-io';

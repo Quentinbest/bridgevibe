@@ -45,3 +45,16 @@ test('US-04.1: learner actions record learner provenance when the caller omits i
   table.submit('north', 'learner', table.legalActions('north')[0]);
   expect(table.record().actions[1].provenance).toEqual({ kind: 'learner' });
 });
+
+// US-04.3: the Table accepts imported provenance for any controller, but only in its exact shape.
+test('imported provenance is accepted only as { kind: imported, format: pbn }', () => {
+  for (const provenance of [{ kind: 'imported', format: 'json' }, { kind: 'imported', format: 'pbn', extra: 1 }]) {
+    const table = fixedPlaythrough();
+    const before = table.record();
+    expect(table.submit('west', 'robot', table.legalActions('west')[0], provenance as never)).toMatchObject({ kind: 'rejected', reason: 'malformed-action' });
+    expect(table.record()).toEqual(before);
+  }
+  const table = fixedPlaythrough();
+  expect(table.submit('west', 'robot', table.legalActions('west')[0], { kind: 'imported', format: 'pbn' }).kind).toBe('accepted');
+  expect(table.submit('north', 'learner', table.legalActions('north')[0], { kind: 'imported', format: 'pbn' }).kind).toBe('accepted');
+});

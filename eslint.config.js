@@ -10,6 +10,9 @@ export default [
     'no-restricted-syntax': ['error', {
       selector: ':matches(TSAsExpression, TSTypeAssertion) > TSTypeReference[typeName.name="SeatView"]',
       message: 'Only table constructs SeatView; request one from the Table API.',
+    }, {
+      selector: ':matches(TSAsExpression, TSTypeAssertion) > TSTypeReference[typeName.name="CompletedPlaythroughRecord"]',
+      message: 'Only table constructs CompletedPlaythroughRecord; request one from the Table API.',
     }],
   } },
   { files: ['src/robots/**'], rules: {
