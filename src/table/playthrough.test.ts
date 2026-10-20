@@ -200,3 +200,29 @@ test('US-01.6, CI-5: unknown robot provenance fields are rejected before any sta
     expect(state(table)).toEqual(before); expect(table.positionKey()).toBe(key);
   }
 });
+
+// US-04.1, CI-5: authored provenance is exact and only accepted for Robot-controlled seats.
+test('authored provenance rejects invalid shapes without changing any state', () => {
+  const valid = { kind: 'authored', contentId: 'lesson.exercise', version: 1 } as const;
+  for (const provenance of [
+    { ...valid, extra: true }, { ...valid, [Symbol('extra')]: true },
+    { ...valid, contentId: 42 }, { ...valid, contentId: '' },
+    { ...valid, version: '1' }, { ...valid, version: NaN },
+    { ...valid, version: 0 }, { ...valid, version: 1.5 },
+    { kind: 'authored', contentId: valid.contentId }, { kind: 'authored', version: 1 },
+  ]) {
+    const table = make();
+    const before = state(table);
+    expect(table.submit('west', 'robot', table.legalActions('west')[0], provenance as never))
+      .toMatchObject({ kind: 'rejected', reason: 'malformed-action' });
+    expect(state(table)).toEqual(before);
+  }
+  const table = make();
+  expect(table.submit('west', 'robot', table.legalActions('west')[0], valid).kind).toBe('accepted');
+  const before = state(table);
+  for (const controller of ['learner', 'robot'] as const) {
+    expect(table.submit('north', controller, table.legalActions('north')[0], valid))
+      .toMatchObject({ kind: 'rejected', reason: 'malformed-action' });
+    expect(state(table)).toEqual(before);
+  }
+});

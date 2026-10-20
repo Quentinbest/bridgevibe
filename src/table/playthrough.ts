@@ -6,7 +6,8 @@ import { positionDigest } from './positionKey';
 export type RobotProvenance = Readonly<{ kind: 'robot'; policy: string; version: string; fallback?: 'timeout' | 'engine-failure'; durationMs: number }>;
 // US-04.3: a play read from a PBN file has no robot or learner provenance; say so instead of inventing one.
 export type ImportedProvenance = Readonly<{ kind: 'imported'; format: 'pbn' }>;
-export type ActionProvenance = RobotProvenance | Readonly<{ kind: 'learner' }> | ImportedProvenance;
+export type AuthoredProvenance = Readonly<{ kind: 'authored'; contentId: string; version: number }>;
+export type ActionProvenance = AuthoredProvenance | RobotProvenance | Readonly<{ kind: 'learner' }> | ImportedProvenance;
 export type Contract = Readonly<{ level: number; strain: Suit | 'no-trumps'; declarer: Seat }>;
 export type Controller = 'learner' | 'robot';
 export type Action = Readonly<{ kind: 'play-card'; card: Card }>;
@@ -100,7 +101,12 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract; learne
     if (status === 'completed') return reject('playthrough-complete');
     if (!SEATS.some(candidate => candidate === seat) || (controller !== 'learner' && controller !== 'robot') || !isAction(action)) return reject('malformed-action');
     // US-01.6, CI-5: controller and complete provenance must agree before any mutation.
-    if ((controller === 'robot' && !provenance) || (provenance && provenance.kind !== controller && provenance.kind !== 'imported')) return reject('malformed-action');
+    if ((controller === 'robot' && !provenance) || (provenance && provenance.kind !== controller && provenance.kind !== 'imported' && provenance.kind !== 'authored')) return reject('malformed-action');
+    // US-04.1, CI-5: authored Script actions belong only to robot-controlled seats.
+    if (provenance?.kind === 'authored' && (controller !== 'robot' || controllerOf(seat as Seat) !== 'robot'
+      || typeof provenance.contentId !== 'string' || !provenance.contentId.trim()
+      || !Number.isSafeInteger(provenance.version) || provenance.version < 1
+      || Reflect.ownKeys(provenance).some(key => key !== 'kind' && key !== 'contentId' && key !== 'version'))) return reject('malformed-action');
     if (provenance?.kind === 'imported' && (provenance.format !== 'pbn'
       || Reflect.ownKeys(provenance).some(key => key !== 'kind' && key !== 'format'))) return reject('malformed-action');
     // US-01.6, CI-5: unknown fields must not escape into downstream provenance records.

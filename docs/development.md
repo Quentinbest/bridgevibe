@@ -168,6 +168,24 @@ authored Deal, and replaces the URL. Play remains 3NT by South until #12.
 Deal info displays metadata only. Copy remains draft (CI-8); replay still reads the
 Playthrough Record, never regenerated actions (ADR-0002).
 
+## Lessons
+
+`?lesson=follow-suit` opens the unsigned draft exercise; Close returns to practice.
+The design's Level means Module, with one Lesson per Module for now. Its five dots
+are the Exercise's five Steps; the fraction and accessible progress value share
+one step index (correcting the design's mismatched success-screen fraction).
+`src/curriculum/` owns the JSON content, the Attempt model and the player's transitions.
+It imports only Table; the Script contains Robot moves only and never invokes robot policies.
+The learner defends South against 1NT by West; North leads and East is Dummy.
+Every scripted action records authored provenance with the Exercise content ID and version;
+trial replay preserves each recorded action’s provenance. `src/progress/`
+owns the append-only session Attempts store (§4.2) and may import only curriculum;
+the player appends through curriculum's `AttemptSink` type.
+The UI schedules scripted plays at 500 ms and renders South's Seat View. Authored
+hint provenance is exposed as data; wiring it to #9's coach log is deferred until
+both tickets land. Hints do not change outcomes. No persistence or level-complete
+screen is included; all lesson copy awaits teacher sign-off.
+
 ## Provenance
 
 US-40 / CI-5: `src/coach/provenance.ts` owns the session-only log and validates every

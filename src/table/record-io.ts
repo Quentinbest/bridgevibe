@@ -25,6 +25,7 @@ function schemas() {
     hands: object({ north: hand, east: hand, south: hand, west: hand }) });
   // US-04.1, CI-5: every action carries provenance, including plays imported from PBN.
   const provenance: Check = value => object({ kind: choice(['learner']) })(value)
+    || object({ kind: choice(['authored']), contentId: string, version: integer(1, Number.MAX_SAFE_INTEGER) })(value)
     || object({ kind: choice(['imported']), format: choice(['pbn']) })(value)
     || object({ kind: choice(['robot']), policy: string, version: string, fallback: choice(['timeout', 'engine-failure']),
       durationMs: value => typeof value === 'number' && Number.isFinite(value) && value >= 0 }, ['fallback'])(value);
