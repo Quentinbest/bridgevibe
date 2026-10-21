@@ -4,6 +4,7 @@
   "signOff": {
     "status": "unsigned-draft"
   },
+  "rights": { "source": "original", "licence": "draft" },
   "schemaVersion": 1,
   "gameFormat": "contract-bridge",
   "titleRef": "lesson.title",
@@ -17,6 +18,7 @@
       "signOff": {
         "status": "unsigned-draft"
       },
+      "rights": { "source": "original", "licence": "draft" },
       "deal": {
         "dealId": "deal-40ae22e2180f4e65",
         "origin": {
@@ -306,6 +308,7 @@
             "signOff": {
               "status": "unsigned-draft"
             },
+            "rights": { "source": "original", "licence": "draft" },
             "promptId": "follow-suit.card",
             "answerKind": "card",
             "textRef": "lesson.prompt",

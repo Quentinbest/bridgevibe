@@ -1,10 +1,14 @@
 import type { Action, Card, Contract, Deal, Seat } from '../table';
 
-export type Content = Readonly<{ contentId: string; version: number; signOff: { status: 'unsigned-draft' } }>;
+export type Content = Readonly<{ contentId: string; version: number; signOff: { status: 'unsigned-draft' };
+  rights: Readonly<{ source: string; licence: string }>;
+}>;
 export type Provenance = Readonly<{ sourceKind: 'authored'; contentId: string; version: number }>;
 export type Prompt = Content & Readonly<{
   promptId: string; answerKind: 'card'; textRef: string; commentaryRef: string;
   expectedAnswers: readonly Card[]; countsRejections?: boolean;
+  acceptThenScripted?: readonly Card[];
+  equivalentsReviewed?: readonly Readonly<{ card: Card; decision: 'accept' | 'reject'; reason?: string }>[];
   // US-28.8: authors leave the hint out where they need an unaided measure.
   hint?: { textRef: string; referencedCards: readonly Card[] }; skillTags: readonly string[];
   correctRef: string; wrongRef: string; shownRef: string;
@@ -12,12 +16,13 @@ export type Prompt = Content & Readonly<{
 export type ScriptAction = Readonly<{ seat: Seat; action: Action }>;
 export type Step = Readonly<{ kind: 'commentary'; textRef: string }>
   | Readonly<{ kind: 'scripted-action'; scriptIndices: readonly number[] }>
-  | Readonly<{ kind: 'prompt'; prompt: Prompt }>;
+  | Readonly<{ kind: 'prompt'; prompt: Prompt }>
+  | Readonly<{ kind: 'exposure'; cards: readonly Readonly<{ seat: Seat; card: Card }>[] }>;
 export type Exercise = Content & Readonly<{
   deal: Deal; contract: Contract; learnerSide: 'northSouth'; script: readonly ScriptAction[]; steps: readonly Step[];
 }>;
 export type Lesson = Content & Readonly<{
-  schemaVersion: 1; gameFormat: 'contract-bridge'; titleRef: string; skillTags: readonly string[];
+  schemaVersion: 1; gameFormat: 'contract-bridge' | 'minibridge'; titleRef: string; skillTags: readonly string[];
   exercises: readonly Exercise[];
 }>;
 export type Attempt = Readonly<{

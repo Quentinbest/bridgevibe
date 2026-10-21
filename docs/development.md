@@ -239,3 +239,39 @@ West leads S2, North wins SA then leads SJ; the second row remains W,N,E,S
 (`CK SJ HJ DQ`). North wins all 13 tricks. The other fixtures use `test/strategy.ts`.
 The review reuses existing theme tokens; result, trick cost and key moments remain
 owned by their separate tickets.
+
+## Content checks
+
+Run `node scripts/content/check.ts` or `npm run content:check` to validate every
+JSON Lesson under `src/curriculum/content/`. Optional file or directory arguments
+check unpublished content. CI runs the command separately and `npm run check`
+runs it before unit tests. Errors fail the command; warnings do not.
+
+The offline `pipeline` module imports only Table and curriculum (§4.2, §4.1.10).
+US-27 checks 52 distinct cards, 13 per hand and the canonical Deal ID; replays
+Robot Scripts in Step order with authored provenance; probes every expected
+answer on the Table; and enumerates every combination of expected answers for
+illegal later answers, scripted moves or changed trick winners. Answers in `acceptThenScripted` must be
+legal before being replaced by the canonical card. Enumeration is capped at 1,024
+answer branches per Exercise (including canonical and replaced answers across
+all reachable lines); exceeding the cap is an error, never a partial success.
+Every Script entry must occur exactly once. MiniBridge 20–20 HCP Deals are rejected. US-15 checks structured hint card references against
+South's Seat View, played cards and earlier Exposures in the same Exercise.
+Exposure references must identify the card's actual Seat. Parsing card names in
+prose is outside this check; authors must supply `hint.referencedCards`.
+Rights source, licence and sign-off status are required on Lessons, Exercises
+and Prompts; draft values are allowed. Release gating and version rules await MVP.
+
+The first `expectedAnswers` card is canonical (Show me plays it); the Script holds
+only Robot Actions. Add an alternative to `expectedAnswers`. If playing it would
+break the continuation or change a trick winner, also list it in
+`acceptThenScripted`: the player records a correct answer but plays the canonical
+card. Illegal alternatives are rejected even with this marker.
+
+Equivalent cards (US-27.3b) are same-suit cards in the acting hand with every
+intervening rank either already played or in that hand. No intervening card can
+remain in another hand. Unlisted equivalents produce a warning. Add them to
+`expectedAnswers`, or record `{ card, decision: 'accept' }` or
+`{ card, decision: 'reject', reason: '...' }` in `equivalentsReviewed`.
+A rejection needs a non-empty reason. A review record acknowledges the warning;
+only `expectedAnswers` controls what the player accepts.

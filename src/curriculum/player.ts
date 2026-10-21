@@ -57,7 +57,10 @@ export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: 
     rejection = result.kind === 'rejected' ? result : null;
     if (result.kind === 'rejected' && !current.prompt.countsRejections) return snapshot();
     if (result.kind === 'accepted' && current.prompt.expectedAnswers.some(expected => sameCard(expected, card))) {
-      table.submit(seat, 'learner', { kind: 'play-card', card });
+      // US-27.3a: accept the alternative while preserving the author's continuation.
+      const played = current.prompt.acceptThenScripted?.some(expected => sameCard(expected, card))
+        ? current.prompt.expectedAnswers[0] : card;
+      table.submit(seat, 'learner', { kind: 'play-card', card: played });
       finish(wrongAnswers ? 'corrected' : 'correct', time);
     } else wrongAnswers++;
     return snapshot();
