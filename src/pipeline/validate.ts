@@ -11,12 +11,36 @@ const cardShape = (value: unknown): value is Card => object(value)
 function error(report: Report, rule: string, item: { contentId?: string }, message: string) {
   report.errors.push({ rule, contentId: item.contentId || '(unknown)', message });
 }
-function rights(item: Content, report: Report) {
+function identity(item: Content, report: Report): boolean {
+  // §4.4: attempts and provenance key on contentId and version.
+  if (nonempty(item.contentId) && Number.isSafeInteger(item.version) && item.version >= 1) return true;
+  error(report, 'lesson-shape', item, 'Content needs a non-empty contentId and a positive integer version.');
+  return false;
+}
+function references(lesson: Lesson, catalogue: ReadonlySet<string>, report: Report) {
+  // CI-8: every learner-facing string comes from the catalogue; a missing reference crashes the screen.
+  const check = (item: { contentId?: string }, ref: unknown) => {
+    if (typeof ref !== 'string' || !catalogue.has(ref)) error(report, 'catalogue-reference', item, `Unknown catalogue reference ${String(ref)}.`);
+  };
+  check(lesson, lesson.titleRef);
+  for (const exercise of lesson.exercises) {
+    for (const step of exercise.steps) {
+      if (step.kind === 'commentary') check(exercise, step.textRef);
+      if (step.kind !== 'prompt') continue;
+      const prompt = step.prompt;
+      for (const ref of [prompt.textRef, prompt.commentaryRef, prompt.correctRef, prompt.wrongRef, prompt.shownRef]) check(prompt, ref);
+      if (prompt.hint) check(prompt, prompt.hint.textRef);
+    }
+  }
+}
+function rights(item: Content, report: Report): boolean {
+  const identified = identity(item, report);
   // §4.4, CI-8: presence only; release sign-off gating belongs to MVP.
   if (!object(item.rights) || !nonempty(item.rights.source) || !nonempty(item.rights.licence)
     || !object(item.signOff) || !nonempty(item.signOff.status)) {
     error(report, 'rights-sign-off', item, 'Rights source, licence and sign-off status must be non-empty.');
   }
+  return identified;
 }
 function dealShape(exercise: Exercise, report: Report): boolean {
   const deal = exercise.deal;
@@ -26,7 +50,8 @@ function dealShape(exercise: Exercise, report: Report): boolean {
     error(report, 'deal-shape', exercise, 'Deal must contain 52 distinct cards, 13 per hand.');
     return false;
   }
-  if (!SEATS.includes(deal.dealer) || !deal.vulnerability || deal.dealId !== dealIdOf(deal)) {
+  if (!SEATS.includes(deal.dealer) || !object(deal.vulnerability) || typeof deal.vulnerability.northSouth !== 'boolean'
+    || typeof deal.vulnerability.eastWest !== 'boolean' || deal.dealId !== dealIdOf(deal)) {
     error(report, 'deal-shape', exercise, 'Deal metadata or dealId does not match dealIdOf.');
     return false;
   }
@@ -81,6 +106,14 @@ function expectedAnswers(prompt: Prompt, exercise: Exercise, table: Playthrough,
     error(report, 'expected-answer', prompt, 'Prompt needs expected cards at a learner-controlled turn.');
     return null;
   }
+  // ADR-0001: the Prompt reaches the learner snapshot, so reviews may name only the acting hand's cards.
+  const hand = table.seatView(seat).hand;
+  if (prompt.equivalentsReviewed !== undefined && (!Array.isArray(prompt.equivalentsReviewed)
+    || prompt.equivalentsReviewed.some(review => !review || !cardShape(review.card) || !has(hand, review.card)
+      || !['accept', 'reject'].includes(review.decision)))) {
+    error(report, 'equivalent-cards', prompt, 'Reviewed equivalents must be accepted or rejected cards in the acting hand.');
+    return null;
+  }
   // US-27.3b: the player's accepted cards are exactly expectedAnswers.
   for (const review of prompt.equivalentsReviewed ?? []) {
     if (review.decision === 'accept' && !has(prompt.expectedAnswers, review.card)) {
@@ -105,9 +138,10 @@ function scriptReplay(exercise: Exercise, report: Report) {
   const used = new Set<number>();
   for (const step of exercise.steps) {
     if (step.kind === 'exposure') {
-      if (!Array.isArray(step.cards) || step.cards.some(ref => !SEATS.includes(ref.seat) || !cardShape(ref.card)
-        || !has(exercise.deal.hands[ref.seat as Seat], ref.card))) {
-        error(report, 'hint-references', exercise, 'Exposure must reference a card belonging to its named seat.');
+      // US-15.2: an exposure shows a card the named seat still holds at this step.
+      if (!Array.isArray(step.cards) || step.cards.some(ref => !ref || !SEATS.includes(ref.seat) || !cardShape(ref.card)
+        || !has(table.seatView(ref.seat).hand, ref.card))) {
+        error(report, 'hint-references', exercise, 'Exposure must reference a card its named seat still holds.');
       } else exposed.push(...step.cards.map(ref => ref.card));
     } else if (step.kind === 'scripted-action') {
       // US-27.2: advanceScript requires at least one referenced Robot action.
@@ -207,7 +241,8 @@ function alternatives(exercise: Exercise, canonical: NonNullable<ReturnType<type
     lines = next;
   }
 }
-export function validateLesson(value: unknown): Report {
+// The pipeline may not import the explanation module (§4.2), so callers pass the catalogue's IDs.
+export function validateLesson(value: unknown, catalogue?: ReadonlySet<string>): Report {
   const report: Report = { errors: [], warnings: [] };
   if (!object(value) || !Array.isArray(value.exercises) || !value.exercises.length || !['contract-bridge', 'minibridge'].includes(String(value.gameFormat))) {
     error(report, 'lesson-shape', {}, 'Expected a Lesson with gameFormat and at least one exercise.');
@@ -215,6 +250,9 @@ export function validateLesson(value: unknown): Report {
   }
   const lesson = value as Lesson;
   rights(lesson, report);
+  if (catalogue) {
+    try { references(lesson, catalogue, report); } catch { /* malformed exercises are reported below */ }
+  }
   for (const exercise of lesson.exercises) {
     try {
       if (!object(exercise) || !Array.isArray(exercise.steps) || !exercise.steps.length || !Array.isArray(exercise.script)
@@ -225,9 +263,10 @@ export function validateLesson(value: unknown): Report {
         error(report, 'lesson-shape', exercise ?? {}, 'Exercise requires a valid contract, at least one step and a script.');
         continue;
       }
-      rights(exercise, report);
+      // Replay needs the exercise's identity for authored provenance.
+      const identified = rights(exercise, report);
       for (const step of exercise.steps) if (step.kind === 'prompt') rights(step.prompt, report);
-      if (!dealShape(exercise, report)) continue;
+      if (!identified || !dealShape(exercise, report)) continue;
       miniBridge(lesson, exercise, report);
       if (exercise.contract.declarer === 'north') {
         error(report, 'lesson-shape', exercise, 'North declarers are not supported until #16.');

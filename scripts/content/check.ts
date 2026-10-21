@@ -18,6 +18,8 @@ registerHooks({
 });
 const moduleUrl = new URL('../../src/pipeline/validate.ts', import.meta.url).href;
 const { validateLesson } = await import(moduleUrl) as typeof import('../../src/pipeline/validate');
+const { catalogue } = await import(new URL('../../src/explanation/index.ts', import.meta.url).href) as typeof import('../../src/explanation');
+const catalogueIds = new Set(Object.keys(catalogue));
 // US-27: optional file/directory arguments allow authors to check fixtures before adding content.
 const inputs = process.argv.slice(2);
 const paths = inputs.length ? inputs.map(path => pathToFileURL(resolve(path))) : [new URL('../../src/curriculum/content/', import.meta.url)];
@@ -32,7 +34,7 @@ function check(path: URL) {
       }
       return;
     }
-    const result = validateLesson(JSON.parse(readFileSync(path, 'utf8')));
+    const result = validateLesson(JSON.parse(readFileSync(path, 'utf8')), catalogueIds);
     for (const severity of ['errors', 'warnings'] as const) {
       for (const finding of result[severity]) console.log(`${path.pathname}: ${severity}: ${finding.rule} [${finding.contentId}] ${finding.message}`);
     }

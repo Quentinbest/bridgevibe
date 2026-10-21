@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { describe, expect, test } from 'vitest';
 import { dealIdOf } from '../table';
+import { catalogue } from '../explanation';
 import { validateLesson } from './validate';
 
 const fixture = (name: string) => JSON.parse(readFileSync(`test/fixtures/lessons/${name}.json`, 'utf8'));
@@ -157,4 +158,51 @@ test('equivalents are checked after earlier alternatives, with duplicate warning
   expect(validateLesson(lesson).warnings).toEqual(result.warnings);
   first.acceptThenScripted = [first.expectedAnswers[1]];
   expect(validateLesson(lesson).warnings).toEqual([]);
+});
+
+// ADR-0001: the Prompt, reviews included, reaches the learner snapshot.
+test('reviewed equivalents must be cards in the acting hand', () => {
+  const lesson = fixture('valid');
+  const prompt = lesson.exercises[0].steps[2].prompt;
+  prompt.equivalentsReviewed = [{ card: lesson.exercises[0].deal.hands.west[0], decision: 'reject', reason: 'Hidden.' }];
+  expect(validateLesson(lesson).errors.map(f => f.rule)).toEqual(['equivalent-cards']);
+  prompt.equivalentsReviewed = [{ card: prompt.expectedAnswers[1], decision: 'maybe' }];
+  expect(validateLesson(lesson).errors.map(f => f.rule)).toEqual(['equivalent-cards']);
+});
+test.each([{}, { northSouth: 'yes', eastWest: false }])('vulnerability flags must be booleans: %j', vulnerability => {
+  const lesson = fixture('valid');
+  const deal = lesson.exercises[0].deal;
+  deal.vulnerability = vulnerability;
+  deal.dealId = dealIdOf(deal);
+  expect(validateLesson(lesson).errors.map(f => f.rule)).toEqual(['deal-shape']);
+});
+test.each([
+  ['lesson', (lesson: ReturnType<typeof fixture>) => { lesson.contentId = ''; }],
+  ['exercise', (lesson: ReturnType<typeof fixture>) => { delete lesson.exercises[0].version; }],
+  ['prompt', (lesson: ReturnType<typeof fixture>) => { lesson.exercises[0].steps[2].prompt.version = 0; }],
+])('%s needs a contentId and a positive version', (_, change) => {
+  const lesson = fixture('valid');
+  change(lesson);
+  expect(validateLesson(lesson).errors.map(f => f.rule)).toEqual(['lesson-shape']);
+});
+// CI-8: references resolve against the catalogue the caller passes in.
+test('catalogue references must exist', () => {
+  const ids = new Set(Object.keys(catalogue));
+  const lesson = fixture('valid');
+  expect(validateLesson(lesson, ids)).toEqual({ errors: [], warnings: [] });
+  delete lesson.exercises[0].steps[2].prompt.textRef;
+  lesson.exercises[0].steps[2].prompt.hint.textRef = 'lesson.missing';
+  lesson.titleRef = 'lesson.missing';
+  lesson.exercises[0].steps[0].textRef = 'lesson.missing';
+  expect(validateLesson(lesson, ids).errors.map(f => f.rule)).toEqual(Array(4).fill('catalogue-reference'));
+});
+// US-15.2: the exposure is checked at its own step, after earlier scripted plays.
+test('exposures must name cards the seat still holds', () => {
+  const lesson = fixture('valid');
+  const exercise = lesson.exercises[0];
+  const lead = exercise.script[0];
+  exercise.steps.splice(2, 0, { kind: 'exposure', cards: [{ seat: lead.seat, card: lead.action.card }] });
+  expect(validateLesson(lesson).errors.map(f => f.rule)).toEqual(['hint-references']);
+  exercise.steps[2].cards[0].card = exercise.deal.hands[lead.seat].find((card: { rank: string }) => card.rank !== lead.action.card.rank);
+  expect(validateLesson(lesson).errors).toEqual([]);
 });
