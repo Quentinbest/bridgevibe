@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { SEATS, SUITS, dealFromSeed, highCardPoints, startMiniBridge, sideOf, trickTarget, encodeSetupSeatView, decodeSetupSeatView,
   exportRecordJson, importRecordJson, exportPbn, importPbn, replay, startPlaythrough, type Deal } from './index';
+import { reconstruct } from './replay';
 
 function findDeal(predicate: (deal: Deal) => boolean) {
   for (let index = 1; index <= 2000; index++) { const deal = dealFromSeed('minibridge-f1', index); if (predicate(deal)) return deal; }
@@ -64,6 +65,21 @@ test.each([false, true])('ADR-0001, US-06: all card-play views retain only final
       ? { kind: 'robot', policy: 'test', version: '1', durationMs: 0 } : undefined).kind).toBe('accepted');
   }
   expect(table.seatView('south').status).toBe('completed');
+});
+test('US-04.2: replay reconstruction keeps the recorded Announcements in every view', () => {
+  const setup = ready(findDeal(deal => nsPoints(deal) !== 20));
+  const declarer = setup.seatView('south').declarer!, controller = setup.controllerOf(declarer);
+  expect(setup.submit(declarer, controller, { kind: 'choose-contract', strain: 'no-trumps', objective: 'part-score' },
+    controller === 'robot' ? { kind: 'robot', policy: 'test', version: '1', durationMs: 0 } : undefined).kind).toBe('accepted');
+  const table = setup.playthrough()!;
+  for (let position = 0; position < 52; position++) {
+    const seat = table.seatView('south').turn!, controller = table.controllerOf(seat);
+    expect(table.submit(seat, controller, table.legalActions(seat)[0], controller === 'robot'
+      ? { kind: 'robot', policy: 'test', version: '1', durationMs: 0 } : undefined).kind).toBe('accepted');
+  }
+  const rebuilt = reconstruct(table.record()).table;
+  for (const seat of SEATS) expect(rebuilt.seatView(seat).announcements).toEqual(table.seatView(seat).announcements);
+  expect(rebuilt.seatView('south').announcements).toHaveLength(4);
 });
 test('ADR-0001: Contract Bridge views have no Announcements without setup events', () => {
   const table = startPlaythrough({ deal: dealFromSeed('legacy', 1), learnerSide: 'northSouth',
