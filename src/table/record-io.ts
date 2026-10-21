@@ -1,5 +1,6 @@
 import { RANKS, SEATS, SUITS, dealFromSeed, dealIdOf, type Card, type Deal, type Hand, type Seat } from './index';
 import { sameCard, sideOf, startPlaythrough, type CompletedPlaythroughRecord, type PlaythroughRecord } from './playthrough';
+import { startMiniBridge } from './miniBridge';
 import { reconstruct, replay } from './replay';
 
 type Check = (value: unknown) => boolean;
@@ -29,7 +30,7 @@ function schemas() {
     || object({ kind: choice(['imported']), format: choice(['pbn']) })(value)
     || object({ kind: choice(['robot']), policy: string, version: string, fallback: choice(['timeout', 'engine-failure']),
       durationMs: value => typeof value === 'number' && Number.isFinite(value) && value >= 0 }, ['fallback'])(value);
-  const recordShape = object({ schemaVersion: choice([2]), playthroughId: string, deal: dealShape,
+  const recordShape = object({ gameFormat: choice(['contract-bridge', 'minibridge']), setupEvents: value => Array.isArray(value) && value.length <= 100000, schemaVersion: choice([2]), playthroughId: string, deal: dealShape,
     contract: object({ level: integer(1, 7), strain: choice([...SUITS, 'no-trumps']), declarer: seat }),
     learnerSide: choice(['northSouth']), status: choice(['in-progress', 'completed']),
     result: object({ northSouth: integer(0, 13), eastWest: integer(0, 13) }),
@@ -37,7 +38,7 @@ function schemas() {
     engineVersions: value => !!value && typeof value === 'object' && !Array.isArray(value) && Object.values(value).every(string),
     actions: array(object({ index: integer(0, 51), seat, controller: choice(['learner', 'robot']),
       action: object({ kind: choice(['play-card']), card }), provenance }), 52),
-  });
+  }, ['gameFormat', 'setupEvents']);
 
   return { dealShape, recordShape };
 }
@@ -66,6 +67,25 @@ export function importRecordJson(text: string): PlaythroughRecord {
         throw new Error('Deal seed and index do not reproduce its hands, dealer and vulnerability');
       }
     }
+    // US-06, ADR-0002: validate setup by replaying the authoritative transitions.
+    if (record.gameFormat === 'minibridge') {
+      const events = record.setupEvents;
+      if (!events?.length) throw new Error('Missing MiniBridge setup events');
+      const firstRedeal = events.find(event => event.kind === 'redeal');
+      const initial = firstRedeal?.from ?? record.deal;
+      validateDeal(initial);
+      if (initial.dealId !== dealIdOf(initial) || initial.origin.kind === 'seed'
+        && initial.dealId !== dealFromSeed(initial.origin.seed, initial.origin.index).dealId) throw new Error('Invalid initial MiniBridge Deal');
+      const setup = startMiniBridge({ deal: initial, learnerSide: record.learnerSide });
+      for (let i = 0; i < events.length + 4 && setup.seatView('south').step !== 'contract-choice'; i++) setup.advance();
+      const choice = events.at(-1);
+      if (choice?.kind !== 'contract-choice' || setup.submit(choice.seat, choice.controller, choice.action, choice.provenance).kind !== 'accepted') throw new Error('Invalid Contract Choice');
+      const rebuilt = setup.playthrough()!.record();
+      const canonical = (value: unknown): string => JSON.stringify(value, (_, item: unknown) => item && typeof item === 'object' && !Array.isArray(item)
+        ? Object.fromEntries(Object.entries(item).sort(([a], [b]) => a.localeCompare(b))) : item);
+      if (canonical(rebuilt.setupEvents) !== canonical(events) || canonical(rebuilt.contract) !== canonical(record.contract)
+        || canonical(rebuilt.deal) !== canonical(record.deal)) throw new Error('Invalid MiniBridge setup history');
+    } else if (record.setupEvents?.length) throw new Error('Setup events require MiniBridge format');
     reconstruct(record);
     return record;
   } catch (error) { throw new Error(`JSON parse error: ${error instanceof Error ? error.message : String(error)}`, { cause: error }); }

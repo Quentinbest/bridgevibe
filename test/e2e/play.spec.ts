@@ -1,3 +1,4 @@
+import { choosePractice } from './miniBridge';
 import { expect, test, type Page } from '@playwright/test';
 import { cardName, text } from '../../src/explanation';
 import { fixedDeal } from '../../src/app/fixture';
@@ -7,7 +8,7 @@ import { completeFixedDeal } from '../strategy';
 async function open(page: Page) {
   await page.clock.install();
   await page.clock.pauseAt(new Date());
-  await page.goto('/');
+  await page.goto('/'); await choosePractice(page, true);
 }
 // US-10.2: assert real-worker audit coverage, not just absence of visible leaks.
 async function robotAuditPassed(page: Page) {
@@ -96,9 +97,10 @@ test('off-suit card is rejected, retained and announced until the next action', 
   await ace.click(); await ace.click();
   await expect(page.locator('[aria-live="assertive"]')).toBeEmpty();
 });
-test('blind lead and later positions never expose unplayed opponent cards', async ({ page }) => {
+test('MiniBridge exposes dummy before the lead and never exposes unplayed opponent cards', async ({ page }) => {
   await open(page); await noHiddenCards(page, []);
-  await expect(page.getByRole('img', { name: 'Ace of spades', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('img', { name: 'Ace of spades', exact: true })).toBeVisible();
+  await expect(page.locator('.dummy .card')).toHaveCount(13);
   await page.clock.runFor(500);
   await noHiddenCards(page, [{ suit: 'spades', rank: '9' }]);
   const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });

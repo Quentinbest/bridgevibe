@@ -1,8 +1,9 @@
+import { choosePractice } from '../../test/miniBridge';
 import { afterEach, expect, test, vi } from 'vitest';
 import { robotAudit, hiddenCard } from '../../test/robotAudit';
 import { fixedPlaythrough } from '../../test/strategy';
 import { basicPolicy } from '../robots';
-import { seatViewSeed, type Action, type Hand, type Playthrough, type RobotProvenance } from '../table';
+import { dealFromSeed, seatViewSeed, type Action, type Hand, type Playthrough, type RobotProvenance } from '../table';
 import { fixedDeal } from './fixture';
 import { createRobotHost, type RobotHostOptions, type RobotWorker } from './robotHost';
 import { handleRobotMessage } from './robotWorker';
@@ -33,7 +34,7 @@ function setup(latency?: number, options: RobotHostOptions = {}, table: Playthro
   vi.useFakeTimers();
   const workers: FakeWorker[] = [];
   const submit = vi.fn<(action: Action, provenance: RobotProvenance) => boolean>(() => true);
-  const audit = vi.fn(robotAudit(fixedDeal, table.record));
+  const audit = vi.fn(robotAudit(table.record));
   const host = createRobotHost({ createWorker: () => { const worker = new FakeWorker(latency); workers.push(worker); return worker; }, audit, ...options });
   hosts.push(host);
   const decide = () => {
@@ -157,9 +158,9 @@ test('US-10.4: invalid timing or threshold is rejected', () => {
 });
 test('composition: complete fixed Deal through the real policy, auditing every worker message', () => {
   vi.useFakeTimers();
-  const audit = vi.fn(robotAudit(fixedDeal, () => play.record()));
+  const audit = vi.fn(robotAudit(() => play.record()));
   const play = createPlay({ createWorker: () => new FakeWorker(1), audit });
-  const stop = play.start();
+  const stop = play.start(); choosePractice(play);
   for (let index = 0; index < 52; index++) {
     const view = play.getSnapshot();
     if (view.turn === 'north' || view.turn === 'south') play.play(view.turn, view.legalCards[0]);
@@ -190,7 +191,7 @@ test('US-12.5: construction and posting failures are marked and bounded', () => 
   expect(next.submit.mock.calls[0][1].fallback).toBe('engine-failure');
 });
 test('US-10.2: a throwing audit fails directly instead of producing a fallback', () => {
-  const table = fixedPlaythrough(); const inspect = robotAudit(fixedDeal, table.record);
+  const table = fixedPlaythrough(); const inspect = robotAudit(table.record);
   expect(() => setup(undefined, { audit: (message, seat) => inspect(message.type === 'decide' ? { message, leak: hiddenCard(fixedDeal, seat) } : message, seat) }))
     .toThrow('robot-audit-hidden-card');
 });
@@ -206,30 +207,31 @@ test('US-10.4, US-12.4: completed decisions wait a full display window after the
 });
 test('composition: timeout provenance survives Table submission into the record', () => {
   vi.useFakeTimers();
-  const audit = vi.fn(robotAudit(fixedDeal, () => play.record()));
+  const audit = vi.fn(robotAudit(() => play.record()));
   const play = createPlay({ createWorker: () => new FakeWorker(), audit });
-  const stop = play.start(); vi.advanceTimersByTime(500);
+  const stop = play.start(); choosePractice(play); vi.advanceTimersByTime(500);
   expect(play.record().actions[0].provenance).toMatchObject({ kind: 'robot', policy: 'bv-fallback', fallback: 'timeout', durationMs: 400 });
   expect(audit).toHaveBeenCalledOnce(); stop();
 });
 
 test('US-10.3, US-44: composition seed and view ignore cards hidden from West', () => {
   vi.useFakeTimers();
-  // Before the opening lead, East's and North's (Dummy's) cards are both hidden from West.
+  // MiniBridge exposes North before the lead; South and East remain hidden from West.
   const changed = structuredClone(fixedDeal);
-  const east: [...Hand] = [...changed.hands.east]; const north: [...Hand] = [...changed.hands.north];
-  [east[0], north[0]] = [north[0], east[0]];
-  const permuted = { ...changed, hands: { ...changed.hands, east, north } };
+  const east: [...Hand] = [...changed.hands.east]; const south: [...Hand] = [...changed.hands.south];
+  [east[0], south[1]] = [south[1], east[0]];
+  const permuted = { ...changed, hands: { ...changed.hands, east, south } };
   const requests = [fixedDeal, permuted].map(deal => {
     const worker = new FakeWorker();
-    const audit = vi.fn(robotAudit(deal, () => play.record()));
+    const audit = vi.fn(robotAudit(() => play.record()));
     const play = createPlay({ createWorker: () => worker, audit }, deal);
-    const stop = play.start();
+    const stop = play.start(); choosePractice(play);
+    worker.emit({ type: 'hello', protocolVersion: ROBOT_PROTOCOL_VERSION });
     try {
       vi.advanceTimersByTime(0);
       expect(worker.request.seat).toBe('west');
       expect(worker.request.view.positionIndex).toBe(0);
-      expect(worker.request.view.dummy).toBeNull();
+      expect(worker.request.view.dummy).toEqual(fixedDeal.hands.north);
       expect(audit).toHaveBeenCalledOnce();
       return worker.request;
     } finally { stop(); }
@@ -262,7 +264,8 @@ test('US-11.1: in the composition a rejected robot card shows no learner message
   vi.useFakeTimers();
   const worker = new FakeWorker();
   const play = createPlay({ createWorker: () => worker });
-  const stop = play.start();
+  const stop = play.start(); choosePractice(play);
+  worker.emit({ type: 'hello', protocolVersion: ROBOT_PROTOCOL_VERSION });
   try {
     vi.advanceTimersByTime(0);
     const { requestId, playthroughId, positionKey } = worker.request;
@@ -300,4 +303,23 @@ test('US-41.3, US-12.5: a worker that never sends hello is replaced and eventual
   expect(created).toHaveLength(3);
   for (const worker of created) expect(worker.terminate).toHaveBeenCalled();
   expect(submit.mock.calls.map(call => call[1].fallback)).toEqual(['timeout', 'timeout', 'timeout', 'engine-failure', 'engine-failure']);
+});
+
+// CI-5, US-12: the host names the policy that actually produced a fallback choice.
+test.each(['timeout', 'engine-failure'] as const)('contract-choice host fallback records %s and its producing policy', fallback => {
+  vi.useFakeTimers(); const workers: FakeWorker[] = [];
+  const play = createPlay({ createWorker: () => { const worker = new FakeWorker(); workers.push(worker); return worker; } }, dealFromSeed('setup-ui', 3));
+  const stop = play.start();
+  try {
+    vi.advanceTimersByTime(3001);
+    expect(workers[0].messages.some(message => message.type === 'choose-contract')).toBe(true);
+    if (fallback === 'engine-failure') workers[0].onerror?.({} as ErrorEvent);
+    vi.advanceTimersByTime(499);
+    expect(play.record().setupEvents?.at(-1)).toMatchObject({ kind: 'contract-choice', provenance: {
+      kind: 'robot', policy: 'bv-contract-placeholder', version: '0', fallback,
+      durationMs: fallback === 'timeout' ? 400 : 1,
+    } });
+    expect(play.provenanceLog.entries().at(-1)?.provenance).toMatchObject({ policy: 'bv-contract-placeholder', fallback });
+    expect(play.provenanceLog.counters().silentFallbacks).toBe(0);
+  } finally { stop(); }
 });

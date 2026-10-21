@@ -8,7 +8,7 @@ export default [
   // ADR-0001: Seat Views can only be manufactured inside Table.
   { files: ['**/*.{ts,tsx}'], ignores: ['src/table/**'], rules: {
     'no-restricted-syntax': ['error', {
-      selector: ':matches(TSAsExpression, TSTypeAssertion) > TSTypeReference[typeName.name="SeatView"]',
+      selector: ':matches(TSAsExpression, TSTypeAssertion) > TSTypeReference:matches([typeName.name="SeatView"], [typeName.name="SetupSeatView"])',
       message: 'Only table constructs SeatView; request one from the Table API.',
     }, {
       selector: ':matches(TSAsExpression, TSTypeAssertion) > TSTypeReference[typeName.name="CompletedPlaythroughRecord"]',
@@ -19,7 +19,7 @@ export default [
     // §4.2 rule 2: no type that carries a full deal, so an allowlist rather than a blocklist.
     'no-restricted-imports': ['error', { patterns: [{
       group: ['**/table', '**/table/**'],
-      allowImportNames: ['Action', 'SeatView', 'Card', 'Suit', 'Rank', 'Seat', 'Side', 'Contract', 'PlayedCard', 'Trick', 'SUITS', 'RANKS', 'SEATS', 'sameCard', 'sideOf'],
+      allowImportNames: ['Action', 'SeatView', 'SetupSeatView', 'Card', 'Suit', 'Rank', 'Seat', 'Side', 'Contract', 'PlayedCard', 'Trick', 'SUITS', 'RANKS', 'SEATS', 'sameCard', 'sideOf'],
       message: 'Robots receive SeatView only (ADR-0001); import only seat-view types and card helpers from table.',
     }] }],
   } },

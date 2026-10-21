@@ -1,10 +1,16 @@
 // @vitest-environment jsdom
+import { choosePractice } from '../../test/miniBridge';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
 import { text } from '../explanation';
 import { App } from './App';
 import { createPlay } from './play';
 
+function chooseContract() {
+  act(() => vi.advanceTimersByTime(3000));
+  fireEvent.click(screen.getByRole('button', { name: 'Game · 9 tricks' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Choose' }));
+}
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 function rejectCard() {
   const queen = screen.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades" });
@@ -13,7 +19,7 @@ function rejectCard() {
 }
 test('US-01.9: real Table rejection fills the Template and preserves the position', () => {
   vi.useFakeTimers();
-  const play = createPlay(); const stop = play.start(); vi.advanceTimersByTime(500);
+  const play = createPlay(); const stop = play.start(); choosePractice(play); vi.advanceTimersByTime(500);
   const before = play.getSnapshot();
   play.play('north', { suit: 'hearts', rank: 'Q' });
   expect(play.getSnapshot()).toMatchObject({ reason: 'Not that one. You still have spades.', reasonCode: 'must-follow-suit', positionIndex: before.positionIndex, hand: before.hand, dummy: before.dummy, displayedTrick: before.displayedTrick });
@@ -23,7 +29,7 @@ test('US-01.9: real Table rejection fills the Template and preserves the positio
 });
 for (const nextAction of ['raise', 'play', 'Escape'] as const) {
   test(`UX §3.4: disclosure preserves feedback; ${nextAction} clears it`, () => {
-    vi.useFakeTimers(); render(<App />); act(() => vi.advanceTimersByTime(500));
+    vi.useFakeTimers(); render(<App />); chooseContract(); act(() => vi.advanceTimersByTime(500));
     const queen = rejectCard();
     expect(queen.classList.contains('rejected-card')).toBe(true);
     expect(queen.getAttribute('aria-pressed')).toBe('false');
@@ -57,7 +63,7 @@ for (const nextAction of ['raise', 'play', 'Escape'] as const) {
 
 for (const dismissal of ['Escape', 'raise'] as const) {
   test(`UX §10: ${dismissal} restores focused disclosure to the rejected card and arrow navigation`, () => {
-    vi.useFakeTimers(); render(<App />); act(() => vi.advanceTimersByTime(500));
+    vi.useFakeTimers(); render(<App />); chooseContract(); act(() => vi.advanceTimersByTime(500));
     const queen = rejectCard();
     // Keep the roving tab stop elsewhere, so restoring only that stop would fail.
     const ace = screen.getByRole('button', { name: 'Ace of spades, playable' });
@@ -77,7 +83,7 @@ for (const dismissal of ['Escape', 'raise'] as const) {
 }
 
 test('UX §3.4: consecutive rejections of the same card restart its animation', () => {
-  vi.useFakeTimers(); render(<App />); act(() => vi.advanceTimersByTime(500));
+  vi.useFakeTimers(); render(<App />); chooseContract(); act(() => vi.advanceTimersByTime(500));
   const queen = screen.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades" });
   const animation = { cancel: vi.fn(), play: vi.fn() };
   Object.defineProperty(queen, 'getAnimations', { value: () => [animation] });

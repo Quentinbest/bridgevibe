@@ -23,9 +23,16 @@ export function nextDeal(deal: Deal): Deal {
 }
 // US-16.4: only metadata and the Seat View projection reach React, never four hands.
 export function dealSession(deal: Deal, invalid = false) {
-  return { info: { dealId: deal.dealId, origin: deal.origin }, invalid, play: createPlay({}, deal),
+  const play = createPlay({}, deal);
+  let info = { dealId: deal.dealId, origin: deal.origin };
+  // US-06: a redeal updates metadata without remounting the dialog or debug disclosure.
+  return { key: deal.dealId, get info() {
+    const current = play.setupRecord().deal;
+    if (current.dealId !== info.dealId) info = { dealId: current.dealId, origin: current.origin };
+    return info;
+  }, invalid, play,
     next() {
-      const next = nextDeal(deal);
+      const next = nextDeal(play.setupRecord().deal);
       if (next.origin.kind === 'seed') {
         const url = new URL(window.location.href);
         url.searchParams.set('seed', next.origin.seed);

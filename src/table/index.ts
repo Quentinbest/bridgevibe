@@ -17,3 +17,7 @@ export { encodeSeatView, decodeSeatView, seatViewSeed, type SeatViewMessage } fr
 export * from './scoring';
 export { replay, type ReplayTrick } from './replay';
 export { exportRecordJson, importRecordJson, exportPbn, importPbn } from './record-io';
+
+export * from './miniBridge';
+export * from './miniBridgeRules';
+export { encodeSetupSeatView, decodeSetupSeatView, type SetupSeatView, type SetupSeatViewMessage } from './seatViewMessage';

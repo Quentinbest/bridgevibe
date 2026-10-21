@@ -29,7 +29,7 @@ export default function DebugPanel({ play }: { play: ReturnType<typeof createPla
       <pre>{JSON.stringify(entry.provenance, null, 2)}</pre>
     </li>)}</ol>
     <button type="button" onClick={download}>{text('debug.export')}</button>
-    <div><label htmlFor="debug-seat">{text('debug.seat')}</label><select id="debug-seat" value={seat} onChange={event => setSeat(event.target.value as Seat)}>
+    <div><label htmlFor="debug-seat">{text('debug.seat')}</label><select id="debug-seat" value={seat} onChange={event => { setSeat(event.target.value as Seat); setShowSeat(true); }}>
       {SEATS.map(value => <option key={value} value={value}>{text(`seat.${value}`)}</option>)}
     </select></div>
     <button type="button" aria-expanded={showSeat} aria-controls="debug-seat-view" onClick={() => setShowSeat(value => !value)}>{text('debug.show')}</button>

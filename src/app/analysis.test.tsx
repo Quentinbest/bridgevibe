@@ -19,6 +19,9 @@ afterEach(() => { cleanup(); vi.useRealTimers(); vi.clearAllMocks(); });
 
 test('§4.5: completion requests analysis before Hand review opens, never during play or lesson', async () => {
   vi.useFakeTimers(); render(<App />);
+  act(() => vi.advanceTimersByTime(3000));
+  fireEvent.click(screen.getByRole('button', { name: 'Game · 9 tricks' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Choose' }));
   expect(analysisClient).not.toHaveBeenCalled();
   for (const entry of completeFixedDeal().actions) {
     expect(analysisClient).not.toHaveBeenCalled();

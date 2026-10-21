@@ -1,12 +1,15 @@
-import { SEATS, type Deal, type PlaythroughRecord, type Seat } from '../table';
+import { SEATS, type Deal, type PlaythroughRecord, type SetupEvent, type Seat } from '../table';
 
+type AuditRecord = { deal: Deal; actions?: PlaythroughRecord['actions']; contract?: PlaythroughRecord['contract']; setupEvents?: readonly SetupEvent[] };
 // US-10.2: visibility is derived from authoritative history, never the worker payload.
-export function robotAudit(deal: Deal, record: () => Pick<PlaythroughRecord, 'actions' | 'contract'>, hiddenCardFound?: () => void) {
+export function robotAudit(record: () => AuditRecord, hiddenCardFound?: () => void) {
   return (message: unknown, seat: Seat) => {
     const history = record();
-    const dummySeat = SEATS[(SEATS.indexOf(history.contract.declarer) + 2) % 4];
-    const visible = [...deal.hands[seat], ...history.actions.map(entry => entry.action.card),
-      ...(history.actions.length ? deal.hands[dummySeat] : [])];
+    const deal = history.deal;
+    const exposure = [...(history.setupEvents ?? [])].reverse().find(event => event.kind === 'dummy-exposed');
+    const dummySeat = exposure?.seat ?? (history.contract ? SEATS[(SEATS.indexOf(history.contract.declarer) + 2) % 4] : null);
+    const visible = [...deal.hands[seat], ...(history.actions ?? []).map(entry => entry.action.card),
+      ...(dummySeat && (exposure || history.actions?.length) ? deal.hands[dummySeat] : [])];
     function inspect(value: unknown) {
       if (!value || typeof value !== 'object') return;
       if ('suit' in value && 'rank' in value && !visible.some(card => card.suit === value.suit && card.rank === value.rank)) {
@@ -26,8 +29,8 @@ declare global {
   }
 }
 // §4.3.6: audit builds expose evidence without sending the Deal to a worker.
-export function browserRobotAudit(deal: Deal, record: () => Pick<PlaythroughRecord, 'actions' | 'contract'>, hiddenCardFound?: () => void) {
-  const inspect = robotAudit(deal, record, hiddenCardFound);
+export function browserRobotAudit(record: () => AuditRecord, hiddenCardFound?: () => void) {
+  const inspect = robotAudit(record, hiddenCardFound);
   window.__robotAuditCount ??= 0;
   window.__robotAuditViolations ??= [];
   return (message: unknown, seat: Seat) => {

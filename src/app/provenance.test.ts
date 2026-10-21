@@ -1,3 +1,4 @@
+import { choosePractice } from '../../test/miniBridge';
 import { version } from '../../package.json';
 import { afterEach, expect, test, vi } from 'vitest';
 import { validateEntry } from '../coach/provenance';
@@ -20,7 +21,7 @@ afterEach(() => vi.useRealTimers());
 test('US-40.1, F5: complete real-policy Playthrough and learner rejection have complete provenance', () => {
   vi.useFakeTimers();
   const play = createPlay({ createWorker: () => new PolicyWorker() });
-  const stop = play.start();
+  const stop = play.start(); choosePractice(play);
   try {
     play.play('south', play.getSnapshot().hand[0]);
     const reason = play.getSnapshot().reason;
@@ -52,20 +53,21 @@ test('US-40.1, F5: complete real-policy Playthrough and learner rejection have c
 });
 test('US-40.2: hidden-card audit reports into the log before rejecting the payload', () => {
   const play = createPlay();
-  const audit = robotAudit(fixedDeal, play.record, play.provenanceLog.hiddenCardFound);
+  const audit = robotAudit(() => play.setupRecord(), play.provenanceLog.hiddenCardFound);
   expect(() => audit({ leak: fixedDeal.hands.east[0] }, 'west')).toThrow('robot-audit-hidden-card');
   expect(play.provenanceLog.counters()).toEqual({ hiddenCardsInVisibleInputs: 1, silentFallbacks: 0 });
 });
 
 test('US-40.1: disclosed rule text is also a statement, with its own catalogue key', () => {
-  const play = createPlay();
+  vi.useFakeTimers();
+  const play = createPlay(); const stop = play.start(); choosePractice(play);
   play.showRule(); expect(play.provenanceLog.entries()).toEqual([]);
   play.play('south', play.getSnapshot().hand[0]);
   play.showRule();
   expect(play.provenanceLog.entries()).toHaveLength(2);
   expect(play.provenanceLog.entries()[1]).toMatchObject({ kind: 'statement', informationMode: 'VISIBLE',
     provenance: { sourceKind: 'template', templateId: 'rule.not-your-turn' } });
-  expect(validateEntry(play.provenanceLog.entries()[1])).toEqual([]);
+  expect(validateEntry(play.provenanceLog.entries()[1])).toEqual([]); stop();
 });
 
 test('US-01.6, US-40.1: unexpected worker provenance cannot commit a card then break logging', () => {
@@ -78,7 +80,8 @@ test('US-01.6, US-40.1: unexpected worker provenance cannot commit a card then b
     }), 1);
   };
   const play = createPlay({ createWorker: () => worker });
-  const stop = play.start();
+  const stop = play.start(); choosePractice(play);
+  worker.onmessage?.({ data: { type: 'hello', protocolVersion: ROBOT_PROTOCOL_VERSION } } as MessageEvent);
   try {
     expect(() => vi.advanceTimersByTime(500)).not.toThrow();
     expect(play.record().actions).toHaveLength(1);

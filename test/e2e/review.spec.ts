@@ -1,3 +1,4 @@
+import { choosePractice, installPausedClock } from './miniBridge';
 import { readFile } from 'node:fs/promises';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
@@ -10,7 +11,7 @@ import { fixedDeal } from '../../src/app/fixture';
 async function noHiddenCards(page: Page, played: readonly Card[]) {
   const dom = await page.locator('body').innerHTML();
   const accessibility = await page.locator('body').ariaSnapshot();
-  const hidden = [...fixedDeal.hands.east, ...fixedDeal.hands.west, ...(played.length ? [] : fixedDeal.hands.north)]
+  const hidden = [...fixedDeal.hands.east, ...fixedDeal.hands.west]
     .filter(card => !played.some(known => sameCard(card, known)));
   for (const card of hidden) {
     expect(dom).not.toContain(cardName(card));
@@ -29,9 +30,11 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
   await page.route('**/assets/analysisClient-*.js', async route => {
     solverRequested = true; await solverGate; await route.continue();
   });
-  await page.clock.install(); await page.clock.pauseAt(new Date()); await page.goto('/');
+  await installPausedClock(page); await page.goto('/'); await choosePractice(page, true);
   const played: Card[] = [];
   await noHiddenCards(page, played);
+  await expect(page.getByRole('img', { name: 'Ace of spades', exact: true })).toBeVisible();
+  await expect(page.locator('.dummy .card')).toHaveCount(13);
   expect(solverRequested).toBe(false);
   for (const entry of reference.actions) {
     if (entry.controller === 'robot') await page.clock.runFor(500);

@@ -8,7 +8,7 @@ h1 { font: 800 var(--type-24) var(--font-display); letter-spacing: -.03em; max-w
 .wordmark-accent { color: var(--accent-text); }
 main { max-width: 1164px; margin: auto; padding: var(--space-16) var(--space-32); }
 .status { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-12); margin-bottom: var(--space-16); color: var(--muted); font-size: var(--type-15); }
-.contract { background: var(--text); color: var(--background); padding: var(--space-6) var(--space-12); border-radius: var(--radius-10); font-weight: 600; }
+.contract { line-height: 1.3; background: var(--text); color: var(--background); padding: var(--space-6) var(--space-12); border-radius: var(--radius-10); font-weight: 600; }
 .tricks { margin-left: auto; background: var(--accent-soft); color: var(--accent-soft-text); padding: var(--space-8) var(--space-12); border-radius: var(--radius-10); font-weight: 600; }
 .table { background: var(--felt); color: var(--felt-text); border-radius: var(--radius-32); padding: var(--space-16); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr); grid-template-rows: auto 1fr auto; gap: var(--space-8); }
 .dummy { grid-column: 1 / 4; text-align: center; }
@@ -249,3 +249,21 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
 .review-cost-xray { color: var(--accent-soft-text); background: var(--accent-soft); }
 .review-analysis-skeleton { padding: var(--space-12); border-radius: var(--radius-8); background: var(--raised); color: var(--muted); }
 .review-plays li { min-width: 0; flex: 1 1 0; }
+
+/* US-06, UX §4.2: setup wraps without horizontal scrolling on narrow phones. */
+.setup-screen { max-width: 900px; margin: auto; padding: 16px; }
+.setup-screen fieldset { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.setup-screen button { min-height: 44px; padding: 8px 14px; }
+.setup-screen button[aria-pressed="true"], .setup-declarer { font-weight: bold; outline: 2px solid currentColor; outline-offset: 2px; }
+.setup-points { display: flex; flex-wrap: wrap; gap: 16px; padding: 0; list-style: none; }
+.setup-dummy { margin: 16px 0; }
+.opponent .suit-columns { max-width: 100%; }
+.setup-screen > section { margin-block: 16px; }
+.setup-screen .hand { max-width: 100%; }
+.opponent .suit-columns { grid-template-columns: repeat(2, 44px); gap: 4px; }
+.opponent .suit-column .card { width: 44px; padding: 4px; }
+@media (max-width: 355px) { .opponent .suit-columns { grid-template-columns: 44px; } }
+.setup-screen fieldset { border: 1px solid var(--border); border-radius: var(--radius-8); }
+.setup-screen button { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-8); font: inherit; cursor: pointer; }
+.setup-screen button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-soft-text); }
+.setup-screen button:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 3px; }

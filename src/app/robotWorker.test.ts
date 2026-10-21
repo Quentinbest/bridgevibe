@@ -3,7 +3,6 @@ import { fixedPlaythrough } from '../../test/strategy';
 import { robotAudit } from '../../test/robotAudit';
 import { encodeSeatView, seatViewSeed } from '../table';
 import { basicPolicy } from '../robots';
-import { fixedDeal } from './fixture';
 import { handleRobotMessage } from './robotWorker';
 import type { RobotRequest } from './robotProtocol';
 afterEach(() => vi.unstubAllGlobals());
@@ -15,7 +14,7 @@ test('US-12.6: worker handler decides without WebAssembly and reports policy pro
     const table = fixedPlaythrough();
     const request: RobotRequest = { type: 'decide', requestId: '1', cancellationId: '1', playthroughId: table.record().playthroughId,
       positionKey: table.positionKey(), deadline: 400, seat: 'west', seed: seatViewSeed(table.seatView('west')), view: encodeSeatView(table.seatView('west')) };
-    robotAudit(fixedDeal, table.record)(request, 'west');
+    robotAudit(table.record)(request, 'west');
     const post = vi.fn(); let time = 0;
     handleRobotMessage(request, post, undefined, () => time++);
     expect(post).toHaveBeenCalledWith({ type: 'decided', requestId: '1', playthroughId: table.record().playthroughId, positionKey: table.positionKey(),
@@ -33,7 +32,7 @@ test('ADR-0001: policy receives exactly decoded view, visible seed, and deadline
   const request: RobotRequest = { type: 'decide', requestId: 'request-only', cancellationId: 'cancel-only',
     playthroughId: 'playthrough-envelope-only', positionKey: 'position-envelope-only',
     seat: 'west', view: encodeSeatView(view), seed: seatViewSeed(view), deadline: 400 };
-  robotAudit(fixedDeal, table.record)(request, 'west');
+  robotAudit(table.record)(request, 'west');
   const decide = vi.fn(basicPolicy.decide);
   handleRobotMessage(request, vi.fn(), { ...basicPolicy, decide });
   expect(decide.mock.calls).toEqual([[view, request.seed, request.deadline]]);

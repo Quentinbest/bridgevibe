@@ -10,13 +10,16 @@ import { ReviewScreen } from './ReviewScreen';
 
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 test('US-16.1: the composition API refuses early review and the UI has no entry', () => {
-  expect(() => createPlay().completedRecord()).toThrow(/completed/);
+  expect(() => createPlay().completedRecord()).toThrow('setup-in-progress');
   render(<App />);
   expect(screen.queryByRole('button', { name: 'Hand review' })).toBeNull();
   expect(screen.queryByRole('note')).toBeNull();
 });
 test('US-16: completed composition opens review and returns to the table', () => {
   vi.useFakeTimers(); render(<App />);
+  act(() => vi.advanceTimersByTime(3000));
+  fireEvent.click(screen.getByRole('button', { name: 'Game · 9 tricks' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Choose' }));
   for (const entry of completeFixedDeal().actions) {
     if (entry.controller === 'robot') act(() => vi.advanceTimersByTime(500));
     else {

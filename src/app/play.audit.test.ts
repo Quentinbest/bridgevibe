@@ -1,3 +1,4 @@
+import { choosePractice } from '../../test/miniBridge';
 import { afterEach, expect, test, vi } from 'vitest';
 import type { RobotMessage, RobotResponse } from './robotProtocol';
 import type { RobotWorker } from './robotHost';
@@ -22,10 +23,10 @@ for (const mode of ['test', 'development', 'internal']) test(`${mode} mode insta
   const worker: RobotWorker = { onmessage: null, onerror: null, onmessageerror: null, terminate() {},
     postMessage(message) { posted.push(message); } };
   const play = createPlay({ createWorker: () => {
-    queueMicrotask(() => worker.onmessage?.({ data: { type: 'hello', protocolVersion: 1 } } as MessageEvent<RobotResponse>));
+    queueMicrotask(() => worker.onmessage?.({ data: { type: 'hello', protocolVersion: 2 } } as MessageEvent<RobotResponse>));
     return worker;
   } });
-  const stop = play.start();
+  const stop = play.start(); choosePractice(play);
   await Promise.resolve();
   expect(posted.some(message => message.type === 'decide')).toBe(true);
   expect(inspected).toEqual(posted);
