@@ -137,7 +137,8 @@ test.each([
   expect(current()).toHaveLength(1);
   expect(current()[0].getAttribute('aria-label')).toBe('Trick 1');
   expect(screen.getByRole('region', { name: 'Hands as trick 1 began' }).querySelectorAll('[role="img"]')).toHaveLength(52);
-  fireEvent.click(screen.getByRole('button', { name: 'Previous trick' }));
+  expect(screen.queryByRole('button', { name: 'Previous trick' })).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Previous step' }));
   expect(screen.getByRole('heading', { name: 'Contract Choice' })).toBeTruthy();
   fireEvent.click(within(document.querySelector('.review-strip') as HTMLElement).getByRole('button', { name: 'Announcements', hidden: true }));
   expect(screen.getByRole('heading', { name: 'Announcements' })).toBeTruthy();

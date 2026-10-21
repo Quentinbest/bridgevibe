@@ -81,7 +81,8 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
   await page.clock.resume();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await expect(page.getByRole('note')).toContainText('X-ray view: now you can see all 4 hands');
-  await expect(page.getByRole('button', { name: 'Previous trick' })).toBeEnabled();
+  // US-16.2: from trick 1, Previous leads back to the Contract Choice step.
+  await expect(page.getByRole('button', { name: 'Previous step', exact: true })).toBeEnabled();
   const toggle = page.getByRole('button', { name: /^(Show|Hide) all 4 hands$/ });
   if (await toggle.getAttribute('aria-expanded') === 'true') await toggle.click();
   await expect(page.locator('#review-hands')).toHaveCount(0);

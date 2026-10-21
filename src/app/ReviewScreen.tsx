@@ -17,6 +17,8 @@ export function ReviewScreen({ record, onBack, analysis, onTryAgain }: { onTryAg
   const trickIndex = index - setup.length;
   const trick = tricks[trickIndex];
   const hands = setupPosition ? record.deal.hands : trick.hands;
+  // US-16.2: Previous is named by where it leads; from trick 1 it goes back a setup step.
+  const previousLabel = text(setup.length && index <= setup.length ? 'review.previous-step' : 'review.previous');
   const handsLabel = setupPosition ? text('review.dealt-hands') : text('review.hands-at', { n: trickIndex + 1 });
   function download(format: 'json' | 'pbn') {
     const data = format === 'json' ? exportRecordJson(record) : exportPbn(record);
@@ -37,7 +39,7 @@ export function ReviewScreen({ record, onBack, analysis, onTryAgain }: { onTryAg
     </div>}
     <section className="review-replay" aria-label={text(setup.length ? 'review.setup-replay' : 'review.replay')}>
       <div className="review-stepper">
-        <button type="button" disabled={index === 0} onClick={() => setIndex(index - 1)} aria-label={text(setupPosition ? 'review.previous-step' : 'review.previous')}>←</button>
+        <button type="button" disabled={index === 0} onClick={() => setIndex(index - 1)} aria-label={previousLabel}>←</button>
         <div aria-live="polite" aria-atomic="true"><h2>{setupPosition?.title ?? text('review.position', { n: trickIndex + 1 })}</h2>
           {setupPosition ? setupPosition.lines.map((line, n) => <p key={n}>{line}</p>)
             : <p>{text('review.winner', { seat: text(`seat.${trick.winner}`) })}</p>}</div>
