@@ -1,5 +1,7 @@
 module.exports = {
   forbidden: [
+    // §4.2: offline content validation uses the same Table and curriculum model.
+    { name: 'pipeline-only-table-curriculum', severity: 'error', from: { path: '(^|/)src/pipeline/', pathNot: '\\.test\\.ts$' }, to: { pathNot: '(^|/)src/(pipeline|table|curriculum)/' } },
     // §4.2: progress owns the Attempts store and may depend on curriculum (types) only.
     { name: 'progress-only-curriculum', severity: 'error', from: { path: '(^|/)src/progress/', pathNot: '\\.test\\.ts$' }, to: { pathNot: '(^|/)src/(progress|curriculum)/' } },
     { name: 'curriculum-only-table', severity: 'error', from: { path: '(^|/)src/curriculum/', pathNot: '\\.test\\.ts$' }, to: { pathNot: '(^|/)src/(table|curriculum)/' } },

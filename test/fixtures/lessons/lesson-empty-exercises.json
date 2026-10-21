@@ -1,0 +1,18 @@
+{
+  "contentId": "follow-suit",
+  "version": 1,
+  "signOff": {
+    "status": "unsigned-draft"
+  },
+  "rights": {
+    "source": "original",
+    "licence": "draft"
+  },
+  "schemaVersion": 1,
+  "gameFormat": "contract-bridge",
+  "titleRef": "lesson.title",
+  "skillTags": [
+    "follow-suit"
+  ],
+  "exercises": []
+}
