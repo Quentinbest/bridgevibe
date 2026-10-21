@@ -1,5 +1,7 @@
 import { REASON_CODES, type ReasonCode, type RobotProvenance } from '../table';
 
+export type AnalysisCause = 'timeout' | 'error' | 'worker-crash' | 'protocol-mismatch';
+export type Abstention = { reason: 'unavailable'; cause: AnalysisCause };
 export type InformationMode = 'VISIBLE' | 'ALL_HANDS';
 export type Provenance =
   | { sourceKind: 'authored'; contentId: string; version: string }
@@ -10,6 +12,7 @@ export type Provenance =
   | ({ sourceKind: 'robot' } & RobotProvenance);
 export type LogEntry = {
   id: string; playthroughId: string; positionIndex: number; kind: 'statement' | 'robot-action';
+  abstention?: Abstention;
   summary: string; text?: string; informationMode: InformationMode; provenance: Provenance; at: string;
 };
 const object = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
@@ -28,8 +31,14 @@ export function validateEntry(entry: unknown): string[] {
   if (entry.kind === 'statement' && !nonempty(entry.text)) errors.push('text');
   if (entry.text !== undefined && !nonempty(entry.text)) errors.push('text');
   if (!mode(entry.informationMode)) errors.push('informationMode');
+  if (entry.abstention !== undefined) {
+    const a = entry.abstention;
+    if (!object(a) || a.reason !== 'unavailable' || !['timeout', 'error', 'worker-crash', 'protocol-mismatch'].includes(String(a.cause))) errors.push('abstention');
+    if (entry.kind !== 'statement') errors.push('abstention.kind');
+  }
   const p = entry.provenance;
   if (!object(p)) return [...errors, 'provenance'];
+  if (entry.abstention !== undefined && p.sourceKind !== 'engine') errors.push('abstention.provenance');
   const fields = (...keys: string[]) => { for (const key of keys) if (!nonempty(p[key])) errors.push(`provenance.${key}`); };
   switch (p.sourceKind) {
     case 'authored': fields('contentId', 'version'); break;
@@ -62,17 +71,21 @@ export function createProvenanceLog(appVersion = 'development') {
   const entries: LogEntry[] = [];
   let hiddenCardsInVisibleInputs = 0;
   let silentFallbacks = 0;
+  const analysisFailures = new Set<string>();
   return {
     record(entry: LogEntry) {
       const errors = validateEntry(entry);
       if (errors.length) throw new Error(`Incomplete provenance: ${errors.join(', ')}`);
       if (entries.some(existing => existing.id === entry.id)) throw new Error('Duplicate provenance id');
       entries.push(structuredClone(entry));
+      if (entry.abstention) analysisFailures.delete(entry.id);
       if (entry.provenance.sourceKind === 'robot' && entry.provenance.policy === 'bv-fallback' && !entry.provenance.fallback) silentFallbacks++;
     },
     entries: () => structuredClone(entries),
     hiddenCardFound() { hiddenCardsInVisibleInputs++; },
-    counters: () => ({ hiddenCardsInVisibleInputs, silentFallbacks }),
+    // VAL-06: failures remain counted until a validated abstention accounts for them.
+    analysisFailed(id: string) { analysisFailures.add(id); },
+    counters: () => ({ hiddenCardsInVisibleInputs, silentFallbacks: silentFallbacks + analysisFailures.size }),
     export: () => ({ schemaVersion: 1 as const, format: 'bridgevibe-f5' as const, exportedAt: new Date().toISOString(), appVersion,
       entries: structuredClone(entries).map(entry => ({ ...entry, grade: null, graderNote: null })) }),
   };

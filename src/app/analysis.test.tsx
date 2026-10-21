@@ -101,7 +101,7 @@ test('ADR-0001: the host refuses an in-progress record before invoking any solve
 test('US-17 / #21: failure ends the skeleton without inventing badges', async () => {
   const host = createAnalysisHost(); const record: CompletedPlaythroughRecord = completedRecord(completeFixedDeal());
   host.start(record, createProvenanceLog(), { ...bridgeDdsEngine, solveTable: vi.fn(), solvePosition: vi.fn().mockRejectedValue(new Error('failed')) });
-  await waitFor(() => expect(host.snapshot(record)).toEqual({ running: false, costs: [] }));
+  await waitFor(() => expect(host.snapshot(record)).toMatchObject({ running: false, costs: [], abstention: { abstention: { reason: 'unavailable', cause: 'error' } } }));
 });
 
 // §4.7: replacing the completed deal cancels its analysis; nothing half-done is cached or published.

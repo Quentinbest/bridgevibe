@@ -301,7 +301,14 @@ The in-memory cache key includes the Playthrough ID, recorded engine versions an
 analysis adapter version. Reopening review reuses in-flight or finished work without
 duplicate log entries. Workers close after analysis. A 30-second stalled solve
 terminates that worker and ends subsequent requests immediately; solve/startup failures
-leave badges absent and end the skeleton. User-facing failure states belong to #21.
+produce a validated unavailable abstention with the cause and engine version (CI-4).
+Already analysed badges remain; no further positions run after the first failure.
+Try again drops the failed cache entry and uses a fresh worker, with focus returned to
+the review heading. Replay always reads the record. Internal, audit and development
+builds accept `?analysisFault=timeout|error|crash|protocol-mismatch`; the shared
+`analysisFaults.ts` wrappers are excluded from production. VAL-06 counts failures
+until a validated abstention accounts for them. Copy follows the UX spec's “X-ray
+view isn't available right now”, overriding the design's wording; it remains draft.
 
 ### F2 smoke references
 

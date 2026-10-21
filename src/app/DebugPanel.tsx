@@ -26,7 +26,7 @@ export default function DebugPanel({ play }: { play: ReturnType<typeof createPla
         <dt>{text('debug.mode')}</dt><dd>{text('debug.value', { value: entry.informationMode })}</dd>
         <dt>{text('debug.source')}</dt><dd>{text('debug.value', { value: entry.provenance.sourceKind })}</dd>
       </dl>
-      <pre>{JSON.stringify(entry.provenance, null, 2)}</pre>
+      <pre>{JSON.stringify({ ...entry.provenance, ...(entry.abstention ? { abstention: entry.abstention } : {}) }, null, 2)}</pre>
     </li>)}</ol>
     <button type="button" onClick={download}>{text('debug.export')}</button>
     <div><label htmlFor="debug-seat">{text('debug.seat')}</label><select id="debug-seat" value={seat} onChange={event => setSeat(event.target.value as Seat)}>
