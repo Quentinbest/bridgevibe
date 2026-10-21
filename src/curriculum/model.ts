@@ -1,6 +1,8 @@
 import type { Action, Card, Contract, Deal, Seat } from '../table';
 
-export type Content = Readonly<{ contentId: string; version: number; signOff: { status: 'unsigned-draft' } }>;
+export type Content = Readonly<{ contentId: string; version: number; signOff: { status: 'unsigned-draft' };
+  rights: Readonly<{ source: string; licence: string }>;
+}>;
 export type Provenance = Readonly<{ sourceKind: 'authored'; contentId: string; version: number }>;
 export type Prompt = Content & Readonly<{
   promptId: string; answerKind: 'card'; textRef: string; commentaryRef: string;
@@ -11,6 +13,7 @@ export type Prompt = Content & Readonly<{
 }>;
 export type ScriptAction = Readonly<{ seat: Seat; action: Action }>;
 export type Step = Readonly<{ kind: 'commentary'; textRef: string }>
+  | Readonly<{ kind: 'exposure'; cards: readonly Readonly<{ seat: Seat; card: Card }>[] }>
   | Readonly<{ kind: 'scripted-action'; scriptIndices: readonly number[] }>
   | Readonly<{ kind: 'prompt'; prompt: Prompt }>;
 export type Exercise = Content & Readonly<{

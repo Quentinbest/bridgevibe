@@ -1,8 +1,8 @@
-import { sameCard, startPlaythrough, type Card, type Submission } from '../table';
+import { sameCard, startPlaythrough, type Card, type Playthrough, type Seat, type Submission } from '../table';
 import type { Attempt, AttemptSink, Exercise, Provenance } from './model';
 
 // US-21: deterministic transitions, no timers, React, or robot policies. The caller supplies time.
-export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: string) {
+export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: string, inspect?: (table: Playthrough) => void) {
   const table = startPlaythrough(exercise);
   // US-02, ADR-0003: Script contains only Robot actions; learner actions come from Prompts.
   if (exercise.script.some(play => table.controllerOf(play.seat) !== 'robot')) throw new Error('Script contains a learner-controlled seat');
@@ -13,10 +13,16 @@ export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: 
   let rejection: Extract<Submission, { kind: 'rejected' }> | null = null;
   let hintTiming: Attempt['hintTiming'] = null;
   let hint: { textRef: string; provenance: Provenance } | null = null;
+  let exposed: readonly { seat: Seat; card: Card }[] = [];
+  let complete = false;
   const step = () => exercise.steps[stepIndex];
   function enterStep(index: number) {
     stepIndex = index;
     scriptOffset = 0;
+    const current = step();
+    // US-21.6: exposures belong to presentation only, never to Table state.
+    if (current.kind === 'exposure') exposed = [...exposed, ...current.cards].filter((entry, index, all) =>
+      all.findIndex(other => other.seat === entry.seat && sameCard(other.card, entry.card)) === index);
     // §4.4, US-28.8: each Prompt starts unresolved with its own answer and hint history.
     if (step().kind === 'prompt') {
       wrongAnswers = 0;
@@ -28,11 +34,15 @@ export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: 
   }
   function snapshot() {
     const current = step();
+    const visibleExposures: readonly { seat: Seat; card: Card }[] = exposed
+      .filter(entry => table.seatView(entry.seat).hand.some(card => sameCard(card, entry.card)))
+      .map(entry => ({ seat: entry.seat, card: { ...entry.card } }));
     // ADR-0001: never return the Exercise, Script or full Deal to the screen.
     return { stepIndex, totalSteps: exercise.steps.length, kind: current.kind,
       textRef: current.kind === 'commentary' ? current.textRef : null,
       prompt: current.kind === 'prompt' ? current.prompt : null,
-      view: table.seatView('south'), wrongAnswers, outcome, rejection, hint };
+      view: table.seatView('south'), wrongAnswers, outcome, rejection, hint, complete,
+      exposed: visibleExposures };
   }
   function finish(result: Attempt['outcome'], time: number) {
     const current = step();
@@ -73,19 +83,25 @@ export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: 
     return snapshot();
   }
   function next() {
+    if (complete) return snapshot();
     const current = step();
     if (current.kind === 'scripted-action' || (current.kind === 'prompt' && !outcome)) return snapshot();
     if (stepIndex < exercise.steps.length - 1) enterStep(stepIndex + 1);
+    else complete = true;
     return snapshot();
   }
   function advanceScript() {
+    if (complete) return snapshot();
     const current = step();
     if (current.kind !== 'scripted-action') return snapshot();
     const scripted = exercise.script[current.scriptIndices[scriptOffset]];
     const result = table.submit(scripted.seat, table.controllerOf(scripted.seat), scripted.action, {
       kind: 'authored', contentId: exercise.contentId, version: exercise.version });
     if (result.kind === 'rejected') throw new Error('Authored script rejected by Table');
-    if (++scriptOffset === current.scriptIndices.length) enterStep(stepIndex + 1);
+    if (++scriptOffset === current.scriptIndices.length) {
+      if (stepIndex < exercise.steps.length - 1) enterStep(stepIndex + 1);
+      else complete = true;
+    }
     return snapshot();
   }
   function showHint() {
@@ -98,5 +114,8 @@ export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: 
     }
     return snapshot();
   }
+  enterStep(0);
+  // ADR-0001, US-16.4: tests may inspect the Table; the screen receives no arbitrary-seat accessor.
+  inspect?.(table);
   return { record: table.record, snapshot, answer, showAnswer, next, advanceScript, showHint };
 }
