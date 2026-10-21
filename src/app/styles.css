@@ -223,3 +223,12 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
   .review-strip { display: flex; flex-wrap: wrap; gap: 6px; }
   .review-strip button[aria-current="step"] { background: var(--accent-soft); color: var(--accent-soft-text); border-color: var(--accent-text); }
 }
+
+/* US-17, CI-2: retain the hindsight label even for neutral zero costs. */
+.review-cost { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-6); border-radius: var(--radius-8); max-width: 100%; }
+.review-cost b { font: inherit; font-weight: 700; }
+.review-cost small { font-size: var(--type-11); overflow-wrap: anywhere; }
+.review-cost-neutral { color: var(--text); background: var(--raised); }
+.review-cost-xray { color: var(--accent-soft-text); background: var(--accent-soft); }
+.review-analysis-skeleton { padding: var(--space-12); border-radius: var(--radius-8); background: var(--raised); color: var(--muted); }
+.review-plays li { min-width: 0; flex: 1 1 0; }

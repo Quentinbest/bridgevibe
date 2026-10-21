@@ -25,8 +25,10 @@ export function resolveArtefact(root: string, id: string, shippedFile: string, a
   const source = id.replace(/[?#].*$/, '');
   let file = path.resolve(root, source);
   let bundler = false;
-  if (source.startsWith('\0')) {
-    const provider = /^\0vite\/(?:preload-helper|modulepreload-polyfill)\.js$/.test(source) ? 'vite'
+  // US-46.1: Vite owns browser stand-ins for Node built-ins (Vite 8 also emits the bare ID).
+  const browserExternal = source.startsWith('\0__vite-browser-external') || source === '__vite-browser-external' || source.startsWith('__vite-browser-external:');
+  if (source.startsWith('\0') || browserExternal) {
+    const provider = browserExternal || /^\0vite\/(?:preload-helper|modulepreload-polyfill)\.js$/.test(source) ? 'vite'
       : source === '\0rolldown/runtime.js' ? 'rolldown' : undefined;
     if (!provider) return { name: source, kind: 'bundler', version: 'unknown', licenceFiles: [], notices: [], texts: [], shippedFiles: [shippedFile], problem: `${source}: unknown virtual module` };
     file = path.join(root, 'node_modules', provider, 'package.json');

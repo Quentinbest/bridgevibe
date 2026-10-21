@@ -23,9 +23,16 @@ async function noHiddenCards(page: Page, played: readonly Card[]) {
 
 test('US-04, US-16: review, keyboard stepper, four hands and record downloads', async ({ page }) => {
   const reference = completeFixedDeal();
+  let solverRequested = false;
+  let releaseSolver!: () => void;
+  const solverGate = new Promise<void>(resolve => { releaseSolver = resolve; });
+  await page.route('**/assets/analysisClient-*.js', async route => {
+    solverRequested = true; await solverGate; await route.continue();
+  });
   await page.clock.install(); await page.clock.pauseAt(new Date()); await page.goto('/');
   const played: Card[] = [];
   await noHiddenCards(page, played);
+  expect(solverRequested).toBe(false);
   for (const entry of reference.actions) {
     if (entry.controller === 'robot') await page.clock.runFor(500);
     else {
@@ -34,11 +41,21 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
     }
     played.push(entry.action.card);
     if (entry.index % 4 === 3) await page.clock.runFor(1000);
-    if ([0, 9, 25, 47].includes(entry.index)) await noHiddenCards(page, played);
+    if ([0, 9, 25, 47].includes(entry.index)) { await noHiddenCards(page, played); expect(solverRequested).toBe(false); }
   }
+  await expect.poll(() => solverRequested).toBe(true);
   const entry = page.getByRole('button', { name: 'Hand review', exact: true });
   await entry.focus(); await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { name: 'Hand review' })).toBeFocused();
+  await expect(page.getByRole('status')).toHaveText('Working out the X-ray view…');
+  releaseSolver();
+  await expect(page.locator('.review-cost')).toHaveCount(2);
+  for (const badge of await page.locator('.review-cost').all()) {
+    await expect(badge).toContainText('X-ray view: with all cards visible');
+    await expect(badge).toHaveAccessibleName(/Engine: bridge-dds, version 1.4.0 \/ DDS 2.9/);
+  }
+  await page.clock.resume();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await expect(page.getByRole('note')).toContainText('X-ray view: now you can see all 4 hands');
   await expect(page.getByRole('button', { name: 'Previous trick' })).toBeDisabled();
   const toggle = page.getByRole('button', { name: /^(Show|Hide) all 4 hands$/ });
@@ -90,4 +107,15 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole('button', { name: 'Back to table' }).click();
   await expect(page.getByRole('button', { name: 'Hand review', exact: true })).toBeVisible();
+});
+
+// §4.7: the first lesson never fetches the analysis host's dynamic client or worker.
+test('first lesson loads without requesting the solver', async ({ page }) => {
+  const solverRequests: string[] = [];
+  page.on('request', request => { if (/analysisClient|analysisWorker|bridge-dds|\.wasm/.test(request.url())) solverRequests.push(request.url()); });
+  await page.goto('/?lesson=follow-suit');
+  await expect(page.getByRole('heading', { name: 'Follow suit' })).toBeVisible();
+  // The lesson's first step is commentary; its Next step button shows the lesson has rendered.
+  await expect(page.getByRole('button', { name: 'Next step' })).toBeVisible();
+  expect(solverRequests).toEqual([]);
 });

@@ -1,5 +1,6 @@
+import { analysisHost } from './analysisHost';
 import { ReviewScreen } from './ReviewScreen';
-import { lazy, Suspense, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { SUITS, type Card as TableCard, type Deal, type CompletedPlaythroughRecord } from '../table';
 import { cardName, text } from '../explanation';
 import { Card, CardBack } from './Card';
@@ -111,9 +112,13 @@ function PracticeScreen() {
   const reviewButton = useRef<HTMLButtonElement>(null);
   const play = session.play;
   const view = useSyncExternalStore(play.subscribe, play.getSnapshot);
+  const completed = useMemo(() => view.status === 'completed' ? play.completedRecord() : null, [play, view.status]);
+  const analysis = useSyncExternalStore(analysisHost.subscribe, () => analysisHost.snapshot(completed));
+  // §4.5, U-13: start at completion, before Hand review is opened.
+  useEffect(() => { if (completed) analysisHost.start(completed, play.provenanceLog); }, [completed, play]);
   useEffect(() => play.start(), [play]);
   useEffect(() => { if (!review && view.status === 'completed') reviewButton.current?.focus(); }, [review, view.status]);
-  if (review) return <ReviewScreen record={review} onBack={() => setReview(null)} />;
+  if (review) return <ReviewScreen analysis={analysis} record={review} onBack={() => setReview(null)} />;
   const debug = DebugPanel && new URLSearchParams(window.location.search).get('debug') === '1';
   return <div className={debug ? 'debug-layout' : undefined}><TableScreen key={session.info.dealId} view={view} play={play.play} clearRejection={play.clearRejection} onShowRule={play.showRule} info={session.info} invalid={session.invalid} onNew={() => setSession(session.next())} />
     {view.status === 'completed' && <div className="review-entry"><button ref={reviewButton} type="button" onClick={() => setReview(play.completedRecord())}>{text('review.title')}</button></div>}

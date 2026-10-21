@@ -275,3 +275,28 @@ it('attributes packages bundled into a Web Worker, and fails on an unlicensed on
     else expect(report.violations.join()).toContain('worker-dep: no explicit grant');
   }
 }, 60_000);
+
+// US-46.1: only known Vite stand-ins inherit Vite's grant; arbitrary virtual code fails.
+it('attributes browser-external stand-ins to Vite without permitting unknown virtual modules', async () => {
+  const dir = temp();
+  mkdirSync(path.join(dir, 'src'));
+  mkdirSync(path.join(dir, 'node_modules/vite'), { recursive: true });
+  for (const file of ['package.json', 'LICENSE.md']) cpSync(path.join(root, 'node_modules/vite', file), path.join(dir, 'node_modules/vite', file));
+  mkdirSync(path.join(dir, 'node_modules/rolldown'));
+  for (const file of ['package.json', 'LICENSE']) cpSync(path.join(root, 'node_modules/rolldown', file), path.join(dir, 'node_modules/rolldown', file));
+  writeFileSync(path.join(dir, 'package.json'), '{"version":"1.0.0"}');
+  writeFileSync(path.join(dir, 'index.html'), '<script type="module" src="/src/main.js"></script>');
+  writeFileSync(path.join(dir, 'src/main.js'), 'import fs from "node:fs"; console.log(fs);');
+  cpSync(path.join(root, 'licences'), path.join(dir, 'licences'), { recursive: true });
+  const reportPath = path.join(dir, 'bom.json');
+  await build({ root: dir, configFile: false, logLevel: 'silent', plugins: [licences({ reportPath })], build: { modulePreload: false } });
+  const report: Bom = JSON.parse(readFileSync(reportPath, 'utf8'));
+  expect(report.violations).toEqual([]);
+  expect(report.artefacts.find(item => item.name === 'vite')).toMatchObject({ kind: 'bundler', licence: 'MIT' });
+  expect(resolveArtefact(root, '\0__vite-browser-external:fs', 'assets/app.js', {})).toMatchObject({ name: 'vite', kind: 'bundler' });
+  writeFileSync(path.join(dir, 'src/main.js'), 'import "unknown-helper";');
+  await expect(build({ root: dir, configFile: false, logLevel: 'silent', build: { modulePreload: false }, plugins: [licences({ reportPath }), {
+    name: 'unknown-virtual', resolveId(id) { if (id === 'unknown-helper') return '\0unknown-helper'; },
+    load(id) { if (id === '\0unknown-helper') return 'console.log("unknown");'; },
+  }] })).rejects.toThrow('unknown virtual module');
+}, 60_000);
