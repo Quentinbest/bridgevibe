@@ -38,6 +38,26 @@ test('ADR-0001: policy receives exactly decoded view, visible seed, and deadline
   expect(decide.mock.calls).toEqual([[view, request.seed, request.deadline]]);
   expect(decide.mock.calls[0][0]).not.toBe(request.view);
 });
+test('ADR-0001, FR-BOT1: MiniBridge card-play worker policy receives decoded public Announcements', () => {
+  const setup = startMiniBridge({ deal: dealFromSeed('setup-ui', 3), learnerSide: 'northSouth' });
+  while (setup.seatView('south').step !== 'contract-choice') setup.advance();
+  const declarer = setup.seatView('south').declarer!, controller = setup.controllerOf(declarer);
+  const announcements = setup.seatView(declarer).announcements;
+  expect(setup.submit(declarer, controller, { kind: 'choose-contract', strain: 'no-trumps', objective: 'part-score' },
+    controller === 'robot' ? { kind: 'robot', policy: 'test', version: '1', durationMs: 0 } : undefined).kind).toBe('accepted');
+  const table = setup.playthrough()!, seat = table.seatView('south').turn!, view = table.seatView(seat);
+  const request: RobotRequest = { type: 'decide', requestId: 'announcements', cancellationId: 'announcements',
+    playthroughId: table.record().playthroughId, positionKey: table.positionKey(), seat,
+    view: encodeSeatView(view), seed: seatViewSeed(view), deadline: 400 };
+  robotAudit(table.record)(request, seat);
+  const decide = vi.fn(basicPolicy.decide), post = vi.fn();
+  handleRobotMessage(request, post, { ...basicPolicy, decide });
+  expect(decide).toHaveBeenCalledOnce();
+  expect(decide.mock.calls[0][0]).toEqual(view);
+  expect(decide.mock.calls[0][0].announcements).toEqual(announcements);
+  expect(announcements).toHaveLength(4);
+  expect(post.mock.calls[0][0]).toMatchObject({ type: 'decided' });
+});
 
 test('§4.3.3: contract worker success and failure carry the structured rule ID', () => {
   const setup = startMiniBridge({ deal: dealFromSeed('setup-ui', 3), learnerSide: 'northSouth' });

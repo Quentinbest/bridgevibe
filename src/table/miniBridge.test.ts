@@ -41,6 +41,35 @@ test('F1 US-06.2: 20–20 redeals to the next index of the same seed and records
   for (let i = 0; i < 3; i++) authored.advance();
   expect(() => authored.advance()).toThrow(/cannot be redealt/);
 });
+test.each([false, true])('ADR-0001, US-06: all card-play views retain only final Announcements through completion (Redeal: %s)', redealt => {
+  const initial = findDeal(deal => (nsPoints(deal) === 20) === redealt);
+  const setup = ready(initial), final = setup.record().deal;
+  const expected = SEATS.map((_, index) => {
+    const seat = SEATS[(SEATS.indexOf(final.dealer) + index) % 4];
+    return { seat, hcp: highCardPoints(final.hands[seat]) };
+  });
+  if (redealt) {
+    expect(final.dealId).not.toBe(initial.dealId);
+    expect(setup.record().setupEvents.filter(event => event.kind === 'announcement').length).toBeGreaterThan(4);
+  }
+  const declarer = setup.seatView('south').declarer!, controller = setup.controllerOf(declarer);
+  expect(setup.submit(declarer, controller, { kind: 'choose-contract', strain: 'no-trumps', objective: 'part-score' },
+    controller === 'robot' ? { kind: 'robot', policy: 'test', version: '1', durationMs: 0 } : undefined).kind).toBe('accepted');
+  const table = setup.playthrough()!;
+  for (let position = 0; position <= 52; position++) {
+    for (const viewer of SEATS) expect(table.seatView(viewer).announcements).toEqual(expected);
+    if (position === 52) break;
+    const seat = table.seatView('south').turn!, controller = table.controllerOf(seat);
+    expect(table.submit(seat, controller, table.legalActions(seat)[0], controller === 'robot'
+      ? { kind: 'robot', policy: 'test', version: '1', durationMs: 0 } : undefined).kind).toBe('accepted');
+  }
+  expect(table.seatView('south').status).toBe('completed');
+});
+test('ADR-0001: Contract Bridge views have no Announcements without setup events', () => {
+  const table = startPlaythrough({ deal: dealFromSeed('legacy', 1), learnerSide: 'northSouth',
+    contract: { level: 3, strain: 'no-trumps', declarer: 'south' } });
+  for (const seat of SEATS) expect(table.seatView(seat).announcements).toEqual([]);
+});
 test.each(SEATS)('F1 US-06.3: %s wins the declaring-side tie by announcing first', dealer => {
   const deal = findDeal(d => {
     const partner = SEATS[(SEATS.indexOf(dealer) + 2) % 4];

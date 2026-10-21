@@ -1,7 +1,7 @@
 import type { Action, RobotProvenance, Seat, SeatViewMessage, SetupSeatViewMessage, ContractChoice } from '../table';
 
 // US-41.3, §4.3.6: versioned worker envelope.
-export const ROBOT_PROTOCOL_VERSION = 2;
+export const ROBOT_PROTOCOL_VERSION = 3;
 export type RobotRequest = {
   type: 'decide'; requestId: string; playthroughId: string; positionKey: string; deadline: number;
   cancellationId: string; seat: Seat; view: SeatViewMessage; seed: string;

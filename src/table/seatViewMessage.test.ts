@@ -1,7 +1,8 @@
 import { expect, test } from 'vitest';
 import { dealWith } from '../../test/deals';
 import { fixedPlaythrough } from '../../test/strategy';
-import { decodeSeatView, encodeSeatView, startPlaythrough } from './index';
+import { dealFromSeed, decodeSeatView, encodeSeatView, startPlaythrough } from './index';
+import { startMiniBridge } from './miniBridge';
 const make = () => startPlaythrough({ deal: dealWith(), contract: { level: 3, strain: 'no-trumps', declarer: 'south' }, learnerSide: 'northSouth' });
 test('ADR-0001: wire data roundtrips and reconstructs the private Seat View brand', () => {
   const table = make(); const view = table.seatView('west'); const wire = encodeSeatView(view);
@@ -10,9 +11,28 @@ test('ADR-0001: wire data roundtrips and reconstructs the private Seat View bran
   Object.assign(wire.hand[0], { rank: '2' });
   expect(table.seatView('west')).toEqual(view);
 });
+test('ADR-0001: MiniBridge announcements roundtrip explicitly and without aliasing', () => {
+  const setup = startMiniBridge({ deal: dealFromSeed('setup-ui', 3), learnerSide: 'northSouth' });
+  while (setup.seatView('south').step !== 'contract-choice') setup.advance();
+  const seat = setup.seatView('south').declarer!, controller = setup.controllerOf(seat);
+  setup.submit(seat, controller, { kind: 'choose-contract', strain: 'no-trumps', objective: 'part-score' },
+    controller === 'robot' ? { kind: 'robot', policy: 'test', version: '1', durationMs: 0 } : undefined);
+  const table = setup.playthrough()!, view = table.seatView('west'), wire = encodeSeatView(view);
+  expect(wire.announcements).toEqual(setup.seatView('west').announcements);
+  expect(wire.announcements).toHaveLength(4);
+  const decoded = decodeSeatView(structuredClone(wire));
+  expect(decoded).toEqual(view);
+  Object.assign(wire.announcements[0], { hcp: 40 });
+  expect(decoded).toEqual(view);
+  expect(table.seatView('west')).toEqual(view);
+});
 for (const bad of [null, [], {}, { seat: 'up' }, { positionIndex: -1 }, { positionIndex: 0.5 }, { hand: [{ suit: 'stars', rank: 'A' }] },
   { contract: { level: 0, strain: 'no-trumps', declarer: 'south' } }, { extra: [] }, { status: 'unknown' }, { turn: 1 },
   { dummy: {} }, { currentTrick: [{}] }, { tricks: [{ cards: [], winner: 'west' }] },
+  { announcements: null }, { announcements: [{ seat: 'up', hcp: 10 }] },
+  ...[-1, 41, 1.5, '10', NaN, Infinity].map(hcp => ({ announcements: [{ seat: 'north', hcp }] })),
+  { announcements: [{ seat: 'north', hcp: 10, extra: true }] },
+  { announcements: Array.from({ length: 5 }, () => ({ seat: 'north', hcp: 0 })) },
   { cardCounts: { north: 13, east: 13, south: 13, west: 14 } }, { tricksWon: { northSouth: NaN, eastWest: 0 } }]) {
   test(`ADR-0001: rejects malformed or extra wire fields ${JSON.stringify(bad)}`, () => {
     const wire = encodeSeatView(make().seatView('west'));
@@ -21,6 +41,8 @@ for (const bad of [null, [], {}, { seat: 'up' }, { positionIndex: -1 }, { positi
 }
 test('ADR-0001: rejects nested extra fields, symbols, and missing fields', () => {
   const wire = encodeSeatView(make().seatView('west'));
+  const { announcements: _, ...missingAnnouncements } = wire; void _;
+  expect(() => decodeSeatView(missingAnnouncements)).toThrow();
   for (const bad of [{ ...wire, contract: { ...wire.contract, hidden: [] } },
     { ...wire, hand: [{ ...wire.hand[0], hidden: [] }] }, { ...wire, [Symbol('extra')]: true },
     { ...wire, cardCounts: { north: 13 } }, { ...wire, hand: Array(1) },
