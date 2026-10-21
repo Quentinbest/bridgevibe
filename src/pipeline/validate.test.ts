@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { describe, expect, test } from 'vitest';
-import { dealIdOf } from '../table';
+import { dealFromSeed, dealIdOf } from '../table';
 import { catalogue } from '../explanation';
 import { validateLesson } from './validate';
 
@@ -194,7 +194,8 @@ test('catalogue references must exist', () => {
   lesson.exercises[0].steps[2].prompt.hint.textRef = 'lesson.missing';
   lesson.titleRef = 'lesson.missing';
   lesson.exercises[0].steps[0].textRef = 'lesson.missing';
-  expect(validateLesson(lesson, ids).errors.map(f => f.rule)).toEqual(Array(4).fill('catalogue-reference'));
+  // US-27: the missing Prompt field stops this Exercise; the Lesson title is checked independently.
+  expect(validateLesson(lesson, ids).errors.map(f => f.rule)).toEqual(Array(2).fill('catalogue-reference'));
 });
 // US-15.2: the exposure is checked at its own step, after earlier scripted plays.
 test('exposures must name cards the seat still holds', () => {
@@ -205,4 +206,148 @@ test('exposures must name cards the seat still holds', () => {
   expect(validateLesson(lesson).errors.map(f => f.rule)).toEqual(['hint-references']);
   exercise.steps[2].cards[0].card = exercise.deal.hands[lead.seat].find((card: { rank: string }) => card.rank !== lead.action.card.rank);
   expect(validateLesson(lesson).errors).toEqual([]);
+});
+
+// US-27: exercise the entire authored shape through the public validator, before any replay.
+const completeLesson = () => {
+  const lesson = fixture('valid');
+  const prompt = lesson.exercises[0].steps[2].prompt;
+  prompt.acceptThenScripted = [prompt.expectedAnswers[1]];
+  prompt.equivalentsReviewed = [{ card: prompt.expectedAnswers[1], decision: 'accept', reason: '' }];
+  lesson.exercises[0].steps.unshift({ kind: 'exposure', cards: [{ seat: 'west', card: { suit: 'hearts', rank: 'J' } }] });
+  return lesson;
+};
+type Path = (string | number)[];
+function paths(value: unknown, path: Path = []): Path[] {
+  if (value === null || typeof value !== 'object') return [path];
+  return [path, ...Object.entries(value).flatMap(([key, child]) => paths(child, [...path, Array.isArray(value) ? Number(key) : key]))];
+}
+const shapePaths = paths(completeLesson());
+const at = (lesson: ReturnType<typeof fixture>, path: Path) => path.reduce((value, key) => value[key], lesson);
+const optional = new Set(['countsRejections', 'acceptThenScripted', 'equivalentsReviewed', 'hint', 'reason']);
+
+test.each(shapePaths.map(path => [path.join('.'), path] as const))('rejects malformed field %s without replay cascades', (_, path) => {
+  const lesson = completeLesson();
+  const old = at(lesson, path);
+  const malformed = typeof old === 'object' ? null : typeof old === 'string' ? 42 : 'wrong-type';
+  if (!path.length) {
+    expect(validateLesson(malformed).errors).toHaveLength(1);
+    return;
+  }
+  at(lesson, path.slice(0, -1))[path.at(-1)!] = malformed;
+  const result = validateLesson(lesson);
+  expect(result.errors).toHaveLength(1);
+  expect(result.errors[0].message).toContain('Invalid');
+  expect(result.warnings).toEqual([]);
+});
+
+test.each(shapePaths.filter(path => path.length && typeof path.at(-1) === 'string')
+  .map(path => [path.join('.'), path] as const))('checks required or optional presence of %s', (_, path) => {
+  const lesson = completeLesson();
+  const key = path.at(-1)!;
+  delete at(lesson, path.slice(0, -1))[key];
+  expect(validateLesson(lesson).errors).toHaveLength(optional.has(String(key)) ? 0 : 1);
+});
+
+test.each(shapePaths.filter(path => {
+  const value = at(completeLesson(), path);
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}).map(path => [path.join('.'), path] as const))('rejects unknown keys on %s', (_, path) => {
+  const lesson = completeLesson();
+  at(lesson, path).countRejections = false;
+  expect(validateLesson(lesson).errors).toHaveLength(1);
+  expect(validateLesson(lesson).errors[0].message).toContain('unknown key');
+});
+
+test.each([
+  ['skillTags', []], ['exercises.0.steps.2.prompt.skillTags', []],
+  ['exercises.0.steps.2.prompt.countsRejections', false],
+])('allows valid empty arrays and false: %s', (path, value) => {
+  const lesson = fixture('valid');
+  const parts = path.split('.');
+  at(lesson, parts.slice(0, -1))[parts.at(-1)!] = value;
+  expect(validateLesson(lesson)).toEqual({ errors: [], warnings: [] });
+});
+test.each([
+  ['skillTags', [' ']], ['skillTags', 'follow-suit'],
+  ['exercises.0.steps.2.prompt.skillTags', ['']],
+  ['exercises.0.steps.2.prompt.countsRejections', 'false'],
+  ['schemaVersion', 2], ['signOff.status', 'approved'],
+  ['exercises.0.learnerSide', 'eastWest'], ['exercises.0.steps.0.kind', 'unknown'],
+  ['exercises.0.steps.2.prompt.answerKind', 'bid'], ['exercises.0.steps.2.prompt.promptId', ' '],
+  ['exercises.0.script.0.action.kind', 'bid'], ['exercises.0.steps.1.scriptIndices', [0.5]],
+])('rejects invalid model value at %s', (path, value) => {
+  const lesson = fixture('valid');
+  const parts = path.split('.');
+  at(lesson, parts.slice(0, -1))[parts.at(-1)!] = value;
+  expect(validateLesson(lesson).errors).toHaveLength(1);
+});
+
+test.each([
+  null, {}, { kind: 'other' }, { kind: 'authored', contentId: '', version: 1 },
+  { kind: 'authored', contentId: 'test', version: 0 },
+  ...['kind', 'seed', 'index', 'rotation', 'algorithm'].map(key => {
+    const origin: Record<string, unknown> = { kind: 'seed', seed: 'abc', index: 1, rotation: 0, algorithm: 'bv-deal-1' };
+    delete origin[key];
+    return origin;
+  }),
+  ...[{ seed: 'bad seed' }, { seed: '' }, { seed: 'a'.repeat(65) }, { index: 0 }, { index: 1.5 },
+    { index: Number.MAX_SAFE_INTEGER + 1 }, { rotation: 1 }, { algorithm: 'other' }, { extra: true }]
+    .map(change => ({ kind: 'seed', seed: 'abc', index: 1, rotation: 0, algorithm: 'bv-deal-1', ...change })),
+])('rejects malformed Deal origin: %j', origin => {
+  const lesson = fixture('valid');
+  lesson.exercises[0].deal.origin = origin;
+  expect(validateLesson(lesson).errors).toEqual([expect.objectContaining({ rule: 'deal-shape' })]);
+});
+
+test('structural failure stops only the affected Exercise and preserves its Prompt identity', () => {
+  const lesson = fixture('valid');
+  lesson.exercises[0].steps[2].prompt.countsRejections = 'false';
+  lesson.exercises[0].script[0].action.card = { suit: 'clubs', rank: '2' };
+  lesson.exercises.push(fixture('script-not-held').exercises[0]);
+  const result = validateLesson(lesson);
+  expect(result.errors.map(f => f.rule)).toEqual(['lesson-shape', 'script-replay']);
+  expect(result.errors[0].contentId).toBe('follow-suit.prompt');
+});
+
+test('catalogue membership checks all references on structurally valid content', () => {
+  const lesson = fixture('valid');
+  const prompt = lesson.exercises[0].steps[2].prompt;
+  lesson.titleRef = 'missing';
+  lesson.exercises[0].steps[0].textRef = 'missing';
+  for (const key of ['textRef', 'commentaryRef', 'correctRef', 'wrongRef', 'shownRef']) prompt[key] = 'missing';
+  prompt.hint.textRef = 'missing';
+  expect(validateLesson(lesson, new Set(Object.keys(catalogue))).errors.map(f => f.rule))
+    .toEqual(Array(8).fill('catalogue-reference'));
+});
+
+// US-15.2 / US-27.3a: exposures use the position reached by the learner's actual answers.
+test.each([3, 5])('checks exposures after alternative answers, including trailing Steps (%i)', index => {
+  const lesson = fixture('valid');
+  const exercise = lesson.exercises[0];
+  const prompt = exercise.steps[2].prompt;
+  exercise.steps.splice(index, 0, { kind: 'exposure', cards: [{ seat: 'south', card: prompt.expectedAnswers[1] }] });
+  expect(validateLesson(lesson).errors).toEqual([expect.objectContaining({ rule: 'hint-references' })]);
+  prompt.acceptThenScripted = [prompt.expectedAnswers[1]];
+  expect(validateLesson(lesson)).toEqual({ errors: [], warnings: [] });
+});
+test('exposures check later alternatives on lines with multiple Prompts', () => {
+  const lesson = fixture('equivalent-after-alternative');
+  const exercise = lesson.exercises[0];
+  const second = exercise.steps[4].prompt;
+  const card = { suit: 'spades', rank: '2' };
+  second.expectedAnswers.push(card);
+  exercise.steps.push({ kind: 'exposure', cards: [{ seat: 'south', card }] });
+  expect(validateLesson(lesson).errors.map(f => f.rule)).toEqual(['hint-references']);
+  second.acceptThenScripted = [card];
+  expect(validateLesson(lesson).errors).toEqual([]);
+});
+
+test('accepts a valid seeded origin', () => {
+  const lesson = fixture('valid');
+  const exercise = lesson.exercises[0];
+  exercise.deal = dealFromSeed('lesson-56', 1);
+  exercise.script = [];
+  exercise.steps = [{ kind: 'commentary', textRef: 'lesson.intro' }];
+  expect(validateLesson(lesson)).toEqual({ errors: [], warnings: [] });
 });
