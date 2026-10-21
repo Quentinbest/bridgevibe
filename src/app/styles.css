@@ -249,3 +249,6 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
 .review-cost-xray { color: var(--accent-soft-text); background: var(--accent-soft); }
 .review-analysis-skeleton { padding: var(--space-12); border-radius: var(--radius-8); background: var(--raised); color: var(--muted); }
 .review-plays li { min-width: 0; flex: 1 1 0; }
+
+/* CI-4: neutral unavailable state; replay remains usable. */
+.review-unavailable { margin-block: 1rem; }

@@ -4,7 +4,7 @@ import { replay, exportPbn, exportRecordJson, SEATS, SUITS, type CompletedPlayth
 import { cardName, text } from '../explanation';
 import { Card } from './Card';
 
-export function ReviewScreen({ record, onBack, analysis }: { analysis?: AnalysisState; record: CompletedPlaythroughRecord; onBack: () => void }) {
+export function ReviewScreen({ record, onBack, analysis, onTryAgain }: { onTryAgain?: () => void; analysis?: AnalysisState; record: CompletedPlaythroughRecord; onBack: () => void }) {
   // US-16.1, §4.3.5: replay also refuses incomplete records at runtime.
   const tricks = useMemo(() => replay(record), [record]);
   const [index, setIndex] = useState(0);
@@ -25,6 +25,10 @@ export function ReviewScreen({ record, onBack, analysis }: { analysis?: Analysis
       <h1 ref={heading} tabIndex={-1}>{text('review.title')}</h1></header>
     <p role="note" className="review-xray"><span aria-hidden="true">▦</span>{text('review.xray')}</p>
     {analysis?.running && <p role="status" className="review-analysis-skeleton">{text('review.working')}</p>}
+    {analysis?.abstention && <div className="review-unavailable">
+      <p role="status">{analysis.abstention.text}</p>
+      <button type="button" onClick={() => { heading.current?.focus(); onTryAgain?.(); }}>{text('review.try-again')}</button>
+    </div>}
     <section className="review-replay" aria-label={text('review.replay')}>
       <div className="review-stepper">
         <button type="button" disabled={index === 0} onClick={() => setIndex(index - 1)} aria-label={text('review.previous')}>←</button>

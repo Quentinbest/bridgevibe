@@ -2,6 +2,8 @@ import type { Card, ReasonCode } from '../table';
 
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
+  'review.unavailable': { text: "X-ray view isn't available right now", status: 'draft' },
+  'review.try-again': { text: 'Try again', status: 'draft' },
   'review.working': { text: 'Working out the X-ray view…', status: 'draft' },
   'review.hindsight': { text: 'X-ray view: with all cards visible', status: 'draft' },
   'review.cost-zero': { text: '0', status: 'draft' },

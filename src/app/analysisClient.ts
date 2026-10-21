@@ -6,10 +6,10 @@ export type AnalysisWorker = Pick<Worker, 'postMessage' | 'terminate'> & {
   onmessage: ((event: MessageEvent<AnalysisResponse>) => void) | null;
   onerror: ((event: ErrorEvent) => void) | null;
 };
-const defaultWorker = (): AnalysisWorker => new Worker(new URL('./analysisWorker.ts', import.meta.url), { type: 'module' });
+export const defaultWorker = (): AnalysisWorker => new Worker(new URL('./analysisWorker.ts', import.meta.url), { type: 'module' });
 
 // §4.7: imported at completion; the solver is bundled exclusively in this worker.
-export function analysisClient(record: CompletedPlaythroughRecord, createWorker: () => AnalysisWorker = defaultWorker) {
+export function analysisClient(record: CompletedPlaythroughRecord, createWorker: () => AnalysisWorker = defaultWorker, timeoutMs = 30000) {
   let worker: AnalysisWorker | undefined;
   let ready: Promise<AnalysisWorker> | undefined;
   let index = 0;
@@ -22,8 +22,8 @@ export function analysisClient(record: CompletedPlaythroughRecord, createWorker:
     ready ??= new Promise<AnalysisWorker>((resolve, reject) => {
       const owned = worker = createWorker();
       // A worker that never says hello must not hang the review (#21 owns the failure display).
-      const timer = setTimeout(() => { fail(); reject(new Error('AnalysisTimeout')); }, 30000);
-      owned.onerror = () => { clearTimeout(timer); fail(); reject(new Error('AnalysisFailed')); };
+      const timer = setTimeout(() => { fail(); reject(new Error('AnalysisTimeout')); }, timeoutMs);
+      owned.onerror = () => { clearTimeout(timer); fail(); reject(new Error('AnalysisWorkerCrash')); };
       owned.onmessage = ({ data }) => {
         if (data.type !== 'hello') return;
         clearTimeout(timer);
@@ -42,14 +42,14 @@ export function analysisClient(record: CompletedPlaythroughRecord, createWorker:
       const connected = await connect();
       const requestId = ++sequence;
       return new Promise<PositionResult>((resolve, reject) => {
-        const timer = setTimeout(() => { fail(); reject(new Error('AnalysisTimeout')); }, 30000);
+        const timer = setTimeout(() => { fail(); reject(new Error('AnalysisTimeout')); }, timeoutMs);
         connected.onmessage = ({ data }) => {
           // §4.3.6: only the response to this request counts.
           if (data.type === 'hello' || data.requestId !== requestId) return;
           clearTimeout(timer);
           if (data.type === 'result') resolve(data.result); else reject(new Error('AnalysisFailed'));
         };
-        connected.onerror = () => { clearTimeout(timer); fail(); reject(new Error('AnalysisFailed')); };
+        connected.onerror = () => { clearTimeout(timer); fail(); reject(new Error('AnalysisWorkerCrash')); };
         connected.postMessage({ type: 'solve', requestId, record, index } satisfies AnalysisRequest);
       });
     },
