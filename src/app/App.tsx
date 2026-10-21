@@ -9,6 +9,7 @@ import { type LearnerView } from './play';
 import { dealFromUrl, dealSession } from './deals';
 import { DealControls } from './DealControls';
 import { LessonScreen } from './LessonScreen';
+import { lessonById } from '../curriculum/content';
 
 // US-40.2: the constant build guard removes the entire debug import from production.
 const DebugPanel = import.meta.env.MODE === 'internal' || import.meta.env.MODE === 'audit' || import.meta.env.MODE === 'development'
@@ -128,11 +129,11 @@ function PracticeScreen() {
 }
 
 export function App() {
-  const [lesson, setLesson] = useState(() => new URLSearchParams(window.location.search).get('lesson') === 'follow-suit');
-  return lesson ? <LessonScreen onClose={() => {
+  const [lesson, setLesson] = useState(() => lessonById(new URLSearchParams(window.location.search).get('lesson')));
+  return lesson ? <LessonScreen lesson={lesson} onClose={() => {
     const url = new URL(window.location.href);
     url.searchParams.delete('lesson');
     window.history.replaceState(null, '', url);
-    setLesson(false);
+    setLesson(undefined);
   }} /> : <PracticeScreen />;
 }

@@ -103,12 +103,54 @@ test('showing the hint records one authored statement in the provenance log', ()
     provenance: { sourceKind: 'authored', contentId: 'follow-suit.prompt', version: '1' } });
 });
 // UX §10: after the last scripted play, focus moves to the newly shown continuation.
-test('focus moves to Return to practice after the scripted play that ends the exercise', () => {
+test('focus moves to Finish level after the scripted play that ends the exercise', () => {
   openPrompt();
   const card = screen.getByRole('button', { name: 'Ace of hearts' });
   fireEvent.keyDown(card, { key: 'Enter' });
   fireEvent.keyDown(card, { key: 'Enter' });
   fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
   act(() => { vi.advanceTimersByTime(500); });
-  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Return to practice' }));
+  expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Finish level' }));
+});
+
+// US-21.6/7, UX §10: full lesson navigation, teaching cards and pressure-free completion.
+test('full lesson shows step states and an unplayable exposure, then counts this run and exits', async () => {
+  const { fullFollowSuit } = await import('../curriculum/content');
+  vi.useFakeTimers();
+  const onClose = vi.fn();
+  render(<LessonScreen lesson={fullFollowSuit} onClose={onClose} />);
+  for (let exercise = 0; exercise < 3; exercise++) {
+    const list = screen.getByRole('list');
+    expect(list.querySelectorAll('li')).toHaveLength(16);
+    expect(list.querySelectorAll('[aria-current="step"]')).toHaveLength(1);
+    expect(list.querySelector('[data-state="upcoming"]')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    if (exercise === 1) {
+      const exposed = screen.getByText('Shown for this lesson').closest('figure')!;
+      expect(within(exposed).getByRole('img', { name: '4 of hearts' })).toBeTruthy();
+      expect(within(exposed).queryByRole('button')).toBeNull();
+      expect(exposed.closest('section')?.getAttribute('aria-label')).toBe('West');
+      expect(list.querySelector('[data-state="done"]')).toBeTruthy();
+      fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    }
+    for (let i = 0; i < 2; i++) act(() => { vi.advanceTimersByTime(500); });
+    if (exercise === 1) {
+      const wrong = screen.getByRole('button', { name: '6 of spades' });
+      fireEvent.keyDown(wrong, { key: 'Enter' }); fireEvent.keyDown(wrong, { key: 'Enter' });
+    }
+    const card = screen.getByRole('button', { name: 'Ace of hearts' });
+    fireEvent.keyDown(card, { key: 'Enter' }); fireEvent.keyDown(card, { key: 'Enter' });
+    fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
+    act(() => { vi.advanceTimersByTime(500); });
+    expect(screen.queryByText('Shown for this lesson')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: exercise === 2 ? 'Finish level' : 'Next step' }));
+  }
+  expect(document.activeElement).toBe(screen.getByRole('heading', { name: 'Level complete' }));
+  expect(screen.getByText('Right first time').nextElementSibling?.textContent).toBe('2');
+  expect(screen.getByText('After a nudge (that counts too)').nextElementSibling?.textContent).toBe('1');
+  expect(screen.getByText('Skill unlocked: Follow suit')).toBeTruthy();
+  expect(screen.getByRole('main').textContent).not.toMatch(/score|star|streak|mastery/i);
+  fireEvent.click(screen.getByRole('button', { name: 'Next: Practice following suit' }));
+  fireEvent.click(screen.getByRole('button', { name: "That's enough for today" }));
+  expect(onClose).toHaveBeenCalledTimes(2);
 });
