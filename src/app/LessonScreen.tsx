@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { followSuit } from '../curriculum/content';
-import { createPlayer } from '../curriculum/player';
+import { createLessonPlayer } from '../curriculum/lessonPlayer';
+import type { Lesson } from '../curriculum/model';
 import { sessionAttempts } from '../progress/attemptStore';
 import { createProvenanceLog } from '../coach/provenance';
 type ProvenanceLog = ReturnType<typeof createProvenanceLog>;
@@ -8,9 +9,10 @@ import { cardName, text, type StringId } from '../explanation';
 import { SEATS, type Card as TableCard } from '../table';
 import { Card } from './Card';
 import { Hand } from './Hand';
+import { LevelComplete } from './LevelComplete';
 
-export function LessonScreen({ onClose, provenanceLog }: { onClose: () => void; provenanceLog?: ProvenanceLog }) {
-  const [player] = useState(() => createPlayer(followSuit.exercises[0], sessionAttempts, 'session-learner'));
+export function LessonScreen({ onClose, provenanceLog, lesson = followSuit }: { onClose: () => void; provenanceLog?: ProvenanceLog; lesson?: Lesson }) {
+  const [player] = useState(() => createLessonPlayer(lesson, sessionAttempts, 'session-learner'));
   // US-40, CI-5: lesson statements are logged like the practice table's; #49 replaces the literal version.
   const [log] = useState(() => provenanceLog ?? createProvenanceLog('0.0.0'));
   const [state, setState] = useState(player.snapshot);
@@ -21,16 +23,16 @@ export function LessonScreen({ onClose, provenanceLog }: { onClose: () => void; 
   const started = useRef(false);
   // UX §10: whenever the continuation newly appears (a resolved Prompt, or a commentary step reached
   // after a scripted play), the control that had focus is gone, so focus moves to it.
-  const continuationShown = state.kind === 'commentary' || (state.kind === 'prompt' && !!state.outcome);
+  const continuationShown = state.kind === 'commentary' || state.kind === 'exposure' || (state.kind === 'prompt' && !!state.outcome);
   useEffect(() => {
     if (continuationShown && started.current) continuation.current?.focus();
     started.current = true;
-  }, [continuationShown]);
+  }, [continuationShown, state.stepIndex]);
   const offerShowMe = state.wrongAnswers >= 2 && !state.outcome;
   // UX §10: the second wrong answer removes the focused card controls, so focus moves to Show me.
   useEffect(() => { if (offerShowMe) showMe.current?.focus(); }, [offerShowMe]);
   useEffect(() => {
-    if (state.kind !== 'scripted-action') return;
+    if (state.complete || state.kind !== 'scripted-action') return;
     // UX §6.2: each authored play uses the normal 500 ms display delay.
     const timer = setTimeout(() => setState(player.advanceScript()), 500);
     return () => clearTimeout(timer);
@@ -53,12 +55,13 @@ export function LessonScreen({ onClose, provenanceLog }: { onClose: () => void; 
     }
     setState(next);
   }
+  if (state.summary) return <LevelComplete summary={state.summary} onClose={onClose} />;
   return <div className="lesson-screen" onKeyDown={event => {
     if (event.key.toLowerCase() === 'h' && !event.ctrlKey && !event.metaKey && !event.altKey) { event.preventDefault(); hint(); }
   }}>
     <header className="lesson-header">
       <button type="button" onClick={onClose} aria-label={text('lesson.close')}>{text('lesson.close-symbol')}</button>
-      <h1>{text('lesson.title')}</h1>
+      <h1>{text(lesson.titleRef as StringId)}</h1>
       <div role="progressbar" aria-label={text('lesson.progress')} aria-valuemin={1} aria-valuemax={state.totalSteps}
         aria-valuenow={state.stepIndex + 1} aria-valuetext={progressValue}>
         <span className="lesson-dots" aria-hidden="true">{Array.from({ length: state.totalSteps }, (_, index) =>
@@ -68,6 +71,8 @@ export function LessonScreen({ onClose, provenanceLog }: { onClose: () => void; 
     </header>
     <main className="lesson-layout">
       <section className="lesson-table" aria-label={text('table')}>
+        <p>{text('lesson.exercise-progress', { current: state.exerciseIndex + 1, total: state.totalExercises,
+          step: state.exerciseStepIndex + 1, steps: state.exerciseTotalSteps })}</p>
         {/* UX §3.1, §6.2: lessons use the normal table, so exposed Dummy shows face up, on its own
             full-width row as on the practice table. */}
         {state.view.dummy && <section className="lesson-dummy" aria-label={text('dummy.seat', { seat: text(`seat.${dummySeat}`) })}>
@@ -76,11 +81,18 @@ export function LessonScreen({ onClose, provenanceLog }: { onClose: () => void; 
             selected={selected} onSelect={setSelected} onPlay={answer} />
         </section>}
         <div className="lesson-seats">{(['west', 'north', 'east'] as const).filter(seat => !(seat === dummySeat && state.view.dummy)).map(seat =>
-          <span key={seat}>{text('opponent', { seat: text(`seat.${seat}`), count: state.view.cardCounts[seat] })}</span>)}</div>
-        <div className="lesson-trick" aria-label={text('trick')}>
+          <section key={seat} aria-label={text(`seat.${seat}`)}>
+            <span>{text('opponent', { seat: text(`seat.${seat}`), count: state.view.cardCounts[seat] })}</span>
+            {state.exposed.filter(entry => entry.seat === seat).map(({ card }) =>
+              <figure className="lesson-exposure" key={`${card.suit}-${card.rank}`}>
+                <Card card={card} /><figcaption>{text('lesson.exposed')}</figcaption>
+              </figure>)}
+          </section>)}</div>
+        {/* WCAG 4.1.2: a labelled region, so the label is allowed and announced (a plain div's isn't). */}
+        <section className="lesson-trick" aria-label={text('trick')}>
           {(state.view.currentTrick.length ? state.view.currentTrick : state.view.tricks.at(-1)?.cards ?? []).map(played =>
             <article key={played.seat}><p>{text(`seat.${played.seat}`)}</p><Card card={played.card} /></article>)}
-        </div>
+        </section>
         <section aria-label={text('hand')}>
           {/* UX P-1: no legal-card highlighting or accessible answer clues in following-suit lessons. */}
           <Hand cards={state.view.hand} active={active && state.view.turn === 'south'} legalCards={[]} selected={selected} onSelect={setSelected} onPlay={answer} />
@@ -90,6 +102,7 @@ export function LessonScreen({ onClose, provenanceLog }: { onClose: () => void; 
         <p className="lesson-persona">{text('lesson.persona')}</p>
         {state.textRef && <p>{text(state.textRef as StringId)}</p>}
         {state.kind === 'scripted-action' && <p role="status">{text('lesson.watch')}</p>}
+        {state.kind === 'exposure' && <p role="status">{text('lesson.exposure-note')}</p>}
         <div role="alert" aria-atomic="true">
           {state.rejection && <p>{text(`reason.${state.rejection.reason}`, { suit: state.rejection.details.suit ? text(`suit.${state.rejection.details.suit}`) : '' })}</p>}
         </div>
@@ -110,9 +123,17 @@ export function LessonScreen({ onClose, provenanceLog }: { onClose: () => void; 
           {state.hint && <section className="lesson-hint" role="status"><p>{text(state.hint.textRef as StringId)}</p>
             <small>{text('lesson.provenance', state.hint.provenance)}</small></section>}
         </>}
-        {(state.kind === 'commentary' || state.outcome && state.kind === 'prompt') &&
-          <button ref={continuation} type="button" onClick={() => state.stepIndex === state.totalSteps - 1 ? onClose() : setState(player.next())}>
-            {text(state.stepIndex === state.totalSteps - 1 ? 'lesson.done' : 'lesson.next')}</button>}
+        {continuationShown &&
+          <button ref={continuation} type="button" onClick={() => { setSelected(null); setRuleOpen(false); setState(player.next()); }}>
+            {text(state.stepIndex === state.totalSteps - 1 ? 'lesson.finish' : 'lesson.next')}</button>}
+        <section className="lesson-step-list" aria-label={text('lesson.in-level')}>
+          <h2>{text('lesson.in-level')}</h2>
+          <ol>{state.steps.map((step, index) => <li key={index} aria-current={index === state.stepIndex ? 'step' : undefined}
+            data-state={index < state.stepIndex ? 'done' : index === state.stepIndex ? 'current' : 'upcoming'}>
+            {text('lesson.step-item', { exercise: step.exerciseIndex + 1, step: text(`lesson.step.${step.kind}`),
+              status: text(index < state.stepIndex ? 'lesson.step.done' : index === state.stepIndex ? 'lesson.step.current' : 'lesson.step.upcoming') })}
+          </li>)}</ol>
+        </section>
         <p className="lesson-keys">{text('lesson.keys')}</p>
         <small>{text('lesson.draft')}</small>
       </aside>

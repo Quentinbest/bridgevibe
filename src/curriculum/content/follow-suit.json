@@ -337,7 +337,11 @@
             ],
             "correctRef": "lesson.correct",
             "wrongRef": "lesson.wrong",
-            "shownRef": "lesson.shown"
+            "shownRef": "lesson.shown",
+            "rights": {
+              "source": "original",
+              "licence": "draft"
+            }
           }
         },
         {
@@ -350,7 +354,15 @@
           "kind": "commentary",
           "textRef": "lesson.end"
         }
-      ]
+      ],
+      "rights": {
+        "source": "original",
+        "licence": "draft"
+      }
     }
-  ]
+  ],
+  "rights": {
+    "source": "original",
+    "licence": "draft"
+  }
 }

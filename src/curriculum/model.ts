@@ -15,6 +15,7 @@ export type Prompt = Content & Readonly<{
 }>;
 export type ScriptAction = Readonly<{ seat: Seat; action: Action }>;
 export type Step = Readonly<{ kind: 'commentary'; textRef: string }>
+  | Readonly<{ kind: 'exposure'; cards: readonly Readonly<{ seat: Seat; card: Card }>[] }>
   | Readonly<{ kind: 'scripted-action'; scriptIndices: readonly number[] }>
   | Readonly<{ kind: 'prompt'; prompt: Prompt }>
   | Readonly<{ kind: 'exposure'; cards: readonly Readonly<{ seat: Seat; card: Card }>[] }>;
