@@ -339,6 +339,25 @@ check unpublished content. CI runs the command separately and `npm run check`
 runs it before unit tests. Errors fail the command; warnings do not.
 
 The offline `pipeline` module imports only Table and curriculum (§4.2, §4.1.10).
+A structural pass mirrors every field of `src/curriculum/model.ts`, including
+required versus optional fields and nested Cards, Deal origins, Contracts,
+Script Actions and each Step kind. Unknown keys are rejected on all authored
+objects so misspellings such as `countRejections` cannot silently change behaviour.
+Malformed input returns findings; the first structural failure stops deeper
+checks for that Exercise, while other Exercises are still checked. A malformed
+Lesson header stops the whole Lesson.
+
+Lessons, Exercises and Prompts require a non-empty `contentId` and a positive
+safe-integer `version`. `schemaVersion` is `1`, `learnerSide` is `northSouth`,
+`answerKind` is `card`, and `signOff.status` is `unsigned-draft`. Lesson and Prompt
+`skillTags` are arrays of non-empty strings; optional `countsRejections` must be
+a boolean. Rights source and licence are non-empty strings. All text references
+must be non-empty strings and, when the caller supplies catalogue IDs (as the CLI
+does), must resolve in that catalogue. Release gating and version rules await MVP.
+
+Deal vulnerability flags must be booleans. Origins must be authored (non-empty
+content ID and positive safe-integer version) or seeded (1–64 ASCII letters,
+digits, `_` or `-`, positive safe-integer index, rotation `0`, algorithm `bv-deal-1`).
 US-27 checks 52 distinct cards, 13 per hand and the canonical Deal ID; replays
 Robot Scripts in Step order with authored provenance; probes every expected
 answer on the Table; and enumerates every combination of expected answers for
@@ -351,10 +370,11 @@ scripted-action Steps at least one in-bounds Script index. Every Script entry
 must occur exactly once. MiniBridge 20–20 HCP Deals are rejected. US-15 checks
 structured hint card references against
 South's Seat View, played cards and earlier Exposures in the same Exercise.
-Exposure references must identify the card's actual Seat. Parsing card names in
-prose is outside this check; authors must supply `hint.referencedCards`.
-Rights source, licence and sign-off status are required on Lessons, Exercises
-and Prompts; draft values are allowed. Release gating and version rules await MVP.
+At each Exposure Step, every named card must still be held by its named Seat
+in the current position on every reachable answer line, including after accepted
+alternatives and at trailing Steps. Invalid exposures report `hint-references`.
+Parsing card names in prose is outside this check; authors must supply
+`hint.referencedCards`.
 
 The first `expectedAnswers` card is canonical (Show me plays it); the Script holds
 only Robot Actions. Add an alternative to `expectedAnswers`. If playing it would
@@ -369,7 +389,9 @@ reachable line; repeated findings for the same card and Prompt produce one
 warning. Add them to
 `expectedAnswers`, or record `{ card, decision: 'accept' }` or
 `{ card, decision: 'reject', reason: '...' }` in `equivalentsReviewed`.
-A rejection needs a non-empty reason. An `accept` review requires the card to
+Reviews must name cards in the acting hand and use `accept` or `reject`; an optional
+`reason` must be a string. Suppressing an equivalent-card warning for a rejection
+needs a non-empty reason. An `accept` review requires the card to
 also appear in `expectedAnswers`; otherwise validation reports an error. Only
 `expectedAnswers` controls what the player accepts.
 
