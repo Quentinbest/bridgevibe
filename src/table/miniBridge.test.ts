@@ -94,7 +94,8 @@ test('CI-5: robot contract choice rejects missing or invalid provenance without 
   const seat = setup.seatView('south').declarer!, before = setup.record();
   const action = { kind: 'choose-contract', strain: 'no-trumps', objective: 'game' };
   for (const provenance of [undefined, { kind: 'learner' }, { kind: 'robot', policy: 'bad', version: '0', durationMs: -1 },
-    { kind: 'robot', policy: 'bad', version: '0', durationMs: 1, secret: [] }]) {
+    { kind: 'robot', policy: 'bad', version: '0', durationMs: 1, secret: [] },
+    ...['', ' ', 42, null].map(ruleId => ({ kind: 'robot', policy: 'test', version: '0', durationMs: 1, ruleId }))]) {
     expect(setup.submit(seat, 'robot', action, provenance as never)).toMatchObject({ reason: 'malformed-action' });
     expect(setup.record()).toEqual(before);
   }
@@ -128,4 +129,13 @@ test('US-04: MiniBridge card actions still replay and export through the existin
   const imported = importPbn(exportPbn(record));
   expect(imported.contract).toEqual(record.contract); expect(imported.result).toEqual(record.result);
   expect(importRecordJson(exportRecordJson(record))).toEqual(JSON.parse(exportRecordJson(record)));
+});
+
+test('§4.3.3, CI-5: accepted robot Contract Choice retains its structured rule ID in JSON', () => {
+  const setup = ready(findDeal(d => nsPoints(d) < 20)), seat = setup.seatView('south').declarer!;
+  const provenance = { kind: 'robot', policy: 'bv-contract-placeholder', version: '0', ruleId: 'placeholder-dep-02', durationMs: 1 } as const;
+  expect(setup.submit(seat, 'robot', { kind: 'choose-contract', strain: 'spades', objective: 'game' }, provenance).kind).toBe('accepted');
+  const record = setup.playthrough()!.record();
+  expect(record.setupEvents?.at(-1)).toMatchObject({ provenance });
+  expect(importRecordJson(exportRecordJson(record))).toEqual(record);
 });

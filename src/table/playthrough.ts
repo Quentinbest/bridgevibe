@@ -4,7 +4,7 @@ import { decodeSeatView, type SeatView } from './seatViewMessage';
 import type { SetupEvent } from './miniBridge';
 import { positionDigest } from './positionKey';
 
-export type RobotProvenance = Readonly<{ kind: 'robot'; policy: string; version: string; fallback?: 'timeout' | 'engine-failure'; durationMs: number }>;
+export type RobotProvenance = Readonly<{ kind: 'robot'; policy: string; version: string; ruleId?: string; fallback?: 'timeout' | 'engine-failure'; durationMs: number }>;
 // US-04.3: a play read from a PBN file has no robot or learner provenance; say so instead of inventing one.
 export type ImportedProvenance = Readonly<{ kind: 'imported'; format: 'pbn' }>;
 export type AuthoredProvenance = Readonly<{ kind: 'authored'; contentId: string; version: number }>;
@@ -69,9 +69,10 @@ export function validProvenance(controller: Controller, provenance?: ActionProve
     || Reflect.ownKeys(provenance).some(key => key !== 'kind' && key !== 'format'))) return false;
   // US-01.6, CI-5: unknown fields must not escape into downstream provenance records.
   if (provenance?.kind === 'robot' && Reflect.ownKeys(provenance).some(key =>
-    !['kind', 'policy', 'version', 'fallback', 'durationMs'].includes(key as string))) return false;
+    !['kind', 'policy', 'version', 'ruleId', 'fallback', 'durationMs'].includes(key as string))) return false;
   if (provenance?.kind === 'robot' && (typeof provenance.policy !== 'string' || !provenance.policy.trim()
     || typeof provenance.version !== 'string' || !provenance.version.trim()
+    || (provenance.ruleId !== undefined && (typeof provenance.ruleId !== 'string' || !provenance.ruleId.trim()))
     || !Number.isFinite(provenance.durationMs) || provenance.durationMs < 0
     || (provenance.fallback !== undefined && provenance.fallback !== 'timeout' && provenance.fallback !== 'engine-failure'))) return false;
   return true;

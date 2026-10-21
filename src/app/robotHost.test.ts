@@ -51,6 +51,7 @@ for (const latency of [1, 350]) test(`US-10.4: ${latency} ms policy displays at 
   vi.advanceTimersByTime(1); expect(submit).toHaveBeenCalledOnce();
   expect(submit.mock.calls[0][1]).toMatchObject({ policy: 'bv-basic', version: '1', kind: 'robot' });
   expect(submit.mock.calls[0][1].fallback).toBeUndefined(); expect(audit).toHaveBeenCalled();
+  expect(submit.mock.calls[0][1]).not.toHaveProperty('ruleId');
 });
 test('US-10.4: forced final play uses the same display delay', () => {
   const table = fixedPlaythrough();
@@ -72,6 +73,7 @@ test('US-12.2: deadline timeout is marked, cancelled, and late answers discarded
   expect(submit).toHaveBeenCalledOnce();
   expect(submit.mock.calls[0][1]).toMatchObject({ policy: 'bv-fallback', fallback: 'timeout', durationMs: 400 });
   expect(audit).toHaveBeenCalledOnce();
+  expect(submit.mock.calls[0][1]).not.toHaveProperty('ruleId');
 });
 for (const event of ['error', 'messageerror', 'response'] as const) test(`US-12.5: ${event} restarts and records engine-failure`, () => {
   const { workers, submit } = setup();
@@ -316,10 +318,10 @@ test.each(['timeout', 'engine-failure'] as const)('contract-choice host fallback
     if (fallback === 'engine-failure') workers[0].onerror?.({} as ErrorEvent);
     vi.advanceTimersByTime(499);
     expect(play.record().setupEvents?.at(-1)).toMatchObject({ kind: 'contract-choice', provenance: {
-      kind: 'robot', policy: 'bv-contract-placeholder', version: '0', fallback,
+      kind: 'robot', policy: 'bv-contract-placeholder', version: '0', ruleId: 'placeholder-dep-02', fallback,
       durationMs: fallback === 'timeout' ? 400 : 1,
     } });
-    expect(play.provenanceLog.entries().at(-1)?.provenance).toMatchObject({ policy: 'bv-contract-placeholder', fallback });
+    expect(play.provenanceLog.entries().at(-1)?.provenance).toMatchObject({ policy: 'bv-contract-placeholder', ruleId: 'placeholder-dep-02', fallback });
     expect(play.provenanceLog.counters().silentFallbacks).toBe(0);
   } finally { stop(); }
 });

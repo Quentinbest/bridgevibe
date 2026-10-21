@@ -1,10 +1,10 @@
 import { afterEach, expect, test, vi } from 'vitest';
 import { fixedPlaythrough } from '../../test/strategy';
 import { robotAudit } from '../../test/robotAudit';
-import { encodeSeatView, seatViewSeed } from '../table';
+import { dealFromSeed, startMiniBridge, encodeSetupSeatView, encodeSeatView, seatViewSeed } from '../table';
 import { basicPolicy } from '../robots';
 import { handleRobotMessage } from './robotWorker';
-import type { RobotRequest } from './robotProtocol';
+import type { ContractRequest, RobotRequest } from './robotProtocol';
 afterEach(() => vi.unstubAllGlobals());
 test('US-12.6: worker handler decides without WebAssembly and reports policy provenance', () => {
   const descriptor = Object.getOwnPropertyDescriptor(globalThis, 'WebAssembly');
@@ -37,4 +37,18 @@ test('ADR-0001: policy receives exactly decoded view, visible seed, and deadline
   handleRobotMessage(request, vi.fn(), { ...basicPolicy, decide });
   expect(decide.mock.calls).toEqual([[view, request.seed, request.deadline]]);
   expect(decide.mock.calls[0][0]).not.toBe(request.view);
+});
+
+test('§4.3.3: contract worker success and failure carry the structured rule ID', () => {
+  const setup = startMiniBridge({ deal: dealFromSeed('setup-ui', 3), learnerSide: 'northSouth' });
+  while (setup.seatView('south').step !== 'contract-choice') setup.advance();
+  const seat = setup.seatView('south').declarer!;
+  const request: ContractRequest = { type: 'choose-contract', requestId: 'choice', cancellationId: 'choice',
+    playthroughId: 'setup', positionKey: setup.positionKey(), deadline: 400, seat, seed: 'visible', view: encodeSetupSeatView(setup.seatView(seat)) };
+  const post = vi.fn(); let time = 0;
+  handleRobotMessage(request, post, undefined, () => time++);
+  expect(post.mock.calls[0][0]).toMatchObject({ type: 'decided', provenance: { kind: 'robot',
+    policy: 'bv-contract-placeholder', version: '0', ruleId: 'placeholder-dep-02', durationMs: 1 } });
+  handleRobotMessage({ ...request, view: { ...request.view, seat: 'south' } }, post);
+  expect(post.mock.calls[1][0]).toMatchObject({ type: 'error', provenance: { ruleId: 'placeholder-dep-02' } });
 });

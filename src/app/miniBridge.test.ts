@@ -71,8 +71,9 @@ test.each(['east', 'west'] as const)('US-06.6, CI-5: %s chooses in the worker wi
   expect(() => audit({ request, leak: deal.hands.south[0] }, declarer)).toThrow('robot-audit-hidden-card');
   vi.advanceTimersByTime(1);
   const event = play.record().setupEvents?.at(-1);
-  expect(event).toMatchObject({ kind: 'contract-choice', provenance: { kind: 'robot', policy: 'bv-contract-placeholder', version: '0' } });
-  expect(play.provenanceLog.entries()[0]).toMatchObject({ kind: 'robot-action', provenance: { sourceKind: 'robot', policy: 'bv-contract-placeholder' } });
+  expect(event).toMatchObject({ kind: 'contract-choice', provenance: { kind: 'robot', policy: 'bv-contract-placeholder', version: '0', ruleId: 'placeholder-dep-02' } });
+  expect(play.provenanceLog.entries()[0]).toMatchObject({ kind: 'robot-action', provenance: { sourceKind: 'robot', policy: 'bv-contract-placeholder', ruleId: 'placeholder-dep-02' } });
+  expect(JSON.parse(play.provenanceLog.entries()[0].summary)).not.toHaveProperty('ruleId');
   expect(play.record().actions).toHaveLength(0);
   expect(importRecordJson(exportRecordJson(play.record()))).toEqual(play.record());
   expect(play.getSnapshot().dummySeat).toBe(dummy); stop();
@@ -83,7 +84,7 @@ test.each(['timeout', 'engine-failure'] as const)('US-12: robot Contract Choice 
     return { onmessage: null, onerror: null, onmessageerror: null, postMessage() {}, terminate() {} };
   } }, fixture('east'));
   const stop = play.start(); vi.advanceTimersByTime(3500);
-  expect(play.record().setupEvents?.at(-1)).toMatchObject({ provenance: { kind: 'robot', policy: 'bv-contract-placeholder', version: '0', fallback, durationMs: expect.any(Number) } });
+  expect(play.record().setupEvents?.at(-1)).toMatchObject({ provenance: { kind: 'robot', policy: 'bv-contract-placeholder', version: '0', ruleId: 'placeholder-dep-02', fallback, durationMs: expect.any(Number) } });
   expect(play.provenanceLog.counters().silentFallbacks).toBe(0); stop();
 });
 test('ADR-0003: North chooses and the learner plays both North and South', () => {
@@ -126,7 +127,7 @@ test('US-11.1: rejected robot choice falls back with provenance instead of start
     return worker;
   } }, fixture('east'));
   const stop = play.start(); vi.advanceTimersByTime(3500);
-  expect(play.record().setupEvents?.at(-1)).toMatchObject({ kind: 'contract-choice', provenance: { policy: 'bv-contract-placeholder', version: '0', fallback: 'engine-failure' } });
+  expect(play.record().setupEvents?.at(-1)).toMatchObject({ kind: 'contract-choice', provenance: { policy: 'bv-contract-placeholder', version: '0', ruleId: 'placeholder-dep-02', fallback: 'engine-failure' } });
   expect(play.provenanceLog.counters().silentFallbacks).toBe(0);
   expect(play.getSnapshot().reason).toBe(''); stop();
 });

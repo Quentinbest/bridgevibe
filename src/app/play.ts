@@ -148,7 +148,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     const result = setup.submit(seat, provenance ? 'robot' : 'learner', action, provenance);
     if (result.kind === 'rejected') return false;
     table = setup.playthrough();
-    if (provenance) log({ positionIndex: 0, kind: 'robot-action', summary: JSON.stringify({ seat, action, ruleId: contractChoicePolicy.ruleId }),
+    if (provenance) log({ positionIndex: 0, kind: 'robot-action', summary: JSON.stringify({ seat, action }),
       provenance: { sourceKind: 'robot', ...provenance } });
     publish(); schedule(); return true;
   }

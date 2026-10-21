@@ -90,6 +90,7 @@ export function createRobotHost(options: RobotHostOptions = {}) {
     const policy = active.kind === 'contract' ? contractChoicePolicy : fallbackRobotPolicy;
     result = { action: fallbackAction(active, clock.now()),
       provenance: { kind: 'robot', policy: policy.name, version: policy.version,
+        ...(active.kind === 'contract' ? { ruleId: contractChoicePolicy.ruleId } : {}),
         fallback: reason, durationMs: clock.now() - started } };
     cancelRequest();
   }
@@ -143,7 +144,9 @@ export function createRobotHost(options: RobotHostOptions = {}) {
     failures++; terminate();
     const policy = decision.kind === 'contract' ? contractChoicePolicy : fallbackRobotPolicy;
     submitDecision(decision, fallbackAction(decision, clock.now()), { kind: 'robot',
-      policy: policy.name, version: policy.version, fallback: 'engine-failure', durationMs: clock.now() - started });
+      policy: policy.name, version: policy.version,
+      ...(decision.kind === 'contract' ? { ruleId: contractChoicePolicy.ruleId } : {}),
+      fallback: 'engine-failure', durationMs: clock.now() - started });
   }
   function begin() {
     if (!active || visibility.hidden()) return;

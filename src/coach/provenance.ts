@@ -47,6 +47,7 @@ export function validateEntry(entry: unknown): string[] {
       break;
     case 'robot':
       fields('policy', 'version');
+      if (p.ruleId !== undefined) fields('ruleId');
       if (p.kind !== 'robot') errors.push('provenance.kind');
       if (typeof p.durationMs !== 'number' || !Number.isFinite(p.durationMs) || p.durationMs < 0) errors.push('provenance.durationMs');
       if (p.fallback !== undefined && p.fallback !== 'timeout' && p.fallback !== 'engine-failure') errors.push('provenance.fallback');

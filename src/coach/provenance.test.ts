@@ -58,3 +58,14 @@ test('CI-5: only unmarked fallback actions increment the silent counter', () => 
   expect(log.counters()).toEqual({ hiddenCardsInVisibleInputs: 1, silentFallbacks: 1 });
   expect(createProvenanceLog().counters()).toEqual({ hiddenCardsInVisibleInputs: 0, silentFallbacks: 0 });
 });
+
+test('§4.3.3, CI-5: robot rule IDs are optional, nonempty when present, and retained in the log', () => {
+  const provenance = { sourceKind: 'robot', kind: 'robot', policy: 'bv-contract-placeholder', version: '0',
+    ruleId: 'placeholder-dep-02', durationMs: 1 } as const;
+  expect(validateEntry(entry(provenance))).toEqual([]);
+  for (const ruleId of ['', ' ', 42, null]) {
+    expect(validateEntry({ ...entry(provenance), provenance: { ...provenance, ruleId } })).toContain('provenance.ruleId');
+  }
+  const log = createProvenanceLog(); log.record(entry(provenance));
+  expect(log.entries()[0].provenance).toEqual(provenance);
+});
