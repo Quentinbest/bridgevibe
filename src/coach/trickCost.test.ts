@@ -32,7 +32,7 @@ test('US-17: costly/zero/equivalent plays, forced plays, both declaring hands an
       ] };
     });
     const log = createProvenanceLog(); const results: TrickCost[] = [];
-    await trickCosts(record, { ...bridgeDdsEngine, solvePosition, solveTable: vi.fn() }, log, words, result => results.push(result));
+    await trickCosts(record, { ...bridgeDdsEngine, solvePosition, solveTable: vi.fn() }, log, 'analysis-test-1', words, result => results.push(result));
     expect(results.some(result => result.cost === 0)).toBe(true);
     for (const result of results) {
       expect(record.actions[result.positionIndex].controller).toBe('learner');
@@ -57,21 +57,22 @@ test('US-17.2: only equivalent actions remain; no badge or statement, even with 
   const log = createProvenanceLog(); const arrive = vi.fn();
   await trickCosts(completedRecord(completeFixedDeal()), { ...bridgeDdsEngine, solveTable: vi.fn(),
     solvePosition: async layout => ({ ...bridgeDdsEngine, classes: [{ cards: layout.south, tricks: 3 }] }),
-  }, log, words, arrive);
+  }, log, 'analysis-test-1', words, arrive);
   expect(arrive).not.toHaveBeenCalled(); expect(log.entries()).toEqual([]);
 });
-test('US-17: a failed solve leaves no invented cost and subsequent decisions continue (#21)', async () => {
+test('CI-4: a failed position propagates to composition and counts as silent until an abstention is recorded', async () => {
   const record = completed(); const log = createProvenanceLog(); const arrive = vi.fn();
   const solvePosition = vi.fn<SolverPort['solvePosition']>().mockRejectedValue(new Error('solver failure'));
-  await trickCosts(record, { ...bridgeDdsEngine, solvePosition, solveTable: vi.fn() }, log, words, arrive);
-  expect(solvePosition.mock.calls.length).toBeGreaterThan(1);
+  await expect(trickCosts(record, { ...bridgeDdsEngine, solvePosition, solveTable: vi.fn() }, log, 'analysis-test-1', words, arrive)).rejects.toMatchObject({ positionIndex: 1, cause: new Error('solver failure') });
+  expect(solvePosition).toHaveBeenCalledOnce();
+  expect(log.counters().silentFallbacks).toBe(1);
   expect(arrive).not.toHaveBeenCalled(); expect(log.entries()).toEqual([]);
 });
 
 test('US-17: the completed fixed Deal produces progressive, logged results from the real adapter', async () => {
   const { bridgeDdsAdapter } = await import('../analysis/bridgeDdsAdapter');
   const record = completedRecord(completeFixedDeal()); const log = createProvenanceLog(); const results: TrickCost[] = [];
-  await trickCosts(record, bridgeDdsAdapter, log, words, cost => results.push(cost));
+  await trickCosts(record, bridgeDdsAdapter, log, 'analysis-test-1', words, cost => results.push(cost));
   expect(results.filter(result => result.positionIndex < 4)).toHaveLength(2);
   expect(results.some(result => result.cost > 0)).toBe(true);
   expect(results.every(result => validateEntry(result.statement).length === 0)).toBe(true);

@@ -267,3 +267,5 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
 .setup-screen button { background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-8); font: inherit; cursor: pointer; }
 .setup-screen button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-soft-text); }
 .setup-screen button:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 3px; }
+/* CI-4: neutral unavailable state; replay remains usable. */
+.review-unavailable { margin-block: 1rem; }

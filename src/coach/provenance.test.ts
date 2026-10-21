@@ -69,3 +69,18 @@ test('§4.3.3, CI-5: robot rule IDs are optional, nonempty when present, and ret
   const log = createProvenanceLog(); log.record(entry(provenance));
   expect(log.entries()[0].provenance).toEqual(provenance);
 });
+test('CI-4 / VAL-06: abstentions require valid cause and engine provenance; only their failure is accounted for', () => {
+  const log = createProvenanceLog();
+  const abstention: LogEntry = { ...entry(sources[2]), abstention: { reason: 'unavailable', cause: 'timeout' } };
+  expect(validateEntry(abstention)).toEqual([]);
+  for (const invalid of [{ reason: 'uncertain', cause: 'timeout' }, { reason: 'unavailable' }, { cause: 'error' }, { reason: 'unavailable', cause: 'connection' }, null]) {
+    expect(validateEntry({ ...abstention, abstention: invalid })).toContain('abstention');
+  }
+  expect(validateEntry({ ...abstention, provenance: sources[0] })).toContain('abstention.provenance');
+  log.analysisFailed(abstention.id); log.analysisFailed('unanswered');
+  expect(log.counters().silentFallbacks).toBe(2);
+  expect(() => log.record({ ...abstention, text: '' })).toThrow();
+  expect(log.counters().silentFallbacks).toBe(2);
+  log.record(abstention);
+  expect(log.counters().silentFallbacks).toBe(1);
+});

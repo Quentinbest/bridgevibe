@@ -128,11 +128,18 @@ function PracticeScreen() {
   const analysis = useSyncExternalStore(analysisHost.subscribe, () => analysisHost.snapshot(completed));
   // §4.5, U-13: start at completion, before Hand review is opened.
   // §4.7: a New deal (or leaving) cancels the old record's analysis instead of leaving the solver running.
-  useEffect(() => completed ? analysisHost.start(completed, play.provenanceLog) : undefined, [completed, play]);
+  const cancelAnalysis = useRef<() => void>(() => {});
+  useEffect(() => {
+    cancelAnalysis.current = completed ? analysisHost.start(completed, play.provenanceLog) : () => {};
+    return () => cancelAnalysis.current();
+  }, [completed, play]);
   useEffect(() => play.start(), [play]);
   useEffect(() => { if (!review && view.status === 'completed') reviewButton.current?.focus(); }, [review, view.status]);
-  if (review) return <ReviewScreen analysis={analysis} record={review} onBack={() => setReview(null)} />;
   const debug = DebugPanel && new URLSearchParams(window.location.search).get('debug') === '1';
+  if (review) return <div className={debug ? 'debug-layout' : undefined}>
+    <ReviewScreen onTryAgain={() => { cancelAnalysis.current = analysisHost.retry(review, play.provenanceLog); }} analysis={analysis} record={review} onBack={() => setReview(null)} />
+    {debug && <Suspense fallback={null}><DebugPanel play={play} /></Suspense>}
+  </div>;
   return <div className={debug ? 'debug-layout' : undefined}><TableScreen key={session.key} view={view} chooseContract={play.chooseContract} play={play.play} clearRejection={play.clearRejection} onShowRule={play.showRule} info={session.info} invalid={session.invalid} onNew={() => setSession(session.next())} />
     {view.status === 'completed' && <div className="review-entry"><button ref={reviewButton} type="button" onClick={() => setReview(play.completedRecord())}>{text('review.title')}</button></div>}
     {debug && <Suspense fallback={null}><DebugPanel key={session.key} play={play} /></Suspense>}
