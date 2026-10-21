@@ -1,9 +1,10 @@
+import { type AnalysisState } from './analysisHost';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { replay, exportPbn, exportRecordJson, SEATS, SUITS, type CompletedPlaythroughRecord } from '../table';
 import { cardName, text } from '../explanation';
 import { Card } from './Card';
 
-export function ReviewScreen({ record, onBack }: { record: CompletedPlaythroughRecord; onBack: () => void }) {
+export function ReviewScreen({ record, onBack, analysis }: { analysis?: AnalysisState; record: CompletedPlaythroughRecord; onBack: () => void }) {
   // US-16.1, §4.3.5: replay also refuses incomplete records at runtime.
   const tricks = useMemo(() => replay(record), [record]);
   const [index, setIndex] = useState(0);
@@ -23,6 +24,7 @@ export function ReviewScreen({ record, onBack }: { record: CompletedPlaythroughR
     <header className="review-header"><button type="button" onClick={onBack}>{text('review.back')}</button>
       <h1 ref={heading} tabIndex={-1}>{text('review.title')}</h1></header>
     <p role="note" className="review-xray"><span aria-hidden="true">▦</span>{text('review.xray')}</p>
+    {analysis?.running && <p role="status" className="review-analysis-skeleton">{text('review.working')}</p>}
     <section className="review-replay" aria-label={text('review.replay')}>
       <div className="review-stepper">
         <button type="button" disabled={index === 0} onClick={() => setIndex(index - 1)} aria-label={text('review.previous')}>←</button>
@@ -31,7 +33,15 @@ export function ReviewScreen({ record, onBack }: { record: CompletedPlaythroughR
       </div>
       {showHands && <p>{text('review.hands-at', { n: index + 1 })}</p>}
       <div className="review-layout" data-hands={showHands}>
-        <ol className="review-plays">{trick.cards.map(({ seat, card }) => <li key={seat}><Card card={card} /><span>{text(`seat.${seat}`)}</span></li>)}</ol>
+        <ol className="review-plays">{trick.cards.map(({ seat, card }, offset) => {
+          const badge = analysis?.costs.find(cost => cost.positionIndex === index * 4 + offset);
+          return <li key={seat}><Card card={card} /><span>{text(`seat.${seat}`)}</span>
+            {badge && <span className={`review-cost ${badge.cost ? 'review-cost-xray' : 'review-cost-neutral'}`}
+              role="img" aria-label={badge.statement.text}>
+              <b>{text(badge.cost ? 'review.cost-negative' : 'review.cost-zero', { cost: badge.cost })}</b>
+              <small>{text('review.hindsight')}</small>
+            </span>}</li>;
+        })}</ol>
         {showHands && <section id="review-hands" className="review-hands" aria-label={text('review.hands-at', { n: index + 1 })}>
           {SEATS.map(seat => <section key={seat} className={`review-hand review-${seat}`} aria-label={text(`seat.${seat}`)}>
             <h3>{text(`seat.${seat}`)}</h3><div>{SUITS.map(suit => <p key={suit}>

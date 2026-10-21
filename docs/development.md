@@ -265,6 +265,72 @@ West leads S2, North wins SA then leads SJ; the second row remains W,N,E,S
 The review reuses existing theme tokens; result, trick cost and key moments remain
 owned by their separate tickets.
 
+## Analysis
+
+US-17, §4.3.2, U-13: `src/analysis/` owns the `SolverPort` and the completed-record
+`doubleDummy` service. Analysis may import Table and `bridge-dds`; Coach may import
+Analysis. The service checks `completedRecord()` and replays the record through Table
+before reconstructing a position. Legality and trick winners remain Table's decisions.
+The port accepts remaining hands and a position with the trick leader, strain and
+zero to three cards already played. Position results group equivalent cards and count
+remaining tricks for the side to act. Table results use S/H/D/C/NT rows and N/E/S/W
+columns. Every result carries the adapter name and version.
+
+The first adapter is `bridge-dds` 1.4.0 (DDS 2.9, Apache-2.0). `App.tsx` starts the
+session host when `play.completedRecord()` becomes available, before Hand review is
+opened. The host dynamically imports `analysisClient`, which creates `analysisWorker`;
+the solver and its embedded WebAssembly live exclusively in that worker chunk.
+The lesson route never starts analysis. A build test walks the initial chunk graph,
+checks the worker's DDS code and checks its LICENSE attribution; e2e checks the
+lesson's requests and the completion trigger. Vite's Node-only `module` import warning
+is expected: its browser stand-in is attributed to Vite, including Vite 8's bare ID.
+Unknown virtual modules still fail the licence check.
+
+`coach/trickCost.ts` subtracts the chosen equivalence class's value from the best
+value for the acting side. One legal card, or just one equivalence class, produces
+no statement or badge. Table controller assignments cover South when defending and
+both declaring hands when declaring. Each result is logged through the Playthrough's
+provenance log as `ALL_HANDS`, engine source, sample count 0. Catalogue text supplies
+the hindsight label and engine description; it remains draft pending CI-8 sign-off.
+Review subscribes to session results: a static skeleton says “Working out the X-ray
+view…” while pending, then badges appear individually (`0` neutral, `−n` X-ray).
+The existing review theme tokens are reused; the design's judgement/key-moment copy
+is not used for trick costs (CI-3; #26).
+
+The in-memory cache key includes the Playthrough ID, recorded engine versions and
+analysis adapter version. Reopening review reuses in-flight or finished work without
+duplicate log entries. Workers close after analysis. A 30-second stalled solve
+terminates that worker and ends subsequent requests immediately; solve/startup failures
+leave badges absent and end the skeleton. User-facing failure states belong to #21.
+
+### F2 smoke references
+
+From the repository root, outside the sandbox, run:
+
+```sh
+node scripts/solver/generate-f2.ts
+npx vitest run --project node src/analysis src/coach
+```
+
+Requirements: Node 24, a C++17 compiler, `.reference-solvers/venv/bin/python` with
+endplay 0.5.12, and `.reference-solvers/bridge-solver/` at commit `630705d`.
+The generator compiles a small driver against macroxue's public API so mid-trick
+positions do not depend on parsing its interactive CLI. It generates 20 `bv-deal-1`
+deals with seed `f2-smoke`, indices 1–20, cycling strains and declarers; positions
+follow Table's first legal action after `16 + i % 4` and `33 + i % 3` plays (zero-based
+`i`). Thus the 40 positions include every current-trick length. Both references score
+every legal card; macroxue's total NS result is converted to remaining acting-side
+tricks. All 20 tables and 40 per-card arrays must agree. On disagreement the output
+preserves both references and the command fails loudly.
+
+`src/analysis/f2-smoke.json` records the endplay and native DDS versions and macroxue's
+full commit. It contains no timestamps or timing data, so repeated generation must
+be byte-identical. `f2.test.ts` checks the adapter against both references; missing
+data is a failure with the regeneration command, never a skipped test. Native DDS
+requires a sysctl unavailable in this sandbox: generation and repeatability verification
+must run outside it. Reference sources, compiled driver and Matplotlib cache remain
+under the Git/ESLint-ignored `.reference-solvers/` directory and are never shipped.
+
 ## Content checks
 
 Run `node scripts/content/check.ts` or `npm run content:check` to validate every

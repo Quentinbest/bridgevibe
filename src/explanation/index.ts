@@ -2,6 +2,11 @@ import type { Card, ReasonCode } from '../table';
 
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
+  'review.working': { text: 'Working out the X-ray view…', status: 'draft' },
+  'review.hindsight': { text: 'X-ray view: with all cards visible', status: 'draft' },
+  'review.cost-zero': { text: '0', status: 'draft' },
+  'review.cost-negative': { text: '−{cost}', status: 'draft' },
+  'review.cost-description': { text: 'Trick cost: {cost}. X-ray view: with all cards visible. Engine: {name}, version {version}.', status: 'draft' },
   "lesson.title": { text: "Follow suit", status: 'draft' },
   "lesson.complete": { text: "Level complete", status: 'draft' },
   "lesson.finish": { text: "Finish level", status: 'draft' },
