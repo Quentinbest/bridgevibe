@@ -56,8 +56,10 @@ export function startMiniBridge(input: Omit<Parameters<typeof startPlaythrough>[
       dummySeat: exposed ? partner(declarer!) : null, announcements, declarer, tied, step });
   }
   function submit(seat: unknown, controller: unknown, action: unknown, provenance?: ActionProvenance): Submission {
-    const reject = (reason: 'not-declarer' | 'invalid-contract-choice' | 'malformed-action'): Submission => ({ kind: 'rejected', reason, details: {} });
-    if (step !== 'contract-choice' || seat !== declarer || controller !== controllerOf(declarer!)) return reject('not-declarer');
+    const reject = (reason: 'wrong-phase' | 'not-declarer' | 'invalid-contract-choice' | 'malformed-action'): Submission => ({ kind: 'rejected', reason, details: {} });
+    // US-01.5: a Contract Choice before dummy is exposed, or a card play during setup, is in the wrong phase.
+    if (step !== 'contract-choice' || (!!action && typeof action === 'object' && 'kind' in action && action.kind === 'play-card')) return reject('wrong-phase');
+    if (seat !== declarer || controller !== controllerOf(declarer!)) return reject('not-declarer');
     if (!action || typeof action !== 'object' || !('kind' in action) || action.kind !== 'choose-contract'
       || !('strain' in action) || ![...SUITS, 'no-trumps'].includes(action.strain as Contract['strain'])
       || !('objective' in action) || !OBJECTIVES.includes(action.objective as Objective)

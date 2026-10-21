@@ -26,6 +26,8 @@ export const catalogue = {
   "contract.chosen": { text: "{strain} {objective}", status: 'draft' },
   "reason.not-declarer": { text: "Only declarer can choose the contract.", status: 'draft' },
   "rule.not-declarer": { text: "Declarer’s controller chooses the strain and objective after dummy is exposed.", status: 'draft' },
+  "reason.wrong-phase": { text: "That can’t be done yet — finish the setup first.", status: 'draft' },
+  "rule.wrong-phase": { text: "Each step happens in order: points, declarer, dummy, contract choice, then card play.", status: 'draft' },
   "reason.invalid-contract-choice": { text: "Choose a strain and either Part-score or Game.", status: 'draft' },
   "rule.invalid-contract-choice": { text: "A MiniBridge contract choice needs one of the four suits or no-trumps, and a part-score or game objective.", status: 'draft' },
 
@@ -216,6 +218,7 @@ export function text(id: StringId, params: Readonly<Record<string, string | numb
 export const reasonStrings: Record<ReasonCode, StringId> = {
   'not-declarer': 'reason.not-declarer',
   'invalid-contract-choice': 'reason.invalid-contract-choice',
+  'wrong-phase': 'reason.wrong-phase',
   'playthrough-complete': 'reason.playthrough-complete',
   'malformed-action': 'reason.malformed-action',
   'not-your-turn': 'reason.not-your-turn',

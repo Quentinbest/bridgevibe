@@ -139,3 +139,18 @@ test('§4.3.3, CI-5: accepted robot Contract Choice retains its structured rule 
   expect(record.setupEvents?.at(-1)).toMatchObject({ provenance });
   expect(importRecordJson(exportRecordJson(record))).toEqual(record);
 });
+
+// US-01.5: actions in the wrong phase say so, even from the declarer.
+test('F1 US-01.5: wrong-phase before the contract choice and for card plays during setup', () => {
+  const deal = findDeal(d => nsPoints(d) !== 20), setup = startMiniBridge({ deal, learnerSide: 'northSouth' });
+  const choice = { kind: 'choose-contract', strain: 'no-trumps', objective: 'game' } as const;
+  for (let n = 0; setup.seatView('south').step !== 'contract-choice' && n < 100; n++) {
+    const { declarer } = setup.seatView('south');
+    expect(setup.submit(declarer ?? 'south', declarer ? setup.controllerOf(declarer) : 'learner', choice)).toMatchObject({ reason: 'wrong-phase' });
+    setup.advance();
+  }
+  const declarer = setup.seatView('south').declarer!;
+  const card = setup.seatView(declarer).hand[0];
+  expect(setup.submit(declarer, setup.controllerOf(declarer), { kind: 'play-card', card })).toMatchObject({ reason: 'wrong-phase' });
+  expect(setup.seatView('south').step).toBe('contract-choice');
+});
