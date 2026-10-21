@@ -32,7 +32,10 @@ const object = (fields: Record<string, Check>): Check => value => {
   return keys.length === Object.keys(fields).length && keys.every(key => typeof key === 'string'
     && Object.hasOwn(fields, key) && fields[key]((value as Record<string, unknown>)[key]));
 };
-const announcements: Check = value => array(object({ seat: choice(SEATS), hcp: integer(40) }), 4)(value);
+// US-06.2: at most one Announcement per Seat; card play has none (Contract Bridge) or all four (MiniBridge).
+const announcementList: Check = value => array(object({ seat: choice(SEATS), hcp: integer(40) }), 4)(value)
+  && new Set((value as { seat: string }[]).map(entry => entry.seat)).size === (value as unknown[]).length;
+const announcements: Check = value => announcementList(value) && [0, 4].includes((value as unknown[]).length);
 function valid(value: unknown): boolean {
   const seat = choice(SEATS);
   const card = object({ suit: choice(SUITS), rank: choice(RANKS) });
@@ -81,7 +84,7 @@ export function decodeSetupSeatView(data: unknown): SetupSeatView {
   const seat = choice(SEATS), card = object({ suit: choice(SUITS), rank: choice(RANKS) });
   const nullableSeat: Check = value => value === null || seat(value);
   if (!object({ seat, hand: array(card, 13), dummy: value => value === null || array(card, 13)(value), dummySeat: nullableSeat,
-    announcements, declarer: nullableSeat, tied: choice([true, false]),
+    announcements: announcementList, declarer: nullableSeat, tied: choice([true, false]),
     step: choice(['announcements', 'redeal', 'declarer', 'dummy', 'contract-choice', 'complete']) })(data)) throw new Error('Invalid SetupSeatView message');
   return { ...JSON.parse(JSON.stringify(data)), [setupSeatViewBrand]: true };
 }

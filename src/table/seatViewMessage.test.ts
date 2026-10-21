@@ -33,6 +33,8 @@ for (const bad of [null, [], {}, { seat: 'up' }, { positionIndex: -1 }, { positi
   ...[-1, 41, 1.5, '10', NaN, Infinity].map(hcp => ({ announcements: [{ seat: 'north', hcp }] })),
   { announcements: [{ seat: 'north', hcp: 10, extra: true }] },
   { announcements: Array.from({ length: 5 }, () => ({ seat: 'north', hcp: 0 })) },
+  { announcements: [{ seat: 'north', hcp: 10 }, { seat: 'east', hcp: 10 }, { seat: 'south', hcp: 10 }] },
+  { announcements: ['north', 'north', 'south', 'west'].map(seat => ({ seat, hcp: 10 })) },
   { cardCounts: { north: 13, east: 13, south: 13, west: 14 } }, { tricksWon: { northSouth: NaN, eastWest: 0 } }]) {
   test(`ADR-0001: rejects malformed or extra wire fields ${JSON.stringify(bad)}`, () => {
     const wire = encodeSeatView(make().seatView('west'));

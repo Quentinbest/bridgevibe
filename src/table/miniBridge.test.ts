@@ -113,6 +113,9 @@ test('ADR-0001: setup decode rejects extra fields; returned views and events are
   const setup = ready(findDeal(d => nsPoints(d) !== 20));
   const encoded = encodeSetupSeatView(setup.seatView('south'));
   expect(() => decodeSetupSeatView({ ...encoded, leak: [] })).toThrow();
+  // US-06.2: a partial list is valid during setup, a repeated Seat never is.
+  expect(decodeSetupSeatView({ ...encoded, announcements: encoded.announcements.slice(0, 2) }).announcements).toHaveLength(2);
+  expect(() => decodeSetupSeatView({ ...encoded, announcements: [encoded.announcements[0], encoded.announcements[0]] })).toThrow();
   const changed = JSON.parse(JSON.stringify(encoded)); changed.hand.length = 0; changed.announcements[0].hcp = 99;
   expect(setup.seatView('south').hand).toHaveLength(13);
   expect(setup.seatView('south').announcements[0].hcp).not.toBe(99);
