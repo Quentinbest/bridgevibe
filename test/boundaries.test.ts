@@ -28,3 +28,17 @@ test('ESLint rejects robot namespace and deep imports of table', async () => {
     expect(result.messages.some(message => message.ruleId === 'no-restricted-imports')).toBe(true);
   }
 });
+
+// ADR-0001, US-06: setup's separate view has the same construction boundary.
+for (const assertion of ['value as SetupSeatView', '<SetupSeatView>value']) {
+  test(`ESLint rejects forged setup view: ${assertion}`, async () => {
+    const [result] = await new ESLint().lintText(`import type { SetupSeatView } from '../table'; declare const value: unknown; export const bad = ${assertion};`, { filePath: 'src/app/boundary.ts' });
+    expect(result.messages.some(message => message.ruleId === 'no-restricted-syntax')).toBe(true);
+  });
+}
+test('robots can import SetupSeatView but cannot import setup constructors, messages or full records', async () => {
+  for (const name of ['SetupSeatView', 'SetupSeatViewMessage', 'decodeSetupSeatView', 'startMiniBridge', 'SetupEvent', 'Deal', 'PlaythroughRecord']) {
+    const [result] = await new ESLint().lintText(`import type { ${name} } from '../table'; export type Check = ${name};`, { filePath: 'src/robots/boundary.ts' });
+    expect(result.messages.some(message => message.ruleId === 'no-restricted-imports')).toBe(name !== 'SetupSeatView');
+  }
+});

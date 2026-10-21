@@ -1,13 +1,18 @@
 import { createProvenanceLog, type LogEntry } from '../coach/provenance';
-import { basicPolicy, fallbackRobotPolicy } from '../robots';
-import { startPlaythrough, seatViewSeed, type Card, type Deal, type SeatView, type Seat, type PlayedCard, type ReasonCode, type RobotProvenance } from '../table';
+import { basicPolicy, fallbackRobotPolicy, contractChoicePolicy } from '../robots';
+import { startMiniBridge, encodeSetupSeatView, sideOf, SEATS, seatViewSeed, type Playthrough, type SetupSeatView, type ContractChoice, type Objective, type Card, type Deal, type SeatView, type Seat, type PlayedCard, type ReasonCode, type RobotProvenance } from '../table';
 import { createRobotHost, type RobotHostOptions } from './robotHost';
 import { cardName, reasonStrings, text } from '../explanation';
 import { fixedDeal } from './fixture';
 import { browserRobotAudit, robotAudit } from './robotAudit';
 
 export type LearnerView = Readonly<Pick<SeatView,
-  'positionIndex' | 'hand' | 'dummy' | 'contract' | 'turn' | 'tricksWon' | 'cardCounts' | 'status'> & {
+  'positionIndex' | 'hand' | 'dummy' | 'turn' | 'tricksWon' | 'cardCounts' | 'status'> & {
+  contract: SeatView['contract'] | null;
+  setup: SetupSeatView | null;
+  objective: Objective | null;
+  dummySeat: Seat | null;
+  north: readonly Card[] | null;
   legalCards: readonly Card[];
   displayedTrick: readonly PlayedCard[];
   collecting: boolean;
@@ -20,14 +25,17 @@ export type LearnerView = Readonly<Pick<SeatView,
   announcements: readonly string[];
 }>;
 
-// The learner declares 3NT from South until the table turns for other declarers (#16, ADR-0003).
+// US-06: MiniBridge Setup is the entry point for every practice Deal.
 export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fixedDeal) {
-  const table = startPlaythrough({ deal, contract: { level: 3, strain: 'no-trumps', declarer: 'south' }, learnerSide: 'northSouth',
-    versions: { appVersion: '0.0.0', engineVersions: { [basicPolicy.name]: basicPolicy.version, [fallbackRobotPolicy.name]: fallbackRobotPolicy.version } } });
+  const setup = startMiniBridge({ deal, learnerSide: 'northSouth',
+    versions: { appVersion: '0.0.0', engineVersions: { [basicPolicy.name]: basicPolicy.version, [fallbackRobotPolicy.name]: fallbackRobotPolicy.version,
+      [contractChoicePolicy.name]: contractChoicePolicy.version } } });
+  let table: Playthrough | null = null;
+  const record = () => { if (!table) throw new Error('setup-in-progress'); return table.record(); };
   const provenanceLog = createProvenanceLog('0.0.0');
   let entryId = 0;
   function log(entry: Pick<LogEntry, 'kind' | 'summary' | 'text' | 'provenance' | 'positionIndex'>) {
-    provenanceLog.record({ ...entry, id: `${table.record().playthroughId}-${++entryId}`, playthroughId: table.record().playthroughId,
+    provenanceLog.record({ ...entry, id: `${record().playthroughId}-${++entryId}`, playthroughId: record().playthroughId,
       informationMode: 'VISIBLE', at: new Date().toISOString() });
   }
   let options = robotOptions;
@@ -37,7 +45,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
   if (import.meta.env.MODE === 'audit' || import.meta.env.MODE === 'test' || import.meta.env.MODE === 'internal'
     || import.meta.env.MODE === 'development') {
     const hiddenCardFound = () => { provenanceLog.hiddenCardFound(); publish(); };
-    const audit = import.meta.env.MODE === 'audit' ? browserRobotAudit(table.record().deal, table.record, hiddenCardFound) : robotAudit(table.record().deal, table.record, hiddenCardFound);
+    const audit = import.meta.env.MODE === 'audit' ? browserRobotAudit(() => table ? record() : setup.record(), hiddenCardFound) : robotAudit(() => table ? record() : setup.record(), hiddenCardFound);
     options = { ...robotOptions, audit(message, seat) { audit(message, seat); robotOptions.audit?.(message, seat); } };
   }
   const robots = createRobotHost(options);
@@ -55,8 +63,22 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
   const announcements: string[] = [];
   function learnerView(): LearnerView {
     // ADR-0001, US-16.4: UI data comes exclusively from Declarer's Seat View.
-    const { positionIndex, hand, dummy, contract, turn, tricksWon, cardCounts, status, tricks } = table.seatView('south');
-    return { positionIndex, hand, dummy, contract, turn, tricksWon, cardCounts, status,
+    if (!table) {
+      const south = setup.seatView('south');
+      const view = south.declarer && sideOf(south.declarer) === 'northSouth' && south.dummy ? setup.seatView(south.declarer) : south;
+      return { setup: view, objective: null, north: null, contract: null, dummySeat: view.dummySeat, hand: south.hand, dummy: view.dummy,
+        positionIndex: 0, turn: null, tricksWon: { northSouth: 0, eastWest: 0 }, cardCounts: { north: 13, east: 13, south: 13, west: 13 },
+        status: 'in-progress', legalCards: [], lastTrickWinner: null, displayedTrick, collecting, reason, reasonCode, rejectionId,
+        rejectedCard, rejectedSeat, announcements: [...announcements] };
+    }
+    const history = record();
+    const choice = history.setupEvents?.find(event => event.kind === 'contract-choice');
+    const contractSeat = history.contract.declarer;
+    const viewingSeat = sideOf(contractSeat) === 'northSouth' ? contractSeat : 'south';
+    const view = table.seatView(viewingSeat);
+    const { positionIndex, dummy, contract, turn, tricksWon, cardCounts, status, tricks } = view;
+    const hand = contractSeat === 'north' ? dummy! : view.hand;
+    return { setup: null, objective: choice?.action.objective ?? null, north: contract.declarer === 'north' ? view.hand : contract.declarer === 'south' ? dummy : null, dummySeat: SEATS[(SEATS.indexOf(contract.declarer) + 2) % 4], positionIndex, hand, dummy, contract, turn, tricksWon, cardCounts, status,
       // ADR-0001: only seats the learner controls expose legal cards to the UI.
       legalCards: turn && table.controllerOf(turn) === 'learner' ? table.legalActions(turn).map(action => action.card) : [],
       lastTrickWinner: tricks.at(-1)?.winner ?? null,
@@ -68,6 +90,19 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     clearTimeout(timer);
     robots.cancel();
     if (!running) return;
+    if (!table) {
+      const view = setup.seatView('south');
+      if (view.step === 'contract-choice') {
+        const seat = view.declarer!;
+        if (setup.controllerOf(seat) === 'robot') robots.decide({ kind: 'contract', view: setup.seatView(seat), seed: JSON.stringify(encodeSetupSeatView(setup.seatView(seat))),
+          playthroughId: setup.record().deal.dealId, positionKey: setup.positionKey(), currentPositionKey: setup.positionKey,
+          submit: (action, provenance) => choose(action, provenance) });
+      } else {
+        const reduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion:reduce)').matches;
+        timer = setTimeout(() => { setup.advance(); publish(); schedule(); }, view.step === 'redeal' ? 1500 : reduced ? 0 : 500);
+      }
+      return;
+    }
     if (collecting) {
       timer = setTimeout(() => { collecting = false; displayedTrick = []; publish(); schedule(); }, 1000);
     } else if (snapshot.turn && table.controllerOf(snapshot.turn) === 'robot') {
@@ -75,11 +110,12 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
       const seat = snapshot.turn;
       const view = table.seatView(seat);
       robots.decide({ view, seed: seatViewSeed(view),
-        playthroughId: table.record().playthroughId, positionKey: table.positionKey(), currentPositionKey: table.positionKey,
+        playthroughId: record().playthroughId, positionKey: table.positionKey(), currentPositionKey: table.positionKey,
         submit: (action, provenance) => accept(seat, action.card, 'robot', provenance) });
     }
   }
   function accept(seat: 'north' | 'south' | 'east' | 'west', card: Card, controller: 'learner' | 'robot', provenance?: RobotProvenance) {
+    if (!table) return false;
     // US-40.1: provenance refers to the position where the action was decided.
     const positionIndex = table.seatView(seat).positionIndex;
     const result = table.submit(seat, controller, { kind: 'play-card', card }, provenance);
@@ -106,15 +142,27 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     publish(); schedule();
     return true;
   }
+  function choose(action: ContractChoice, provenance?: RobotProvenance): boolean {
+    const seat = setup.seatView('south').declarer;
+    if (!seat || table) return false;
+    const result = setup.submit(seat, provenance ? 'robot' : 'learner', action, provenance);
+    if (result.kind === 'rejected') return false;
+    table = setup.playthrough();
+    if (provenance) log({ positionIndex: 0, kind: 'robot-action', summary: JSON.stringify({ seat, action }),
+      provenance: { sourceKind: 'robot', ...provenance } });
+    publish(); schedule(); return true;
+  }
   return {
-    record: table.record,
+    record,
+    setupRecord: setup.record,
+    chooseContract: (action: ContractChoice) => choose(action),
     provenanceLog,
-    seatView: table.seatView,
-    completedRecord: table.completedRecord,
+    seatView: (seat: Seat) => table ? table.seatView(seat) : setup.seatView(seat),
+    completedRecord: () => { if (!table) throw new Error('setup-in-progress'); return table.completedRecord(); },
     getSnapshot: () => snapshot,
     clearRejection() { clearRejection(); publish(); },
     showRule() {
-      if (!reasonCode) return;
+      if (!reasonCode || !table) return;
       const templateId = `rule.${reasonCode}` as const;
       log({ positionIndex: table.seatView('south').positionIndex, kind: 'statement', summary: reasonCode, text: text(templateId), provenance: { sourceKind: 'template', templateId } });
       publish();

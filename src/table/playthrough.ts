@@ -1,9 +1,10 @@
 import { RANKS, SEATS, SUITS, type Card, type Deal, type Seat, type Side, type Suit } from './index';
 
 import { decodeSeatView, type SeatView } from './seatViewMessage';
+import type { SetupEvent } from './miniBridge';
 import { positionDigest } from './positionKey';
 
-export type RobotProvenance = Readonly<{ kind: 'robot'; policy: string; version: string; fallback?: 'timeout' | 'engine-failure'; durationMs: number }>;
+export type RobotProvenance = Readonly<{ kind: 'robot'; policy: string; version: string; ruleId?: string; fallback?: 'timeout' | 'engine-failure'; durationMs: number }>;
 // US-04.3: a play read from a PBN file has no robot or learner provenance; say so instead of inventing one.
 export type ImportedProvenance = Readonly<{ kind: 'imported'; format: 'pbn' }>;
 export type AuthoredProvenance = Readonly<{ kind: 'authored'; contentId: string; version: number }>;
@@ -12,13 +13,15 @@ export type Contract = Readonly<{ level: number; strain: Suit | 'no-trumps'; dec
 export type Controller = 'learner' | 'robot';
 export type Action = Readonly<{ kind: 'play-card'; card: Card }>;
 export type Status = 'in-progress' | 'completed';
-export const REASON_CODES = ['playthrough-complete', 'malformed-action', 'not-your-turn', 'only-declarer-plays-dummy', 'card-not-held', 'must-follow-suit'] as const;
+export const REASON_CODES = ['playthrough-complete', 'malformed-action', 'not-your-turn', 'only-declarer-plays-dummy', 'card-not-held', 'must-follow-suit', 'not-declarer', 'invalid-contract-choice', 'wrong-phase'] as const;
 export type ReasonCode = typeof REASON_CODES[number];
 export type PlayedCard = Readonly<{ seat: Seat; card: Card }>;
 export type Trick = Readonly<{ cards: readonly PlayedCard[]; winner: Seat }>;
 export type { SeatView } from './seatViewMessage';
 export type PlaythroughRecord = Readonly<{
   schemaVersion: 2;
+  gameFormat?: 'contract-bridge' | 'minibridge';
+  setupEvents?: readonly SetupEvent[];
   appVersion: string;
   engineVersions: Readonly<Record<string, string>>;
   rulesCoreVersion: string;
@@ -54,11 +57,33 @@ function isAction(value: unknown): value is Action {
   return !!card && typeof card === 'object' && 'suit' in card && 'rank' in card
     && SUITS.some(suit => suit === card.suit) && RANKS.some(rank => rank === card.rank);
 }
+// CI-5: shared by card plays and Contract Choices.
+export function validProvenance(controller: Controller, provenance?: ActionProvenance): boolean {
+  if ((controller === 'robot' && !provenance) || (provenance && provenance.kind !== controller && provenance.kind !== 'imported' && provenance.kind !== 'authored')) return false;
+  // US-04.1, CI-5: authored Script actions belong only to robot-controlled seats.
+  if (provenance?.kind === 'authored' && (controller !== 'robot'
+    || typeof provenance.contentId !== 'string' || !provenance.contentId.trim()
+    || !Number.isSafeInteger(provenance.version) || provenance.version < 1
+    || Reflect.ownKeys(provenance).some(key => key !== 'kind' && key !== 'contentId' && key !== 'version'))) return false;
+  if (provenance?.kind === 'imported' && (provenance.format !== 'pbn'
+    || Reflect.ownKeys(provenance).some(key => key !== 'kind' && key !== 'format'))) return false;
+  // US-01.6, CI-5: unknown fields must not escape into downstream provenance records.
+  if (provenance?.kind === 'robot' && Reflect.ownKeys(provenance).some(key =>
+    !['kind', 'policy', 'version', 'ruleId', 'fallback', 'durationMs'].includes(key as string))) return false;
+  if (provenance?.kind === 'robot' && (typeof provenance.policy !== 'string' || !provenance.policy.trim()
+    || typeof provenance.version !== 'string' || !provenance.version.trim()
+    || (provenance.ruleId !== undefined && (typeof provenance.ruleId !== 'string' || !provenance.ruleId.trim()))
+    || !Number.isFinite(provenance.durationMs) || provenance.durationMs < 0
+    || (provenance.fallback !== undefined && provenance.fallback !== 'timeout' && provenance.fallback !== 'engine-failure'))) return false;
+  return true;
+}
 let nextId = 0;
-export function startPlaythrough(input: { deal: Deal; contract: Contract; learnerSide: Side; versions?: { appVersion: string; engineVersions: Readonly<Record<string, string>> } }) {
+export function startPlaythrough(input: { deal: Deal; contract: Contract; learnerSide: Side; gameFormat?: 'contract-bridge' | 'minibridge'; setupEvents?: readonly SetupEvent[]; versions?: { appVersion: string; engineVersions: Readonly<Record<string, string>> } }) {
   // INV-2: take ownership of the input; no returned object aliases mutable Table state.
   const deal: Deal = JSON.parse(JSON.stringify(input.deal));
   const contract = { ...input.contract };
+  const gameFormat = input.gameFormat ?? 'contract-bridge';
+  const setupEvents: readonly SetupEvent[] = JSON.parse(JSON.stringify(input.setupEvents ?? []));
   const appVersion = input.versions?.appVersion ?? 'unknown';
   const engineVersions = { ...input.versions?.engineVersions };
   const playthroughId = `playthrough-${++nextId}`;
@@ -86,14 +111,14 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract; learne
   function seatView(seat: Seat): SeatView {
     return decodeSeatView({
       seat, positionIndex: actions.length,
-      hand: hands[seat].map(copyCard), dummy: actions.length ? hands[dummySeat].map(copyCard) : null,
+      hand: hands[seat].map(copyCard), dummy: actions.length || gameFormat === 'minibridge' ? hands[dummySeat].map(copyCard) : null,
       contract: { ...contract }, tricks: tricks.map(trick => ({ cards: trick.cards.map(copyPlay), winner: trick.winner })),
       currentTrick: currentTrick.map(copyPlay), turn, tricksWon: { ...tricksWon },
       cardCounts: { north: hands.north.length, east: hands.east.length, south: hands.south.length, west: hands.west.length }, status,
     });
   }
   function record(): PlaythroughRecord {
-    return JSON.parse(JSON.stringify({ schemaVersion: 2, appVersion, engineVersions, rulesCoreVersion: RULES_CORE_VERSION, playthroughId, deal, contract, learnerSide, actions, status, result: tricksWon }));
+    return JSON.parse(JSON.stringify({ schemaVersion: 2, appVersion, engineVersions, rulesCoreVersion: RULES_CORE_VERSION, playthroughId, deal, contract, learnerSide, gameFormat, setupEvents, actions, status, result: tricksWon }));
   }
   function submit(seat: unknown, controller: unknown, action: unknown, provenance?: ActionProvenance): Submission {
     const reject = (reason: ReasonCode, details: { cause?: 'controller' | 'duplicate'; suit?: Suit } = {}): Submission => ({ kind: 'rejected', reason, details });
@@ -101,21 +126,8 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract; learne
     if (status === 'completed') return reject('playthrough-complete');
     if (!SEATS.some(candidate => candidate === seat) || (controller !== 'learner' && controller !== 'robot') || !isAction(action)) return reject('malformed-action');
     // US-01.6, CI-5: controller and complete provenance must agree before any mutation.
-    if ((controller === 'robot' && !provenance) || (provenance && provenance.kind !== controller && provenance.kind !== 'imported' && provenance.kind !== 'authored')) return reject('malformed-action');
-    // US-04.1, CI-5: authored Script actions belong only to robot-controlled seats.
-    if (provenance?.kind === 'authored' && (controller !== 'robot' || controllerOf(seat as Seat) !== 'robot'
-      || typeof provenance.contentId !== 'string' || !provenance.contentId.trim()
-      || !Number.isSafeInteger(provenance.version) || provenance.version < 1
-      || Reflect.ownKeys(provenance).some(key => key !== 'kind' && key !== 'contentId' && key !== 'version'))) return reject('malformed-action');
-    if (provenance?.kind === 'imported' && (provenance.format !== 'pbn'
-      || Reflect.ownKeys(provenance).some(key => key !== 'kind' && key !== 'format'))) return reject('malformed-action');
-    // US-01.6, CI-5: unknown fields must not escape into downstream provenance records.
-    if (provenance?.kind === 'robot' && Reflect.ownKeys(provenance).some(key =>
-      !['kind', 'policy', 'version', 'fallback', 'durationMs'].includes(key as string))) return reject('malformed-action');
-    if (provenance?.kind === 'robot' && (typeof provenance.policy !== 'string' || !provenance.policy.trim()
-      || typeof provenance.version !== 'string' || !provenance.version.trim()
-      || !Number.isFinite(provenance.durationMs) || provenance.durationMs < 0
-      || (provenance.fallback !== undefined && provenance.fallback !== 'timeout' && provenance.fallback !== 'engine-failure'))) return reject('malformed-action');
+    if (provenance?.kind === 'authored' && controllerOf(seat as Seat) !== 'robot') return reject('malformed-action');
+    if (!validProvenance(controller, provenance)) return reject('malformed-action');
     // US-01.5: a card that has already been played is duplicate-card input, not merely a card not held.
     if (actions.some(entry => sameCard(entry.action.card, action.card))) return reject('malformed-action', { cause: 'duplicate' });
     const actingSeat = seat as Seat;

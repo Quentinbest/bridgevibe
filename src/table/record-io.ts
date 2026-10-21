@@ -1,5 +1,6 @@
 import { RANKS, SEATS, SUITS, dealFromSeed, dealIdOf, type Card, type Deal, type Hand, type Seat } from './index';
 import { sameCard, sideOf, startPlaythrough, type CompletedPlaythroughRecord, type PlaythroughRecord } from './playthrough';
+import { startMiniBridge } from './miniBridge';
 import { reconstruct, replay } from './replay';
 
 type Check = (value: unknown) => boolean;
@@ -27,9 +28,9 @@ function schemas() {
   const provenance: Check = value => object({ kind: choice(['learner']) })(value)
     || object({ kind: choice(['authored']), contentId: string, version: integer(1, Number.MAX_SAFE_INTEGER) })(value)
     || object({ kind: choice(['imported']), format: choice(['pbn']) })(value)
-    || object({ kind: choice(['robot']), policy: string, version: string, fallback: choice(['timeout', 'engine-failure']),
-      durationMs: value => typeof value === 'number' && Number.isFinite(value) && value >= 0 }, ['fallback'])(value);
-  const recordShape = object({ schemaVersion: choice([2]), playthroughId: string, deal: dealShape,
+    || object({ kind: choice(['robot']), policy: string, version: string, ruleId: value => typeof value === 'string' && !!value.trim(), fallback: choice(['timeout', 'engine-failure']),
+      durationMs: value => typeof value === 'number' && Number.isFinite(value) && value >= 0 }, ['fallback', 'ruleId'])(value);
+  const recordShape = object({ gameFormat: choice(['contract-bridge', 'minibridge']), setupEvents: value => Array.isArray(value) && value.length <= 100000, schemaVersion: choice([2]), playthroughId: string, deal: dealShape,
     contract: object({ level: integer(1, 7), strain: choice([...SUITS, 'no-trumps']), declarer: seat }),
     learnerSide: choice(['northSouth']), status: choice(['in-progress', 'completed']),
     result: object({ northSouth: integer(0, 13), eastWest: integer(0, 13) }),
@@ -37,9 +38,11 @@ function schemas() {
     engineVersions: value => !!value && typeof value === 'object' && !Array.isArray(value) && Object.values(value).every(string),
     actions: array(object({ index: integer(0, 51), seat, controller: choice(['learner', 'robot']),
       action: object({ kind: choice(['play-card']), card }), provenance }), 52),
-  });
+  }, ['gameFormat', 'setupEvents']);
 
-  return { dealShape, recordShape };
+  const setupShape = object({ gameFormat: choice(['minibridge']), deal: dealShape,
+    setupEvents: value => Array.isArray(value) && value.length <= 100000 });
+  return { dealShape, recordShape, setupShape };
 }
 function validateDeal(deal: unknown): asserts deal is Deal {
   if (!schemas().dealShape(deal)) throw new Error('Invalid deal shape');
@@ -47,25 +50,49 @@ function validateDeal(deal: unknown): asserts deal is Deal {
   if (cards.some((card, index) => cards.slice(0, index).some(other => sameCard(card, other)))) throw new Error('Deal must contain 52 distinct cards');
 }
 
-// US-04.3: JSON preserves provenance and versions; PBN has neither and is not lossless.
+// US-04.3: JSON preserves all provenance and versions; PBN preserves setup in a supplemental tag.
 export function exportRecordJson(record: PlaythroughRecord): string { return JSON.stringify(record, null, 2); }
+function validateRecordedDeal(deal: Deal) {
+  validateDeal(deal);
+  // US-03.4, US-04.3: stored identity and origin must describe the actual Deal.
+  if (deal.dealId !== dealIdOf(deal)) throw new Error('Invalid dealId: does not match deal content');
+  if (deal.origin.kind === 'seed') {
+    const generated = dealFromSeed(deal.origin.seed, deal.origin.index);
+    if (generated.dealer !== deal.dealer || generated.vulnerability.northSouth !== deal.vulnerability.northSouth
+      || generated.vulnerability.eastWest !== deal.vulnerability.eastWest
+      || SEATS.some(seat => deal.hands[seat].some(card => !generated.hands[seat].some(other => sameCard(card, other))))) {
+      throw new Error('Deal seed and index do not reproduce its hands, dealer and vulnerability');
+    }
+  }
+}
+
+// US-06, US-04.3: both formats validate setup through the same authoritative transitions.
+function replayMiniBridgeSetup(record: Pick<PlaythroughRecord, 'deal' | 'contract' | 'learnerSide' | 'setupEvents'>) {
+  const events = record.setupEvents;
+  if (!events?.length) throw new Error('Missing MiniBridge setup events');
+  const firstRedeal = events.find(event => event.kind === 'redeal');
+  const initial = firstRedeal?.from ?? record.deal;
+  validateRecordedDeal(initial);
+  const setup = startMiniBridge({ deal: initial, learnerSide: record.learnerSide });
+  for (let i = 0; i < events.length + 4 && setup.seatView('south').step !== 'contract-choice'; i++) setup.advance();
+  const choice = events.at(-1);
+  if (choice?.kind !== 'contract-choice' || setup.submit(choice.seat, choice.controller, choice.action, choice.provenance).kind !== 'accepted') throw new Error('Invalid Contract Choice');
+  const rebuilt = setup.playthrough()!.record();
+  const canonical = (value: unknown): string => JSON.stringify(value, (_, item: unknown) => item && typeof item === 'object' && !Array.isArray(item)
+    ? Object.fromEntries(Object.entries(item).sort(([a], [b]) => a.localeCompare(b))) : item);
+  if (canonical(rebuilt.setupEvents) !== canonical(events) || canonical(rebuilt.contract) !== canonical(record.contract)
+    || canonical(rebuilt.deal) !== canonical(record.deal)) throw new Error('Invalid MiniBridge setup history');
+  return setup.playthrough()!;
+}
+
 export function importRecordJson(text: string): PlaythroughRecord {
   try {
     const value: unknown = JSON.parse(text);
     if (!schemas().recordShape(value)) throw new Error('Invalid record schema (expected schemaVersion 2, deal, contract, versions and actions)');
     const record = value as PlaythroughRecord;
-    validateDeal(record.deal);
-    // US-03.4, US-04.3: stored identity and origin must describe the actual Deal.
-    const deal = record.deal;
-    if (deal.dealId !== dealIdOf(deal)) throw new Error('Invalid dealId: does not match deal content');
-    if (deal.origin.kind === 'seed') {
-      const generated = dealFromSeed(deal.origin.seed, deal.origin.index);
-      if (generated.dealer !== deal.dealer || generated.vulnerability.northSouth !== deal.vulnerability.northSouth
-        || generated.vulnerability.eastWest !== deal.vulnerability.eastWest
-        || SEATS.some(seat => deal.hands[seat].some(card => !generated.hands[seat].some(other => sameCard(card, other))))) {
-        throw new Error('Deal seed and index do not reproduce its hands, dealer and vulnerability');
-      }
-    }
+    validateRecordedDeal(record.deal);
+    if (record.gameFormat === 'minibridge') replayMiniBridgeSetup(record);
+    else if (record.setupEvents?.length) throw new Error('Setup events require MiniBridge format');
     reconstruct(record);
     return record;
   } catch (error) { throw new Error(`JSON parse error: ${error instanceof Error ? error.message : String(error)}`, { cause: error }); }
@@ -87,6 +114,7 @@ function parseCard(value: string): Card {
 function withoutComments(text: string): string {
   let state: 'plain' | 'quoted' | 'brace' | 'line' = 'plain';
   let result = '';
+  let escaped = false;
   for (const char of text) {
     if (state === 'brace') {
       if (char === '}') state = 'plain';
@@ -94,7 +122,9 @@ function withoutComments(text: string): string {
       if (char === '\n' || char === '\r') { state = 'plain'; result += char; }
     } else if (state === 'quoted') {
       result += char;
-      if (char === '"') state = 'plain';
+      if (escaped) escaped = false;
+      else if (char === '\\') escaped = true;
+      else if (char === '"') state = 'plain';
     } else if (char === '{' || char === ';') {
       result += ' ';
       state = char === '{' ? 'brace' : 'line';
@@ -129,9 +159,12 @@ export function exportPbn(record: CompletedPlaythroughRecord): string {
   const tags = { Event: 'BridgeVibe', Site: '?', Date: '????.??.??', Board: '?', West: '?', North: '?', East: '?', South: '?',
     Dealer: direction(deal.dealer), Vulnerable: vulnerable, Deal: `${direction(deal.dealer)}:${hands}`, Scoring: '?', Declarer: direction(contract.declarer),
     Contract: `${contract.level}${contract.strain === 'no-trumps' ? 'NT' : suits[SUITS.indexOf(contract.strain)]}`,
-    Result: String(record.result[sideOf(contract.declarer)]), Play: direction(leader) };
+    Result: String(record.result[sideOf(contract.declarer)]),
+    // US-04.3: other PBN readers may discard this tag; JSON remains the lossless format.
+    ...(record.gameFormat === 'minibridge' ? { BridgeVibeSetup: JSON.stringify({ gameFormat: record.gameFormat, deal, setupEvents: record.setupEvents }) } : {}),
+    Play: direction(leader) };
   // PBN 2.1 §3.6: columns remain fixed at the Play tag's seat, even when the lead changes.
-  return Object.entries(tags).map(([name, value]) => `[${name} "${value}"]`).join('\n') + '\n'
+  return Object.entries(tags).map(([name, value]) => `[${name} "${value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"]`).join('\n') + '\n'
     + tricks.map(trick => columns.map(seat => cardCode(trick.cards.find(card => card.seat === seat)!.card)).join(' ')).join('\n') + '\n';
 }
 export function importPbn(text: string): CompletedPlaythroughRecord {
@@ -143,9 +176,9 @@ export function importPbn(text: string): CompletedPlaythroughRecord {
     const content = text.split(/\r?\n/).filter(line => !line.startsWith('%')).join('\n');
     for (const line of withoutComments(content).trim().split(/\r?\n/).map(line => line.trim()).filter(Boolean)) {
       if (line.startsWith('[')) {
-        const match = /^\[([A-Za-z]+) "([^"\\]*)"\]$/.exec(line);
+        const match = /^\[([A-Za-z]+) "((?:[^"\\]|\\["\\])*)"\]$/.exec(line);
         if (!match || playing || Object.hasOwn(tags, match[1])) throw new Error('Malformed or misplaced tag');
-        tags[match[1]] = match[2];
+        tags[match[1]] = match[2].replace(/\\(["\\])/g, '$1');
         if (match[1] === 'Play') playing = true;
       } else {
         if (!playing) throw new Error('Play must follow the Play tag');
@@ -171,8 +204,17 @@ export function importPbn(text: string): CompletedPlaythroughRecord {
     deal.dealId = dealIdOf(deal);
     const contract = /^([1-7])(NT|[SHDC])$/.exec(tags.Contract);
     if (!contract) throw new Error('Invalid or unsupported Contract tag');
-    const table = startPlaythrough({ deal, learnerSide: 'northSouth', contract: { level: Number(contract[1]),
-      strain: contract[2] === 'NT' ? 'no-trumps' : SUITS[suits.indexOf(contract[2])], declarer: parseSeat(tags.Declarer) } });
+    const chosenContract = { level: Number(contract[1]),
+      strain: contract[2] === 'NT' ? 'no-trumps' as const : SUITS[suits.indexOf(contract[2])], declarer: parseSeat(tags.Declarer) };
+    let table: ReturnType<typeof startPlaythrough>;
+    if (Object.hasOwn(tags, 'BridgeVibeSetup')) {
+      const supplement: unknown = JSON.parse(tags.BridgeVibeSetup);
+      if (!schemas().setupShape(supplement)) throw new Error('Invalid MiniBridge supplemental tag');
+      const setup = supplement as Pick<PlaythroughRecord, 'gameFormat' | 'deal' | 'setupEvents'>;
+      validateRecordedDeal(setup.deal);
+      if (setup.deal.dealId !== deal.dealId) throw new Error('Supplemental Deal disagrees with PBN Deal');
+      table = replayMiniBridgeSetup({ ...setup, contract: chosenContract, learnerSide: 'northSouth' });
+    } else table = startPlaythrough({ deal, learnerSide: 'northSouth', contract: chosenContract });
     const first = SEATS.indexOf(parseSeat(tags.Play));
     if (SEATS[first] !== table.seatView('south').turn) throw new Error('Play tag must match the opening leader');
     for (let trick = 0; trick < 13; trick++) {

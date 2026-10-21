@@ -1,14 +1,15 @@
+import { choosePractice } from './miniBridge';
 import { readFile } from 'node:fs/promises';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 test('US-40.2: debug panel requires the URL opt-in', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/'); await choosePractice(page, false);
   await expect(page.locator('.trick-area .card')).toHaveCount(1);
   await expect(page.getByRole('complementary', { name: 'Provenance log' })).toHaveCount(0);
 });
 test('US-40.1–3: entries, counters, grading download and current Seat Views', async ({ page }) => {
-  await page.goto('/?debug=1');
+  await page.goto('/?debug=1'); await choosePractice(page);
   const panel = page.getByRole('complementary', { name: 'Provenance log' });
   await expect(panel).toBeVisible();
   await expect(panel.locator('ol li')).toHaveCount(1);
@@ -25,8 +26,10 @@ test('US-40.1–3: entries, counters, grading download and current Seat Views', 
     { kind: 'robot-action', informationMode: 'VISIBLE', provenance: { sourceKind: 'robot' }, grade: null, graderNote: null },
   ] });
   await panel.getByRole('button', { name: 'Show seat view' }).click();
+  await expect(panel.locator('#debug-seat-view')).toBeVisible();
   for (const seat of ['north', 'east', 'south', 'west']) {
     await panel.getByLabel('Seat', { exact: true }).selectOption(seat);
+    await expect(panel.locator('#debug-seat-view')).toBeVisible();
     const view = JSON.parse((await panel.locator('#debug-seat-view').textContent())!);
     expect(view.seat).toBe(seat); expect(view.positionIndex).toBe(1);
     expect(view.hand).toHaveLength(seat === 'west' ? 12 : 13);

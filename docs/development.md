@@ -164,7 +164,7 @@ Links use `?seed=abc&deal=3`. Seeds contain 1–64 ASCII letters, digits, `_` or
 indices use positive decimal notation. Missing both parameters retains the authored
 fixture; malformed or incomplete links show the fixture with feedback. New deal advances
 a seeded index, or creates a 12-character seed with `crypto.getRandomValues` for an
-authored Deal, and replaces the URL. Play remains 3NT by South until #12.
+authored Deal, and replaces the URL. Practice proceeds through MiniBridge Setup before card play.
 Deal info displays metadata only. Copy remains draft (CI-8); replay still reads the
 Playthrough Record, never regenerated actions (ADR-0002).
 
@@ -401,3 +401,29 @@ Reviews must name cards in the acting hand and use `accept` or `reject`; an opti
 needs a non-empty reason. An `accept` review requires the card to
 also appear in `expectedAnswers`; otherwise validation reports an error. Only
 `expectedAnswers` controls what the player accepts.
+
+## MiniBridge setup
+
+Practice now starts with `startMiniBridge` (US-06); authored lessons retain
+`startPlaythrough` and their blind opening leads. The separate branded
+`SetupSeatView` carries only own cards, public Announcements and exposed Dummy;
+there is no Contract until the Table accepts a Contract Choice. Setup events stay
+separate from card actions. Schema 2 JSON accepts older records without the new
+`gameFormat`/`setupEvents` fields and validates MiniBridge history through Table.
+PBN continues to export the resulting level/strain/declarer and card plays.
+
+`table/miniBridgeRules.ts` holds the **DEP-01 placeholder** targets: part-score 7;
+game NT 9, majors 10, minors 11; no slam and no vulnerability use. Scoring is #17.
+`robots/index.ts` holds the **DEP-02 placeholder**, rule
+`placeholder-dep-02`, policy `bv-contract-placeholder` version `0`. It chooses
+an eight-card major fit (longer major, spades on a tie), otherwise NT, and game
+with 25 combined HCP. Protocol 2 runs this in the robot worker with the existing
+500 ms display window and marked fallbacks; accepted choices enter the provenance
+log. Both placeholders and all copy await teacher review.
+
+Announcements appear 500 ms apart; the redeal message lasts 1500 ms. Reduced
+motion removes the stagger while preserving order. North declarers are controlled
+by the learner without rotating the table (#16). East/West dummy stays in its
+physical seat. The default authored Deal has North 15, South 17 HCP; existing
+card-play UI/e2e tests explicitly choose NT game on it to preserve their scenarios.
+The design's Hint button and score-risk claims are omitted as specified in #12.

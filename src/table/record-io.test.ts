@@ -2,7 +2,7 @@ import { expect, test } from 'vitest';
 import clean from '../../test/fixtures/records/column-order.pbn?raw';
 import annotated from '../../test/fixtures/records/column-order-annotated.pbn?raw';
 import fixed from '../../test/fixtures/records/fixed.json';
-import { dealFromSeed, dealIdOf, exportPbn, exportRecordJson, importPbn, importRecordJson, SEATS, startPlaythrough, type Deal } from './index';
+import { dealFromSeed, dealIdOf, exportPbn, exportRecordJson, importPbn, importRecordJson, SEATS, startMiniBridge, startPlaythrough, type Deal } from './index';
 
 // US-04.3: rotating columns must not make an incorrect opening leader acceptable.
 test.each(['N', 'E', 'S'])('PBN rejects Play %s when South declares', leader => {
@@ -89,4 +89,68 @@ test('JSON import rejects an action without provenance', () => {
   expect(() => importRecordJson(JSON.stringify(record))).not.toThrow();
   delete record.actions[1].provenance;
   expect(() => importRecordJson(JSON.stringify(record))).toThrow(/Invalid record schema/);
+});
+
+// US-04.3: PBN preserves MiniBridge setup in a supplemental tag; play provenance remains imported.
+function miniBridgeRecord() {
+  const setup = startMiniBridge({ deal: dealFromSeed('setup-ui', 1), learnerSide: 'northSouth' });
+  while (setup.seatView('south').step !== 'contract-choice') setup.advance();
+  const seat = setup.seatView('south').declarer!, controller = setup.controllerOf(seat);
+  setup.submit(seat, controller, { kind: 'choose-contract', strain: 'no-trumps', objective: 'game' }, controller === 'robot'
+    ? { kind: 'robot', policy: 'quoted-"policy"\\{literal};', version: '0', ruleId: 'placeholder-dep-02', durationMs: 1 } : undefined);
+  const table = setup.playthrough()!;
+  for (let i = 0; i < 52; i++) {
+    const turn = table.seatView('south').turn!, owner = table.controllerOf(turn);
+    table.submit(turn, owner, table.legalActions(turn)[0], owner === 'robot'
+      ? { kind: 'robot', policy: 'test', version: '0', durationMs: 0 } : undefined);
+  }
+  return table.completedRecord();
+}
+test('US-04.3: MiniBridge PBN round-trips every setup event, objective and provenance with safe escaping', () => {
+  const record = miniBridgeRecord(), pbn = exportPbn(record);
+  expect(pbn).toContain('[BridgeVibeSetup "');
+  expect(record.setupEvents?.some(event => event.kind === 'redeal')).toBe(true);
+  const imported = importPbn(pbn);
+  expect(imported).toMatchObject({ gameFormat: 'minibridge', setupEvents: record.setupEvents,
+    contract: record.contract, result: record.result, deal: record.deal });
+  expect(imported.actions.every(action => action.provenance.kind === 'imported')).toBe(true);
+  expect(importRecordJson(exportRecordJson(imported))).toEqual(JSON.parse(exportRecordJson(imported)));
+  const withoutSetup = importPbn(pbn.split('\n').filter(line => !line.startsWith('[BridgeVibeSetup ')).join('\n'));
+  expect(withoutSetup.gameFormat).toBe('contract-bridge'); expect(withoutSetup.setupEvents).toEqual([]);
+});
+test.each(['announcement', 'redeal', 'declarer', 'dummy-exposed', 'contract-choice', 'provenance', 'deal', 'format', 'shape', 'json'])('US-04.3: tampered PBN supplemental %s is a parse error', field => {
+  const pbn = exportPbn(miniBridgeRecord());
+  const tag = pbn.match(/\[BridgeVibeSetup ("(?:\\.|[^"\\])*")\]/)!;
+  expect(tag).not.toBeNull();
+  const payload = JSON.parse(JSON.parse(tag[1]));
+  if (field === 'deal') [payload.deal.hands.north, payload.deal.hands.south] = [payload.deal.hands.south, payload.deal.hands.north];
+  else if (field === 'format') payload.gameFormat = 'contract-bridge';
+  else if (field === 'shape') delete payload.setupEvents;
+  else if (field === 'provenance') payload.setupEvents.at(-1).provenance.ruleId = ' ';
+  else if (field !== 'json') {
+    const event = payload.setupEvents.find((event: { kind: string }) => event.kind === field);
+    if (field === 'announcement') event.hcp++;
+    else if (field === 'redeal') event.to.origin.index++;
+    else if (field === 'contract-choice') event.action.objective = 'part-score';
+    else event.seat = 'invalid';
+  }
+  const encoded = field === 'json' ? 'not-json' : JSON.stringify(payload);
+  expect(() => importPbn(pbn.replace(tag[0], `[BridgeVibeSetup ${JSON.stringify(encoded)}]`))).toThrow(/PBN parse error/);
+});
+test('US-04.3: PBN contract tags must agree with the supplemental setup', () => {
+  const pbn = exportPbn(miniBridgeRecord());
+  expect(() => importPbn(pbn.replace('[Contract "3NT"]', '[Contract "4NT"]'))).toThrow(/PBN parse error/);
+});
+
+test('§4.3.3, US-04.3: JSON preserves optional robot rule IDs and rejects invalid values', () => {
+  const record = structuredClone(fixed);
+  const robot = record.actions.find(action => action.provenance.kind === 'robot')!;
+  const tagged = { ...record, actions: record.actions.map(action => action === robot
+    ? { ...action, provenance: { ...action.provenance, ruleId: 'test-card-rule' } } : action) };
+  expect(importRecordJson(JSON.stringify(tagged))).toEqual(tagged);
+  for (const ruleId of ['', ' ', 42, null]) {
+    const invalid = structuredClone(tagged);
+    Object.assign(invalid.actions[robot.index].provenance, { ruleId });
+    expect(() => importRecordJson(JSON.stringify(invalid))).toThrow(/Invalid record schema/);
+  }
 });

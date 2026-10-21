@@ -1,4 +1,4 @@
-import { RANKS, SUITS, type Action, type Card, type SeatView } from '../table';
+import { RANKS, SUITS, type Action, type Card, type SeatView, type SetupSeatView } from '../table';
 
 // Engineering §4.6.6: deterministic fallback using only this Seat's information.
 export function fallbackPolicy(view: SeatView): Card {
@@ -23,3 +23,17 @@ export const fallbackRobotPolicy: RobotPolicy = {
 };
 // US-10.1: teacher-approved rules arrive with #13.
 export const basicPolicy: RobotPolicy = { ...fallbackRobotPolicy, name: 'bv-basic' };
+
+// PLACEHOLDER (DEP-02): teacher review pending; only own cards, exposed Dummy and Announcements.
+export const contractChoicePolicy = {
+  name: 'bv-contract-placeholder', version: '0', ruleId: 'placeholder-dep-02',
+  decide(view: SetupSeatView) {
+    if (!view.dummy || !view.declarer || view.seat !== view.declarer) throw new Error('Contract choice requires declarer and exposed dummy');
+    const cards = [...view.hand, ...view.dummy];
+    const spades = cards.filter(card => card.suit === 'spades').length;
+    const hearts = cards.filter(card => card.suit === 'hearts').length;
+    const strain: 'spades' | 'hearts' | 'no-trumps' = spades >= 8 && spades >= hearts ? 'spades' : hearts >= 8 ? 'hearts' : 'no-trumps';
+    const hcp = view.announcements.filter(a => a.seat === view.seat || a.seat === view.dummySeat).reduce((n, a) => n + a.hcp, 0);
+    return { kind: 'choose-contract' as const, strain, objective: hcp >= 25 ? 'game' as const : 'part-score' as const };
+  },
+};

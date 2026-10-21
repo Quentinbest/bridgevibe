@@ -1,9 +1,12 @@
+import { choosePractice } from './miniBridge';
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 test('seed links reproduce South and IDs; New deal advances; info is keyboard accessible', async ({ page }) => {
+  // #55: one fixed time for both calls.
+  const time = new Date(); await page.clock.install({ time }); await page.clock.pauseAt(time);
   await page.goto('/?seed=abc&deal=3');
-  const hand = () => page.locator('.learner .card').allTextContents();
+  const hand = () => page.locator('.setup-own .card').allTextContents();
   const firstHand = await hand();
   const trigger = page.getByRole('button', { name: 'Deal info', exact: true });
   await trigger.focus(); await page.keyboard.press('Enter');
@@ -13,7 +16,11 @@ test('seed links reproduce South and IDs; New deal advances; info is keyboard ac
   await expect(dialog).toContainText('abc');
   await expect(dialog).toContainText('bv-deal-1');
   await expect(dialog.locator('.card')).toHaveCount(0);
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  // The paused clock holds Setup still; axe-core waits on zero-delay timers, so tick 1 ms until it finishes.
+  let scan: Awaited<ReturnType<AxeBuilder['analyze']>> | undefined;
+  const scanning = new AxeBuilder({ page }).analyze().then(result => { scan = result; });
+  while (!scan) await Promise.race([scanning, page.clock.runFor(1)]);
+  expect(scan.violations).toEqual([]);
   await page.keyboard.press('Escape');
   await expect(dialog).not.toBeVisible();
   await expect(trigger).toBeFocused();
@@ -69,7 +76,7 @@ test('long seeded suits remain inside the viewport with 44px targets', async ({ 
 test('header controls and invalid-link feedback preserve the fixed Deal height', async ({ page }) => {
   let headerHeight = 0;
   for (const url of ['/', '/?seed=bad!&deal=3']) {
-    await page.goto(url);
+    await page.goto(url); await choosePractice(page);
     await page.evaluate(() => document.fonts.ready);
     const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });
     await ace.click();
@@ -100,6 +107,7 @@ test('a robot play reaching the learner keeps focus on Deal info', async ({ page
   await page.clock.install();
   await page.clock.pauseAt(new Date(Date.now() + 1000));
   await page.goto('/?seed=abc&deal=3');
+  await choosePractice(page, true);
   const trigger = page.getByRole('button', { name: 'Deal info', exact: true });
   await trigger.focus();
   await page.clock.runFor(600);

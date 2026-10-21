@@ -1,6 +1,6 @@
-import { encodeSeatView, type Action, type RobotProvenance, type Seat, type SeatView } from '../table';
-import { fallbackRobotPolicy } from '../robots';
-import { ROBOT_PROTOCOL_VERSION, type RobotMessage, type RobotRequest, type RobotResponse } from './robotProtocol';
+import { encodeSeatView, encodeSetupSeatView, type SetupSeatView, type ContractChoice, type Action, type RobotProvenance, type Seat, type SeatView } from '../table';
+import { fallbackRobotPolicy, contractChoicePolicy } from '../robots';
+import { ROBOT_PROTOCOL_VERSION, type RobotMessage, type RobotRequest, type ContractRequest, type RobotResponse } from './robotProtocol';
 
 export interface RobotWorker {
   postMessage(message: RobotMessage): void;
@@ -16,8 +16,19 @@ export type RobotHostOptions = {
   policyDeadlineMs?: number; displayDelayMs?: number; failureThreshold?: number;
   audit?: (message: RobotMessage, seat: Seat) => void;
 };
-type Decision = { view: SeatView; seed: string; playthroughId: string; positionKey: string;
-  currentPositionKey(): string; submit(action: Action, provenance: RobotProvenance): boolean };
+type Identity = { seed: string; playthroughId: string; positionKey: string;
+  currentPositionKey(): string };
+type Decision = Identity & ({ kind?: 'play'; view: SeatView; submit(action: Action, provenance: RobotProvenance): boolean }
+  | { kind: 'contract'; view: SetupSeatView; submit(action: ContractChoice, provenance: RobotProvenance): boolean });
+function submitDecision(decision: Decision, action: Action | ContractChoice, provenance: RobotProvenance): boolean {
+  if (!action || typeof action !== 'object') return false;
+  return decision.kind === 'contract' ? action.kind === 'choose-contract' && decision.submit(action, provenance)
+    : action.kind === 'play-card' && decision.submit(action, provenance);
+}
+function fallbackAction(decision: Decision, now: number): Action | ContractChoice {
+  return decision.kind === 'contract' ? contractChoicePolicy.decide(decision.view)
+    : fallbackRobotPolicy.decide(decision.view, decision.seed, now);
+}
 export function createRobotHost(options: RobotHostOptions = {}) {
   // Browser timer functions throw "Illegal invocation" when called as methods of another object,
   // so the default clock wraps each one instead of storing the bare function.
@@ -43,9 +54,9 @@ export function createRobotHost(options: RobotHostOptions = {}) {
   let failures = 0;
   let sequence = 0;
   let active: Decision | undefined;
-  let request: RobotRequest | undefined;
+  let request: RobotRequest | ContractRequest | undefined;
   let inFlight = false;
-  let result: { action: Action; provenance: RobotProvenance } | undefined;
+  let result: { action: Action | ContractChoice; provenance: RobotProvenance } | undefined;
   let started = 0;
   let deadlineTimer: ReturnType<typeof setTimeout> | undefined;
   let displayTimer: ReturnType<typeof setTimeout> | undefined;
@@ -76,8 +87,10 @@ export function createRobotHost(options: RobotHostOptions = {}) {
     // US-41.3, US-12.5: a worker still without its handshake at the deadline is replaced, and
     // counts toward the failure threshold, so a stale or hung worker can't time out forever.
     if (reason === 'timeout' && worker && !ready) { failures++; terminate(); }
-    result = { action: fallbackRobotPolicy.decide(active.view, active.seed, clock.now()),
-      provenance: { kind: 'robot', policy: fallbackRobotPolicy.name, version: fallbackRobotPolicy.version,
+    const policy = active.kind === 'contract' ? contractChoicePolicy : fallbackRobotPolicy;
+    result = { action: fallbackAction(active, clock.now()),
+      provenance: { kind: 'robot', policy: policy.name, version: policy.version,
+        ...(active.kind === 'contract' ? { ruleId: contractChoicePolicy.ruleId } : {}),
         fallback: reason, durationMs: clock.now() - started } };
     cancelRequest();
   }
@@ -126,20 +139,24 @@ export function createRobotHost(options: RobotHostOptions = {}) {
     if (!result) fallback('timeout');
     const decision = active; const chosen = result;
     active = undefined; result = undefined; request = undefined; clearTimers();
-    if (!chosen || decision.submit(chosen.action, chosen.provenance) || chosen.provenance.fallback) return;
+    if (!chosen || submitDecision(decision, chosen.action, chosen.provenance) || chosen.provenance.fallback) return;
     // US-11.1, INV-7: an action the Table rejects is an engine failure, never a retry loop.
     failures++; terminate();
-    decision.submit(fallbackRobotPolicy.decide(decision.view, decision.seed, clock.now()), { kind: 'robot',
-      policy: fallbackRobotPolicy.name, version: fallbackRobotPolicy.version, fallback: 'engine-failure', durationMs: clock.now() - started });
+    const policy = decision.kind === 'contract' ? contractChoicePolicy : fallbackRobotPolicy;
+    submitDecision(decision, fallbackAction(decision, clock.now()), { kind: 'robot',
+      policy: policy.name, version: policy.version,
+      ...(decision.kind === 'contract' ? { ruleId: contractChoicePolicy.ruleId } : {}),
+      fallback: 'engine-failure', durationMs: clock.now() - started });
   }
   function begin() {
     if (!active || visibility.hidden()) return;
     started = clock.now();
     displayTimer = clock.setTimeout(display, displayMs);
     if (result) return;
-    request = { type: 'decide', requestId: String(++sequence), cancellationId: String(sequence),
+    request = { ...(active.kind === 'contract' ? { type: 'choose-contract' as const, view: encodeSetupSeatView(active.view) }
+      : { type: 'decide' as const, view: encodeSeatView(active.view) }), requestId: String(++sequence), cancellationId: String(sequence),
       playthroughId: active.playthroughId, positionKey: active.positionKey, deadline: started + deadlineMs,
-      seat: active.view.seat, view: encodeSeatView(active.view), seed: active.seed };
+      seat: active.view.seat, seed: active.seed };
     deadlineTimer = clock.setTimeout(() => fallback('timeout'), deadlineMs);
     if (failures >= threshold) fallback('engine-failure');
     else { ensureWorker(); send(); }

@@ -1,3 +1,4 @@
+import { choosePractice } from './miniBridge';
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -7,14 +8,13 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
   page.on('pageerror', error => errors.push(error.message));
   await page.clock.install();
   await page.clock.pauseAt(new Date());
-  await page.goto('/');
+  await page.goto('/'); await choosePractice(page, true);
   await page.evaluate(() => document.fonts.ready);
   await expect(page.getByRole('heading', { level: 1, name: 'BridgeVibe' })).toHaveCount(1);
   await expect(page.getByText('West is playing', { exact: true })).toBeVisible();
-  await expect(page.getByText('Dummy · 13 cards', { exact: true })).toBeVisible();
-  await expect(page.getByText('3NT', { exact: true })).toBeVisible();
-  await expect(page.getByText('Declarer: South', { exact: true })).toBeVisible();
-  await expect(page.getByText('Need 9 tricks', { exact: true })).toBeVisible();
+  await expect(page.locator('.dummy .card')).toHaveCount(13);
+  await expect(page.getByText('NT Game', { exact: true })).toBeVisible();
+  await expect(page.getByText('South declares · 9 tricks', { exact: true })).toBeVisible();
   await expect(page.getByText('You 0 · Them 0', { exact: true })).toBeVisible();
   await page.clock.runFor(500);
   await expect(page.getByText('Play from dummy', { exact: true })).toBeVisible();

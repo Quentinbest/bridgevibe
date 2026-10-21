@@ -60,3 +60,25 @@ export function decodeSeatView(data: unknown): SeatView {
 export function seatViewSeed(view: SeatView): string {
   return positionDigest(encodeSeatView(view));
 }
+
+// ADR-0001: setup has its own brand and no Contract until the Table accepts a choice.
+const setupSeatViewBrand: unique symbol = Symbol('SetupSeatView');
+export type SetupSeatView = Readonly<{
+  [setupSeatViewBrand]: true;
+  seat: Seat; hand: readonly Card[]; dummy: readonly Card[] | null; dummySeat: Seat | null;
+  announcements: readonly import('./miniBridge').Announcement[];
+  declarer: Seat | null; tied: boolean; step: import('./miniBridge').SetupStep;
+}>;
+export type SetupSeatViewMessage = Omit<SetupSeatView, typeof setupSeatViewBrand>;
+export function encodeSetupSeatView(view: SetupSeatView): SetupSeatViewMessage {
+  const { seat, hand, dummy, dummySeat, announcements, declarer, tied, step } = view;
+  return JSON.parse(JSON.stringify({ seat, hand, dummy, dummySeat, announcements, declarer, tied, step }));
+}
+export function decodeSetupSeatView(data: unknown): SetupSeatView {
+  const seat = choice(SEATS), card = object({ suit: choice(SUITS), rank: choice(RANKS) });
+  const nullableSeat: Check = value => value === null || seat(value);
+  if (!object({ seat, hand: array(card, 13), dummy: value => value === null || array(card, 13)(value), dummySeat: nullableSeat,
+    announcements: array(object({ seat, hcp: integer(40) }), 4), declarer: nullableSeat, tied: choice([true, false]),
+    step: choice(['announcements', 'redeal', 'declarer', 'dummy', 'contract-choice', 'complete']) })(data)) throw new Error('Invalid SetupSeatView message');
+  return { ...JSON.parse(JSON.stringify(data)), [setupSeatViewBrand]: true };
+}

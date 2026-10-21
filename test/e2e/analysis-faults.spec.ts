@@ -1,3 +1,4 @@
+import { choosePractice } from './miniBridge';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { completeFixedDeal } from '../strategy';
@@ -7,7 +8,7 @@ for (const fault of ['timeout', 'error', 'crash', 'protocol-mismatch', 'success'
   test(`VAL-06: ${fault}, replay, provenance and keyboard recovery`, async ({ page }) => {
     // #55: one fixed time for both calls; a later Node clock can't be in the page clock's past.
     const time = new Date(); await page.clock.install({ time }); await page.clock.pauseAt(time);
-    await page.goto(`/?debug=1&analysisFault=${fault}`);
+    await page.goto(`/?debug=1&analysisFault=${fault}`); await choosePractice(page, true);
     for (const entry of completeFixedDeal().actions) {
       if (entry.controller === 'robot') await page.clock.runFor(500);
       else {
