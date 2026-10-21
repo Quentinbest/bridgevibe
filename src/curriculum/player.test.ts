@@ -243,3 +243,13 @@ test('construction rejects any Script entry controlled by the learner', () => {
     ] }, createAttemptStore(), 'learner-1')).toThrow('learner-controlled seat');
   }
 });
+
+// US-27.3a: an accepted alternative can deliberately retain the canonical continuation.
+test('acceptThenScripted records a correct answer and plays the canonical card', () => {
+  const { player, store } = setup({ acceptThenScripted: [heart('K')] });
+  expect(player.answer(heart('K'), 100).outcome).toBe('correct');
+  expect(store.snapshot()[0].outcome).toBe('correct');
+  expect(player.record().actions[2].action.card).toEqual(heart('A'));
+  expect(player.snapshot().view.hand).toContainEqual(heart('K'));
+  continueScript(player);
+});

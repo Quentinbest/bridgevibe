@@ -11,10 +11,11 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.app.json",
     "lint": "eslint .",
     "deps:check": "depcruise --config .dependency-cruiser.cjs src",
+    "content:check": "node scripts/content/check.ts",
     "test": "vitest run --project node",
     "test:browser": "vitest run --project browser",
     "test:e2e": "playwright test",
-    "check": "npm run typecheck && npm run lint && npm run deps:check && npm test && npm run test:browser && npm run build && npm run test:e2e"
+    "check": "npm run typecheck && npm run lint && npm run deps:check && npm run content:check && npm test && npm run test:browser && npm run build && npm run test:e2e"
   },
   "dependencies": {
     "@fontsource/bricolage-grotesque": "5.3.0",
