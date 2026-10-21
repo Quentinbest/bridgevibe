@@ -351,3 +351,13 @@ test('accepts a valid seeded origin', () => {
   exercise.steps = [{ kind: 'commentary', textRef: 'lesson.intro' }];
   expect(validateLesson(lesson)).toEqual({ errors: [], warnings: [] });
 });
+
+// US-03, US-04.3: a seeded origin is provenance; it must reproduce the authored Deal.
+test('seeded origins must reproduce the Deal', () => {
+  const lesson = fixture('valid');
+  const exercise = lesson.exercises[0];
+  exercise.deal = dealFromSeed('lesson-seed', 3);
+  expect(validateLesson(lesson).errors.map(f => f.rule)).not.toContain('deal-shape');
+  exercise.deal = { ...fixture('valid').exercises[0].deal, origin: { kind: 'seed', seed: 'lesson-seed', index: 3, rotation: 0, algorithm: 'bv-deal-1' } };
+  expect(validateLesson(lesson).errors).toEqual([expect.objectContaining({ rule: 'deal-shape', message: 'Seeded origin does not reproduce this Deal.' })]);
+});

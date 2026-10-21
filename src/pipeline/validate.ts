@@ -1,5 +1,5 @@
 import { structuralFinding } from './shape';
-import { dealIdOf, RANKS, SEATS, sameCard, startPlaythrough, type Card, type Playthrough, type Seat } from '../table';
+import { dealFromSeed, dealIdOf, RANKS, SEATS, sameCard, startPlaythrough, type Card, type Playthrough, type Seat } from '../table';
 import type { Content, Exercise, Lesson, Prompt } from '../curriculum/model';
 
 export type Finding = { rule: string; contentId: string; message: string };
@@ -34,6 +34,11 @@ function dealShape(exercise: Exercise, report: Report): boolean {
   }
   if (deal.dealId !== dealIdOf(deal)) {
     error(report, 'deal-shape', exercise, 'Deal metadata or dealId does not match dealIdOf.');
+    return false;
+  }
+  // US-03, US-04.3: a seeded origin must reproduce the Deal, or exported records won't import.
+  if (deal.origin.kind === 'seed' && dealFromSeed(deal.origin.seed, deal.origin.index).dealId !== deal.dealId) {
+    error(report, 'deal-shape', exercise, 'Seeded origin does not reproduce this Deal.');
     return false;
   }
   return true;
