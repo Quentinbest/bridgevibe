@@ -6,12 +6,15 @@ export type TrickCost = { positionIndex: number; cost: number; statement: LogEnt
 export type CostWords = (cost: number, name: string, version: string) => string;
 // US-17, CI-1–3: an outcome in hindsight, never a judgement of the learner's decision.
 export async function trickCosts(record: CompletedPlaythroughRecord, solver: SolverPort,
-  log: ReturnType<typeof createProvenanceLog>, words: CostWords, arrive: (cost: TrickCost) => void) {
+  log: ReturnType<typeof createProvenanceLog>, words: CostWords, arrive: (cost: TrickCost) => void,
+  isCancelled: () => boolean = () => false) {
   completedRecord(record);
   for (const entry of record.actions) {
+    if (isCancelled()) return;
     if (entry.controller !== 'learner' || positionAt(record, entry.index).legalCards.length < 2) continue;
     try {
       const result = await doubleDummy(solver, record, entry.index);
+      if (isCancelled()) return;
       // GLOSSARY Forced Play: only Equivalent Actions remain, so this is not a Decision (US-17.2).
       if (result.classes.length < 2) continue;
       const chosen = result.classes.find(group => group.cards.some(card => sameCard(card, entry.action.card)));

@@ -300,3 +300,15 @@ it('attributes browser-external stand-ins to Vite without permitting unknown vir
     load(id) { if (id === '\0unknown-helper') return 'console.log("unknown");'; },
   }] })).rejects.toThrow('unknown virtual module');
 }, 60_000);
+
+// US-46.1: only Vite's exact browser-external IDs borrow Vite's licence.
+it('attributes exact Vite browser-external IDs to Vite and nothing that merely shares the prefix', () => {
+  for (const id of ['\0__vite-browser-external', '__vite-browser-external', '\0__vite-browser-external:fs', '__vite-browser-external:node:path']) {
+    expect(resolveArtefact(root, id, 'assets/app.js', {})).toMatchObject({ name: 'vite', kind: 'bundler' });
+  }
+  for (const id of ['\0__vite-browser-external-malicious', '\0__vite-browser-external:not-a-builtin']) {
+    expect(resolveArtefact(root, id, 'assets/app.js', {}).problem).toMatch(/unknown virtual module/);
+  }
+  // Without the \0 prefix it isn't virtual at all: an ordinary path, never Vite's.
+  expect(resolveArtefact(root, '__vite-browser-externalx', 'assets/app.js', {}).name).not.toBe('vite');
+});

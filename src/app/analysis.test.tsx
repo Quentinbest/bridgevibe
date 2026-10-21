@@ -103,3 +103,20 @@ test('US-17 / #21: failure ends the skeleton without inventing badges', async ()
   host.start(record, createProvenanceLog(), { ...bridgeDdsEngine, solveTable: vi.fn(), solvePosition: vi.fn().mockRejectedValue(new Error('failed')) });
   await waitFor(() => expect(host.snapshot(record)).toEqual({ running: false, costs: [] }));
 });
+
+// §4.7: replacing the completed deal cancels its analysis; nothing half-done is cached or published.
+test('cancelling an in-flight analysis stops it and drops the unfinished result', async () => {
+  const host = createAnalysisHost(); const record = completedRecord(completeFixedDeal());
+  let release: () => void = () => {};
+  const solvePosition = vi.fn<SolverPort['solvePosition']>(() => new Promise(resolve => {
+    release = () => resolve({ ...bridgeDdsEngine, classes: [{ cards: [], tricks: 0 }, { cards: [], tricks: 0 }] });
+  }));
+  const cancel = host.start(record, createProvenanceLog(), { ...bridgeDdsEngine, solvePosition, solveTable: vi.fn() });
+  await vi.waitFor(() => expect(solvePosition).toHaveBeenCalledOnce());
+  expect(host.snapshot(record).running).toBe(true);
+  cancel();
+  expect(host.snapshot(record)).toEqual({ running: false, costs: [] });
+  release(); await new Promise(resolve => setTimeout(resolve, 0));
+  expect(solvePosition).toHaveBeenCalledOnce();
+  expect(host.snapshot(record)).toEqual({ running: false, costs: [] });
+});

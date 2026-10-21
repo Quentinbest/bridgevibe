@@ -115,7 +115,8 @@ function PracticeScreen() {
   const completed = useMemo(() => view.status === 'completed' ? play.completedRecord() : null, [play, view.status]);
   const analysis = useSyncExternalStore(analysisHost.subscribe, () => analysisHost.snapshot(completed));
   // §4.5, U-13: start at completion, before Hand review is opened.
-  useEffect(() => { if (completed) analysisHost.start(completed, play.provenanceLog); }, [completed, play]);
+  // §4.7: a New deal (or leaving) cancels the old record's analysis instead of leaving the solver running.
+  useEffect(() => completed ? analysisHost.start(completed, play.provenanceLog) : undefined, [completed, play]);
   useEffect(() => play.start(), [play]);
   useEffect(() => { if (!review && view.status === 'completed') reviewButton.current?.focus(); }, [review, view.status]);
   if (review) return <ReviewScreen analysis={analysis} record={review} onBack={() => setReview(null)} />;

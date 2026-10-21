@@ -1,5 +1,6 @@
 import { existsSync, readdirSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { builtinModules } from 'node:module';
 import { createHash } from 'node:crypto';
 import type { Plugin, ResolvedConfig } from 'vite';
 import { buildBom, prohibitedPaths, renderNotice, scanBytes } from './core.js';
@@ -25,8 +26,10 @@ export function resolveArtefact(root: string, id: string, shippedFile: string, a
   const source = id.replace(/[?#].*$/, '');
   let file = path.resolve(root, source);
   let bundler = false;
-  // US-46.1: Vite owns browser stand-ins for Node built-ins (Vite 8 also emits the bare ID).
-  const browserExternal = source.startsWith('\0__vite-browser-external') || source === '__vite-browser-external' || source.startsWith('__vite-browser-external:');
+  // US-46.1: Vite owns browser stand-ins for Node built-ins, as the bare ID or `:<built-in>` (Vite 8 emits
+  // both, with or without the \0 prefix). Exact forms only, so another plugin can't borrow Vite's licence.
+  const external = /^\0?__vite-browser-external(?::(.+))?$/.exec(source);
+  const browserExternal = !!external && (external[1] === undefined || builtinModules.includes(external[1].replace(/^node:/, '')));
   if (source.startsWith('\0') || browserExternal) {
     const provider = browserExternal || /^\0vite\/(?:preload-helper|modulepreload-polyfill)\.js$/.test(source) ? 'vite'
       : source === '\0rolldown/runtime.js' ? 'rolldown' : undefined;

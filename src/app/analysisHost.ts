@@ -15,16 +15,19 @@ export function createAnalysisHost() {
   return {
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
     snapshot(record: CompletedPlaythroughRecord | null, engine: { name: string; version: string } = bridgeDdsEngine): AnalysisState { return record ? cache.get(keyOf(record, engine)) ?? empty : empty; },
-    start(record: CompletedPlaythroughRecord, log: ReturnType<typeof createProvenanceLog>, fake?: SolverPort) {
+    // Returns a cancel function: a replaced deal stops its analysis and frees the worker.
+    start(record: CompletedPlaythroughRecord, log: ReturnType<typeof createProvenanceLog>, fake?: SolverPort): () => void {
       completedRecord(record);
       const key = keyOf(record, fake ?? bridgeDdsEngine);
-      if (cache.has(key)) return;
+      if (cache.has(key)) return () => {};
       cache.set(key, { running: true, costs: [] }); publish();
+      let cancelled = false;
+      let close = () => {};
       void (async () => {
-        let close = () => {};
         try {
           const client = fake ? undefined : (await import('./analysisClient')).analysisClient(record);
           close = () => client?.close();
+          if (cancelled) return;
           const port = fake ?? client!.solver;
           // US-17: worker requests reference positions in the completed record only.
           const solver: SolverPort = { ...port, solvePosition(layout, position) {
@@ -32,11 +35,16 @@ export function createAnalysisHost() {
             return port.solvePosition(layout, position);
           } };
           await trickCosts(record, solver, log, (cost, name, version) => text('review.cost-description', { cost, name, version }), result => {
-            cache.set(key, { running: true, costs: [...cache.get(key)!.costs, result] }); publish();
-          });
+            if (!cancelled) { cache.set(key, { running: true, costs: [...cache.get(key)!.costs, result] }); publish(); }
+          }, () => cancelled);
         } catch { /* US-17: TODO #21 — no permanent skeleton after worker startup failure. */ }
-        finally { close(); cache.set(key, { ...cache.get(key)!, running: false }); publish(); }
+        finally { close(); if (!cancelled) { cache.set(key, { ...cache.get(key)!, running: false }); publish(); } }
       })();
+      return () => {
+        if (cancelled || !cache.get(key)?.running) return;
+        // An unfinished analysis is dropped, not cached half-done.
+        cancelled = true; close(); cache.delete(key); publish();
+      };
     },
   };
 }
