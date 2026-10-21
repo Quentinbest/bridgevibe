@@ -160,11 +160,28 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
 .lesson-hint { border-left: 3px solid var(--accent-text); padding-left: 12px; }
 .lesson-panel small { color: var(--muted); overflow-wrap: anywhere; }
 .lesson-keys { display: none; }
+/* US-21.6: shown cards remain non-interactive and labelled in their seat's area. */
+.lesson-exposure { margin: 8px 0; max-width: 100px; }
+.lesson-exposure .card { width: 56px; height: 80px; }
+.lesson-exposure figcaption { margin-top: 6px; }
+.lesson-step-list { display: none; }
+.lesson-step-list ol { padding-left: 24px; }
+.lesson-step-list li { padding: 4px; font-size: var(--type-13); }
+.lesson-step-list [data-state="done"] { color: var(--muted); }
+.lesson-step-list [aria-current="step"] { font-weight: 600; border-left: 3px solid var(--accent-text); }
+.lesson-dots { flex-wrap: wrap; max-width: 180px; gap: 4px; }
+.level-complete { max-width: 520px; margin: 32px auto; text-align: center; }
+.lesson-skill { background: var(--accent-soft); color: var(--accent-soft-text); padding: 12px; border-radius: var(--radius-pill); }
+.lesson-counts { display: flex; justify-content: space-around; gap: 16px; margin: 32px 0; }
+.lesson-counts div { display: flex; flex-direction: column-reverse; flex: 1; }
+.lesson-counts dd { margin: 0; font: 600 var(--type-32) var(--font-display); }
+.level-complete button { display: block; width: 100%; margin: 12px 0; }
 /* UX §3.1: four played cards fit the phone felt while keeping faces at least 44px wide. */
 @media (max-width: 719px) {
   .lesson-trick .card { width: 56px; height: 80px; }
 }
 @media (min-width: 1100px) {
+  .lesson-step-list { display: block; }
   .lesson-layout { grid-template-columns: minmax(680px, 2fr) minmax(300px, 1fr); align-items: start; }
   .lesson-table { padding: 24px; }
   .lesson-trick { min-height: 350px; }

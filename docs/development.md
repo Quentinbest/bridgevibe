@@ -170,21 +170,46 @@ Playthrough Record, never regenerated actions (ADR-0002).
 
 ## Lessons
 
-`?lesson=follow-suit` opens the unsigned draft exercise; Close returns to practice.
-The design's Level means Module, with one Lesson per Module for now. Its five dots
-are the Exercise's five Steps; the fraction and accessible progress value share
-one step index (correcting the design's mismatched success-screen fraction).
-`src/curriculum/` owns the JSON content, the Attempt model and the player's transitions.
-It imports only Table; the Script contains Robot moves only and never invokes robot policies.
-The learner defends South against 1NT by West; North leads and East is Dummy.
-Every scripted action records authored provenance with the Exercise content ID and version;
-trial replay preserves each recorded action’s provenance. `src/progress/`
-owns the append-only session Attempts store (§4.2) and may import only curriculum;
-the player appends through curriculum's `AttemptSink` type.
-The UI schedules scripted plays at 500 ms and renders South's Seat View. Authored
-hint provenance is exposed as data; wiring it to #9's coach log is deferred until
-both tickets land. Hints do not change outcomes. No persistence or level-complete
-screen is included; all lesson copy awaits teacher sign-off.
+`?lesson=follow-suit-full` opens the three-exercise unsigned draft Follow suit lesson.
+`?lesson=follow-suit` retains the original five-step exercise as a short lesson;
+it is also the full lesson's first Exercise. Close returns to practice.
+The other two fixed Deals have their own content IDs and rights records. They
+repeat following hearts with a teaching Exposure, then an unaided Prompt.
+All content and catalogue copy await teacher sign-off (CI-8).
+
+`src/curriculum/lessonPlayer.ts` composes `createPlayer` for each Exercise in order,
+creating a separate Table Playthrough each time. Its snapshot provides the overall
+step index, Exercise index and within-Exercise progress. The header fraction and
+bar share the overall index; at the existing 1100 px desktop breakpoint, an
+accessible “In this level” list marks done, current and upcoming Steps.
+The design's Level means Module, with one Lesson per Module for now.
+
+`src/curriculum/` owns content, Attempts and deterministic player transitions.
+It imports only Table; Scripts contain Robot moves only and never invoke policies.
+The learner sits South on North–South; `loadLesson` rejects North declarers until
+#16 rotates the table. Script actions carry authored provenance with the Exercise
+content ID and version; trial replay preserves each action's provenance.
+`src/progress/` owns the append-only session Attempts store (§4.2); the player
+appends through curriculum's `AttemptSink` type.
+
+Exposures accumulate in the Exercise player and reset with the next Exercise.
+The snapshot's separate `exposed` array contains only named cards still held by
+their seat. The screen renders them face up and non-interactively with “Shown for
+this lesson”. Seat Views and the Playthrough Record remain unchanged (ADR-0001);
+exposures never feed robots or computed outputs. Scripts retain the normal 500 ms
+delay. Authored hints retain their content provenance and do not penalize outcomes.
+
+After the final Step, Level complete counts only this run's Attempts: `correct`
+as right first time and `corrected` as after a nudge. It shows the Lesson skill
+tags without scores, stars, streaks or mastery claims. Both “Next: Practice
+following suit” and “That's enough for today” return to practice. There is no
+levels map or persistence. Compared with the mock-ups, the fraction is synchronized,
+the time estimate and “like a pro” claim are omitted, and the next destination is
+practice as specified for #14. UX §6.2's map/next-lesson destinations remain MVP work.
+
+Automated keyboard journeys cover lesson completion, Exposure labels, hidden-card
+DOM boundaries and axe in both themes. The owner must still play the full lesson
+on both physical reference phones (US-21.7); browser emulation does not replace it.
 
 ## Provenance
 
