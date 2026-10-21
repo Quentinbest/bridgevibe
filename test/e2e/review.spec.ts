@@ -52,6 +52,27 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
   await expect(page.getByRole('heading', { name: 'Hand review' })).toBeFocused();
   await expect(page.getByRole('status')).toHaveText('Working out the X-ray view…');
   releaseSolver();
+  await expect(page.getByRole('heading', { name: 'Announcements', exact: true })).toBeVisible();
+  await expect(page.locator('[aria-current="step"]')).toHaveText('Announcements');
+  await expect(page.locator('.review-cost')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Previous step', exact: true })).toBeDisabled();
+  await page.clock.resume();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  const setupNext = page.getByRole('button', { name: 'Next step', exact: true });
+  // US-16.2: Tab from the focused heading into the stepper, then use native buttons.
+  await page.keyboard.press('Tab');
+  await expect(setupNext).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('heading', { name: 'Declarer and dummy' })).toBeVisible();
+  await expect(page.locator('[aria-current="step"]')).toHaveText('Declarer and dummy');
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.keyboard.press('Space');
+  await expect(page.getByRole('heading', { name: 'Contract Choice', exact: true })).toBeVisible();
+  await expect(page.locator('[aria-current="step"]')).toHaveText('Contract Choice');
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.keyboard.press('Enter');
+  await expect(page.getByText('Trick 1 of 13', { exact: true })).toBeVisible();
+  await expect(page.locator('[aria-current="step"]')).toHaveAttribute('aria-label', 'Trick 1');
   await expect(page.locator('.review-cost')).toHaveCount(2);
   for (const badge of await page.locator('.review-cost').all()) {
     await expect(badge).toContainText('X-ray view: with all cards visible');
@@ -60,7 +81,7 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
   await page.clock.resume();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await expect(page.getByRole('note')).toContainText('X-ray view: now you can see all 4 hands');
-  await expect(page.getByRole('button', { name: 'Previous trick' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Previous trick' })).toBeEnabled();
   const toggle = page.getByRole('button', { name: /^(Show|Hide) all 4 hands$/ });
   if (await toggle.getAttribute('aria-expanded') === 'true') await toggle.click();
   await expect(page.locator('#review-hands')).toHaveCount(0);
@@ -87,7 +108,7 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
   await previous.focus(); await page.keyboard.press('Space');
   await expect(page.getByText('Trick 12 of 13', { exact: true })).toBeVisible();
   if (page.viewportSize()!.width >= 1000) {
-    await expect(page.getByRole('navigation', { name: 'Tricks' }).getByRole('button')).toHaveCount(13);
+    await expect(page.getByRole('navigation', { name: 'Replay steps' }).getByRole('button')).toHaveCount(16);
     await page.getByRole('button', { name: 'Trick 1', exact: true }).click();
     await expect(page.getByText('Trick 1 of 13', { exact: true })).toBeVisible();
   }
