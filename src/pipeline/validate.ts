@@ -66,9 +66,13 @@ function equivalents(prompt: Prompt, table: Playthrough, seat: Seat, report: Rep
         Math.max(RANKS.indexOf(answer.rank), RANKS.indexOf(card.rank)))
         .every(rank => has([...hand, ...played], { suit: card.suit, rank })));
     const reviewed = prompt.equivalentsReviewed?.some(review => sameCard(review.card, card)
-      && (review.decision === 'accept' || (review.decision === 'reject' && nonempty(review.reason))));
-    if (equivalent && !reviewed) report.warnings.push({ rule: 'equivalent-cards', contentId: prompt.contentId,
-      message: `Equivalent ${card.suit} ${card.rank} is not expected or reviewed (rejection needs a reason).` });
+      && review.decision === 'reject' && nonempty(review.reason));
+    const message = `Equivalent ${card.suit} ${card.rank} is not expected or reviewed (rejection needs a reason).`;
+    // US-27.3b: multiple reachable lines may expose the same missing equivalent.
+    if (equivalent && !reviewed && !report.warnings.some(finding => finding.rule === 'equivalent-cards'
+      && finding.contentId === prompt.contentId && finding.message === message)) {
+      report.warnings.push({ rule: 'equivalent-cards', contentId: prompt.contentId, message });
+    }
   }
 }
 function expectedAnswers(prompt: Prompt, exercise: Exercise, table: Playthrough, report: Report): Seat | null {
@@ -76,6 +80,13 @@ function expectedAnswers(prompt: Prompt, exercise: Exercise, table: Playthrough,
   if (!seat || table.controllerOf(seat) !== 'learner' || !Array.isArray(prompt.expectedAnswers) || !prompt.expectedAnswers.length) {
     error(report, 'expected-answer', prompt, 'Prompt needs expected cards at a learner-controlled turn.');
     return null;
+  }
+  // US-27.3b: the player's accepted cards are exactly expectedAnswers.
+  for (const review of prompt.equivalentsReviewed ?? []) {
+    if (review.decision === 'accept' && !has(prompt.expectedAnswers, review.card)) {
+      error(report, 'equivalent-cards', prompt,
+        `Reviewed ${review.card.suit} ${review.card.rank} is accepted but not in expectedAnswers.`);
+    }
   }
   for (const card of prompt.expectedAnswers) {
     const result = copyPosition(exercise, table).submit(seat, 'learner', { kind: 'play-card', card });
@@ -99,9 +110,14 @@ function scriptReplay(exercise: Exercise, report: Report) {
         error(report, 'hint-references', exercise, 'Exposure must reference a card belonging to its named seat.');
       } else exposed.push(...step.cards.map(ref => ref.card));
     } else if (step.kind === 'scripted-action') {
+      // US-27.2: advanceScript requires at least one referenced Robot action.
+      if (!Array.isArray(step.scriptIndices) || !step.scriptIndices.length) {
+        error(report, 'script-replay', exercise, 'Scripted-action steps require at least one script index.');
+        return null;
+      }
       for (const index of step.scriptIndices) {
         const play = exercise.script[index];
-        if (!Number.isInteger(index) || !play || used.has(index)) {
+        if (!Number.isInteger(index) || index < 0 || index >= exercise.script.length || !play || used.has(index)) {
           error(report, 'script-replay', exercise, `Invalid or repeated script index ${index}.`);
           return null;
         }
@@ -119,7 +135,6 @@ function scriptReplay(exercise: Exercise, report: Report) {
       const before = report.errors.length;
       const seat = expectedAnswers(prompt, exercise, table, report);
       if (!seat || report.errors.length !== before) return null;
-      equivalents(prompt, table, seat, report);
       positions.push({ prompt, table: copyPosition(exercise, table), seat });
       table.submit(seat, 'learner', { kind: 'play-card', card: prompt.expectedAnswers[0] });
     }
@@ -151,6 +166,8 @@ function alternatives(exercise: Exercise, canonical: NonNullable<ReturnType<type
     const next: Playthrough[] = [];
     for (const table of lines) {
       if (prompt) {
+        // US-27.3b: earlier answers can leave different equivalents in the acting hand.
+        equivalents(prompt, table, play.seat, report);
         for (const card of prompt.expectedAnswers) {
           if (++branches > MAX_ANSWER_BRANCHES) {
             fail(prompt, `Exercise exceeds the enumeration limit of ${MAX_ANSWER_BRANCHES} answer branches; validation is incomplete.`);
@@ -192,20 +209,20 @@ function alternatives(exercise: Exercise, canonical: NonNullable<ReturnType<type
 }
 export function validateLesson(value: unknown): Report {
   const report: Report = { errors: [], warnings: [] };
-  if (!object(value) || !Array.isArray(value.exercises) || !['contract-bridge', 'minibridge'].includes(String(value.gameFormat))) {
-    error(report, 'lesson-shape', {}, 'Expected a Lesson with gameFormat and exercises.');
+  if (!object(value) || !Array.isArray(value.exercises) || !value.exercises.length || !['contract-bridge', 'minibridge'].includes(String(value.gameFormat))) {
+    error(report, 'lesson-shape', {}, 'Expected a Lesson with gameFormat and at least one exercise.');
     return report;
   }
   const lesson = value as Lesson;
   rights(lesson, report);
   for (const exercise of lesson.exercises) {
     try {
-      if (!object(exercise) || !Array.isArray(exercise.steps) || !Array.isArray(exercise.script)
+      if (!object(exercise) || !Array.isArray(exercise.steps) || !exercise.steps.length || !Array.isArray(exercise.script)
         || !object(exercise.contract) || !SEATS.includes(exercise.contract.declarer)
         || ![...SUITS, 'no-trumps'].includes(exercise.contract.strain)
         || !Number.isInteger(exercise.contract.level) || exercise.contract.level < 1 || exercise.contract.level > 7
         || exercise.steps.some(step => !object(step) || !['commentary', 'prompt', 'scripted-action', 'exposure'].includes(String(step.kind)))) {
-        error(report, 'lesson-shape', exercise ?? {}, 'Exercise requires valid contract, steps and script.');
+        error(report, 'lesson-shape', exercise ?? {}, 'Exercise requires a valid contract, at least one step and a script.');
         continue;
       }
       rights(exercise, report);

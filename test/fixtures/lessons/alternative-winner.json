@@ -330,6 +330,10 @@
               {
                 "suit": "hearts",
                 "rank": "5"
+              },
+              {
+                "suit": "hearts",
+                "rank": "K"
               }
             ],
             "countsRejections": true,

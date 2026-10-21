@@ -280,7 +280,10 @@ illegal later answers, scripted moves or changed trick winners. Answers in `acce
 legal before being replaced by the canonical card. Enumeration is capped at 1,024
 answer branches per Exercise (including canonical and replaced answers across
 all reachable lines); exceeding the cap is an error, never a partial success.
-Every Script entry must occur exactly once. MiniBridge 20–20 HCP Deals are rejected. US-15 checks structured hint card references against
+Lessons require at least one Exercise, Exercises at least one Step, and
+scripted-action Steps at least one in-bounds Script index. Every Script entry
+must occur exactly once. MiniBridge 20–20 HCP Deals are rejected. US-15 checks
+structured hint card references against
 South's Seat View, played cards and earlier Exposures in the same Exercise.
 Exposure references must identify the card's actual Seat. Parsing card names in
 prose is outside this check; authors must supply `hint.referencedCards`.
@@ -295,8 +298,11 @@ card. Illegal alternatives are rejected even with this marker.
 
 Equivalent cards (US-27.3b) are same-suit cards in the acting hand with every
 intervening rank either already played or in that hand. No intervening card can
-remain in another hand. Unlisted equivalents produce a warning. Add them to
+remain in another hand. Unlisted equivalents are checked at every Prompt on every
+reachable line; repeated findings for the same card and Prompt produce one
+warning. Add them to
 `expectedAnswers`, or record `{ card, decision: 'accept' }` or
 `{ card, decision: 'reject', reason: '...' }` in `equivalentsReviewed`.
-A rejection needs a non-empty reason. A review record acknowledges the warning;
-only `expectedAnswers` controls what the player accepts.
+A rejection needs a non-empty reason. An `accept` review requires the card to
+also appear in `expectedAnswers`; otherwise validation reports an error. Only
+`expectedAnswers` controls what the player accepts.

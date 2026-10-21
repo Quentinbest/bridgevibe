@@ -6,8 +6,10 @@ import { validateLesson } from './validate';
 
 const fixture = (name: string) => JSON.parse(readFileSync(`test/fixtures/lessons/${name}.json`, 'utf8'));
 const rules = {
+  'lesson-shape': ['lesson-empty-exercises', 'exercise-empty-steps'],
+  'equivalent-cards': ['equivalent-accepted-not-expected'],
   'deal-shape': ['deal-duplicate', 'deal-count', 'deal-id'],
-  'script-replay': ['script-not-held', 'script-follow-suit', 'script-learner', 'script-unreferenced'],
+  'script-replay': ['script-not-held', 'script-follow-suit', 'script-learner', 'script-unreferenced', 'script-empty-indices', 'script-index-bounds', 'script-index-repeated'],
   'expected-answer': ['expected-illegal', 'expected-not-held', 'expected-inconsistent'],
   'alternative-continuation': ['alternative-illegal', 'alternative-winner', 'alternative-later-prompt'],
   'minibridge-redeal': ['minibridge-tie'],
@@ -36,6 +38,11 @@ test('missing equivalents warn until accepted or rejected with a reason', () => 
     { card: { suit: 'hearts', rank: 'K' }, decision: 'accept' },
     { card: { suit: 'hearts', rank: 'Q' }, decision: 'reject' },
   ];
+  expect(validateLesson(lesson).errors).toEqual([expect.objectContaining({
+    rule: 'equivalent-cards', message: expect.stringContaining('accepted but not in expectedAnswers'),
+  })]);
+  prompt.expectedAnswers.push(prompt.equivalentsReviewed[0].card);
+  expect(validateLesson(lesson).errors).toEqual([]);
   expect(validateLesson(lesson).warnings).toHaveLength(1);
   prompt.equivalentsReviewed[1].reason = 'This Prompt teaches the highest card.';
   expect(validateLesson(lesson).warnings).toEqual([]);
@@ -134,4 +141,20 @@ test('enumeration limit fails explicitly instead of accepting unchecked branches
   expect(validateLesson(lesson).errors).toEqual([expect.objectContaining({
     rule: 'alternative-continuation', message: expect.stringContaining('enumeration limit of 1024'),
   })]);
+});
+
+// US-27.3b: the canonical line plays the ace; the alternative leaves it equivalent to the queen.
+test('equivalents are checked after earlier alternatives, with duplicate warnings suppressed', () => {
+  const lesson = fixture('equivalent-after-alternative');
+  const result = validateLesson(lesson);
+  expect(result.errors).toEqual([]);
+  expect(result.warnings).toEqual([{
+    rule: 'equivalent-cards', contentId: 'follow-suit.second-prompt',
+    message: 'Equivalent hearts A is not expected or reviewed (rejection needs a reason).',
+  }]);
+  const first = lesson.exercises[0].steps[2].prompt;
+  first.expectedAnswers.push(first.expectedAnswers[1]);
+  expect(validateLesson(lesson).warnings).toEqual(result.warnings);
+  first.acceptThenScripted = [first.expectedAnswers[1]];
+  expect(validateLesson(lesson).warnings).toEqual([]);
 });
