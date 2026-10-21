@@ -28,7 +28,8 @@ Every production build runs `scripts/licences/` (US-46, LR-1–LR-7). It writes
 texts, including the font OFL notices. CI uploads both files, including after a
 failed build. Only shipped modules and assets are attributed; development-only
 packages are excluded unless their helpers reach the bundle.
-Assets are never inlined, so each is attributed.
+Assets normally remain separate for attribution; the standalone macroxue WASM is
+explicitly inlined and attributed through its worker module source path.
 
 Package versions come from `package.json`, but grants come from actual licence
 files. Missing or unrecognised grants, GPL-family licences, unknown virtual
@@ -337,6 +338,45 @@ data is a failure with the regeneration command, never a skipped test. Native DD
 requires a sysctl unavailable in this sandbox: generation and repeatability verification
 must run outside it. Reference sources, compiled driver and Matplotlib cache remain
 under the Git/ESLint-ignored `.reference-solvers/` directory and are never shipped.
+
+The full F2 set is `src/analysis/f2-full.json`: 100 Deals from endplay
+`generate_deals(produce=100, seed=42)` and 200 positions after 4–47 plays
+(tricks 2–12), covering every current-trick length. Regenerate outside the sandbox:
+
+```sh
+node scripts/solver/generate-f2.ts --full
+```
+
+Both smoke and full suites run against both adapters and both committed references,
+checking every legal card and exact class coverage. No native tools are needed to
+run the tests. Generation preserves both references and is byte-identical on rerun.
+
+`scripts/solver/build-macroxue.sh` builds the standalone WASM with emscripten 5.0.7
+from macroxue commit `630705d`. The vendored `src/analysis/macroxue/VERSION` records
+the full commit; both upstream licence files accompany it. The BOM attributes the
+WASM by content hash and elects its MIT grant in `licences/assets.json`.
+The adapter loads inline base64 bytes without a network request or Emscripten JS loader.
+Vite and Vitest both set `assetsInclude: ['**/*.wasm']` so `solver.wasm?inline`
+returns a base64 data URL in the built worker and in Node tests.
+
+Set `VITE_SOLVER=macroxue` when starting Vite or building to select macroxue;
+`VITE_SOLVER=bridge-dds` (or unset) selects the default bridge-dds adapter.
+Only the selected engine ships in the analysis worker graph; neither engine enters
+the initial page graph. Audit and e2e builds retain the unset default. This is
+configuration for validation, not the device gate's final solver choice.
+
+Verified in Node on 2026-10-21: both adapters have zero mismatches against both
+references for every table and legal-card score in both sets, with exact class
+coverage. An isolated run took bridge-dds 3.18 s (smoke) / 17.53 s (full), and
+macroxue 2.30 s / 14.24 s; these are local test timings, not device benchmarks.
+Production builds and licence checks pass with either selection. The build test
+checks the initial graph, excludes inline WASM from all page chunks, and executes
+each selected built worker in a Node VM with worker globals. bridge-dds embeds
+its WASM as base64 in JavaScript, so the new asset classification does not change
+its loading path. Equivalent cards are grouped by rank (GLOSSARY *Equivalent Actions*);
+a card on the current trick separates ranks, matching DDS's `equals` on every F2 position.
+The browser and e2e suites pass with the default; with macroxue selected, review shows the
+same trick costs, with macroxue named in provenance.
 
 ## Content checks
 
