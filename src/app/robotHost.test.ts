@@ -85,7 +85,7 @@ for (const operation of ['decide', 'choose-contract'] as const) {
     const audit = vi.fn();
     const play = createPlay({ audit, createWorker: () => {
       const worker = new FakeWorker(workers.length ? 1 : undefined); workers.push(worker); return worker;
-    } }, operation === 'decide' ? fixedDeal : dealFromSeed('setup-ui', 3));
+    } }, operation === 'decide' ? fixedDeal : dealFromSeed('setup-ui', 3), 'eastWest');
     const stop = play.start();
     try {
       if (operation === 'decide') choosePractice(play);
@@ -393,7 +393,7 @@ test('US-41.3, US-12.5: a worker that never sends hello is replaced and eventual
 // CI-5, US-12: the host names the policy that actually produced a fallback choice.
 test.each(['timeout', 'engine-failure'] as const)('contract-choice host fallback records %s and its producing policy', fallback => {
   vi.useFakeTimers(); const workers: FakeWorker[] = [];
-  const play = createPlay({ createWorker: () => { const worker = new FakeWorker(); workers.push(worker); return worker; } }, dealFromSeed('setup-ui', 3));
+  const play = createPlay({ createWorker: () => { const worker = new FakeWorker(); workers.push(worker); return worker; } }, dealFromSeed('setup-ui', 3), 'eastWest');
   const stop = play.start();
   try {
     vi.advanceTimersByTime(3001);

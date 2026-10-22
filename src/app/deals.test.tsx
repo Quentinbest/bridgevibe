@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
-import { dealFromSeed, highCardPoints } from '../table';
+import { dealFromSeed, highCardPoints, rotateDeal, sideOf, importRecordJson, exportRecordJson } from '../table';
 import { dealFromUrl, dealSession, nextDeal } from './deals';
 import { fixedDeal } from './fixture';
 import { App } from './App';
@@ -51,7 +51,7 @@ test('US-06, US-03: terminal 20–20 link explains that no Redeal is available a
   expect(vi.getTimerCount()).toBe(0);
   act(() => vi.advanceTimersByTime(30000));
   expect(vi.getTimerCount()).toBe(0);
-  // US-03: use a reproducible fresh seed whose first Deal lets the learner choose.
+  // US-03, US-07.1: use a reproducible fresh seed; the second Playthrough targets defence.
   vi.spyOn(crypto, 'getRandomValues').mockImplementation(array => {
     (array as Uint8Array).fill(0); return array;
   });
@@ -59,7 +59,8 @@ test('US-06, US-03: terminal 20–20 link explains that no Redeal is available a
   expect(location.search).toBe('?seed=AAAAAAAAAAAA&deal=1');
   expect(screen.queryByRole('status')).toBeNull();
   act(() => vi.advanceTimersByTime(3000));
-  fireEvent.click(screen.getByRole('button', { name: 'Choose' }));
+  expect(screen.queryByRole('button', { name: 'Choose' })).toBeNull();
+  act(() => vi.advanceTimersByTime(500));
   expect(document.querySelector('.table')).not.toBeNull();
 });
 test('session exposes metadata only, preserves URL context, and restarts MiniBridge Setup', () => {
@@ -67,7 +68,8 @@ test('session exposes metadata only, preserves URL context, and restarts MiniBri
   const session = dealSession(dealFromSeed('abc', 3));
   expect(Object.keys(session.info).sort()).toEqual(['dealId', 'origin']);
   const next = session.next();
-  expect(next.info).toEqual({ dealId: dealFromSeed('abc', 4).dealId, origin: dealFromSeed('abc', 4).origin });
+  const expected = rotateDeal(dealFromSeed('abc', 4));
+  expect(next.info).toEqual({ dealId: expected.dealId, origin: expected.origin });
   expect(location.search).toBe('?seed=abc&deal=4&extra=1');
   expect(location.hash).toBe('#table');
   expect(next.play.getSnapshot()).toMatchObject({ positionIndex: 0, dummy: null, contract: null, setup: { step: 'announcements', announcements: [] } });
@@ -105,5 +107,37 @@ test('US-06: redeal updates stable metadata without replacing the session or ope
   const dialog = screen.getByRole('dialog');
   act(() => vi.advanceTimersByTime(3500));
   expect(screen.getByRole('dialog')).toBe(dialog);
-  expect(dialog.textContent).toContain(dealFromSeed('setup-ui', 2).dealId);
+  expect(dialog.textContent).toContain(rotateDeal(dealFromSeed('setup-ui', 2)).dealId);
+});
+
+// US-07.1: exercise session next(), real setup, robot fallbacks and record import together.
+test('20 consecutive practice Playthroughs alternate declaring sides and retain reproducible origins', () => {
+  vi.useFakeTimers();
+  let session = dealSession(dealFromSeed('role-session', 1));
+  const rotations = new Set<number>();
+  for (let k = 0; k < 20; k++) {
+    const stop = session.play.start();
+    for (let n = 0; n < 30 && !session.play.getSnapshot().contract; n++) {
+      vi.advanceTimersByTime(500);
+      if (session.play.getSnapshot().setup?.step === 'contract-choice') {
+        session.play.chooseContract({ kind: 'choose-contract', strain: 'no-trumps', objective: 'part-score' });
+      }
+    }
+    const record = session.play.record();
+    expect(sideOf(record.contract.declarer)).toBe(k % 2 === 0 ? 'northSouth' : 'eastWest');
+    if (record.deal.origin.kind !== 'seed') throw new Error('Expected seed');
+    rotations.add(record.deal.origin.rotation);
+    const generated = dealFromSeed(record.deal.origin.seed, record.deal.origin.index);
+    expect(record.deal).toEqual(record.deal.origin.rotation ? rotateDeal(generated) : generated);
+    expect(session.info).toEqual({ dealId: record.deal.dealId, origin: record.deal.origin });
+    expect(importRecordJson(exportRecordJson(record))).toEqual(record);
+    stop();
+    if (k < 19) session = session.next();
+  }
+  expect(rotations).toEqual(new Set([0, 1]));
+  const linked = dealSession(dealFromUrl(location.search).deal);
+  const stop = linked.play.start();
+  vi.advanceTimersByTime(30000);
+  expect(sideOf(linked.play.getSnapshot().setup!.declarer!)).toBe('northSouth');
+  stop();
 });

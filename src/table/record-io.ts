@@ -1,6 +1,6 @@
-import { RANKS, SEATS, SUITS, dealFromSeed, dealIdOf, type Card, type Deal, type Hand, type Seat } from './index';
+import { RANKS, SEATS, SUITS, dealFromSeed, dealIdOf, rotateDeal, type Card, type Deal, type Hand, type Seat } from './index';
 import { sameCard, sideOf, startPlaythrough, type CompletedPlaythroughRecord, type PlaythroughRecord } from './playthrough';
-import { startMiniBridge } from './miniBridge';
+import { highCardPoints, startMiniBridge } from './miniBridge';
 import { reconstruct, replay } from './replay';
 
 type Check = (value: unknown) => boolean;
@@ -20,7 +20,7 @@ function schemas() {
   const seat = choice(SEATS);
   const origin: Check = value => object({ kind: choice(['authored']), contentId: string, version: integer(1, Number.MAX_SAFE_INTEGER) })(value)
     || object({ kind: choice(['seed']), seed: value => typeof value === 'string' && /^[A-Za-z0-9_-]{1,64}$/.test(value),
-      index: integer(1, Number.MAX_SAFE_INTEGER), rotation: choice([0]), algorithm: choice(['bv-deal-1']) })(value);
+      index: integer(1, Number.MAX_SAFE_INTEGER), rotation: choice([0, 1, 2, 3]), algorithm: choice(['bv-deal-1']) })(value);
   const dealShape = object({ dealId: string, origin, dealer: seat,
     vulnerability: object({ northSouth: choice([true, false]), eastWest: choice([true, false]) }),
     hands: object({ north: hand, east: hand, south: hand, west: hand }) });
@@ -57,7 +57,8 @@ function validateRecordedDeal(deal: Deal) {
   // US-03.4, US-04.3: stored identity and origin must describe the actual Deal.
   if (deal.dealId !== dealIdOf(deal)) throw new Error('Invalid dealId: does not match deal content');
   if (deal.origin.kind === 'seed') {
-    const generated = dealFromSeed(deal.origin.seed, deal.origin.index);
+    let generated = dealFromSeed(deal.origin.seed, deal.origin.index);
+    for (let i = 0; i < deal.origin.rotation; i++) generated = rotateDeal(generated);
     if (generated.dealer !== deal.dealer || generated.vulnerability.northSouth !== deal.vulnerability.northSouth
       || generated.vulnerability.eastWest !== deal.vulnerability.eastWest
       || SEATS.some(seat => deal.hands[seat].some(card => !generated.hands[seat].some(other => sameCard(card, other))))) {
@@ -70,10 +71,13 @@ function validateRecordedDeal(deal: Deal) {
 function replayMiniBridgeSetup(record: Pick<PlaythroughRecord, 'deal' | 'contract' | 'learnerSide' | 'setupEvents'>) {
   const events = record.setupEvents;
   if (!events?.length) throw new Error('Missing MiniBridge setup events');
-  const firstRedeal = events.find(event => event.kind === 'redeal');
-  const initial = firstRedeal?.from ?? record.deal;
+  const firstTransform = events.find(event => event.kind === 'redeal' || event.kind === 'rotation');
+  const initial = firstTransform?.from ?? record.deal;
   validateRecordedDeal(initial);
-  const setup = startMiniBridge({ deal: initial, learnerSide: record.learnerSide });
+  // US-07.2: the rotation event is sufficient to reproduce role selection without session state.
+  const targetDeclaringSide = events.some(event => event.kind === 'rotation')
+    ? (highCardPoints(record.deal.hands.north) + highCardPoints(record.deal.hands.south) > 20 ? 'northSouth' : 'eastWest') : undefined;
+  const setup = startMiniBridge({ deal: initial, learnerSide: record.learnerSide, targetDeclaringSide });
   for (let i = 0; i < events.length + 4 && setup.seatView('south').step !== 'contract-choice'; i++) setup.advance();
   const choice = events.at(-1);
   if (choice?.kind !== 'contract-choice' || setup.submit(choice.seat, choice.controller, choice.action, choice.provenance).kind !== 'accepted') throw new Error('Invalid Contract Choice');
