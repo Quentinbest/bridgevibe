@@ -8,6 +8,29 @@ function findDeal(predicate: (deal: Deal) => boolean) {
   throw new Error('Missing deterministic F1 case');
 }
 const nsPoints = (deal: Deal) => highCardPoints(deal.hands.north) + highCardPoints(deal.hands.south);
+test('US-06.2: terminal 20–20 Deal stays unavailable without recording a Redeal', () => {
+  let deal: Deal | undefined;
+  for (let seed = 0; seed < 2000; seed++) {
+    const candidate = dealFromSeed(`terminal-${seed}`, Number.MAX_SAFE_INTEGER);
+    if (nsPoints(candidate) === 20) { deal = candidate; break; }
+  }
+  if (!deal) throw new Error('Missing terminal 20–20 fixture');
+  const setup = startMiniBridge({ deal, learnerSide: 'northSouth' });
+  for (let i = 0; i < 4; i++) setup.advance();
+  for (const seat of SEATS) {
+    const view = setup.seatView(seat);
+    expect(view).toMatchObject({ step: 'redeal-unavailable', declarer: null, dummy: null });
+    expect(decodeSetupSeatView(encodeSetupSeatView(view))).toEqual(view);
+  }
+  const record = setup.record(), position = setup.positionKey();
+  expect(record.deal).toEqual(deal);
+  expect(record.setupEvents).toEqual(setup.seatView('south').announcements.map(a => ({ kind: 'announcement', ...a })));
+  for (let i = 0; i < 10; i++) expect(() => setup.advance()).not.toThrow();
+  expect(setup.submit('south', 'learner', { kind: 'choose-contract', strain: 'no-trumps', objective: 'part-score' })).toMatchObject({ kind: 'rejected', reason: 'wrong-phase' });
+  expect(setup.record()).toEqual(record);
+  expect(setup.positionKey()).toBe(position);
+  expect(setup.playthrough()).toBeNull();
+});
 const ready = (deal: Deal) => {
   const setup = startMiniBridge({ deal, learnerSide: 'northSouth' });
   for (let n = 0; setup.seatView('south').step !== 'contract-choice' && n < 100; n++) setup.advance();

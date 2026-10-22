@@ -7,7 +7,7 @@ export function DealControls({ info, onNew }: { info: Pick<Deal, 'dealId' | 'ori
   const trigger = useRef<HTMLButtonElement>(null);
   const origin = info.origin;
   return <div className="deal-controls">
-    <button type="button" onClick={onNew} disabled={origin.kind === 'seed' && origin.index === Number.MAX_SAFE_INTEGER}>{text('deal.new')}</button>
+    <button type="button" onClick={onNew}>{text('deal.new')}</button>
     <button type="button" ref={trigger} onClick={() => dialog.current?.showModal()}>{text('deal.info')}</button>
     <dialog ref={dialog} className="deal-info" aria-labelledby="deal-info-title" onClose={() => trigger.current?.focus()}>
       <h2 id="deal-info-title">{text('deal.info')}</h2>

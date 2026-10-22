@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
-import { dealFromSeed } from '../table';
+import { dealFromSeed, highCardPoints } from '../table';
 import { dealFromUrl, dealSession, nextDeal } from './deals';
 import { fixedDeal } from './fixture';
 import { App } from './App';
@@ -22,6 +22,45 @@ test('New deal uses crypto for a fresh 12-character seed from an authored Deal',
   if (deal.origin.kind !== 'seed') throw new Error('Expected seed');
   expect(deal.origin.seed).toMatch(/^[A-Za-z0-9_-]{12}$/);
   expect(dealFromSeed(deal.origin.seed, 1)).toEqual(deal);
+});
+test('US-03: New deal at the terminal index starts a fresh seed', () => {
+  const random = vi.spyOn(crypto, 'getRandomValues');
+  const deal = nextDeal(dealFromSeed('terminal', Number.MAX_SAFE_INTEGER));
+  expect(random).toHaveBeenCalledOnce();
+  expect(deal.origin).toMatchObject({ kind: 'seed', index: 1 });
+  if (deal.origin.kind !== 'seed') throw new Error('Expected seed');
+  expect(deal.origin.seed).toMatch(/^[A-Za-z0-9_-]{12}$/);
+  expect(dealFromSeed(deal.origin.seed, 1)).toEqual(deal);
+});
+test('US-06, US-03: terminal 20–20 link explains that no Redeal is available and New deal recovers', () => {
+  let seed: string | undefined;
+  for (let i = 0; i < 2000; i++) {
+    const candidate = `terminal-${i}`, deal = dealFromSeed(candidate, Number.MAX_SAFE_INTEGER);
+    if (highCardPoints(deal.hands.north) + highCardPoints(deal.hands.south) === 20) { seed = candidate; break; }
+  }
+  if (!seed) throw new Error('Missing terminal 20–20 fixture');
+  const search = `?seed=${seed}&deal=${Number.MAX_SAFE_INTEGER}`;
+  expect(dealFromUrl(search).invalid).toBe(false);
+  vi.useFakeTimers(); history.replaceState(null, '', `/${search}`);
+  render(<App />);
+  act(() => vi.advanceTimersByTime(2000));
+  // US-06.2: a valid link that can't be redealt says so, rather than claiming a fallback.
+  expect(screen.getByRole('status').textContent).toBe("Both sides have 20 points, and this link can't be redealt. Choose New deal to play another deal.");
+  expect(screen.queryByText('Invalid seed link. Showing the practice deal.')).toBeNull();
+  expect(screen.queryByRole('button', { name: 'Choose' })).toBeNull();
+  expect(vi.getTimerCount()).toBe(0);
+  act(() => vi.advanceTimersByTime(30000));
+  expect(vi.getTimerCount()).toBe(0);
+  // US-03: use a reproducible fresh seed whose first Deal lets the learner choose.
+  vi.spyOn(crypto, 'getRandomValues').mockImplementation(array => {
+    (array as Uint8Array).fill(0); return array;
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'New deal' }));
+  expect(location.search).toBe('?seed=AAAAAAAAAAAA&deal=1');
+  expect(screen.queryByRole('status')).toBeNull();
+  act(() => vi.advanceTimersByTime(3000));
+  fireEvent.click(screen.getByRole('button', { name: 'Choose' }));
+  expect(document.querySelector('.table')).not.toBeNull();
 });
 test('session exposes metadata only, preserves URL context, and restarts MiniBridge Setup', () => {
   history.replaceState(null, '', '/?seed=abc&deal=3&extra=1#table');

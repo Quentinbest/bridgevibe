@@ -134,6 +134,7 @@ export const catalogue = {
   "deal.close": { text: "Close", status: 'draft' },
   "deal.value": { text: "{value}", status: 'draft' },
   "deal.invalid": { text: "Invalid seed link. Showing the practice deal.", status: 'draft' },
+  "setup.redeal-unavailable": { text: "Both sides have 20 points, and this link can't be redealt. Choose New deal to play another deal.", status: 'draft' },
 
   "reason.playthrough-complete": { text: "This playthrough is finished.", status: 'draft' },
   "reason.malformed-action": { text: "Choose a card from the hand you control.", status: 'draft' },
