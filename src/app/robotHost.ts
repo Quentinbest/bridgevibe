@@ -1,11 +1,11 @@
 import { encodeSeatView, encodeSetupSeatView, type SetupSeatView, type ContractChoice, type Action, type RobotProvenance, type Seat, type SeatView } from '../table';
 import { fallbackRobotPolicy, contractChoicePolicy } from '../robots';
-import { ROBOT_PROTOCOL_VERSION, type RobotMessage, type RobotRequest, type ContractRequest, type RobotResponse } from './robotProtocol';
+import { ROBOT_PROTOCOL_VERSION, validRobotResponse, type RobotMessage, type RobotRequest, type ContractRequest } from './robotProtocol';
 
 export interface RobotWorker {
   postMessage(message: RobotMessage): void;
   terminate(): void;
-  onmessage: ((event: MessageEvent<RobotResponse>) => void) | null;
+  onmessage: ((event: MessageEvent<unknown>) => void) | null;
   onerror: ((event: ErrorEvent) => void) | null;
   onmessageerror: ((event: MessageEvent) => void) | null;
 }
@@ -106,6 +106,7 @@ export function createRobotHost(options: RobotHostOptions = {}) {
     owned.onmessage = event => {
       if (worker !== owned) return;
       const message = event.data;
+      if (!validRobotResponse(message, request?.type)) { fail(); return; }
       if (message.type === 'hello') {
         if (message.protocolVersion !== ROBOT_PROTOCOL_VERSION) {
           failures++; terminate();
