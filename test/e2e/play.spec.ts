@@ -1,4 +1,4 @@
-import { choosePractice } from './miniBridge';
+import { choosePractice, installPausedClock } from './miniBridge';
 import { expect, test, type Page } from '@playwright/test';
 import { cardName, text } from '../../src/explanation';
 import { fixedDeal } from '../../src/app/fixture';
@@ -6,8 +6,7 @@ import { sameCard, type Card } from '../../src/table';
 import { completeFixedDeal } from '../strategy';
 
 async function open(page: Page) {
-  await page.clock.install();
-  await page.clock.pauseAt(new Date());
+  await installPausedClock(page);
   await page.goto('/'); await choosePractice(page, true);
 }
 // US-10.2: assert real-worker audit coverage, not just absence of visible leaks.

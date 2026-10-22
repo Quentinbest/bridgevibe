@@ -1,4 +1,4 @@
-import { choosePractice } from './miniBridge';
+import { choosePractice, installPausedClock } from './miniBridge';
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { text } from '../../src/explanation';
@@ -7,7 +7,7 @@ import { text } from '../../src/explanation';
 for (const reducedMotion of ['no-preference', 'reduce'] as const) {
   test(`rejection returns only the illegal card and explains the rule (${reducedMotion})`, async ({ page }, testInfo) => {
     await page.emulateMedia({ reducedMotion });
-    await page.clock.install(); await page.clock.pauseAt(new Date());
+    await installPausedClock(page);
     await page.goto('/'); await choosePractice(page, true); await page.clock.runFor(500);
     const queen = page.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades", exact: true });
     await expect(queen).toBeInViewport();
