@@ -56,7 +56,9 @@ the non-GPL grant its own licence files make (for example `"MIT"` for "MIT or GP
 and the BOM records that election. GPL-only artefacts and LR-3 violations cannot be
 exempted. The list starts empty.
 For an unrecognised asset licence, a reviewed `path` exception matching its exact
-version/content hash permits the registered name; the BOM records
+version/content hash, the registered licence name (`licence`) and the licence text's
+hash (`licenceText`, from `licenceTextHash`) permits the registered name; changing the
+name or the text after review fails the build again. The BOM records
 `licenceSource: "reviewed-register"` and the exception. The licence file is still
 required, known grants still use the classifier, and commercial-use or share-alike
 terms remain the owner's decision during review.

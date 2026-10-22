@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 export interface Exception {
   package?: string;
   path?: string;
@@ -7,6 +8,9 @@ export interface Exception {
   date: string;
   // LR-4: for a dual-licensed artefact, the non-GPL alternative its own licence files grant.
   elected?: string;
+  // US-46.5: a reviewed-register grant pins the reviewed licence name and its licence text.
+  licence?: string;
+  licenceText?: string;
 }
 export interface Asset {
   licenceFile: string;
@@ -85,6 +89,8 @@ export function prohibitedPaths(paths: string[], denylist: Denylist): string[] {
     .map(file => `${file}: prohibited path (LR-3)`);
 }
 
+// US-46.5: changing the licence text after review invalidates a reviewed-register exception.
+export const licenceTextHash = (texts: string[]) => `sha256:${createHash('sha256').update(texts.join('\n')).digest('hex')}`;
 export function buildBom(shipped: Shipped[], allowList: Exception[], assets: Record<string, Asset>, openItems: OpenItem[], denylist: Denylist, generated = new Date().toISOString()): Bom {
   const violations: string[] = [];
   for (const [source, entry] of Object.entries(assets)) {
@@ -121,7 +127,8 @@ export function buildBom(shipped: Shipped[], allowList: Exception[], assets: Rec
     // Known grants still use the classifier; missing files and GPL cannot use this fallback.
     const reviewed = registered && (item.kind === 'asset' || item.kind === 'wasm')
       && licence === 'no explicit grant' && own.length > 0
-      ? valid.find(entry => entry.path === source && covers(entry) && entry.elected === undefined) : undefined;
+      ? valid.find(entry => entry.path === source && covers(entry) && entry.elected === undefined
+        && entry.licence === registered.licence && entry.licenceText === licenceTextHash(own)) : undefined;
     if (reviewed) {
       artefact.licence = registered!.licence;
       artefact.licenceSource = 'reviewed-register';

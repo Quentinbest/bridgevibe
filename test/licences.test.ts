@@ -3,7 +3,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } f
 import os from 'node:os';
 import path from 'node:path';
 import { build } from 'vite';
-import { buildBom, classifyLicence, grantsIn, prohibitedPaths, renderNotice, scanBytes } from '../scripts/licences/core';
+import { buildBom, classifyLicence, grantsIn, licenceTextHash, prohibitedPaths, renderNotice, scanBytes } from '../scripts/licences/core';
 import type { Asset, Bom, Exception, Shipped } from '../scripts/licences/core';
 import { filesIn, isLicenceFile, licences, resolveArtefact } from '../scripts/licences/plugin';
 import denylist from '../scripts/licences/denylist.json';
@@ -74,15 +74,22 @@ it('uses a reviewed asset register name only for an unrecognised grant', () => {
   const source = 'suit.svg';
   const assets = { [source]: { licenceFile: 'CC-BY.txt', licence: 'CC-BY-4.0', attribution: 'Fixture artist' } };
   const item = resolveArtefact(dir, source, source, assets, Buffer.from('<svg/>'));
-  const review: Exception = { path: source, version: item.version, reason: 'Reviewed artwork grant', reviewer: 'Fixture owner', date: '2026-10-22' };
+  const review: Exception = { path: source, version: item.version, reason: 'Reviewed artwork grant', reviewer: 'Fixture owner', date: '2026-10-22',
+    licence: 'CC-BY-4.0', licenceText: licenceTextHash(['Creative Commons Attribution 4.0 International (CC BY 4.0)']) };
   expect(bom([item], [], assets).violations.join()).toContain('registered licence does not match');
   const report = bom([item], [review], assets);
   expect(report.violations).toEqual([]);
   expect(report.artefacts[0]).toMatchObject({ licence: 'CC-BY-4.0', licenceSource: 'reviewed-register', exceptions: [review] });
   expect(renderNotice(report)).toContain('Fixture artist');
-  for (const invalid of [{ ...review, version: 'sha256:other' }, { ...review, reviewer: '' }, { ...review, path: 'other.svg' }, { ...review, path: undefined, package: source }]) {
+  // The review covers the licence name and text too, not only the asset bytes.
+  for (const invalid of [{ ...review, version: 'sha256:other' }, { ...review, reviewer: '' }, { ...review, path: 'other.svg' }, { ...review, path: undefined, package: source },
+    { ...review, licence: undefined }, { ...review, licenceText: undefined }]) {
     expect(bom([item], [invalid], assets).violations.join()).toContain('registered licence does not match');
   }
+  expect(bom([item], [review], { [source]: { ...assets[source], licence: 'CC-BY-NC-4.0' } }).violations.join()).toContain('registered licence does not match');
+  writeFileSync(path.join(dir, 'CC-BY.txt'), 'Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)');
+  const relicensed = resolveArtefact(dir, source, source, assets, Buffer.from('<svg/>'));
+  expect(bom([relicensed], [review], assets).violations.join()).toContain('registered licence does not match');
   writeFileSync(path.join(dir, 'CC-BY.txt'), text('MIT'));
   const known = resolveArtefact(dir, source, source, assets, Buffer.from('<svg/>'));
   expect(bom([known], [review], assets).violations.join()).toContain('registered licence does not match');
