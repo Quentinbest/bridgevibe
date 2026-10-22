@@ -8,12 +8,13 @@ export async function handleHintRequest(data: HintRequest, post: (response: Hint
   // CI-5: name this worker's own engine and sampler, even when the page bundle is newer.
   const { name, version } = configuredEngine();
   const source = { engine: { name, version }, sampler: { ...sampler } };
+  const identity = { requestId: data.requestId, playthroughId: data.playthroughId, positionKey: data.positionKey };
   try {
     const view = decodeSeatView(data.view);
     const solver = await loadConfiguredSolver();
-    post({ type: 'result', requestId: data.requestId, result: await sampledEstimate(solver, view, data.candidates, HINT_SAMPLE_COUNT, data.seed, data.deadline),
+    post({ type: 'result', ...identity, result: await sampledEstimate(solver, view, data.candidates, HINT_SAMPLE_COUNT, data.seed, data.deadline),
       source: { ...source, engine: { name: solver.name, version: solver.version } } });
-  } catch { post({ type: 'result', requestId: data.requestId, result: unavailable(), source }); }
+  } catch { post({ type: 'result', ...identity, result: unavailable(), source }); }
 }
 if (typeof self !== 'undefined' && typeof document === 'undefined') {
   self.onmessage = ({ data }: MessageEvent<HintRequest>) => { void handleHintRequest(data, response => self.postMessage(response)); };

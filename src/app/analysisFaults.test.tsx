@@ -21,10 +21,10 @@ class AdapterWorker implements AnalysisWorker {
   onerror: AnalysisWorker['onerror'] = null;
   terminated = false;
   constructor() { queueMicrotask(() => this.onmessage?.({ data: { type: 'hello', protocolVersion: ANALYSIS_PROTOCOL_VERSION } } as MessageEvent)); }
-  postMessage({ requestId, index }: AnalysisRequest) {
+  postMessage({ requestId, index, playthroughId, positionKey }: AnalysisRequest) {
     const { layout, position } = positionAt(record, index);
     void bridgeDdsAdapter.solvePosition(layout, position).then(result => {
-      if (!this.terminated) this.onmessage?.({ data: { type: 'result', requestId, result } } as MessageEvent);
+      if (!this.terminated) this.onmessage?.({ data: { type: 'result', requestId, playthroughId, positionKey, result } } as MessageEvent);
     });
   }
   terminate() { this.terminated = true; }

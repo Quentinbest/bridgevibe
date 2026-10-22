@@ -29,8 +29,11 @@ export type LearnerView = Readonly<Pick<SeatView,
   announcements: readonly string[];
 }>;
 
+// ADR-0001: setup identity is independent of Deal content.
+let nextSetupId = 0;
 // US-06: MiniBridge Setup is the entry point for every practice Deal.
 export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fixedDeal, targetDeclaringSide: Side = 'northSouth', hintRunner?: HintRunner) {
+  const setupId = `setup-${++nextSetupId}`;
   const setup = startMiniBridge({ deal, targetDeclaringSide, learnerSide: 'northSouth',
     versions: { appVersion: APP_VERSION, engineVersions: { [basicPolicy.name]: basicPolicy.version, [fallbackRobotPolicy.name]: fallbackRobotPolicy.version,
       [contractChoicePolicy.name]: contractChoicePolicy.version } } });
@@ -93,7 +96,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
   function publish() {
     const view = table && running && !collecting ? table.seatView(hintSeat(record().contract.declarer)) : null;
     const candidates = view?.turn && table?.controllerOf(view.turn) === 'learner' ? table.legalActions(view.turn).map(a => a.card) : [];
-    hints.sync(view, candidates);
+    hints.sync(view, candidates, table ? { playthroughId: record().playthroughId, positionKey: table.positionKey() } : null);
     snapshot = learnerView(); listeners.forEach(listener => listener()); }
   function schedule() {
     clearTimeout(timer);
@@ -105,7 +108,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
       if (view.step === 'contract-choice') {
         const seat = view.declarer!;
         if (setup.controllerOf(seat) === 'robot') robots.decide({ kind: 'contract', view: setup.seatView(seat), seed: JSON.stringify(encodeSetupSeatView(setup.seatView(seat))),
-          playthroughId: setup.record().deal.dealId, positionKey: setup.positionKey(), currentPositionKey: setup.positionKey,
+          playthroughId: setupId, positionKey: setup.positionKey(), currentPositionKey: setup.positionKey,
           submit: (action, provenance) => choose(action, provenance) });
       } else {
         const reduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion:reduce)').matches;

@@ -1,12 +1,13 @@
 import { encodeSeatView, seatViewSeed, type SeatView, type Card } from '../table';
 import { unavailable, type HintResult } from '../analysis/hintResult';
 import { HINT_DEADLINE_MS } from '../information/parameters';
-import { HINT_PROTOCOL_VERSION, validHintResponse, type HintRequest, type HintResponse, type HintSource } from './hintProtocol';
+import { HINT_PROTOCOL_VERSION, validHintResponse, validHintEnvelope, type HintIdentity, type HintRequest, type HintResponse, type HintSource } from './hintProtocol';
 export type HintWorker = Pick<Worker, 'postMessage' | 'terminate'> & { onmessage: ((event: MessageEvent<HintResponse>) => void) | null; onerror: ((event: ErrorEvent) => void) | null };
 // `source` is present only for a result the worker produced; client-side failures have none.
-export type HintRunner = (view: SeatView, candidates: readonly Card[], done: (result: HintResult, durationMs: number, source?: HintSource) => void) => () => void;
+export type HintRunner = (view: SeatView, candidates: readonly Card[], done: (result: HintResult, durationMs: number, source?: HintSource) => void, identity: HintIdentity) => () => void;
+let sequence = 0;
 // U-01, US-14.12: the caller cancels this position's run on an action, toggle or teardown.
-export const runHint = (view: SeatView, candidates: readonly Card[], done: (result: HintResult, durationMs: number, source?: HintSource) => void, createWorker: () => HintWorker = () => new Worker(new URL('./hintWorker.ts', import.meta.url), { type: 'module' })) => {
+export const runHint = (view: SeatView, candidates: readonly Card[], done: (result: HintResult, durationMs: number, source?: HintSource) => void, identity: HintIdentity, createWorker: () => HintWorker = () => new Worker(new URL('./hintWorker.ts', import.meta.url), { type: 'module' })) => {
   let start = 0;
   let visibleDuration = 0;
   let worker: HintWorker | undefined;
@@ -39,6 +40,8 @@ export const runHint = (view: SeatView, candidates: readonly Card[], done: (resu
       owned.onmessage = ({ data }) => {
         if (worker !== owned || finished) return;
         if (hidden()) { visibilityChanged(); return; }
+        // US-14.12: stale advice need not belong to this position's candidates.
+        if (validHintEnvelope(data) && (data.requestId !== 1 || data.playthroughId !== identity.playthroughId || data.positionKey !== identity.positionKey)) return;
         if (!validHintResponse(data, candidates)) { finish(unavailable('error')); return; }
         if (data.type === 'hello') {
           if (ready) return;
@@ -51,9 +54,9 @@ export const runHint = (view: SeatView, candidates: readonly Card[], done: (resu
           }
           ready = true;
           try {
-            owned.postMessage({ type: 'hint', requestId: 1, view: encodeSeatView(view), candidates, seed: seatViewSeed(view), deadline: start + HINT_DEADLINE_MS } satisfies HintRequest);
+            owned.postMessage({ type: 'hint', requestId: 1, ...identity, cancellationId: `hint-${++sequence}`, view: encodeSeatView(view), candidates, seed: seatViewSeed(view), deadline: start + HINT_DEADLINE_MS } satisfies HintRequest);
           } catch { finish(unavailable()); }
-        } else if (ready && data.requestId === 1) {
+        } else if (ready && data.requestId === 1 && data.playthroughId === identity.playthroughId && data.positionKey === identity.positionKey) {
           if (Date.now() > start + HINT_DEADLINE_MS) finish(unavailable('timeout')); else finish(data.result, data.source);
         }
       };
