@@ -23,7 +23,9 @@ export function isAsset(entry: unknown): entry is Asset {
   const fields = ['licenceFile', 'licence', 'attribution'];
   const record = entry as Record<string, unknown>;
   return Object.keys(record).every(key => fields.includes(key))
-    && fields.every(key => typeof record[key] === 'string' && record[key].trim().length > 0);
+    && fields.every(key => typeof record[key] === 'string' && record[key].trim().length > 0)
+    // The classifier's sentinel is not a licence name a reviewer can register.
+    && record.licence !== 'no explicit grant';
 }
 export interface OpenItem { candidate: string; question: string; asked: string; status: string }
 export interface Artefact {
@@ -150,7 +152,9 @@ export function buildBom(shipped: Shipped[], allowList: Exception[], assets: Rec
     // LR-2: an election covers the GPL alternative only; an unrecognised licence file still needs
     // its own missing-grant exception.
     if (item.kind !== 'first-party' && cleared && unknownGrant) {
-      const exception = reviewed ?? valid.find(entry => covers(entry) && entry.elected === undefined);
+      // US-46.5: a registered asset with licence text clears only through its pinned review.
+      const pinnedOnly = registered && (item.kind === 'asset' || item.kind === 'wasm') && own.length > 0;
+      const exception = reviewed ?? (pinnedOnly ? undefined : valid.find(entry => covers(entry) && entry.elected === undefined));
       if (exception) applied.push(exception);
       else violations.push(`${item.name}: no explicit grant (LR-2 / LR-7)`);
     }

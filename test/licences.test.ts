@@ -90,6 +90,11 @@ it('uses a reviewed asset register name only for an unrecognised grant', () => {
   writeFileSync(path.join(dir, 'CC-BY.txt'), 'Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)');
   const relicensed = resolveArtefact(dir, source, source, assets, Buffer.from('<svg/>'));
   expect(bom([relicensed], [review], assets).violations.join()).toContain('registered licence does not match');
+  // Registering the classifier's sentinel can't bypass the pinned review through a generic exception.
+  const sentinel = { [source]: { ...assets[source], licence: 'no explicit grant' } };
+  const generic: Exception = { path: source, version: item.version, reason: 'Old review', reviewer: 'Fixture owner', date: '2026-10-22' };
+  expect(bom([relicensed], [generic], sentinel).violations.join()).toContain('Invalid asset register entry');
+  expect(bom([relicensed], [generic], assets).violations.join()).toContain('no explicit grant (LR-2 / LR-7)');
   writeFileSync(path.join(dir, 'CC-BY.txt'), text('MIT'));
   const known = resolveArtefact(dir, source, source, assets, Buffer.from('<svg/>'));
   expect(bom([known], [review], assets).violations.join()).toContain('registered licence does not match');
