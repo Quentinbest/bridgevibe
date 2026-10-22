@@ -562,3 +562,31 @@ by the learner without rotating the table (#16). East/West dummy stays in its
 physical seat. The default authored Deal has North 15, South 17 HCP; existing
 card-play UI/e2e tests explicitly choose NT game on it to preserve their scenarios.
 The design's Hint button and score-risk claims are omitted as specified in #12.
+
+## Practice sampled hints (#23)
+
+US-14 tier (c) starts speculatively on a learner turn when hints are enabled; it
+shows only on request and cancels on an accepted action. Dummy uses Declarer's
+Seat View. The versioned hint worker receives only encoded Seat Views and legal
+candidates, and lazy-loads the configured solver. `information` imports Table types
+only; `analysis` supplies `seatViewSeed(view)` and groups visible Equivalent Actions.
+
+Provisional parameters live in `src/information/parameters.ts`: 50 samples (U-02),
+3,000 ms deadline (U-01), at most 50 consistent layouts for full enumeration, and
+20,000 rejection tries per sample. Constraint-aware enumeration prunes card counts,
+voids and remaining HCP; it is attempted only below 100,000 unconstrained layouts
+(`HINT_ENUMERATION_SEARCH_LIMIT`), and visits at most 100,000 partial assignments
+(`HINT_ENUMERATION_WORK_LIMIT`). Exceeding either the consistent-layout limit or
+work bound falls back to fixed-count rejection sampling. A failed fixed sample
+count never produces a partial average. T2 must validate cost and latency.
+
+US-41.3: a mismatched hint worker is replaced once before abstaining. US-45.1:
+crashes and repeated protocol mismatches retain their distinct provenance causes.
+§4.7: hiding the page terminates pending hint work. Returning restarts only a still
+active position, with a fresh deadline. Latency sums visible processing time across
+attempts and excludes hidden time; acting, disabling hints or teardown prevents restart.
+The debug panel records duration and whether the U-01 target was exceeded; shown
+statements include sampler, solver, sample count, enumeration and template provenance.
+
+The design's suggested-card ring is omitted under UX §5.2: computed hints never
+mark a card. All hint wording remains draft pending teacher sign-off (CI-8).

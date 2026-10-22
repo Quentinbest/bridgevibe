@@ -1,3 +1,4 @@
+import HintSheet from './HintSheet';
 import { MiniBridgeSetup } from './MiniBridgeSetup';
 import { analysisHost } from './analysisHost';
 import { ReviewScreen } from './ReviewScreen';
@@ -24,7 +25,7 @@ function Opponent({ seat, count, cards, position }: { position: ScreenPosition; 
   </section>;
 }
 // ADR-0001, US-16.4: the UI gets deal metadata only, never the play session or its record of all four hands.
-export function TableScreen({ view, play, clearRejection, info, invalid, onNew, onShowRule, chooseContract }: { chooseContract?: (choice: ContractChoice) => void; onShowRule?: () => void; info: Pick<Deal, 'dealId' | 'origin'>; invalid: boolean; onNew: () => void; view: LearnerView; clearRejection: () => void; play: (seat: 'north' | 'south', card: TableCard) => void }) {
+export function TableScreen({ view, play, clearRejection, info, invalid, onNew, onShowRule, chooseContract, onHint, onToggleHints, onDismissHint }: { onHint?: () => void; onToggleHints?: () => void; onDismissHint?: () => void; chooseContract?: (choice: ContractChoice) => void; onShowRule?: () => void; info: Pick<Deal, 'dealId' | 'origin'>; invalid: boolean; onNew: () => void; view: LearnerView; clearRejection: () => void; play: (seat: 'north' | 'south', card: TableCard) => void }) {
   const [selected, setSelected] = useState<TableCard | null>(null);
   const [ruleOpen, setRuleOpen] = useState(false);
   const tableElement = useRef<HTMLElement | null>(null);
@@ -113,7 +114,13 @@ export function TableScreen({ view, play, clearRejection, info, invalid, onNew, 
           <p className="seat-label">{seatLabel('south', view.contract.declarer)}</p>
         </section>
       </section>
-      <footer className="action-bar">{selected && <button type="button" onClick={() => submit(selected)}
+      {view.hint?.open && <HintSheet hint={view.hint} dismiss={() => onDismissHint?.()} />}
+      <footer className="action-bar">
+        {view.hint && <div className="hint-controls">
+          <label className="hint-toggle"><input type="checkbox" checked={view.hint.enabled} onChange={onToggleHints} aria-label={text('hint.toggle')} /><span>{text('hint.toggle-short')}</span></label>
+          {view.hint.enabled && view.legalCards.length > 0 && !view.collecting && <button type="button" onClick={onHint} aria-expanded={view.hint.open}>{text('hint.button')}</button>}
+        </div>}
+        {selected && <button type="button" onClick={() => submit(selected)}
         // UX §3.3: the confirmation names the card. The visible label stays "Play it" (issue #2, design),
         // and the name starts with it, so the visible label is part of the name (WCAG 2.5.3).
         aria-label={text('play.card', { card: cardName(selected) })}>{text('play')}</button>}</footer>
@@ -128,7 +135,13 @@ function PracticeScreen() {
   });
   const [review, setReview] = useState<CompletedPlaythroughRecord | null>(null);
   const reviewButton = useRef<HTMLButtonElement>(null);
+  const hintsEnabled = useRef(true);
   const play = session.play;
+  function newDeal() {
+    const next = session.next();
+    if (next.play.getSnapshot().hint?.enabled !== hintsEnabled.current) next.play.toggleHints();
+    setSession(next);
+  }
   const view = useSyncExternalStore(play.subscribe, play.getSnapshot);
   const completed = useMemo(() => view.status === 'completed' ? play.completedRecord() : null, [play, view.status]);
   const analysis = useSyncExternalStore(analysisHost.subscribe, () => analysisHost.snapshot(completed));
@@ -146,7 +159,7 @@ function PracticeScreen() {
     <ReviewScreen onTryAgain={() => { cancelAnalysis.current = analysisHost.retry(review, play.provenanceLog); }} analysis={analysis} record={review} onBack={() => setReview(null)} />
     {debug && <Suspense fallback={null}><DebugPanel play={play} /></Suspense>}
   </div>;
-  return <div className={debug ? 'debug-layout' : undefined}><TableScreen key={session.key} view={view} chooseContract={play.chooseContract} play={play.play} clearRejection={play.clearRejection} onShowRule={play.showRule} info={session.info} invalid={session.invalid} onNew={() => setSession(session.next())} />
+  return <div className={debug ? 'debug-layout' : undefined}><TableScreen key={session.key} view={view} onHint={play.showHint} onToggleHints={() => { play.toggleHints(); hintsEnabled.current = !!play.getSnapshot().hint?.enabled; }} onDismissHint={play.dismissHint} chooseContract={play.chooseContract} play={play.play} clearRejection={play.clearRejection} onShowRule={play.showRule} info={session.info} invalid={session.invalid} onNew={newDeal} />
     {view.status === 'completed' && <div className="review-entry"><button ref={reviewButton} type="button" onClick={() => setReview(play.completedRecord())}>{text('review.title')}</button></div>}
     {debug && <Suspense fallback={null}><DebugPanel key={session.key} play={play} /></Suspense>}
   </div>;

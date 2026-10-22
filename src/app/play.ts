@@ -1,3 +1,5 @@
+import { createHints, hintSeat, type HintSnapshot } from './hints';
+import type { HintRunner } from './hintClient';
 import { createProvenanceLog, type LogEntry } from '../coach/provenance';
 import { basicPolicy, fallbackRobotPolicy, contractChoicePolicy } from '../robots';
 import { startMiniBridge, encodeSetupSeatView, sideOf, SEATS, seatViewSeed, type Playthrough, type SetupSeatView, type ContractChoice, type Objective, type Side, type Card, type Deal, type SeatView, type Seat, type PlayedCard, type ReasonCode, type RobotProvenance } from '../table';
@@ -8,6 +10,7 @@ import { browserRobotAudit, robotAudit } from './robotAudit';
 
 export type LearnerView = Readonly<Pick<SeatView,
   'positionIndex' | 'hand' | 'dummy' | 'turn' | 'tricksWon' | 'cardCounts' | 'status'> & {
+  hint?: HintSnapshot;
   contract: SeatView['contract'] | null;
   setup: SetupSeatView | null;
   objective: Objective | null;
@@ -26,7 +29,7 @@ export type LearnerView = Readonly<Pick<SeatView,
 }>;
 
 // US-06: MiniBridge Setup is the entry point for every practice Deal.
-export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fixedDeal, targetDeclaringSide: Side = 'northSouth') {
+export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fixedDeal, targetDeclaringSide: Side = 'northSouth', hintRunner?: HintRunner) {
   const setup = startMiniBridge({ deal, targetDeclaringSide, learnerSide: 'northSouth',
     versions: { appVersion: '0.0.0', engineVersions: { [basicPolicy.name]: basicPolicy.version, [fallbackRobotPolicy.name]: fallbackRobotPolicy.version,
       [contractChoicePolicy.name]: contractChoicePolicy.version } } });
@@ -34,10 +37,11 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
   const record = () => { if (!table) throw new Error('setup-in-progress'); return table.record(); };
   const provenanceLog = createProvenanceLog('0.0.0');
   let entryId = 0;
-  function log(entry: Pick<LogEntry, 'kind' | 'summary' | 'text' | 'provenance' | 'positionIndex'>) {
+  function log(entry: Pick<LogEntry, 'kind' | 'summary' | 'text' | 'provenance' | 'positionIndex' | 'abstention'>) {
     provenanceLog.record({ ...entry, id: `${record().playthroughId}-${++entryId}`, playthroughId: record().playthroughId,
       informationMode: 'VISIBLE', at: new Date().toISOString() });
   }
+  const hints = createHints(publish, (entry, positionIndex) => log({ ...entry, positionIndex }), hintRunner);
   let options = robotOptions;
   // US-10.2, §4.3.6, US-40.2: every build that can show the debug panel's hidden-card counter
   // (development, internal, audit) audits robot messages, as test builds do; this guard removes
@@ -66,7 +70,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     if (!table) {
       const south = setup.seatView('south');
       const view = south.declarer && sideOf(south.declarer) === 'northSouth' && south.dummy ? setup.seatView(south.declarer) : south;
-      return { setup: view, objective: null, north: null, contract: null, dummySeat: view.dummySeat, hand: south.hand, dummy: view.dummy,
+      return { hint: hints.snapshot(), setup: view, objective: null, north: null, contract: null, dummySeat: view.dummySeat, hand: south.hand, dummy: view.dummy,
         positionIndex: 0, turn: null, tricksWon: { northSouth: 0, eastWest: 0 }, cardCounts: { north: 13, east: 13, south: 13, west: 13 },
         status: 'in-progress', legalCards: [], lastTrickWinner: null, displayedTrick, collecting, reason, reasonCode, rejectionId,
         rejectedCard, rejectedSeat, announcements: [...announcements] };
@@ -74,18 +78,22 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     const history = record();
     const choice = history.setupEvents?.find(event => event.kind === 'contract-choice');
     const contractSeat = history.contract.declarer;
-    const viewingSeat = sideOf(contractSeat) === 'northSouth' ? contractSeat : 'south';
+    const viewingSeat = hintSeat(contractSeat);
     const view = table.seatView(viewingSeat);
     const { positionIndex, dummy, contract, turn, tricksWon, cardCounts, status, tricks } = view;
     const hand = contractSeat === 'north' ? dummy! : view.hand;
-    return { setup: null, objective: choice?.action.objective ?? null, north: contract.declarer === 'north' ? view.hand : contract.declarer === 'south' ? dummy : null, dummySeat: SEATS[(SEATS.indexOf(contract.declarer) + 2) % 4], positionIndex, hand, dummy, contract, turn, tricksWon, cardCounts, status,
+    return { hint: hints.snapshot(), setup: null, objective: choice?.action.objective ?? null, north: contract.declarer === 'north' ? view.hand : contract.declarer === 'south' ? dummy : null, dummySeat: SEATS[(SEATS.indexOf(contract.declarer) + 2) % 4], positionIndex, hand, dummy, contract, turn, tricksWon, cardCounts, status,
       // ADR-0001: only seats the learner controls expose legal cards to the UI.
       legalCards: turn && table.controllerOf(turn) === 'learner' ? table.legalActions(turn).map(action => action.card) : [],
       lastTrickWinner: tricks.at(-1)?.winner ?? null,
       displayedTrick, collecting, reason, reasonCode, rejectionId, rejectedCard, rejectedSeat, announcements: [...announcements] };
   }
   let snapshot = learnerView();
-  function publish() { snapshot = learnerView(); listeners.forEach(listener => listener()); }
+  function publish() {
+    const view = table && running && !collecting ? table.seatView(hintSeat(record().contract.declarer)) : null;
+    const candidates = view?.turn && table?.controllerOf(view.turn) === 'learner' ? table.legalActions(view.turn).map(a => a.card) : [];
+    hints.sync(view, candidates);
+    snapshot = learnerView(); listeners.forEach(listener => listener()); }
   function schedule() {
     clearTimeout(timer);
     robots.cancel();
@@ -158,6 +166,10 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     setupRecord: setup.record,
     chooseContract: (action: ContractChoice) => choose(action),
     provenanceLog,
+    hintTimings: hints.timings,
+    toggleHints: () => hints.toggle(),
+    showHint: () => hints.show(),
+    dismissHint: () => hints.dismiss(),
     seatView: (seat: Seat) => table ? table.seatView(seat) : setup.seatView(seat),
     completedRecord: () => { if (!table) throw new Error('setup-in-progress'); return table.completedRecord(); },
     getSnapshot: () => snapshot,
@@ -169,7 +181,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
       publish();
     },
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
-    start() { running = true; schedule(); return () => { running = false; clearTimeout(timer); robots.stop(); }; },
+    start() { running = true; publish(); schedule(); return () => { running = false; clearTimeout(timer); robots.stop(); hints.stop(); }; },
     play(seat: 'north' | 'south', card: Card) { if (!collecting) accept(seat, card, 'learner'); },
   };
 }
