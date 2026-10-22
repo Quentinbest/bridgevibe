@@ -37,7 +37,7 @@ test('§4.3.6: analysis errors echo identity and expired work never calls the so
   const expired = { ...request(1), deadline: Date.now() - 1 };
   await handle(expired, post);
   expect(loadConfiguredSolver).not.toHaveBeenCalled();
-  expect(post).toHaveBeenCalledExactlyOnceWith({ type: 'error', requestId: 1, playthroughId: expired.playthroughId, positionKey: expired.positionKey });
+  expect(post).toHaveBeenCalledExactlyOnceWith({ type: 'error', requestId: 1, playthroughId: expired.playthroughId, positionKey: expired.positionKey, cause: 'timeout' });
 });
 test.each([false, true])('ADR-0001, §4.3.6: hint worker echoes identity on success/error (error=%s)', async error => {
   const table = startPlaythrough({ deal: record.deal, contract: record.contract, learnerSide: record.learnerSide });
@@ -63,6 +63,6 @@ test('§4.3.6: a solver load that exhausts the deadline never starts a synchrono
     const pending = createAnalysisHandler()(data, post);
     await vi.advanceTimersByTimeAsync(30001); await pending;
     expect(solvePosition).not.toHaveBeenCalled();
-    expect(post).toHaveBeenCalledExactlyOnceWith({ type: 'error', requestId: 1, playthroughId: data.playthroughId, positionKey: data.positionKey });
+    expect(post).toHaveBeenCalledExactlyOnceWith({ type: 'error', requestId: 1, playthroughId: data.playthroughId, positionKey: data.positionKey, cause: 'timeout' });
   } finally { vi.useRealTimers(); }
 });

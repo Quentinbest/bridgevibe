@@ -18,9 +18,12 @@ export function createAnalysisHandler() {
       if (!current()) return;
       if (Date.now() > data.deadline) throw new Error('AnalysisTimeout');
       const result = await doubleDummy(solver, completedRecord(data.record as PlaythroughRecord), data.index);
-      // §4.3.6: synchronous solver work cannot be interrupted; drop cancelled results after it yields.
-      if (current()) post(Date.now() > data.deadline ? { type: 'error', ...identity } : { type: 'result', ...identity, result });
-    } catch { if (current()) post({ type: 'error', ...identity }); }
+      // §4.3.6: a running synchronous solve can't observe a cancel message, so a cancelled request's result
+      // may still be posted here; the client has already settled and removed it, so it is never accepted.
+      if (current()) post(Date.now() > data.deadline ? { type: 'error', ...identity, cause: 'timeout' } : { type: 'result', ...identity, result });
+    } catch (error) {
+      if (current()) post(error instanceof Error && error.message === 'AnalysisTimeout' ? { type: 'error', ...identity, cause: 'timeout' } : { type: 'error', ...identity });
+    }
     finally { if (current()) active.delete(data.cancellationId); }
   };
 }

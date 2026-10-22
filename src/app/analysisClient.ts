@@ -41,7 +41,7 @@ export function analysisClient(record: CompletedPlaythroughRecord, createWorker:
     // §4.3.6: stale results and errors neither settle a request nor clear its deadline.
     if (!item || data.playthroughId !== item.request.playthroughId || data.positionKey !== item.request.positionKey) return;
     pending.delete(data.requestId); clearTimeout(item.timer);
-    if (data.type === 'result') item.resolve(data.result); else item.reject(new Error('AnalysisFailed'));
+    if (data.type === 'result') item.resolve(data.result); else item.reject(new Error(data.cause === 'timeout' ? 'AnalysisTimeout' : 'AnalysisFailed'));
   }
   // US-41.3: wait for the worker's protocol version; on a mismatch reload it once before any request.
   function connect(): Promise<AnalysisWorker> {

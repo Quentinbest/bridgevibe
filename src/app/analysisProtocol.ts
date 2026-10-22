@@ -7,4 +7,5 @@ export type AnalysisRequest = { type: 'solve'; requestId: number; record: Comple
 export type AnalysisMessage = AnalysisRequest | { type: 'cancel'; cancellationId: string };
 export type AnalysisResponse = { type: 'hello'; protocolVersion: number }
   | { type: 'result'; requestId: number; playthroughId: string; positionKey: string; result: PositionResult }
-  | { type: 'error'; requestId: number; playthroughId: string; positionKey: string };
+  // US-45.1: a request that expired in the worker reports cause 'timeout', so provenance keeps the cause.
+  | { type: 'error'; requestId: number; playthroughId: string; positionKey: string; cause?: 'timeout' };

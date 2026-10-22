@@ -149,3 +149,16 @@ test('§4.3.6: a cancellation made before the handshake completes is never poste
   await expect(later).resolves.toMatchObject({ name: 'test' });
   client.close();
 });
+
+test('US-45.1: a worker-side deadline error keeps its timeout cause', async () => {
+  const worker = new FakeWorker(); const client = analysisClient(record, () => worker);
+  const timedOut = client.solver.solvePosition(layout, position);
+  await vi.waitFor(() => expect(worker.posted).toHaveLength(1));
+  worker.emit({ type: 'error', requestId: worker.posted[0].requestId, playthroughId: worker.posted[0].playthroughId, positionKey: worker.posted[0].positionKey, cause: 'timeout' });
+  await expect(timedOut).rejects.toThrow('AnalysisTimeout');
+  const failed = client.solver.solvePosition(layout, position);
+  await vi.waitFor(() => expect(worker.posted).toHaveLength(2));
+  worker.emit({ type: 'error', requestId: worker.posted[1].requestId, playthroughId: worker.posted[1].playthroughId, positionKey: worker.posted[1].positionKey });
+  await expect(failed).rejects.toThrow('AnalysisFailed');
+  client.close();
+});
