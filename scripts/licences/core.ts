@@ -25,7 +25,7 @@ export function isAsset(entry: unknown): entry is Asset {
   return Object.keys(record).every(key => fields.includes(key))
     && fields.every(key => typeof record[key] === 'string' && record[key].trim().length > 0)
     // The classifier's sentinel is not a licence name a reviewer can register.
-    && record.licence !== 'no explicit grant';
+    && String(record.licence).trim().replace(/\s+/g, ' ').toLowerCase() !== 'no explicit grant';
 }
 export interface OpenItem { candidate: string; question: string; asked: string; status: string }
 export interface Artefact {

@@ -94,6 +94,9 @@ it('uses a reviewed asset register name only for an unrecognised grant', () => {
   const sentinel = { [source]: { ...assets[source], licence: 'no explicit grant' } };
   const generic: Exception = { path: source, version: item.version, reason: 'Old review', reviewer: 'Fixture owner', date: '2026-10-22' };
   expect(bom([relicensed], [generic], sentinel).violations.join()).toContain('Invalid asset register entry');
+  for (const variant of ['No explicit grant', '  no   EXPLICIT grant ']) {
+    expect(bom([relicensed], [{ ...review, licence: variant }], { [source]: { ...assets[source], licence: variant } }).violations.join()).toContain('Invalid asset register entry');
+  }
   expect(bom([relicensed], [generic], assets).violations.join()).toContain('no explicit grant (LR-2 / LR-7)');
   // LR-4: a pinned review can't register a GPL-family name for unrecognised (e.g. translated) GPL text.
   for (const name of ['GPL-3.0-only', 'LGPL-2.1', 'GNU General Public License v3']) {
