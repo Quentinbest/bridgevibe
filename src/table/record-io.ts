@@ -138,14 +138,35 @@ function withoutComments(text: string): string {
     }
   }
   if (state === 'brace') throw new Error('Unterminated PBN comment');
+  if (state === 'quoted') throw new Error('Unterminated PBN string');
   return result;
 }
 function parsePlay(lines: readonly string[]): Card[] {
   const cards: Card[] = [];
-  // PBN 2.1 §3.6.2: annotations can wrap play across lines; only cards count.
-  for (const token of lines.join(' ').replace(/\$/g, ' $').split(/\s+/).filter(Boolean)) {
-    if (cards.length && /^(?:\$\d+|!!|\?\?|!\?|\?!|!|\?)$/.test(token)) continue;
-    cards.push(parseCard(token.replace(/(?:!!|\?\?|!\?|\?!|!|\?)$/, '')));
+  let hasSuffix = false;
+  let hasNote = false;
+  const suffix = /(?:!!|\?\?|!\?|\?!|!|\?)$/;
+  // US-04.3, PBN 2.1 §3.6: a completed record requires every card's identity.
+  for (const token of lines.join(' ').replace(/\$|=\d+=/g, ' $&').split(/\s+/).filter(Boolean)) {
+    if (token === '-') throw new Error('PBN play contains unknown cards (-); a complete play is required');
+    if ((token === '*' || token === '+') && cards.length < 52) throw new Error(`Incomplete PBN play (${token}); a complete play is required`);
+    if (cards.length && /^\$\d+$/.test(token)) continue;
+    const note = /^=(\d+)=$/.exec(token);
+    if (note) {
+      // PBN 2.1 §3.6.4–3.6.5: ignore note content and allow missing definitions.
+      if (!cards.length || hasNote || Number(note[1]) < 1 || Number(note[1]) > 32) throw new Error('Invalid or duplicate note reference');
+      hasNote = true;
+      continue;
+    }
+    if (cards.length && /^(?:!!|\?\?|!\?|\?!|!|\?)$/.test(token)) {
+      // PBN 2.1 §3.6.2: only one suffix annotation is allowed per card.
+      if (hasSuffix) throw new Error('Duplicate suffix annotation');
+      hasSuffix = true;
+      continue;
+    }
+    cards.push(parseCard(token.replace(suffix, '')));
+    hasSuffix = suffix.test(token);
+    hasNote = false;
   }
   if (cards.length !== 52) throw new Error('Expected 13 complete tricks');
   return cards;
@@ -176,20 +197,36 @@ export function importPbn(text: string): CompletedPlaythroughRecord {
     const tags: Record<string, string> = Object.create(null);
     const playLines: string[] = [];
     let playing = false;
+    let notes = false;
+    const noteIndices = new Set<number>();
     // US-04.3: escape lines are ignored before even interpreting comment delimiters.
     const content = text.split(/\r?\n/).filter(line => !line.startsWith('%')).join('\n');
     for (const line of withoutComments(content).trim().split(/\r?\n/).map(line => line.trim()).filter(Boolean)) {
       if (line.startsWith('[')) {
         const match = /^\[([A-Za-z]+) "((?:[^"\\]|\\["\\])*)"\]$/.exec(line);
-        if (!match || playing || Object.hasOwn(tags, match[1])) throw new Error('Malformed or misplaced tag');
-        tags[match[1]] = match[2].replace(/\\(["\\])/g, '$1');
+        if (!match) throw new Error('Malformed tag');
+        const value = match[2].replace(/\\(["\\])/g, '$1');
+        if (playing && match[1] === 'Note') {
+          // PBN 2.1 §3.6.5: note tags may repeat, but their indices must differ.
+          const index = /^(\d+):/.exec(value);
+          if (!index || Number(index[1]) < 1 || Number(index[1]) > 32) throw new Error('Invalid Note tag');
+          if (noteIndices.has(Number(index[1]))) throw new Error('Duplicate Note index');
+          noteIndices.add(Number(index[1]));
+          notes = true;
+          continue;
+        }
+        if (playing || match[1] === 'Note' || Object.hasOwn(tags, match[1])) throw new Error('Malformed or misplaced tag');
+        tags[match[1]] = value;
         if (match[1] === 'Play') playing = true;
       } else {
-        if (!playing) throw new Error('Play must follow the Play tag');
+        if (!playing || notes) throw new Error('Play must follow the Play tag and precede notes');
         playLines.push(line);
       }
     }
-    if (!['Event', 'Deal', 'Declarer', 'Contract', 'Result', 'Play'].every(key => Object.hasOwn(tags, key))) throw new Error('Missing required tag');
+    // US-03, §4.4: Dealer and Vulnerable contribute to Deal identity; never invent them.
+    for (const key of ['Deal', 'Declarer', 'Contract', 'Play', 'Dealer', 'Vulnerable']) {
+      if (!Object.hasOwn(tags, key)) throw new Error(`Missing required ${key} tag`);
+    }
     const playedCards = parsePlay(playLines);
     const match = /^([NESW]):([^ ]+) ([^ ]+) ([^ ]+) ([^ ]+)$/.exec(tags.Deal);
     if (!match) throw new Error('Invalid Deal tag');
@@ -200,8 +237,8 @@ export function importPbn(text: string): CompletedPlaythroughRecord {
       if (holdings.length !== 4 || holdings.some(holding => !/^[AKQJT2-9]*$/.test(holding))) throw new Error('Invalid PBN hand');
       hands[SEATS[(start + index) % 4]] = holdings.flatMap((holding, suit) => [...holding].map(rank => parseCard(suits[suit] + rank))) as unknown as Hand;
     });
-    if (tags.Vulnerable && !['None', 'NS', 'EW', 'All'].includes(tags.Vulnerable)) throw new Error('Invalid Vulnerable tag');
-    const deal = { hands, dealer: tags.Dealer ? parseSeat(tags.Dealer) : 'north' as const,
+    if (!['None', 'NS', 'EW', 'All'].includes(tags.Vulnerable)) throw new Error('Invalid Vulnerable tag');
+    const deal = { hands, dealer: parseSeat(tags.Dealer),
       vulnerability: { northSouth: ['NS', 'All'].includes(tags.Vulnerable), eastWest: ['EW', 'All'].includes(tags.Vulnerable) },
       origin: { kind: 'authored' as const, contentId: 'pbn-import', version: 1 }, dealId: 'import' };
     validateDeal(deal);
@@ -231,7 +268,8 @@ export function importPbn(text: string): CompletedPlaythroughRecord {
       }
     }
     const record = table.completedRecord();
-    if (!/^(?:[0-9]|1[0-3])$/.test(tags.Result) || Number(tags.Result) !== record.result[sideOf(record.contract.declarer)]) throw new Error('Result disagrees with play');
+    if (Object.hasOwn(tags, 'Result') && (!/^(?:[0-9]|1[0-3])$/.test(tags.Result)
+      || Number(tags.Result) !== record.result[sideOf(record.contract.declarer)])) throw new Error('Result disagrees with play');
     return record;
   } catch (error) { throw new Error(`PBN parse error: ${error instanceof Error ? error.message : String(error)}`, { cause: error }); }
 }

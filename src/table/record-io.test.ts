@@ -154,3 +154,91 @@ test('§4.3.3, US-04.3: JSON preserves optional robot rule IDs and rejects inval
     expect(() => importRecordJson(JSON.stringify(invalid))).toThrow(/Invalid record schema/);
   }
 });
+
+// US-04.3: fixtures cover the supported complete-play subset of PBN 2.1.
+const noteReferences = clean.replace('SK SQ', 'SK =1= $9 SQ! =2=')
+  + '\n[Note "1:Ignored {text}; \\"quote\\" and \\\\ path"]\n[Note "2:Second note"]\n';
+const escapedTags = clean.replace('[Event "Hand-checked column order"]',
+  String.raw`[Event "A \"quoted\" event with \\ path {literal};"]`);
+const optionalTags = clean.split('\n').filter(line => !/^\[(?:Event|Result) /.test(line)).join('\n');
+
+function expectSamePbn(text: string) {
+  const original = importPbn(clean), imported = importPbn(text);
+  expect({ ...imported, playthroughId: original.playthroughId }).toEqual(original);
+  expectSamePbnRoundTrip(imported);
+}
+function expectSamePbnRoundTrip(record: ReturnType<typeof importPbn>) {
+  const imported = importPbn(exportPbn(record));
+  expect({ ...imported, playthroughId: record.playthroughId }).toEqual(record);
+}
+test.each(['- - - S2', 'S2 - SK SQ', '- - - -'])('PBN rejects unknown cards rather than treating them as padding: %s', opening => {
+  expect(() => importPbn(clean.replace('S2 SA SK SQ', opening))).toThrow(/unknown cards.*complete play is required/);
+});
+test('PBN rejects leading dashes even when followed by 52 cards', () => {
+  const padded = clean.replace('[Play "W"]', '[Play "N"]\n- - -');
+  expect(() => importPbn(padded)).toThrow(/unknown cards.*complete play is required/);
+});
+test.each(['*', '+'])('PBN rejects an incomplete play marked with %s', marker => {
+  const incomplete = clean.slice(0, clean.indexOf('CK SJ HJ DQ')) + marker;
+  expect(() => importPbn(incomplete)).toThrow(/Incomplete PBN play.*complete play is required/);
+});
+test.each(['S2 SA SK', 'S2 SA SK SQ S2'])('PBN rejects wrong card counts: %s', opening => {
+  expect(() => importPbn(clean.replace('S2 SA SK SQ', opening))).toThrow(/PBN parse error/);
+});
+test('PBN note references coexist with suffixes, NAGs and trailing Note tags', () => {
+  expectSamePbn(noteReferences);
+});
+test.each([1, 32])('PBN accepts note reference %i without a definition', index => {
+  expectSamePbn(clean.replace('SK SQ', `SK=${index}= $9 SQ`));
+});
+test('PBN allows the same note reference on different cards', () => {
+  expectSamePbn(clean.replace('SK SQ', 'SK =1= SQ =1=') + '[Note "1:Shared note"]\n');
+});
+test.each([0, 33, 99, -1, 1.5])('PBN rejects out-of-range or non-integer note reference %s', index => {
+  expect(() => importPbn(clean.replace('SK SQ', `SK =${index}= SQ`))).toThrow(/PBN parse error/);
+});
+test.each(['SK =1= =2=', 'SK =1= $9 =1='])('PBN rejects multiple note references on a card: %s', card => {
+  expect(() => importPbn(clean.replace('SK SQ', `${card} SQ`))).toThrow(/duplicate note reference/);
+});
+test('PBN rejects duplicate Note indices', () => {
+  expect(() => importPbn(noteReferences + '[Note "1:Duplicate"]')).toThrow(/Duplicate Note index/);
+});
+test.each(['0', '33', '-1', '1.5', 'x'])('PBN rejects invalid Note index %s', index => {
+  expect(() => importPbn(clean + `[Note "${index}:Invalid"]`)).toThrow(/Invalid Note tag/);
+});
+test('PBN rejects a Note tag before the play section', () => {
+  expect(() => importPbn(clean.replace('[Play', '[Note "1:Misplaced"]\n[Play'))).toThrow(/misplaced tag/);
+});
+test.each(['SK ! ?', 'SK! ?', 'SK ! $9 ?', 'SK =1= ! =2='])('PBN rejects repeated annotations on a card: %s', card => {
+  expect(() => importPbn(clean.replace('SK SQ', `${card} SQ`))).toThrow(/Duplicate suffix|duplicate note/);
+});
+test.each(['SK ! =1= $9 $10', 'SK $9 =1= ! $10', 'SK! $9 =1= $10'])('PBN accepts one suffix and note in any annotation order: %s', card => {
+  expectSamePbn(clean.replace('SK SQ', `${card} SQ`));
+});
+test.each(['=x=', '=1', '=='])('PBN rejects malformed note reference %s', reference => {
+  expect(() => importPbn(clean.replace('SK SQ', `SK ${reference} SQ`))).toThrow(/PBN parse error/);
+});
+test('PBN escaped tag strings preserve comments and play', () => {
+  expectSamePbn(escapedTags);
+});
+test.each([String.raw`[Event "bad\q"]`, '[Event "unterminated]', String.raw`[Event "trailing\"]`])('PBN rejects malformed string %s', tag => {
+  expect(() => importPbn(clean.replace('[Event "Hand-checked column order"]', tag))).toThrow(/PBN parse error/);
+});
+test.each(['Event', 'Result', 'Event,Result'])('PBN import does not require tags %s', omitted => {
+  const tags = omitted.split(',');
+  const pbn = clean.split('\n').filter(line => !tags.some(tag => line.startsWith(`[${tag} `))).join('\n');
+  expectSamePbn(pbn);
+});
+test.each(['', '?', '14', '12'])('PBN validates an optional Result when present: %s', result => {
+  expect(() => importPbn(optionalTags.replace('[Play', `[Result "${result}"]\n[Play`))).toThrow(/Result/);
+});
+test.each(['Dealer', 'Vulnerable'])('US-03: PBN requires %s rather than inventing metadata', tag => {
+  const missing = clean.split('\n').filter(line => !line.startsWith(`[${tag} `)).join('\n');
+  expect(() => importPbn(missing)).toThrow(new RegExp(`PBN parse error:.*${tag}`));
+});
+test.each(['[Auction "N"]', '[Unknown "N"]', '[Event "second record"]'])('PBN rejects sections after play: %s', section => {
+  expect(() => importPbn(clean + section + '\n')).toThrow(/PBN parse error/);
+});
+test('PBN rejects cards after trailing notes', () => {
+  expect(() => importPbn(noteReferences + 'S2')).toThrow(/PBN parse error/);
+});
