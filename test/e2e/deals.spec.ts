@@ -1,10 +1,9 @@
-import { choosePractice } from './miniBridge';
+import { choosePractice, installPausedClock } from './miniBridge';
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 test('seed links reproduce South and IDs; New deal advances; info is keyboard accessible', async ({ page }) => {
-  // #55: one fixed time for both calls.
-  const time = new Date(); await page.clock.install({ time }); await page.clock.pauseAt(time);
+  await installPausedClock(page);
   await page.goto('/?seed=abc&deal=3');
   const hand = () => page.locator('.setup-own .card').allTextContents();
   const firstHand = await hand();
@@ -104,8 +103,7 @@ test('header controls and invalid-link feedback preserve the fixed Deal height',
 
 // UX §10: the learner's turn arriving never pulls focus away from the header's deal controls.
 test('a robot play reaching the learner keeps focus on Deal info', async ({ page }) => {
-  await page.clock.install();
-  await page.clock.pauseAt(new Date(Date.now() + 1000));
+  await installPausedClock(page);
   await page.goto('/?seed=abc&deal=3');
   await choosePractice(page, true);
   const trigger = page.getByRole('button', { name: 'Deal info', exact: true });

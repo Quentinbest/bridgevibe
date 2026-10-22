@@ -8,7 +8,8 @@ export async function choosePractice(page: Page, clock = false) {
   await page.getByRole('button', { name: 'Choose', exact: true }).click();
 }
 
-// #55: one fixed time for install and pauseAt; a later Node clock can't be in the page clock's past.
+// #36: install at a fixed time and pause a second later, so the pause target is always ahead of the
+// page clock however slowly the machine runs; the only place e2e specs may call pauseAt.
 export async function installPausedClock(page: Page) {
-  const time = new Date(); await page.clock.install({ time }); await page.clock.pauseAt(time);
+  const time = Date.now(); await page.clock.install({ time }); await page.clock.pauseAt(time + 1000);
 }
