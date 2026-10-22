@@ -3,7 +3,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } f
 import os from 'node:os';
 import path from 'node:path';
 import { build } from 'vite';
-import { buildBom, classifyLicence, grantsIn, prohibitedPaths, renderNotice, scanBytes } from '../scripts/licences/core';
+import { buildBom, classifyLicence, grantsIn, licenceTextHash, prohibitedPaths, renderNotice, scanBytes } from '../scripts/licences/core';
 import type { Asset, Bom, Exception, Shipped } from '../scripts/licences/core';
 import { filesIn, isLicenceFile, licences, resolveArtefact } from '../scripts/licences/plugin';
 import denylist from '../scripts/licences/denylist.json';
@@ -25,6 +25,100 @@ function pkg(name: string): Shipped {
 }
 const exception = (name: string): Exception => ({ package: name, version: '1.0.0', reason: 'Fixture review', reviewer: 'Fixture reviewer', date: '2026-10-19' });
 const bom = (items: Shipped[], exceptions: Exception[] = [], assets: Record<string, Asset> = {}) => buildBom(items, exceptions, assets, [], denylist);
+
+// US-46.2: Unlicense packages need no exception when the grant file is named UNLICENSE.
+it('finds UNLICENSE grants with the existing filename separators and extensions', () => {
+  for (const name of ['UNLICENSE', 'unlicence.txt', 'UNLICENSE-MIT', 'THIRD_PARTY_UNLICENSE.md', 'unlicense.copy']) {
+    expect(isLicenceFile(name)).toBe(true);
+  }
+  for (const name of ['UNLICENSE.js', 'UNLICENSE.json', 'UNLICENSE.map', 'license-checker.js', 'licenses.json', 'LICENSE.map']) {
+    expect(isLicenceFile(name)).toBe(false);
+  }
+  const report = bom([pkg('unlicense')]);
+  expect(report.violations).toEqual([]);
+  expect(report.artefacts[0]).toMatchObject({ licence: 'Unlicense', licenceFiles: ['node_modules/unlicense/UNLICENSE'] });
+});
+
+// US-46.1: malformed register entries fail a build even when no shipped file uses them.
+it.each([
+  { licenceFile: 'LICENSE', licence: 'MIT' },
+  { licenceFile: 'LICENSE', licence: 'MIT', attribution: ' \t\n' },
+  { licence: 'MIT', attribution: 'Artist' },
+  { licenceFile: ' ', licence: 'MIT', attribution: 'Artist' },
+  { licenceFile: 'LICENSE', attribution: 'Artist' },
+  { licenceFile: 'LICENSE', licence: '', attribution: 'Artist' },
+  { licenceFile: 'LICENSE', licence: 'MIT', attribution: 42 },
+  { licenceFile: 'LICENSE', licence: 'MIT', attribution: 'Artist', extra: true },
+  null,
+])('rejects an invalid asset register entry: %j', async entry => {
+  const dir = temp();
+  writeFileSync(path.join(dir, 'index.html'), '<script type="module" src="/main.js"></script>');
+  writeFileSync(path.join(dir, 'main.js'), 'console.log("fixture");');
+  writeFileSync(path.join(dir, 'package.json'), '{"version":"1.0.0"}');
+  cpSync(path.join(root, 'licences'), path.join(dir, 'licences'), { recursive: true });
+  writeFileSync(path.join(dir, 'licences/assets.json'), JSON.stringify({ 'unused.svg': entry }));
+  const reportPath = path.join(dir, 'bom.json');
+  await expect(build({ root: dir, configFile: false, logLevel: 'silent', plugins: [licences({ reportPath })] }))
+    .rejects.toThrow('Invalid asset register entry: unused.svg');
+  const report: Bom = JSON.parse(readFileSync(reportPath, 'utf8'));
+  expect(report.violations.join()).toContain('Invalid asset register entry: unused.svg');
+  // Invalid shipped entries must reach validation rather than crashing resolution.
+  const assets = JSON.parse(JSON.stringify({ 'suit.svg': entry }));
+  expect(() => resolveArtefact(dir, 'suit.svg', 'suit.svg', assets, Buffer.from('<svg/>'))).not.toThrow();
+});
+
+// US-46.5: reviewing unfamiliar artwork grants is an owner decision, pinned to the bytes.
+it('uses a reviewed asset register name only for an unrecognised grant', () => {
+  const dir = temp();
+  writeFileSync(path.join(dir, 'CC-BY.txt'), 'Creative Commons Attribution 4.0 International (CC BY 4.0)');
+  const source = 'suit.svg';
+  const assets = { [source]: { licenceFile: 'CC-BY.txt', licence: 'CC-BY-4.0', attribution: 'Fixture artist' } };
+  const item = resolveArtefact(dir, source, source, assets, Buffer.from('<svg/>'));
+  const review: Exception = { path: source, version: item.version, reason: 'Reviewed artwork grant', reviewer: 'Fixture owner', date: '2026-10-22',
+    licence: 'CC-BY-4.0', licenceText: licenceTextHash(['Creative Commons Attribution 4.0 International (CC BY 4.0)']) };
+  expect(bom([item], [], assets).violations.join()).toContain('registered licence does not match');
+  const report = bom([item], [review], assets);
+  expect(report.violations).toEqual([]);
+  expect(report.artefacts[0]).toMatchObject({ licence: 'CC-BY-4.0', licenceSource: 'reviewed-register', exceptions: [review] });
+  expect(renderNotice(report)).toContain('Fixture artist');
+  // The review covers the licence name and text too, not only the asset bytes.
+  for (const invalid of [{ ...review, version: 'sha256:other' }, { ...review, reviewer: '' }, { ...review, path: 'other.svg' }, { ...review, path: undefined, package: source },
+    { ...review, licence: undefined }, { ...review, licenceText: undefined }]) {
+    expect(bom([item], [invalid], assets).violations.join()).toContain('registered licence does not match');
+  }
+  expect(bom([item], [review], { [source]: { ...assets[source], licence: 'CC-BY-NC-4.0' } }).violations.join()).toContain('registered licence does not match');
+  writeFileSync(path.join(dir, 'CC-BY.txt'), 'Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)');
+  const relicensed = resolveArtefact(dir, source, source, assets, Buffer.from('<svg/>'));
+  expect(bom([relicensed], [review], assets).violations.join()).toContain('registered licence does not match');
+  // Registering the classifier's sentinel can't bypass the pinned review through a generic exception.
+  const sentinel = { [source]: { ...assets[source], licence: 'no explicit grant' } };
+  const generic: Exception = { path: source, version: item.version, reason: 'Old review', reviewer: 'Fixture owner', date: '2026-10-22' };
+  expect(bom([relicensed], [generic], sentinel).violations.join()).toContain('Invalid asset register entry');
+  for (const variant of ['No explicit grant', '  no   EXPLICIT grant ']) {
+    expect(bom([relicensed], [{ ...review, licence: variant }], { [source]: { ...assets[source], licence: variant } }).violations.join()).toContain('Invalid asset register entry');
+  }
+  expect(bom([relicensed], [generic], assets).violations.join()).toContain('no explicit grant (LR-2 / LR-7)');
+  // LR-4: a pinned review can't register a GPL-family name for unrecognised (e.g. translated) GPL text.
+  for (const name of ['GPL-3.0-only', 'LGPL-2.1', 'GNU General Public License v3']) {
+    const gplAssets = { [source]: { ...assets[source], licence: name } };
+    const gplReview = { ...review, licence: name, licenceText: licenceTextHash(['Lizenz: GNU Allgemeine Öffentliche Lizenz']) };
+    writeFileSync(path.join(dir, 'CC-BY.txt'), 'Lizenz: GNU Allgemeine Öffentliche Lizenz');
+    const translated = resolveArtefact(dir, source, source, gplAssets, Buffer.from('<svg/>'));
+    const report = bom([translated], [gplReview], gplAssets);
+    expect(report.violations.join()).toContain('GPL-family licence in browser distribution (LR-4)');
+    expect(report.artefacts[0].licenceSource).toBeUndefined();
+  }
+  writeFileSync(path.join(dir, 'CC-BY.txt'), text('MIT'));
+  const known = resolveArtefact(dir, source, source, assets, Buffer.from('<svg/>'));
+  expect(bom([known], [review], assets).violations.join()).toContain('registered licence does not match');
+  const matching = bom([known], [review], { [source]: { ...assets[source], licence: 'MIT' } });
+  expect(matching.violations).toEqual([]);
+  expect(matching.artefacts[0].licence).toBe('MIT');
+  expect(matching.artefacts[0].licenceSource).toBeUndefined();
+  writeFileSync(path.join(dir, 'CC-BY.txt'), text('GPL-3.0'));
+  const gpl = resolveArtefact(dir, source, source, assets, Buffer.from('<svg/>'));
+  expect(bom([gpl], [review], assets).violations.join()).toContain('GPL-family');
+});
 
 it('attributes source JSON to first-party and package JSON to its npm package', () => {
   const dir = temp();

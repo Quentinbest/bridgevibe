@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 export interface Exception {
   package?: string;
   path?: string;
@@ -7,11 +8,24 @@ export interface Exception {
   date: string;
   // LR-4: for a dual-licensed artefact, the non-GPL alternative its own licence files grant.
   elected?: string;
+  // US-46.5: a reviewed-register grant pins the reviewed licence name and its licence text.
+  licence?: string;
+  licenceText?: string;
 }
 export interface Asset {
   licenceFile: string;
   licence: string;
   attribution: string;
+}
+// US-46.1: validate the whole register, including entries not shipped by this build.
+export function isAsset(entry: unknown): entry is Asset {
+  if (!entry || typeof entry !== 'object' || Array.isArray(entry)) return false;
+  const fields = ['licenceFile', 'licence', 'attribution'];
+  const record = entry as Record<string, unknown>;
+  return Object.keys(record).every(key => fields.includes(key))
+    && fields.every(key => typeof record[key] === 'string' && record[key].trim().length > 0)
+    // The classifier's sentinel is not a licence name a reviewer can register.
+    && String(record.licence).trim().replace(/\s+/g, ' ').toLowerCase() !== 'no explicit grant';
 }
 export interface OpenItem { candidate: string; question: string; asked: string; status: string }
 export interface Artefact {
@@ -19,6 +33,7 @@ export interface Artefact {
   kind: 'npm' | 'font' | 'asset' | 'wasm' | 'first-party' | 'bundler';
   version: string;
   licence: string;
+  licenceSource?: 'reviewed-register';
   licenceFiles: string[];
   notices: string[];
   shippedFiles: string[];
@@ -76,8 +91,13 @@ export function prohibitedPaths(paths: string[], denylist: Denylist): string[] {
     .map(file => `${file}: prohibited path (LR-3)`);
 }
 
+// US-46.5: changing the licence text after review invalidates a reviewed-register exception.
+export const licenceTextHash = (texts: string[]) => `sha256:${createHash('sha256').update(texts.join('\n')).digest('hex')}`;
 export function buildBom(shipped: Shipped[], allowList: Exception[], assets: Record<string, Asset>, openItems: OpenItem[], denylist: Denylist, generated = new Date().toISOString()): Bom {
   const violations: string[] = [];
+  for (const [source, entry] of Object.entries(assets)) {
+    if (!isAsset(entry)) violations.push(`Invalid asset register entry: ${source}; only non-empty licenceFile, licence and attribution strings required`);
+  }
   const valid = allowList.filter(entry => {
     if (!entry.reason?.trim() || !entry.reviewer?.trim() || !entry.version || !entry.date || Boolean(entry.package) === Boolean(entry.path)) {
       violations.push(`Invalid allow-list entry: ${entry.package ?? entry.path ?? '(unnamed)'}; package or path, version, reason, reviewer and date required`);
@@ -88,7 +108,7 @@ export function buildBom(shipped: Shipped[], allowList: Exception[], assets: Rec
   const artefacts = shipped.map(item => {
     const { texts, source, problem, ...fields } = item;
     if (problem) violations.push(problem);
-    const registered = source ? assets[source] : undefined;
+    const registered = source && isAsset(assets[source]) ? assets[source] : undefined;
     if ((item.kind === 'asset' || item.kind === 'wasm') && !registered) violations.push(`${item.name}: undeclared asset`);
     // US-46.1: every non-bundler artefact records a version, commit or content hash.
     if (item.kind !== 'bundler' && item.version === 'unknown') violations.push(`${item.name}: unknown version (US-46.1)`);
@@ -104,8 +124,21 @@ export function buildBom(shipped: Shipped[], allowList: Exception[], assets: Rec
     const licence = item.kind === 'first-party' ? 'first-party (owner; distribution model D2 open)'
       : gpl ? 'GPL-family' : [...new Set(grants.filter(grant => grant !== 'no explicit grant'))].join(' AND ') || 'no explicit grant';
     const artefact: Artefact = { ...fields, licence };
-    if (registered && registered.licence !== licence) violations.push(`${item.name}: registered licence does not match licence file`);
     const covers = (entry: Exception) => entry.version === item.version && (entry.package === item.name || (entry.path !== undefined && entry.path === source));
+    // US-46.5: an unrecognised asset grant may use the owner's reviewed register name.
+    // Known grants still use the classifier; missing files and GPL cannot use this fallback.
+    // LR-4: a GPL-family name is never exempted, even for text the classifier doesn't recognise.
+    const gplName = !!registered && (/\b(?:A|L)?GPL\b|General Public Licen[cs]e/i.test(registered.licence) || classifyLicence(registered.licence) === 'GPL-family');
+    if (gplName && (item.kind === 'asset' || item.kind === 'wasm')) violations.push(`${item.name}: GPL-family licence in browser distribution (LR-4)`);
+    const reviewed = registered && !gplName && (item.kind === 'asset' || item.kind === 'wasm')
+      && licence === 'no explicit grant' && own.length > 0
+      ? valid.find(entry => entry.path === source && covers(entry) && entry.elected === undefined
+        && entry.licence === registered.licence && entry.licenceText === licenceTextHash(own)) : undefined;
+    if (reviewed) {
+      artefact.licence = registered!.licence;
+      artefact.licenceSource = 'reviewed-register';
+    }
+    if (registered && registered.licence !== artefact.licence) violations.push(`${item.name}: registered licence does not match licence file`);
     const applied: Exception[] = [];
     let cleared = !gpl;
     if (gpl) {
@@ -122,7 +155,9 @@ export function buildBom(shipped: Shipped[], allowList: Exception[], assets: Rec
     // LR-2: an election covers the GPL alternative only; an unrecognised licence file still needs
     // its own missing-grant exception.
     if (item.kind !== 'first-party' && cleared && unknownGrant) {
-      const exception = valid.find(entry => covers(entry) && entry.elected === undefined);
+      // US-46.5: a registered asset with licence text clears only through its pinned review.
+      const pinnedOnly = registered && (item.kind === 'asset' || item.kind === 'wasm') && own.length > 0;
+      const exception = reviewed ?? (pinnedOnly ? undefined : valid.find(entry => covers(entry) && entry.elected === undefined));
       if (exception) applied.push(exception);
       else violations.push(`${item.name}: no explicit grant (LR-2 / LR-7)`);
     }
