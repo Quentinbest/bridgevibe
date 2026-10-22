@@ -562,10 +562,19 @@ candidates, and lazy-loads the configured solver. `information` imports Table ty
 only; `analysis` supplies `seatViewSeed(view)` and groups visible Equivalent Actions.
 
 Provisional parameters live in `src/information/parameters.ts`: 50 samples (U-02),
-3,000 ms deadline (U-01), 50 candidate layouts for enumeration, and 20,000 rejection
-tries per sample. Enumeration uses the unconstrained assignment count as a safe,
-cheap upper bound; larger spaces use bounded rejection sampling. A failed fixed
-sample count never produces a partial average. T2 must validate cost and latency.
+3,000 ms deadline (U-01), at most 50 consistent layouts for full enumeration, and
+20,000 rejection tries per sample. Constraint-aware enumeration prunes card counts,
+voids and remaining HCP; it is attempted only below 100,000 unconstrained layouts
+(`HINT_ENUMERATION_SEARCH_LIMIT`), and visits at most 100,000 partial assignments
+(`HINT_ENUMERATION_WORK_LIMIT`). Exceeding either the consistent-layout limit or
+work bound falls back to fixed-count rejection sampling. A failed fixed sample
+count never produces a partial average. T2 must validate cost and latency.
+
+US-41.3: a mismatched hint worker is replaced once before abstaining. US-45.1:
+crashes and repeated protocol mismatches retain their distinct provenance causes.
+§4.7: hiding the page terminates pending hint work. Returning restarts only a still
+active position, with a fresh deadline. Latency sums visible processing time across
+attempts and excludes hidden time; acting, disabling hints or teardown prevents restart.
 The debug panel records duration and whether the U-01 target was exceeded; shown
 statements include sampler, solver, sample count, enumeration and template provenance.
 

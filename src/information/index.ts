@@ -1,5 +1,5 @@
 import type { Card, Seat, SeatView, Suit } from '../table';
-import { HINT_ENUMERATION_LIMIT, HINT_MAX_TRIES } from './parameters';
+import { HINT_ENUMERATION_LIMIT, HINT_ENUMERATION_SEARCH_LIMIT, HINT_ENUMERATION_WORK_LIMIT, HINT_MAX_TRIES } from './parameters';
 
 
 export type LayoutSample = Record<Seat, Card[]>;
@@ -45,19 +45,47 @@ export function sampleLayouts(view: SeatView, count: number, seed: string, maxTr
     for (let i = 1; i <= size; i++) possibilities *= (left - i + 1) / i;
     left -= size;
   }
-  if (Math.round(possibilities) <= HINT_ENUMERATION_LIMIT) {
+  if (Math.round(possibilities) <= HINT_ENUMERATION_SEARCH_LIMIT) {
     const layouts: LayoutSample[] = [];
-    const assign = (index: number, cards: Card[], chosen: Card[]) => {
-      if (index === hidden.length) { const layout = layoutFrom(chosen); if (fits(layout)) layouts.push(layout); return; }
-      const size = view.cardCounts[hidden[index]];
-      const choose = (start: number, indices: number[]) => {
-        if (indices.length === size) { const selected = new Set(indices); assign(index + 1, cards.filter((_, i) => !selected.has(i)), [...chosen, ...indices.map(i => cards[i])]); return; }
-        for (let i = start; i <= cards.length - (size - indices.length); i++) choose(i + 1, [...indices, i]);
-      };
-      choose(0, []);
+    const assigned = Object.fromEntries(seats.map(seat => [seat, [...(visible[seat] ?? [])]])) as LayoutSample;
+    const counts = hidden.map(seat => view.cardCounts[seat]);
+    const targets = hidden.map(seat => {
+      const announced = view.announcements.find(a => a.seat === seat);
+      return announced ? announced.hcp - hcp(plays.filter(p => p.seat === seat).map(p => p.card)) : undefined;
+    });
+    let visited = 0, stopped = false;
+    // §4.6.7: canonical card order visits each layout once; prune partial assignments.
+    const assign = (index: number) => {
+      if (stopped) return;
+      if (++visited > HINT_ENUMERATION_WORK_LIMIT) { stopped = true; return; }
+      for (let i = 0; i < hidden.length; i++) {
+        const eligible = remaining.slice(index).filter(card => !voids.has(`${hidden[i]}:${card.suit}`))
+          .map(card => points[card.rank] ?? 0).sort((a, b) => a - b);
+        const needed = counts[i], target = targets[i];
+        if (needed > eligible.length) return;
+        if (target !== undefined && (target < eligible.slice(0, needed).reduce((sum, n) => sum + n, 0)
+          || target > eligible.slice(eligible.length - needed).reduce((sum, n) => sum + n, 0))) return;
+      }
+      if (index === remaining.length) {
+        if (fits(assigned)) layouts.push(Object.fromEntries(seats.map(seat => [seat, [...assigned[seat]]])) as LayoutSample);
+        if (layouts.length > HINT_ENUMERATION_LIMIT) stopped = true;
+        return;
+      }
+      const card = remaining[index], value = points[card.rank] ?? 0;
+      for (let i = 0; i < hidden.length; i++) {
+        const seat = hidden[i];
+        if (!counts[i] || voids.has(`${seat}:${card.suit}`)) continue;
+        counts[i]--; assigned[seat].push(card);
+        if (targets[i] !== undefined) targets[i]! -= value;
+        assign(index + 1);
+        if (targets[i] !== undefined) targets[i]! += value;
+        assigned[seat].pop(); counts[i]++;
+        if (stopped) break;
+      }
     };
-    assign(0, remaining, []);
-    return layouts.length ? { layouts, enumerated: true } : failure;
+    assign(0);
+    // Exhaustion, unlike a work-bound stop, proves that every consistent layout was listed.
+    if (!stopped) return layouts.length ? { layouts, enumerated: true } : failure;
   }
   const layouts: LayoutSample[] = [];
   for (let sample = 0; sample < count; sample++) {

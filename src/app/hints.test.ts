@@ -2,7 +2,7 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { encodeSeatView, sameCard, seatViewSeed, type Deal, type SeatView, type Card } from '../table';
 import { sampledEstimate } from '../analysis/sampledEstimate';
 import type { SolverPort } from '../analysis';
-import type { HintRunner } from './hintClient';
+import { runHint, type HintRunner, type HintWorker } from './hintClient';
 import { createPlay } from './play';
 import { fixedDeal } from './fixture';
 import { choosePractice } from '../../test/miniBridge';
@@ -12,7 +12,7 @@ import { hintStatement } from '../coach/hint';
 import { validateEntry } from '../coach/provenance';
 const engine = { name: 'test', version: '1' };
 const solver: SolverPort = { ...engine, solveTable: vi.fn(), solvePosition: async layout => ({ ...engine, classes: Object.values(layout).flat().map(card => ({ cards: [card], tricks: 3 })) }) };
-afterEach(() => vi.useRealTimers());
+afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 
 function begin(deal = fixedDeal, runner?: HintRunner) {
   const play = createPlay({}, deal, runner); const stop = play.start(); choosePractice(play); vi.advanceTimersByTime(500); return { play, stop };
@@ -104,4 +104,43 @@ test('a shown unavailable abstention logs its timeout cause and a missed U-01 ta
   expect(play.getSnapshot().hint?.advice).toBe(text('hint.unavailable'));
   expect(play.provenanceLog.entries().find(e => e.abstention)).toMatchObject({ abstention: { reason: 'unavailable', cause: 'timeout' }, provenance: { hint: { durationMs: 3001, exceededTarget: true } } });
   expect(play.hintTimings()).toEqual([{ durationMs: 3001, exceededTarget: true }]); stop();
+});
+
+test.each(['worker-crash', 'protocol-mismatch'] as const)('US-45.1: %s survives the worker client through the logged statement', cause => {
+  vi.useFakeTimers();
+  const workers: HintWorker[] = [];
+  const runner: HintRunner = (view, cards, done) => runHint(view, cards, done, () => {
+    const owned: HintWorker = { postMessage: vi.fn(), terminate: vi.fn(), onmessage: null, onerror: null };
+    workers.push(owned); return owned;
+  });
+  const { play, stop } = begin(fixedDeal, runner); play.showHint();
+  if (cause === 'worker-crash') workers[0].onerror!({} as ErrorEvent);
+  else {
+    workers[0].onmessage!({ data: { type: 'hello', protocolVersion: 99 } } as MessageEvent);
+    expect(play.provenanceLog.entries().some(e => e.abstention)).toBe(false);
+    workers[1].onmessage!({ data: { type: 'hello', protocolVersion: 99 } } as MessageEvent);
+  }
+  const entry = play.provenanceLog.entries().find(e => e.abstention)!;
+  expect(entry).toMatchObject({ informationMode: 'VISIBLE', abstention: { reason: 'unavailable', cause }, summary: 'hint.unavailable' });
+  expect(validateEntry(entry)).toEqual([]); stop();
+});
+
+test.each(['act', 'disable'] as const)('a hidden hint does not resume when the learner chooses to %s', action => {
+  vi.useFakeTimers();
+  const visibility = Object.assign(new EventTarget(), { visibilityState: 'visible' });
+  vi.stubGlobal('document', visibility);
+  const workers: HintWorker[] = [];
+  const runner: HintRunner = (view, cards, done) => runHint(view, cards, done, () => {
+    const owned: HintWorker = { postMessage: vi.fn(), terminate: vi.fn(), onmessage: null, onerror: null };
+    workers.push(owned); return owned;
+  });
+  const { play, stop } = begin(fixedDeal, runner);
+  play.showHint(); expect(workers).toHaveLength(1);
+  visibility.visibilityState = 'hidden'; visibility.dispatchEvent(new Event('visibilitychange'));
+  expect(workers[0].terminate).toHaveBeenCalledOnce();
+  if (action === 'act') play.play('north', play.getSnapshot().legalCards[0]); else play.toggleHints();
+  vi.advanceTimersByTime(10000);
+  visibility.visibilityState = 'visible'; visibility.dispatchEvent(new Event('visibilitychange'));
+  expect(workers).toHaveLength(1);
+  expect(play.provenanceLog.entries().some(e => e.abstention)).toBe(false); stop();
 });
