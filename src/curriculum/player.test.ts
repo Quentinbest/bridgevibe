@@ -213,10 +213,10 @@ test('a prompt without a hint offers none and records hint tier none', () => {
   expect(store.snapshot().at(-1)).toMatchObject({ outcome: 'correct', hintTier: 'none', hintTiming: null });
 });
 
-// US-02, ADR-0003: until the table turns (#16), lesson content can't ask for a North declarer the screen can't show.
-test('only North declarers are rejected at load', () => {
+// US-02, ADR-0003: the screen can now show every Declarer.
+test('North declarers are accepted at load', () => {
   const north = { ...followSuit, exercises: [{ ...exercise, contract: { ...exercise.contract, declarer: 'north' } }] };
-  expect(() => loadLesson(north)).toThrow('cannot be declared by North');
+  expect(loadLesson(north)).toBe(north);
   for (const declarer of ['south', 'east', 'west'] as const) {
     const lesson = { ...followSuit, exercises: [{ ...exercise, contract: { ...exercise.contract, declarer } }] };
     expect(loadLesson(lesson)).toBe(lesson);
@@ -252,4 +252,23 @@ test('acceptThenScripted records a correct answer and plays the canonical card',
   expect(player.record().actions[2].action.card).toEqual(heart('A'));
   expect(player.snapshot().view.hand).toContainEqual(heart('K'));
   continueScript(player);
+});
+
+// US-02.3, ADR-0001: North's own cards plus exposed South; no arbitrary-seat API.
+test('North-declared fixture projects Declarer before and after the opening lead and plays both hands', async () => {
+  const { northLesson } = await import('../../test/fixtures/northLesson');
+  const exercise = northLesson.exercises[0];
+  const player = createPlayer(exercise, createAttemptStore(), 'learner');
+  expect(player.snapshot().view).toMatchObject({ seat: 'north', hand: exercise.deal.hands.north, dummy: null, turn: 'east' });
+  const afterLead = player.advanceScript();
+  expect(afterLead.view.dummy).toEqual(exercise.deal.hands.south);
+  expect(afterLead.view.turn).toBe('south');
+  expect(player.answer(afterLead.prompt!.expectedAnswers[0], 1).outcome).toBe('correct');
+  player.next();
+  const north = player.advanceScript();
+  expect(north.view.turn).toBe('north');
+  expect(player.answer(north.prompt!.expectedAnswers[0], 2).outcome).toBe('correct');
+  expect(player.record().actions.map(action => [action.seat, action.controller])).toEqual([
+    ['east', 'robot'], ['south', 'learner'], ['west', 'robot'], ['north', 'learner'],
+  ]);
 });

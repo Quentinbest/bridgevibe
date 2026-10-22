@@ -5,7 +5,8 @@ import { lazy, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRe
 import { SUITS, type Card as TableCard, type Deal, type CompletedPlaythroughRecord, type ContractChoice } from '../table';
 import { cardName, text } from '../explanation';
 import { Card, CardBack } from './Card';
-import { Hand } from './Hand';
+import { Hand, RotationNotice } from './Hand';
+import { tablePositions, seatLabel, declaringTurn, type ScreenPosition } from './rotation';
 import { type LearnerView } from './play';
 import { dealFromUrl, dealSession } from './deals';
 import { DealControls } from './DealControls';
@@ -16,10 +17,10 @@ import { lessonById } from '../curriculum/content';
 const DebugPanel = import.meta.env.MODE === 'internal' || import.meta.env.MODE === 'audit' || import.meta.env.MODE === 'development'
   ? lazy(() => import('./DebugPanel')) : null;
 
-function Opponent({ seat, count, cards }: { seat: 'west' | 'east'; count: number; cards?: readonly TableCard[] | null }) {
-  return <section className={`opponent ${seat}`} aria-label={text(`seat.${seat}`)}>
+function Opponent({ seat, count, cards, position }: { position: ScreenPosition; seat: 'west' | 'east'; count: number; cards?: readonly TableCard[] | null }) {
+  return <section className={`opponent ${seat}`} data-position={position} aria-label={text(`seat.${seat}`)}>
     {cards ? <Hand cards={cards} dummy active={false} legalCards={[]} selected={null} onSelect={() => {}} onPlay={() => {}} /> : <div className="backs">{Array.from({ length: Math.min(count, 3) }, (_, index) => <CardBack key={index} />)}</div>}
-    <p>{text('opponent', { seat: text(`seat.${seat}`), count })}</p>
+    <p><span>{text(`seat.letter.${seat}`)}</span>{' · '}{text('opponent', { seat: text(`seat.${seat}`), count })}</p>
   </section>;
 }
 // ADR-0001, US-16.4: the UI gets deal metadata only, never the play session or its record of all four hands.
@@ -37,7 +38,7 @@ export function TableScreen({ view, play, clearRejection, info, invalid, onNew, 
   // UX §10: restore focus before a focused disclosure is removed, on every dismissal path.
   const disclosureRef = useCallback((element: HTMLButtonElement | null) => {
     if (!element && disclosureElement.current === document.activeElement) {
-      const hand = tableElement.current?.querySelector(view.rejectedSeat === 'north' ? '.dummy' : '.hand');
+      const hand = tableElement.current?.querySelector(`[data-seat="${view.rejectedSeat}"]`);
       const card = view.rejectedCard;
       const returned = card && hand?.querySelector<HTMLButtonElement>(`button[data-suit="${card.suit}"][data-rank="${card.rank}"]`);
       (returned || hand?.querySelector<HTMLButtonElement>('button[tabindex="0"]'))?.focus({ preventScroll: true });
@@ -45,6 +46,9 @@ export function TableScreen({ view, play, clearRejection, info, invalid, onNew, 
     disclosureElement.current = element;
   }, [view.rejectedCard, view.rejectedSeat]);
   function select(card: TableCard | null) { setSelected(card); setRuleOpen(false); clearRejection(); }
+  const positions = tablePositions(view.contract?.declarer ?? null);
+  const rotated = view.contract?.declarer === 'north';
+  const declaring = rotated || view.contract?.declarer === 'south';
   const active = !view.collecting && view.status !== 'completed';
   const target = view.contract ? view.contract.level + 6 : 0;
   // UX §10: an illegal card's name says which suit it must follow.
@@ -52,9 +56,8 @@ export function TableScreen({ view, play, clearRejection, info, invalid, onNew, 
   const banner = view.collecting && view.lastTrickWinner
     ? text('announce.winner', { seat: text(`seat.${view.lastTrickWinner}`) })
     : view.turn === 'west' || view.turn === 'east' ? text(`turn.${view.turn}`)
-    : view.contract?.declarer !== 'south' && view.turn ? text(view.displayedTrick.length ? 'turn.seat' : 'turn.seat-lead', { seat: text(`seat.${view.turn}`) })
-    : view.turn === 'north' ? text(view.displayedTrick.length ? 'turn.dummy' : 'turn.dummy-lead')
-      : text(view.displayedTrick.length ? 'turn.play' : 'turn.lead');
+    : declaring && view.turn ? declaringTurn(view.turn, view.contract!.declarer)
+    : view.turn ? text(view.displayedTrick.length ? 'turn.seat' : 'turn.seat-lead', { seat: text(`seat.${view.turn}`) }) : '';
   function submit(card: TableCard) {
     setSelected(null);
     setRuleOpen(false);
@@ -66,31 +69,32 @@ export function TableScreen({ view, play, clearRejection, info, invalid, onNew, 
       {invalid && <p className="deal-notice" role="status">{text('deal.invalid')}</p>}
       <DealControls info={info} onNew={onNew} />
     </div></header>
-    {view.setup ? <MiniBridgeSetup view={view.setup} choose={choice => chooseContract?.(choice)} /> : view.contract && <main onKeyDown={event => { if (event.key === 'Escape') select(null); }}>
+    {view.setup ? <MiniBridgeSetup view={view.setup} southHand={view.hand} choose={choice => chooseContract?.(choice)} /> : view.contract && <main onKeyDown={event => { if (event.key === 'Escape') select(null); }}>
       <section className="status" aria-label={text('status')}>
         <span className="contract">{text('contract.chosen', { objective: view.objective ? text(`objective.${view.objective}`) : '', strain: text(view.contract.strain === 'no-trumps' ? 'strain.no-trumps' : `symbol.${view.contract.strain}`) })}</span>
         {/* 390×844: one status line fits every strain and objective (US-06.5). */}
         <span>{text('declarer.target', { seat: text(`seat.${view.contract.declarer}`), target })}</span>
         <span className="tricks">{text('tricks.sides', { you: view.tricksWon.northSouth, them: view.tricksWon.eastWest })}</span>
       </section>
-      <section ref={tableElement} className="table" aria-label={text('table')}>
-        <section className="dummy" aria-label={text(view.contract.declarer === 'north' || view.dummySeat !== 'north' ? 'seat.north' : 'dummy')}>
-          <p className="seat-label">{text(view.contract.declarer === 'north' ? 'seat.north' : view.dummySeat === 'north' ? 'dummy' : 'seat.north')}</p>
-          {view.north ? <Hand cards={view.north} dummy active={active && view.turn === 'north'} legalCards={view.legalCards} ledSuit={ledSuit}
+      {rotated && <RotationNotice />}
+      <section ref={tableElement} className="table" data-rotated={rotated} aria-label={text('table')}>
+        <section className="dummy" data-seat="north" data-position={positions.north} aria-label={text(view.contract.declarer === 'north' || view.dummySeat !== 'north' ? 'seat.north' : 'dummy')}>
+          <p className="seat-label">{seatLabel('north', view.contract.declarer)}</p>
+          {view.north ? <Hand cards={view.north} dummy={!rotated} active={active && view.turn === 'north'} legalCards={view.legalCards} ledSuit={ledSuit}
             rejectionId={view.rejectionId} rejectedCard={view.rejectedSeat === 'north' ? view.rejectedCard : null} selected={selected} onSelect={select} onPlay={submit} /> : <>
             <div className="suit-columns">{SUITS.map(suit => <div className="suit-column" key={suit}><CardBack /></div>)}</div>
             <p>{text(view.dummySeat === 'north' ? 'dummy.hidden' : 'opponent', { count: view.cardCounts.north, seat: text('seat.north') })}</p>
           </>}
         </section>
-        <Opponent seat="west" count={view.cardCounts.west} cards={view.dummySeat === 'west' ? view.dummy : null} />
+        <Opponent position={positions.west} seat="west" count={view.cardCounts.west} cards={view.dummySeat === 'west' ? view.dummy : null} />
         <section className="trick-area" aria-label={text(view.displayedTrick.length ? 'trick' : 'trick.empty')}>
-          {view.displayedTrick.map((played, index) => <article className={`played played-${played.seat}`} key={played.seat}>
+          {view.displayedTrick.map((played, index) => <article className={`played played-${played.seat} played-${positions[played.seat]}`} data-seat={played.seat} key={played.seat}>
             <Card card={played.card} />{index === 0 && <b className="led">{text('led')}</b>}
           </article>)}
         </section>
-        <Opponent seat="east" count={view.cardCounts.east} cards={view.dummySeat === 'east' ? view.dummy : null} />
-        <section className="learner" aria-label={text('hand')}>
-          <p className="turn-banner" aria-live="polite">{view.status === 'completed' && !view.collecting ? (view.contract.declarer === 'east' || view.contract.declarer === 'west'
+        <Opponent position={positions.east} seat="east" count={view.cardCounts.east} cards={view.dummySeat === 'east' ? view.dummy : null} />
+        <section className="table-feedback">
+          <p className="turn-banner" tabIndex={-1} aria-live="polite">{view.status === 'completed' && !view.collecting ? (view.contract.declarer === 'east' || view.contract.declarer === 'west'
             // US-06.3: defenders defeat the contract with 14 − target tricks, not declarer's target.
             ? text('result.defending', { won: view.tricksWon.northSouth, target: 14 - target })
             : text('result', { won: view.tricksWon.northSouth, target })) : banner}</p>
@@ -102,9 +106,11 @@ export function TableScreen({ view, play, clearRejection, info, invalid, onNew, 
               <p id="rule-reference" className="rule-reference" hidden={!ruleOpen}>{text(`rule.${view.reasonCode}`)}</p>
             </>}
           </div>
-          <Hand cards={view.hand} active={active && view.turn === 'south'} legalCards={view.legalCards} ledSuit={ledSuit}
+        </section>
+        <section className="learner" data-seat="south" data-position={positions.south} aria-label={text('hand')}>
+          <Hand cards={view.hand} dummy={rotated} active={active && view.turn === 'south'} legalCards={view.legalCards} ledSuit={ledSuit}
             rejectionId={view.rejectionId} rejectedCard={view.rejectedSeat === 'south' ? view.rejectedCard : null} selected={selected} onSelect={select} onPlay={submit} />
-          <p className="seat-label">{text(view.contract.declarer === 'south' ? 'learner' : view.dummySeat === 'south' ? 'learner.dummy' : 'learner.defender')}</p>
+          <p className="seat-label">{seatLabel('south', view.contract.declarer)}</p>
         </section>
       </section>
       <footer className="action-bar">{selected && <button type="button" onClick={() => submit(selected)}

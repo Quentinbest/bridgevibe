@@ -63,10 +63,10 @@ main { max-width: 1164px; margin: auto; padding: var(--space-16) var(--space-32)
 .trick-area { position: relative; width: 220px; height: 220px; aspect-ratio: 1; }
 .played { position: absolute; width: 44px; margin: 0; }
 .played .card { width: 44px; height: 64px; padding: 4px; font-size: var(--type-18); }
-.played-north { top: 4px; left: calc(50% - 22px); }
-.played-west { top: calc(50% - 32px); left: 4px; }
-.played-east { top: calc(50% - 32px); right: 4px; }
-.played-south { bottom: 4px; left: calc(50% - 22px); }
+.played-top { top: 4px; left: calc(50% - 22px); }
+.played-left { top: calc(50% - 32px); left: 4px; }
+.played-right { top: calc(50% - 32px); right: 4px; }
+.played-bottom { bottom: 4px; left: calc(50% - 22px); }
 .led { position: absolute; bottom: -15px; left: 0; border-radius: 4px; padding: 1px 4px; background: var(--card-face); color: var(--suit-black); font: 600 var(--type-11) var(--font-mono); }
 button.card { position: relative; cursor: pointer; font-family: inherit; }
 .card[data-selected="true"] { transform: translateY(-12px); }
@@ -83,10 +83,10 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
 /* UX §3.1: compact phone trick area; footer stays in flow below the felt. */
 @media (max-width: 719px) {
   .trick-area { width: 144px; height: 168px; border: 0; }
-  .played-north { top: 0; }
-  .played-south { bottom: 0; }
-  .played-west { left: 0; }
-  .played-east { right: 0; }
+  .played-top { top: 0; }
+  .played-bottom { bottom: 0; }
+  .played-left { left: 0; }
+  .played-right { right: 0; }
 }
 
 /* US-03, UX §10: a 44px header row replaces the status controls' extra row.
@@ -257,6 +257,8 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
 .setup-screen button[aria-pressed="true"], .setup-declarer { font-weight: bold; outline: 2px solid currentColor; outline-offset: 2px; }
 .setup-points { display: flex; flex-wrap: wrap; gap: 16px; padding: 0; list-style: none; }
 .setup-dummy { margin: 16px 0; }
+/* UX §3.2: the South hand is last in setup flow; both visible hands keep their seat labels. */
+.setup-own, .setup-dummy { min-width: 0; text-align: center; }
 .opponent .suit-columns { max-width: 100%; }
 .setup-screen > section { margin-block: 16px; }
 .setup-screen .hand { max-width: 100%; }
@@ -269,3 +271,40 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
 .setup-screen button:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 3px; }
 /* CI-4: neutral unavailable state; replay remains usable. */
 .review-unavailable { margin-block: 1rem; }
+
+/* US-02.4, UX §3.2: grid positions are display-only, shared with lessons. */
+.table { grid-template-rows: auto 1fr auto auto; }
+.table > [data-position="top"] { grid-column: 1 / 4; grid-row: 1; }
+.table > [data-position="bottom"] { grid-column: 1 / 4; grid-row: 4; }
+.table > [data-position="left"] { grid-column: 1; grid-row: 2; }
+.table > [data-position="right"] { grid-column: 3; grid-row: 2; }
+.table-feedback { grid-column: 1 / 4; grid-row: 3; text-align: center; }
+.table > [data-position] { min-width: 0; }
+.rotation-notice { padding: var(--space-12); margin-bottom: var(--space-12); border-radius: var(--radius-10); background: var(--surface); color: var(--text); }
+.rotation-notice button { min-height: 44px; padding: var(--space-8) var(--space-16); background: var(--accent-soft); color: var(--accent-soft-text); border: 1px solid var(--border); border-radius: var(--radius-8); font: inherit; }
+.rotation-notice button:focus-visible { outline: 3px solid var(--accent-text); }
+/* UX §3.2: animate arrival from the opposite seat; reduced motion swaps instantly. */
+@keyframes turn-from-top { from { transform: translateY(-120px); } to { transform: translateY(0); } }
+@keyframes turn-from-bottom { from { transform: translateY(120px); } to { transform: translateY(0); } }
+@keyframes turn-from-left { from { transform: translateX(-80px); } to { transform: translateX(0); } }
+@keyframes turn-from-right { from { transform: translateX(80px); } to { transform: translateX(0); } }
+:is(.table, .lesson-table)[data-rotated="true"] [data-position="bottom"] { animation: turn-from-top 300ms ease-out; }
+:is(.table, .lesson-table)[data-rotated="true"] [data-position="top"] { animation: turn-from-bottom 300ms ease-out; }
+:is(.table, .lesson-table)[data-rotated="true"] [data-position="left"] { animation: turn-from-right 300ms ease-out; }
+:is(.table, .lesson-table)[data-rotated="true"] [data-position="right"] { animation: turn-from-left 300ms ease-out; }
+.lesson-declaring { display: grid; grid-template-columns: minmax(0, 1fr) 144px minmax(0, 1fr); gap: 8px; }
+.lesson-declaring .lesson-table-progress { grid-column: 1 / 4; grid-row: 1; }
+.lesson-declaring .lesson-seats { display: contents; }
+.lesson-declaring [data-position="top"] { grid-column: 1 / 4; grid-row: 2; text-align: center; }
+.lesson-declaring [data-position="left"] { grid-column: 1; grid-row: 3; align-self: center; }
+.lesson-declaring [data-position="right"] { grid-column: 3; grid-row: 3; align-self: center; }
+.lesson-declaring [data-position="bottom"] { grid-column: 1 / 4; grid-row: 5; text-align: center; }
+.lesson-trick { position: relative; height: 240px; min-height: 240px; width: min(100%, 220px); margin: auto; }
+.lesson-declaring .lesson-trick { grid-column: 2; grid-row: 3; width: 100%; }
+.lesson-trick .played p { font-size: var(--type-11); }
+.lesson-trick .played .card { width: 44px; height: 64px; }
+.lesson-turn { grid-column: 1 / 4; grid-row: 4; }
+.lesson-layout > .rotation-notice { grid-column: 1 / -1; }
+@media (min-width: 720px) {
+  .lesson-declaring { grid-template-columns: minmax(0, 1fr) 220px minmax(0, 1fr); }
+}

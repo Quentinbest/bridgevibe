@@ -17,7 +17,7 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
   await expect(page.getByText('South declares · 9 tricks', { exact: true })).toBeVisible();
   await expect(page.getByText('You 0 · Them 0', { exact: true })).toBeVisible();
   await page.clock.runFor(500);
-  await expect(page.getByText('Play from dummy', { exact: true })).toBeVisible();
+  await expect(page.getByText('Play from North (dummy)', { exact: true })).toBeVisible();
   await expect(page.locator('.dummy .card')).toHaveCount(13);
   await expect(page.locator('.hand .card')).toHaveCount(13);
   await expect(page.locator('.trick-area .card')).toHaveCount(1);
@@ -74,8 +74,8 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
   const columnPositions = await columns.evaluateAll(elements => elements.map(el => { const r = el.getBoundingClientRect(); return { x: r.x, y: r.y }; }));
   expect(new Set(columnPositions.map(p => p.x)).size).toBe(4);
   expect(new Set(columnPositions.map(p => p.y)).size).toBe(1);
-  await expect(page.getByRole('region', { name: 'West', exact: true })).toHaveText('West · 12 cards');
-  await expect(page.getByRole('region', { name: 'East', exact: true })).toHaveText('East · 13 cards');
+  await expect(page.getByRole('region', { name: 'West', exact: true })).toHaveText('W · West · 12 cards');
+  await expect(page.getByRole('region', { name: 'East', exact: true })).toHaveText('E · East · 13 cards');
   await expect(page.locator('.trick-area').getByRole('img', { name: '9 of spades' })).toBeVisible();
   await expect(page.locator('.led')).toHaveText('LED');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);

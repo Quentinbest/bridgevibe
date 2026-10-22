@@ -154,3 +154,27 @@ test('full lesson shows step states and an unplayable exposure, then counts this
   fireEvent.click(screen.getByRole('button', { name: "That's enough for today" }));
   expect(onClose).toHaveBeenCalledTimes(2);
 });
+
+// US-02.3, UX §3.2: unpublished content exercises real player projection and keyboard controls.
+test('North-declared lesson puts North at bottom and plays South dummy then North', async () => {
+  const { northLesson } = await import('../../test/fixtures/northLesson');
+  vi.useFakeTimers();
+  render(<LessonScreen lesson={northLesson} onClose={() => {}} />);
+  const north = document.querySelector('[data-seat="north"][data-position="bottom"]')!;
+  expect(north.textContent).toContain('N · North · You play');
+  act(() => vi.advanceTimersByTime(500));
+  const south = document.querySelector('[data-seat="south"][data-position="top"]')!;
+  expect(south.textContent).toContain('S · South · You play');
+  expect(document.querySelector('.lesson-trick .played-left')?.getAttribute('data-seat')).toBe('east');
+  expect(screen.getByText('Play from South (dummy)')).toBeTruthy();
+  const dummyPrompt = northLesson.exercises[0].steps.filter(step => step.kind === 'prompt')[0].prompt;
+  const dummyCard = within(south as HTMLElement).getByRole('button', { name: cardName(dummyPrompt.expectedAnswers[0]) });
+  fireEvent.keyDown(dummyCard, { key: 'Enter' }); fireEvent.keyDown(dummyCard, { key: 'Enter' });
+  fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
+  act(() => vi.advanceTimersByTime(500));
+  expect(screen.getByText('Play from North (declarer)')).toBeTruthy();
+  const prompt = northLesson.exercises[0].steps.filter(step => step.kind === 'prompt')[1].prompt;
+  const card = within(north as HTMLElement).getByRole('button', { name: cardName(prompt.expectedAnswers[0]) });
+  fireEvent.keyDown(card, { key: 'Enter' }); fireEvent.keyDown(card, { key: 'Enter' });
+  expect(screen.getByRole('button', { name: 'Finish level' })).toBeTruthy();
+});

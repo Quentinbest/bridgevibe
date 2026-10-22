@@ -86,7 +86,7 @@ test('collection announces the winner before the next lead banner', () => {
   expect(banner.textContent).toBe('North wins the trick');
   expect(document.querySelectorAll('button.card')).toHaveLength(0);
   advance(999); expect(banner.textContent).toBe('North wins the trick');
-  advance(1); expect(banner.textContent).toBe("Dummy's lead");
+  advance(1); expect(banner.textContent).toBe('Play from North (dummy)');
   expect(within(screen.getByRole('region', { name: 'North · Dummy' })).getAllByRole('button')).toHaveLength(12);
 });
 test('a rejected confirmation returns focus to the rejected card', () => {

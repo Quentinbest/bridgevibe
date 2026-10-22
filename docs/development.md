@@ -271,8 +271,9 @@ The design's Level means Module, with one Lesson per Module for now.
 
 `src/curriculum/` owns content, Attempts and deterministic player transitions.
 It imports only Table; Scripts contain Robot moves only and never invoke policies.
-The learner sits South on North–South; `loadLesson` rejects North declarers until
-#16 rotates the table. Script actions carry authored provenance with the Exercise
+The learner sits South on North–South; lessons project Declarer's Seat View when that side declares.
+`src/app/rotation.ts` maps true seats to screen positions in practice and lessons: North declaring puts North at the bottom only after Contract Choice; setup keeps South at the bottom. Records and Seat Views are unchanged (US-02.4).
+Script actions carry authored provenance with the Exercise
 content ID and version; trial replay preserves each action's provenance.
 `src/progress/` owns the append-only session Attempts store (§4.2); the player
 appends through curriculum's `AttemptSink` type.
