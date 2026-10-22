@@ -43,7 +43,8 @@ export function Home({ dealsPlayed, navigate }: { dealsPlayed: number; navigate:
     </main>
     {/* UX §2.1: only destinations with phase V content are offered. */}
     <nav className="home-nav" aria-label={text('home.navigation')}>
-      <a href={lessonUrl} aria-current="page" onClick={event => follow(event, lessonUrl)}>{text('home.learn')}</a>
+      {/* UX §2.3: this landing is Learn itself, so its tab stays here; the lesson card starts the lesson. */}
+      <a href="./" aria-current="page" onClick={event => follow(event, '')}>{text('home.learn')}</a>
       <a href="?practice=1" onClick={event => follow(event, '?practice=1')}>{text('home.practice')}</a>
     </nav>
   </div>;

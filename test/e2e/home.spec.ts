@@ -40,9 +40,10 @@ test('keyboard lesson card and both navigation destinations work, with Exit focu
   await expect(page.getByRole('heading', { name: 'Your next move' })).toBeFocused();
   await page.keyboard.press('Tab'); await page.keyboard.press('Tab'); await page.keyboard.press('Tab');
   await expect(page.getByRole('link', { name: 'Learn', exact: true })).toBeFocused();
+  // UX §2.3: the current Learn tab stays on the Learn landing; the lesson card starts the lesson.
   await page.keyboard.press('Enter');
-  await expect(page.getByRole('heading', { name: 'Follow suit' })).toBeVisible();
-  await page.getByRole('button', { name: 'Close lesson', exact: true }).click();
+  await expect(page).not.toHaveURL(/lesson=/);
+  await expect(page.getByRole('heading', { name: 'Your next move' })).toBeVisible();
   await page.getByRole('link', { name: 'Practice', exact: true }).focus();
   await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { name: 'MiniBridge Setup' })).toBeVisible();
@@ -51,9 +52,9 @@ test('keyboard lesson card and both navigation destinations work, with Exit focu
   await expect(page.getByRole('heading', { name: 'Your next move' })).toBeFocused();
 });
 
-test('Quick game starts setup; browser Back returns to Home and reload clears the session', async ({ page }) => {
+test('Quick deal starts setup; browser Back returns to Home and reload clears the session', async ({ page }) => {
   await installPausedClock(page); await page.goto('/');
-  await page.getByRole('link', { name: /^Quick game/ }).click();
+  await page.getByRole('link', { name: /^Quick deal/ }).click();
   await expect(page.getByRole('heading', { name: 'MiniBridge Setup' })).toBeVisible();
   await page.clock.runFor(500);
   await expect(page.locator('.setup-points li')).toHaveCount(1);

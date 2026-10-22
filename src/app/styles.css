@@ -358,9 +358,12 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
 }
 .header-row > button { flex: none; min-width: 44px; min-height: 44px; padding: var(--space-8); border: 1px solid var(--border); border-radius: var(--radius-8); background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
 .header-row > button:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 2px; }
-.header-row > .practice-exit { width: 44px; height: 44px; padding: 0; display: grid; place-items: center; font-size: var(--type-24); }
+.header-row > .practice-exit { height: 44px; padding: 0 var(--space-8); display: inline-flex; align-items: center; gap: var(--space-4); white-space: nowrap; }
 /* UX §10: reserve room for three lines of invalid-link feedback within the 44px phone row. */
 @media (max-width: 355px) {
+  /* UX §2.1: the narrowest phones keep ✕ visible and "Exit" for assistive technology only. */
+  .practice-exit-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .header-row > .practice-exit { width: 44px; padding: 0; justify-content: center; }
   .header-row { gap: var(--space-4); }
   .deal-controls { gap: var(--space-4); font-size: var(--type-14); }
   .deal-controls button { padding-inline: var(--space-6); }

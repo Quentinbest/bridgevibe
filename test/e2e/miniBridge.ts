@@ -17,5 +17,5 @@ export async function installPausedClock(page: Page) {
 // UX §2.3: preserve query context (debug/fault injection) while entering practice from Home.
 export async function openPractice(page: Page, url = '/') {
   await page.goto(url);
-  await page.getByRole('link', { name: /^Quick game/ }).click();
+  await page.getByRole('link', { name: /^Quick deal/ }).click();
 }

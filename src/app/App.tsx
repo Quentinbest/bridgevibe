@@ -69,7 +69,8 @@ export function TableScreen({ view, play, clearRejection, info, invalid, onNew, 
     <header className="header"><div className="header-row">
       <h1 className={invalid || onExit ? 'sr-only' : undefined} aria-label={text('product')}><span>{text('product.first')}</span><span className="wordmark-accent">{text('product.second')}</span></h1>
       {invalid && <p className="deal-notice" role="status">{text('deal.invalid')}</p>}
-      {onExit && <button className="practice-exit" type="button" aria-label={text('home.exit')} onClick={onExit}><span aria-hidden="true">{text('home.exit-symbol')}</span></button>}
+      {/* UX §2.1, §3.1: a visible "✕ Exit" leaves the activity. */}
+      {onExit && <button className="practice-exit" type="button" onClick={onExit}><span aria-hidden="true">{text('home.exit-symbol')}</span><span className="practice-exit-label">{text('home.exit')}</span></button>}
       <DealControls info={info} onNew={onNew} />
     </div></header>
     {view.setup ? <MiniBridgeSetup view={view.setup} southHand={view.hand} choose={choice => chooseContract?.(choice)} /> : view.contract && <main onKeyDown={event => { if (event.key === 'Escape') select(null); }}>

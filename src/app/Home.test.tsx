@@ -29,9 +29,9 @@ test('Home opens on Learn with accessible declared progress and session-only cop
   expect(screen.queryByRole('link', { name: /Rules|Me/ })).toBeNull();
 });
 
-test('Quick game and Practice open real MiniBridge Setup; Exit returns focus to Home without counting an unfinished Deal', () => {
+test('Quick deal and Practice open real MiniBridge Setup; Exit returns focus to Home without counting an unfinished Deal', () => {
   vi.useFakeTimers(); render(<StrictMode><App /></StrictMode>);
-  for (const name of [/^Quick game/, /^Practice$/]) {
+  for (const name of [/^Quick deal/, /^Practice$/]) {
     fireEvent.click(screen.getByRole('link', { name }));
     expect(screen.getByRole('heading', { name: 'MiniBridge Setup' })).toBeTruthy();
     expect(screen.queryByRole('navigation')).toBeNull();
@@ -43,16 +43,24 @@ test('Quick game and Practice open real MiniBridge Setup; Exit returns focus to 
   }
 });
 
-test('lesson card and Learn open the multi-exercise lesson and close to Home', () => {
+test('the lesson card opens the multi-exercise lesson and closes to Home', () => {
   render(<App />);
-  for (const name of [/Skill: Follow suit.*Follow suit.*Open lesson/, 'Learn']) {
-    fireEvent.click(screen.getByRole('link', { name }));
-    expect(location.search).toBe('?lesson=follow-suit-full');
-    expect(screen.getByRole('progressbar').getAttribute('aria-valuemax')).toBe('16');
-    expect(screen.queryByRole('navigation')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Close lesson' }));
-    expect(screen.getByRole('heading', { name: 'Your next move' })).toBe(document.activeElement);
-  }
+  fireEvent.click(screen.getByRole('link', { name: /Skill: Follow suit.*Follow suit.*Open lesson/ }));
+  expect(location.search).toBe('?lesson=follow-suit-full');
+  expect(screen.getByRole('progressbar').getAttribute('aria-valuemax')).toBe('16');
+  expect(screen.queryByRole('navigation')).toBeNull();
+  fireEvent.click(screen.getByRole('button', { name: 'Close lesson' }));
+  expect(screen.getByRole('heading', { name: 'Your next move' })).toBe(document.activeElement);
+});
+
+test('UX §2.3: the current Learn tab stays on the Learn landing instead of starting the lesson', () => {
+  render(<App />);
+  const learn = screen.getByRole('link', { name: 'Learn' });
+  expect(learn.getAttribute('aria-current')).toBe('page');
+  fireEvent.click(learn);
+  expect(location.search).toBe('');
+  expect(screen.getByRole('heading', { name: 'Your next move' })).toBeTruthy();
+  expect(screen.queryByRole('button', { name: 'Close lesson' })).toBeNull();
 });
 
 test.each(['?seed=abc&deal=3', '?seed=&deal=1', '?lesson=follow-suit', '?lesson=follow-suit-full', '?practice=1'])('direct URL %s bypasses Home', search => {
@@ -64,7 +72,7 @@ test.each(['?seed=abc&deal=3', '?seed=&deal=1', '?lesson=follow-suit', '?lesson=
 
 test('browser history restores the matching screen and Home focus', () => {
   render(<App />);
-  fireEvent.click(screen.getByRole('link', { name: /^Quick game/ }));
+  fireEvent.click(screen.getByRole('link', { name: /^Quick deal/ }));
   act(() => { history.replaceState(null, '', '/'); dispatchEvent(new PopStateEvent('popstate')); });
   expect(screen.getByRole('heading', { name: 'Your next move' })).toBe(document.activeElement);
 });
