@@ -1,6 +1,7 @@
 import { createHints, hintSeat, type HintSnapshot } from './hints';
 import type { HintRunner } from './hintClient';
 import { createProvenanceLog, type LogEntry } from '../coach/provenance';
+import { APP_VERSION } from './appVersion';
 import { basicPolicy, fallbackRobotPolicy, contractChoicePolicy } from '../robots';
 import { startMiniBridge, encodeSetupSeatView, sideOf, SEATS, seatViewSeed, type Playthrough, type SetupSeatView, type ContractChoice, type Objective, type Side, type Card, type Deal, type SeatView, type Seat, type PlayedCard, type ReasonCode, type RobotProvenance } from '../table';
 import { createRobotHost, type RobotHostOptions } from './robotHost';
@@ -31,11 +32,11 @@ export type LearnerView = Readonly<Pick<SeatView,
 // US-06: MiniBridge Setup is the entry point for every practice Deal.
 export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fixedDeal, targetDeclaringSide: Side = 'northSouth', hintRunner?: HintRunner) {
   const setup = startMiniBridge({ deal, targetDeclaringSide, learnerSide: 'northSouth',
-    versions: { appVersion: '0.0.0', engineVersions: { [basicPolicy.name]: basicPolicy.version, [fallbackRobotPolicy.name]: fallbackRobotPolicy.version,
+    versions: { appVersion: APP_VERSION, engineVersions: { [basicPolicy.name]: basicPolicy.version, [fallbackRobotPolicy.name]: fallbackRobotPolicy.version,
       [contractChoicePolicy.name]: contractChoicePolicy.version } } });
   let table: Playthrough | null = null;
   const record = () => { if (!table) throw new Error('setup-in-progress'); return table.record(); };
-  const provenanceLog = createProvenanceLog('0.0.0');
+  const provenanceLog = createProvenanceLog(APP_VERSION);
   let entryId = 0;
   function log(entry: Pick<LogEntry, 'kind' | 'summary' | 'text' | 'provenance' | 'positionIndex' | 'abstention'>) {
     provenanceLog.record({ ...entry, id: `${record().playthroughId}-${++entryId}`, playthroughId: record().playthroughId,
