@@ -1,12 +1,13 @@
+import { HINT_DEADLINE_MS } from '../information/parameters';
 import { REASON_CODES, type ReasonCode, type RobotProvenance } from '../table';
 
 export type AnalysisCause = 'timeout' | 'error' | 'worker-crash' | 'protocol-mismatch';
-export type Abstention = { reason: 'unavailable'; cause: AnalysisCause };
+export type Abstention = { reason: 'unavailable'; cause: AnalysisCause } | { reason: 'uncertain'; cause: 'constraints' };
 export type InformationMode = 'VISIBLE' | 'ALL_HANDS';
 export type Provenance =
   | { sourceKind: 'authored'; contentId: string; version: string }
   | { sourceKind: 'bidding-rule'; ruleId: string; profileVersion: string }
-  | { sourceKind: 'engine'; name: string; version: string; mode: InformationMode; sampleCount: number }
+  | { sourceKind: 'engine'; name: string; version: string; mode: InformationMode; sampleCount: number; hint?: { sampler: string; samplerVersion: string; enumerated: boolean; templateId: string; durationMs: number; exceededTarget: boolean } }
   | { sourceKind: 'template'; templateId: string }
   | ({ sourceKind: 'table' } & ({ rulesCoreVersion: string; reasonCode?: ReasonCode } | { reasonCode: ReasonCode; rulesCoreVersion?: string }))
   | ({ sourceKind: 'robot' } & RobotProvenance);
@@ -33,11 +34,12 @@ export function validateEntry(entry: unknown): string[] {
   if (!mode(entry.informationMode)) errors.push('informationMode');
   if (entry.abstention !== undefined) {
     const a = entry.abstention;
-    if (!object(a) || a.reason !== 'unavailable' || !['timeout', 'error', 'worker-crash', 'protocol-mismatch'].includes(String(a.cause))) errors.push('abstention');
+    if (!object(a) || !((a.reason === 'uncertain' && a.cause === 'constraints') || (a.reason === 'unavailable' && ['timeout', 'error', 'worker-crash', 'protocol-mismatch'].includes(String(a.cause))))) errors.push('abstention');
     if (entry.kind !== 'statement') errors.push('abstention.kind');
   }
   const p = entry.provenance;
   if (!object(p)) return [...errors, 'provenance'];
+  if (typeof entry.summary === 'string' && entry.summary.startsWith('hint.') && (p.sourceKind !== 'engine' || !object(p.hint))) errors.push('provenance.hint');
   if (entry.abstention !== undefined && p.sourceKind !== 'engine') errors.push('abstention.provenance');
   const fields = (...keys: string[]) => { for (const key of keys) if (!nonempty(p[key])) errors.push(`provenance.${key}`); };
   switch (p.sourceKind) {
@@ -47,6 +49,12 @@ export function validateEntry(entry: unknown): string[] {
       fields('name', 'version');
       if (!mode(p.mode) || p.mode !== entry.informationMode) errors.push('provenance.mode');
       if (!integer(p.sampleCount)) errors.push('provenance.sampleCount');
+      if (p.hint !== undefined) {
+        const h = p.hint;
+        if (!object(h) || !['sampler', 'samplerVersion', 'templateId'].every(key => nonempty(h[key]))
+          || typeof h.enumerated !== 'boolean' || typeof h.durationMs !== 'number' || !Number.isFinite(h.durationMs) || h.durationMs < 0
+          || h.exceededTarget !== (h.durationMs > HINT_DEADLINE_MS) || entry.informationMode !== 'VISIBLE') errors.push('provenance.hint');
+      }
       break;
     case 'template': fields('templateId'); break;
     case 'table':

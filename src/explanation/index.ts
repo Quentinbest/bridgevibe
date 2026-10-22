@@ -2,6 +2,18 @@ import type { Card, ReasonCode } from '../table';
 
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
+  'hint.button': { text: 'Hint', status: 'draft' },
+  'hint.toggle': { text: 'Hints when I ask', status: 'draft' },
+  'hint.toggle-short': { text: 'Hints', status: 'draft' },
+  'hint.label': { text: 'No peeking: your view only', status: 'draft' },
+  'hint.thinking': { text: 'Thinking from what you can see…', status: 'draft' },
+  'hint.advice': { text: 'From what you can see, {card} looks like your best card here.', status: 'draft' },
+  'hint.reason': { text: 'Across layouts that fit what you can see, this card takes the most tricks on average. Hidden cards could change the outcome.', status: 'draft' },
+  'hint.uncertain': { text: 'No hint is available right now: there are too few consistent samples.', status: 'draft' },
+  'hint.unavailable': { text: 'No hint is available right now: the estimate could not finish.', status: 'draft' },
+  'hint.choose': { text: 'You choose the card', status: 'draft' },
+  'hint.dismiss': { text: 'Got it', status: 'draft' },
+  'debug.hint-latency': { text: 'Hint duration: {duration} ms · exceeded target: {exceeded}', status: 'draft' },
   'rotation.notice': { text: "North won the contract, so you play North's cards as declarer. Your own hand becomes dummy. We've turned the table so the hand you play from is at the bottom.", status: 'draft' },
   'rotation.dismiss': { text: 'Got it', status: 'draft' },
   'seat.label': { text: '{letter} · {seat}', status: 'draft' },

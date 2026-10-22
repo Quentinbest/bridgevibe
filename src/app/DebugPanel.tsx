@@ -20,6 +20,8 @@ export default function DebugPanel({ play }: { play: ReturnType<typeof createPla
       <div><dt>{text('debug.hidden')}</dt><dd>{counters.hiddenCardsInVisibleInputs}</dd></div>
       <div><dt>{text('debug.fallbacks')}</dt><dd>{counters.silentFallbacks}</dd></div>
     </dl>
+    {play.getSnapshot().hint?.durationMs != null && <p>{text('debug.hint-latency', { duration: play.getSnapshot().hint!.durationMs!, exceeded: String(play.getSnapshot().hint!.exceededTarget) })}</p>}
+    {play.hintTimings().length > 0 && <pre>{JSON.stringify(play.hintTimings(), null, 2)}</pre>}
     <ol tabIndex={0} aria-label={text('debug.entries')}>{play.provenanceLog.entries().reverse().map(entry => <li key={entry.id}>
       <p>{entry.text ?? entry.summary}</p>
       <dl>

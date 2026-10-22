@@ -1,8 +1,11 @@
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { runInNewContext } from 'node:vm';
+import { createContext, runInContext, runInNewContext } from 'node:vm';
 import { completeFixedDeal } from '../../test/strategy';
+import { startPlaythrough, encodeSeatView } from '../table';
+import type { HintResult } from './hintResult';
+type HintResponse = { type: 'hello' } | { type: 'result'; result: HintResult };
 import { type PositionResult } from './index';
 import { build } from 'vite';
 import { expect, test, vi } from 'vitest';
@@ -23,7 +26,7 @@ test.each(['bridge-dds', 'macroxue'])('the initial graph excludes solvers; %s al
       const chunk = pending.pop()!;
       if (chunk.type !== 'chunk' || seen.has(chunk.fileName)) continue;
       seen.add(chunk.fileName);
-      expect(Object.keys(chunk.modules).some(id => id.includes('bridge-dds') || id.includes('macroxue'))).toBe(false);
+      expect(Object.keys(chunk.modules).some(id => id.includes('bridge-dds') || id.includes('macroxue') || id.endsWith('/information/index.ts'))).toBe(false);
       expect(chunk.code).not.toMatch(/SolveBoardPBN|CalcDDTablePBN|wasmBinary|WebAssembly\.instantiate|data:application\/wasm;base64,/);
       for (const file of chunk.imports) pending.push(built.output.find(output => output.fileName === file)!);
     }
@@ -35,6 +38,11 @@ test.each(['bridge-dds', 'macroxue'])('the initial graph excludes solvers; %s al
     expect(built.output.some(output => output.fileName.endsWith('.wasm'))).toBe(false);
     const worker = built.output.find(output => /analysisWorker-.*\.js$/.test(output.fileName));
     expect(worker?.type).toBe('asset');
+    const hintWorker = built.output.find(output => /hintWorker-.*\.js$/.test(output.fileName));
+    expect(hintWorker?.type).toBe('asset');
+    const hintCode = String(hintWorker?.type === 'asset' ? hintWorker.source : '');
+    expect(hintCode.includes('SolveBoardPBN')).toBe(solver === 'bridge-dds');
+    expect(hintCode.includes('data:application/wasm;base64,')).toBe(solver === 'macroxue');
     const code = String(worker?.type === 'asset' ? worker.source : '');
     expect(code.includes('SolveBoardPBN')).toBe(solver === 'bridge-dds');
     expect(code.includes('data:application/wasm;base64,')).toBe(solver === 'macroxue');
@@ -51,13 +59,29 @@ test.each(['bridge-dds', 'macroxue'])('the initial graph excludes solvers; %s al
     expect(responses[1]).toMatchObject({ type: 'result', result: { name: solver,
       version: solver === 'macroxue' ? 'bridge-solver 630705d' : '1.4.0 / DDS 2.9' } });
     expect(responses[1].result?.classes.length).toBeGreaterThan(0);
+    // US-14.5, ADR-0001: execute the emitted hint worker against a real late Seat View.
+    const record = completeFixedDeal();
+    const table = startPlaythrough({ deal: record.deal, contract: record.contract, learnerSide: record.learnerSide });
+    for (const entry of record.actions.slice(0, 48)) table.submit(entry.seat, entry.controller, entry.action, entry.provenance);
+    const turn = table.seatView('south').turn!;
+    const hintResponses: HintResponse[] = [];
+    const hintScope = { ...scope, postMessage: (response: HintResponse) => hintResponses.push(response), onmessage: undefined as typeof scope.onmessage };
+    const hintContext = createContext({ self: hintScope, WorkerGlobalScope: class {}, WebAssembly, TextEncoder, TextDecoder, atob, console, setTimeout, clearTimeout });
+    runInContext(hintCode, hintContext);
+    expect(hintResponses[0]).toMatchObject({ type: 'hello' });
+    const hintRequest = { type: 'hint', requestId: 2, view: encodeSeatView(table.seatView(turn)), candidates: table.legalActions(turn).map(a => a.card), seed: 'emitted', deadline: Date.now() + 3000 };
+    runInContext(`self.onmessage({ data: ${JSON.stringify(hintRequest)} })`, hintContext);
+    await vi.waitFor(() => expect(hintResponses).toHaveLength(2));
+    expect(hintResponses[1]).toMatchObject({ type: 'result', result: { enumerated: true } });
+    if (hintResponses[1].type !== 'result' || 'abstention' in hintResponses[1].result) throw new Error('Hint worker abstained');
+    expect(hintResponses[1].result.classes.length).toBeGreaterThan(0);
     const report = JSON.parse(readFileSync(reportPath, 'utf8'));
     expect(report.violations).toEqual([]);
     if (solver === 'bridge-dds') expect(report.artefacts.find((item: { name: string }) => item.name === 'bridge-dds')).toMatchObject({
-      version: '1.4.0', licence: 'Apache-2.0', licenceFiles: ['node_modules/bridge-dds/LICENSE'], shippedFiles: [worker!.fileName],
+      version: '1.4.0', licence: 'Apache-2.0', licenceFiles: ['node_modules/bridge-dds/LICENSE'], shippedFiles: [worker!.fileName, hintWorker!.fileName],
     });
     else expect(report.artefacts.find((item: { name: string }) => item.name === 'src/analysis/macroxue/solver.wasm')).toMatchObject({
-      version: expect.stringMatching(/^sha256:/), licence: 'MIT', licenceFiles: ['src/analysis/macroxue/LICENSE-MIT'], shippedFiles: [worker!.fileName],
+      version: expect.stringMatching(/^sha256:/), licence: 'MIT', licenceFiles: ['src/analysis/macroxue/LICENSE-MIT'], shippedFiles: [worker!.fileName, hintWorker!.fileName],
     });
     expect(report.artefacts.some((item: { name: string }) => item.name === (solver === 'macroxue' ? 'bridge-dds' : 'src/analysis/macroxue/solver.wasm'))).toBe(false);
   } finally { vi.unstubAllEnvs(); rmSync(dir, { recursive: true, force: true }); }
