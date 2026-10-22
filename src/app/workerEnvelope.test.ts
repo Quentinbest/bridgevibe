@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest';
-import { completedRecord, encodeSeatView, startPlaythrough } from '../table';
+import { completedRecord, encodeSeatView, seatViewSeed, startPlaythrough } from '../table';
 import type { PositionResult, SolverPort } from '../analysis';
 import { completeFixedDeal } from '../../test/strategy';
 import { loadConfiguredSolver } from '../analysis/solverSelection';
@@ -45,9 +45,24 @@ test.each([false, true])('ADR-0001, §4.3.6: hint worker echoes identity on succ
   if (error) vi.mocked(loadConfiguredSolver).mockRejectedValue(new Error('solver'));
   else vi.mocked(loadConfiguredSolver).mockResolvedValue({ name: 'test', version: '1', solvePosition: vi.fn(), solveTable: vi.fn() });
   const post = vi.fn();
-  await handleHintRequest({ type: 'hint', requestId: 1, playthroughId: record.playthroughId, positionKey: table.positionKey(), cancellationId: 'hint-1',
+  await handleHintRequest({ type: 'hint', requestId: 1, playthroughId: record.playthroughId, positionKey: seatViewSeed(view), cancellationId: 'hint-1',
     view: encodeSeatView(view), candidates: view.hand, seed: 'test', deadline: Date.now() + 3000 }, post);
   expect(post).toHaveBeenCalledOnce();
-  expect(post.mock.calls[0][0]).toMatchObject({ type: 'result', requestId: 1, playthroughId: record.playthroughId, positionKey: table.positionKey(),
+  expect(post.mock.calls[0][0]).toMatchObject({ type: 'result', requestId: 1, playthroughId: record.playthroughId, positionKey: seatViewSeed(view),
     result: { abstention: { reason: error ? 'unavailable' : 'uncertain' } } });
+});
+
+test('§4.3.6: a solver load that exhausts the deadline never starts a synchronous solve', async () => {
+  vi.useFakeTimers();
+  try {
+    const solvePosition = vi.fn();
+    vi.mocked(loadConfiguredSolver).mockImplementation(() => new Promise(resolve => {
+      setTimeout(() => resolve({ name: 'test', version: '1', solvePosition, solveTable: vi.fn() }), 30001);
+    }));
+    const data = request(1), post = vi.fn();
+    const pending = createAnalysisHandler()(data, post);
+    await vi.advanceTimersByTimeAsync(30001); await pending;
+    expect(solvePosition).not.toHaveBeenCalled();
+    expect(post).toHaveBeenCalledExactlyOnceWith({ type: 'error', requestId: 1, playthroughId: data.playthroughId, positionKey: data.positionKey });
+  } finally { vi.useRealTimers(); }
 });

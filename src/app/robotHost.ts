@@ -1,4 +1,5 @@
-import { encodeSeatView, encodeSetupSeatView, type SetupSeatView, type ContractChoice, type Action, type RobotProvenance, type Seat, type SeatView } from '../table';
+import { seatViewSeed, encodeSeatView, encodeSetupSeatView, type SetupSeatView, type ContractChoice, type Action, type RobotProvenance, type Seat, type SeatView } from '../table';
+import { positionDigest } from '../table/positionKey';
 import { fallbackRobotPolicy, contractChoicePolicy } from '../robots';
 import { ROBOT_PROTOCOL_VERSION, validRobotResponse, type RobotMessage, type RobotRequest, type ContractRequest } from './robotProtocol';
 
@@ -16,6 +17,7 @@ export type RobotHostOptions = {
   policyDeadlineMs?: number; displayDelayMs?: number; failureThreshold?: number;
   audit?: (message: RobotMessage, seat: Seat) => void;
 };
+// ADR-0001: positionKey is host-private; begin() derives the worker key from its encoded view.
 type Identity = { seed: string; playthroughId: string; positionKey: string;
   currentPositionKey(): string };
 type Decision = Identity & ({ kind?: 'play'; view: SeatView; submit(action: Action, provenance: RobotProvenance): boolean }
@@ -120,7 +122,7 @@ export function createRobotHost(options: RobotHostOptions = {}) {
       // §4.3.6: only a response for this exact position counts, success or error.
       if (message.playthroughId !== request.playthroughId || message.positionKey !== request.positionKey) return;
       inFlight = false;
-      if (active.currentPositionKey() !== request.positionKey) { cancel(); return; }
+      if (active.currentPositionKey() !== active.positionKey) { cancel(); return; }
       // US-12.2: anything arriving after the deadline is a timeout, even an error.
       if (clock.now() >= request.deadline) { fallback('timeout'); return; }
       if (message.type === 'error') { fail(); return; }
@@ -156,7 +158,7 @@ export function createRobotHost(options: RobotHostOptions = {}) {
     if (result) return;
     request = { ...(active.kind === 'contract' ? { type: 'choose-contract' as const, view: encodeSetupSeatView(active.view) }
       : { type: 'decide' as const, view: encodeSeatView(active.view) }), requestId: String(++sequence), cancellationId: String(sequence),
-      playthroughId: active.playthroughId, positionKey: active.positionKey, deadline: started + deadlineMs,
+      playthroughId: active.playthroughId, positionKey: active.kind === 'contract' ? positionDigest(encodeSetupSeatView(active.view)) : seatViewSeed(active.view), deadline: started + deadlineMs,
       seat: active.view.seat, seed: active.seed };
     deadlineTimer = clock.setTimeout(() => fallback('timeout'), deadlineMs);
     if (failures >= threshold) fallback('engine-failure');

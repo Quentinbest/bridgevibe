@@ -92,9 +92,9 @@ test.each(['playthroughId', 'positionKey'] as const)('§4.3.6: discards a mismat
 test('§4.3.6: targeted cancellation preserves concurrent requests and the same worker', async () => {
   const worker = new FakeWorker(); const factory = vi.fn(() => worker);
   const client = analysisClient(record, factory);
-  client.at(1); const first = client.solver.solvePosition(layout, position);
+  client.at(1); const first = client.solver.solvePosition(layout, position, 'caller-first');
   const cancelled = expect(first).rejects.toThrow('AnalysisCancelled');
-  client.at(2); const second = client.solver.solvePosition(layout, position);
+  client.at(2); const second = client.solver.solvePosition(layout, position, 'caller-second');
   await vi.waitFor(() => expect(worker.posted).toHaveLength(2));
   const [a, b] = worker.posted;
   const table = startPlaythrough({ deal: record.deal, contract: record.contract, learnerSide: record.learnerSide });
@@ -102,8 +102,8 @@ test('§4.3.6: targeted cancellation preserves concurrent requests and the same 
     expect(table.submit(entry.seat, entry.controller, entry.action, entry.provenance).kind).toBe('accepted');
     expect(worker.posted[i].positionKey).toBe(table.positionKey());
   }
-  client.cancel(a.cancellationId); await cancelled;
-  expect(worker.cancelled).toEqual([a.cancellationId]); expect(worker.terminated).toBe(false);
+  client.cancel('caller-first'); await cancelled;
+  expect(worker.cancelled).toEqual(['caller-first']); expect(worker.terminated).toBe(false);
   const result = { name: 'test', version: '1', classes: [] };
   worker.emit({ ...a, type: 'result', result });
   worker.emit({ ...b, type: 'result', result });
@@ -112,4 +112,23 @@ test('§4.3.6: targeted cancellation preserves concurrent requests and the same 
   await vi.waitFor(() => expect(worker.posted).toHaveLength(3));
   worker.emit({ ...worker.posted[2], type: 'result', result }); await third;
   expect(factory).toHaveBeenCalledOnce(); client.close();
+});
+
+test('§4.3.6: a caller cancels its own ID without inspecting any posted request', async () => {
+  const worker: AnalysisWorker = { onmessage: null, onerror: null, terminate: vi.fn(), postMessage(message: AnalysisMessage) {
+    if (message.type !== 'solve' || message.cancellationId === 'owned-first') return;
+    queueMicrotask(() => worker.onmessage?.(new MessageEvent<AnalysisResponse>('message', { data: { type: 'result', requestId: message.requestId,
+      playthroughId: message.playthroughId, positionKey: message.positionKey, result: { name: 'test', version: '1', classes: [] } } })));
+  } };
+  queueMicrotask(() => worker.onmessage?.({ data: { type: 'hello', protocolVersion: ANALYSIS_PROTOCOL_VERSION } } as MessageEvent<AnalysisResponse>));
+  const client = analysisClient(record, () => worker);
+  const first = client.solver.solvePosition(layout, position, 'owned-first');
+  const rejected = expect(first).rejects.toThrow('AnalysisCancelled');
+  const second = client.solver.solvePosition(layout, position, 'owned-second');
+  // Both solves are pending while the worker handshake completes.
+  await second;
+  client.cancel('owned-first'); await rejected;
+  expect(worker.terminate).not.toHaveBeenCalled();
+  await expect(client.solver.solvePosition(layout, position, 'owned-third')).resolves.toMatchObject({ name: 'test' });
+  client.close();
 });

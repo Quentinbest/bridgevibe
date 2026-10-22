@@ -1,7 +1,11 @@
-import { bridgeDdsEngine, type PositionResult, type SolverPort } from '../analysis';
+import { bridgeDdsEngine, type Layout, type Position, type PositionResult, type SolverPort } from '../analysis';
 import { completedRecord, startPlaythrough, type CompletedPlaythroughRecord } from '../table';
 import { ANALYSIS_PROTOCOL_VERSION, type AnalysisRequest, type AnalysisResponse } from './analysisProtocol';
 
+// §4.3.6: callers may own cancellation without inspecting transport-generated IDs.
+export type AnalysisSolver = Omit<SolverPort, 'solvePosition'> & {
+  solvePosition(layout: Layout, position: Position, cancellationId?: string): Promise<PositionResult>;
+};
 export type AnalysisWorker = Pick<Worker, 'postMessage' | 'terminate'> & {
   onmessage: ((event: MessageEvent<AnalysisResponse>) => void) | null;
   onerror: ((event: ErrorEvent) => void) | null;
@@ -57,9 +61,9 @@ export function analysisClient(record: CompletedPlaythroughRecord, createWorker:
     });
     return ready;
   }
-  const solver: SolverPort = { ...bridgeDdsEngine,
+  const solver: AnalysisSolver = { ...bridgeDdsEngine,
     solveTable: async () => { throw new Error('ReviewUsesPositions'); },
-    solvePosition: async () => {
+    solvePosition: async (_layout, _position, cancellationId) => {
       if (failed) throw new Error('AnalysisUnavailable');
       const requestedIndex = index;
       if (!Number.isInteger(requestedIndex) || requestedIndex < 0 || requestedIndex >= record.actions.length) throw new Error('InvalidAnalysisPosition');
@@ -68,7 +72,7 @@ export function analysisClient(record: CompletedPlaythroughRecord, createWorker:
       const requestId = ++sequence;
       const request: AnalysisRequest = { type: 'solve', requestId, record, index: requestedIndex,
         playthroughId: record.playthroughId, positionKey: keys[requestedIndex], deadline: Date.now() + timeoutMs,
-        cancellationId: `analysis-${requestId}` };
+        cancellationId: cancellationId ?? `analysis-${requestId}` };
       return new Promise<PositionResult>((resolve, reject) => {
         const timer = setTimeout(() => fail('AnalysisTimeout'), timeoutMs);
         pending.set(requestId, { request, resolve, reject, timer });

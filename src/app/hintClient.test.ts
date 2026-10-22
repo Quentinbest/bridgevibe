@@ -116,3 +116,13 @@ test.each(['playthroughId', 'positionKey'] as const)('US-12.5: missing, empty an
     expect(done.mock.calls[0][0]).toMatchObject({ abstention: { cause: 'error' } });
   }
 });
+
+test.each(['playthroughId', 'positionKey'] as const)('US-14.12: stale %s is discarded before checking old-position candidates', field => {
+  vi.useFakeTimers(); const owned = worker(), done = vi.fn(), v = view();
+  runHint(v, v.hand, done, identity, () => owned); hello(owned);
+  send(owned, { ...success, type: 'result', [field]: 'old-position', result: {
+    classes: [{ cards: [notHeld()], tricks: 3 }], sampleCount: 50, enumerated: false,
+  } });
+  expect(done).not.toHaveBeenCalled(); expect(owned.terminate).not.toHaveBeenCalled();
+  send(owned, success); expect(done).toHaveBeenCalledExactlyOnceWith(success.type === 'result' && success.result, 0, source);
+});

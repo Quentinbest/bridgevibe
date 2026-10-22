@@ -16,6 +16,7 @@ export function createAnalysisHandler() {
       if (Date.now() > data.deadline) throw new Error('AnalysisTimeout');
       const solver = await loadConfiguredSolver();
       if (!current()) return;
+      if (Date.now() > data.deadline) throw new Error('AnalysisTimeout');
       const result = await doubleDummy(solver, completedRecord(data.record as PlaythroughRecord), data.index);
       // §4.3.6: synchronous solver work cannot be interrupted; drop cancelled results after it yields.
       if (current()) post(Date.now() > data.deadline ? { type: 'error', ...identity } : { type: 'result', ...identity, result });

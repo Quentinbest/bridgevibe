@@ -295,7 +295,7 @@ test('composition: timeout provenance survives Table submission into the record'
   expect(audit).toHaveBeenCalledOnce(); stop();
 });
 
-test('US-10.3, US-44: composition seed and view ignore cards hidden from West', () => {
+test('US-10.3, US-44: composition worker key, seed and view ignore cards hidden from West', () => {
   vi.useFakeTimers();
   // MiniBridge exposes North before the lead; South and East remain hidden from West.
   const changed = structuredClone(fixedDeal);
@@ -323,7 +323,7 @@ test('US-10.3, US-44: composition seed and view ignore cards hidden from West', 
   });
   expect(requests[1].view).toEqual(requests[0].view);
   expect(requests[1].seed).toBe(requests[0].seed);
-  expect(requests[1].positionKey).not.toBe(requests[0].positionKey);
+  expect(requests[1].positionKey).toBe(requests[0].positionKey);
 });
 test('§4.3.6: a response for another playthrough is ignored, not accepted or failed', () => {
   const { workers, submit } = setup();

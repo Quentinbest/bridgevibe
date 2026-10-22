@@ -28,8 +28,11 @@ export type LearnerView = Readonly<Pick<SeatView,
   announcements: readonly string[];
 }>;
 
+// ADR-0001: setup identity is independent of Deal content.
+let nextSetupId = 0;
 // US-06: MiniBridge Setup is the entry point for every practice Deal.
 export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fixedDeal, targetDeclaringSide: Side = 'northSouth', hintRunner?: HintRunner) {
+  const setupId = `setup-${++nextSetupId}`;
   const setup = startMiniBridge({ deal, targetDeclaringSide, learnerSide: 'northSouth',
     versions: { appVersion: '0.0.0', engineVersions: { [basicPolicy.name]: basicPolicy.version, [fallbackRobotPolicy.name]: fallbackRobotPolicy.version,
       [contractChoicePolicy.name]: contractChoicePolicy.version } } });
@@ -104,7 +107,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
       if (view.step === 'contract-choice') {
         const seat = view.declarer!;
         if (setup.controllerOf(seat) === 'robot') robots.decide({ kind: 'contract', view: setup.seatView(seat), seed: JSON.stringify(encodeSetupSeatView(setup.seatView(seat))),
-          playthroughId: setup.record().deal.dealId, positionKey: setup.positionKey(), currentPositionKey: setup.positionKey,
+          playthroughId: setupId, positionKey: setup.positionKey(), currentPositionKey: setup.positionKey,
           submit: (action, provenance) => choose(action, provenance) });
       } else {
         const reduced = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion:reduce)').matches;
