@@ -109,7 +109,7 @@ test('a shown unavailable abstention logs its timeout cause and a missed U-01 ta
 test.each(['worker-crash', 'protocol-mismatch'] as const)('US-45.1: %s survives the worker client through the logged statement', cause => {
   vi.useFakeTimers();
   const workers: HintWorker[] = [];
-  const runner: HintRunner = (view, cards, done) => runHint(view, cards, done, () => {
+  const runner: HintRunner = (view, cards, done, identity) => runHint(view, cards, done, identity, () => {
     const owned: HintWorker = { postMessage: vi.fn(), terminate: vi.fn(), onmessage: null, onerror: null };
     workers.push(owned); return owned;
   });
@@ -130,7 +130,7 @@ test.each(['act', 'disable'] as const)('a hidden hint does not resume when the l
   const visibility = Object.assign(new EventTarget(), { visibilityState: 'visible' });
   vi.stubGlobal('document', visibility);
   const workers: HintWorker[] = [];
-  const runner: HintRunner = (view, cards, done) => runHint(view, cards, done, () => {
+  const runner: HintRunner = (view, cards, done, identity) => runHint(view, cards, done, identity, () => {
     const owned: HintWorker = { postMessage: vi.fn(), terminate: vi.fn(), onmessage: null, onerror: null };
     workers.push(owned); return owned;
   });
@@ -152,5 +152,15 @@ test('CI-5, §4.3.6: provenance names the engine and sampler the worker reported
   const [entry] = play.provenanceLog.entries().filter(e => e.abstention);
   expect(entry.provenance).toMatchObject({ name: 'older-engine', version: '0.9', hint: { sampler: 'bv-layout', samplerVersion: '0' } });
   expect(validateEntry(entry)).toEqual([]);
+  stop();
+});
+
+test('§4.3.6: composition supplies the Playthrough ID and a Table digest for each hint position', () => {
+  vi.useFakeTimers();
+  const runner = vi.fn<HintRunner>(() => vi.fn());
+  const { play, stop } = begin(fixedDeal, runner);
+  const [, , , identity] = runner.mock.calls[0];
+  expect(identity.playthroughId).toBe(play.record().playthroughId);
+  expect(identity.positionKey).toMatch(/^[0-9a-f]{16}$/);
   stop();
 });

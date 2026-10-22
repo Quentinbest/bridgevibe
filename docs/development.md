@@ -591,6 +591,24 @@ statements include sampler, solver, sample count, enumeration and template prove
 The design's suggested-card ring is omitted under UX §5.2: computed hints never
 mark a card. All hint wording remains draft pending teacher sign-off (CI-8).
 
+Issue #54 / §4.3.6: analysis and hint protocol 2 requests carry `playthroughId`,
+`positionKey`, `deadline` and `cancellationId`; results (including analysis errors)
+echo the position identity and request ID. Clients discard mismatched identities.
+Analysis obtains historical keys by replaying accepted actions through the Table;
+`solver.solvePosition(layout, position, cancellationId?)` accepts a caller-owned ID.
+`cancel(cancellationId)` rejects only that request and sends a cancel message,
+while the worker suppresses its eventual result and rechecks its deadline after
+solver loading. Synchronous solver work cannot be interrupted. Hint cancellation
+still terminates its dedicated worker; stale identities are discarded before
+validating position-specific advice.
+
+ADR-0001: full Table keys and content-derived Deal IDs stay private to the hosts
+for VISIBLE operations: even a digest can verify hidden-card guesses. Card-play
+worker keys use `seatViewSeed(view)`; setup keys hash `encodeSetupSeatView(view)`.
+Setup uses an opaque session counter and card play uses the record's counter-based
+Playthrough ID. The robot message shape is unchanged (protocol 3); hint protocol
+remains 2. Only completed-record ALL_HANDS analysis may receive full Table keys.
+
 ## Home launcher (issue #19)
 
 `/` is the phase V Learn landing, with the multi-exercise `follow-suit-full` lesson and Quick deal (MiniBridge Setup). Direct `?lesson=`, `?seed=&deal=` and `?practice=1` links bypass Home. Learn and Practice are the available destinations; Rules and Me stay hidden. Per UX §2.1 the phone bar becomes a left rail at 900px, and play screens replace navigation with Exit, resolving the mock-ups’ Home/Levels/Play/Rules and desktop top-bar conflict.
