@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react';
 import { SUITS, sameCard, type Card as TableCard, type Suit } from '../table';
 import { cardName, text } from '../explanation';
 import { Card } from './Card';
@@ -23,7 +23,7 @@ export function Hand({ cards, dummy = false, active, legalCards, ledSuit, select
   // never away from a control the learner is using (the header's deal controls or an open dialog).
   const mayTakeFocus = () => {
     const current = document.activeElement;
-    return !current || current === document.body || !!current.closest('main');
+    return !current || current === document.body || (!!current.closest('main') && !current.closest('.rotation-notice'));
   };
   useEffect(() => { if (active && mayTakeFocus()) buttons.current[clampedIndex]?.focus({ preventScroll: true }); }, [active, clampedIndex]);
   // UX §10: when the confirmation button unmounts (a play was rejected), focus returns to the hand's tab stop,
@@ -65,4 +65,27 @@ export function Hand({ cards, dummy = false, active, legalCards, ledSuit, select
       </button> : <Card key={card.rank} card={card} />;
     })}
   </div>)}</div>;
+}
+
+// UX §3.2: session memory only, shared by practice and lessons; no persistence.
+let rotationExplained = false;
+export function RotationNotice() {
+  const [visible, setVisible] = useState(() => !rotationExplained);
+  const description = useId();
+  const dismissal = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    if (!visible) return;
+    rotationExplained = true;
+    const focused = document.activeElement;
+    if (!focused || focused === document.body || focused.closest('main')) dismissal.current?.focus({ preventScroll: true });
+  }, [visible]);
+  if (!visible) return null;
+  return <aside className="rotation-notice">
+    <p id={description} role="status">{text('rotation.notice')}</p>
+    <button ref={dismissal} aria-describedby={description} type="button" onClick={event => {
+      // UX §10: move focus before removing the focused dismissal control.
+      event.currentTarget.closest('main')?.querySelector<HTMLElement>('.turn-banner')?.focus({ preventScroll: true });
+      setVisible(false);
+    }}>{text('rotation.dismiss')}</button>
+  </aside>;
 }

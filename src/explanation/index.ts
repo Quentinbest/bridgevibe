@@ -2,6 +2,17 @@ import type { Card, ReasonCode } from '../table';
 
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
+  'rotation.notice': { text: "North won the contract, so you play North's cards as declarer. Your own hand becomes dummy. We've turned the table so the hand you play from is at the bottom.", status: 'draft' },
+  'rotation.dismiss': { text: 'Got it', status: 'draft' },
+  'seat.label': { text: '{letter} · {seat}', status: 'draft' },
+  'seat.you': { text: '{letter} · {seat} · You', status: 'draft' },
+  'seat.you-play': { text: '{letter} · {seat} · You play', status: 'draft' },
+  'seat.letter.north': { text: 'N', status: 'draft' },
+  'seat.letter.east': { text: 'E', status: 'draft' },
+  'seat.letter.south': { text: 'S', status: 'draft' },
+  'seat.letter.west': { text: 'W', status: 'draft' },
+  'turn.declarer-seat': { text: 'Play from {seat} (declarer)', status: 'draft' },
+  'turn.dummy-seat': { text: 'Play from {seat} (dummy)', status: 'draft' },
   'objective.game': { text: 'Game', status: 'draft' },
   'objective.part-score': { text: 'Part-score', status: 'draft' },
   'turn.seat': { text: '{seat} to play', status: 'draft' },

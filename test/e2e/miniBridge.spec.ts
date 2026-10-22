@@ -49,7 +49,7 @@ for (const [index, dummy] of [[2, 'east'], [3, 'west']] as const) test(`robot co
 });
 test('ADR-0003: North declares and both North and South have learner turns', async ({ page }) => {
   await installPausedClock(page); await page.goto('/?seed=setup-ui&deal=6');
-  await page.clock.runFor(3000); await expect(page.locator('.setup-own')).toHaveAccessibleName('North');
+  await page.clock.runFor(3000); await expect(page.locator('.setup-own')).toHaveAccessibleName('South');
   await page.getByRole('button', { name: 'Choose', exact: true }).click();
   await page.clock.runFor(500);
   const south = page.locator('.learner button.card').filter({ hasText: /, playable$/ }).first();

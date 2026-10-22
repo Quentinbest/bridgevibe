@@ -37,11 +37,11 @@ export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: 
     const visibleExposures: readonly { seat: Seat; card: Card }[] = exposed
       .filter(entry => table.seatView(entry.seat).hand.some(card => sameCard(card, entry.card)))
       .map(entry => ({ seat: entry.seat, card: { ...entry.card } }));
-    // ADR-0001: never return the Exercise, Script or full Deal to the screen.
+    // ADR-0001, US-02.3: project Declarer on the Learner Side; never return the full Deal.
     return { stepIndex, totalSteps: exercise.steps.length, kind: current.kind,
       textRef: current.kind === 'commentary' ? current.textRef : null,
       prompt: current.kind === 'prompt' ? current.prompt : null,
-      view: table.seatView('south'), wrongAnswers, outcome, rejection, hint, complete,
+      view: table.seatView(exercise.contract.declarer === 'north' ? 'north' : 'south'), wrongAnswers, outcome, rejection, hint, complete,
       exposed: visibleExposures };
   }
   function finish(result: Attempt['outcome'], time: number) {

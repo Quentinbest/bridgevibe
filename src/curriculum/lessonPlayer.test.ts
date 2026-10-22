@@ -104,7 +104,7 @@ test('US-21.7, US-27: every authored expected answer completes its whole script 
   }
   expect(lessonById('unknown')).toBeUndefined();
   expect(new Set(fullFollowSuit.exercises.map(exercise => exercise.deal.dealId)).size).toBe(3);
-  expect(() => loadLesson({ ...fullFollowSuit, exercises: [{ ...fullFollowSuit.exercises[0], contract: { level: 1, strain: 'no-trumps', declarer: 'north' } }] })).toThrow(/North/);
+  expect(loadLesson({ ...fullFollowSuit, exercises: [{ ...fullFollowSuit.exercises[0], contract: { level: 1, strain: 'no-trumps', declarer: 'north' } }] }).exercises[0].contract.declarer).toBe('north');
 });
 
 test('CI-8, FR-C4: all authored items carry rights and draft metadata, and all copy references resolve', () => {

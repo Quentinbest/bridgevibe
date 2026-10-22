@@ -8,7 +8,8 @@ type ProvenanceLog = ReturnType<typeof createProvenanceLog>;
 import { cardName, text, type StringId } from '../explanation';
 import { SEATS, type Card as TableCard } from '../table';
 import { Card } from './Card';
-import { Hand } from './Hand';
+import { Hand, RotationNotice } from './Hand';
+import { tablePositions, seatLabel, declaringTurn } from './rotation';
 import { LevelComplete } from './LevelComplete';
 
 export function LessonScreen({ onClose, provenanceLog, lesson = followSuit }: { onClose: () => void; provenanceLog?: ProvenanceLog; lesson?: Lesson }) {
@@ -41,6 +42,8 @@ export function LessonScreen({ onClose, provenanceLog, lesson = followSuit }: { 
   const progressValue = text('lesson.progress-value', { current: state.stepIndex + 1, total: state.totalSteps });
   const active = state.kind === 'prompt' && !state.outcome && state.wrongAnswers < 2;
   const dummySeat = SEATS[(SEATS.indexOf(state.view.contract.declarer) + 2) % 4];
+  const positions = tablePositions(state.view.contract.declarer);
+  const declaring = state.view.contract.declarer === 'north' || state.view.contract.declarer === 'south';
   const answers = state.prompt?.expectedAnswers.map(cardName).join(', ') ?? '';
   function answer(card: TableCard) { setSelected(null); setRuleOpen(false); setState(player.answer(card, Date.now())); }
   function hint() {
@@ -70,19 +73,20 @@ export function LessonScreen({ onClose, provenanceLog, lesson = followSuit }: { 
       <span className="lesson-fraction">{progress}</span>
     </header>
     <main className="lesson-layout">
-      <section className="lesson-table" aria-label={text('table')}>
-        <p>{text('lesson.exercise-progress', { current: state.exerciseIndex + 1, total: state.totalExercises,
+      {state.view.contract.declarer === 'north' && <RotationNotice />}
+      <section className={declaring ? 'lesson-table lesson-declaring' : 'lesson-table'} data-rotated={state.view.contract.declarer === 'north'} aria-label={text('table')}>
+        <p className="lesson-table-progress">{text('lesson.exercise-progress', { current: state.exerciseIndex + 1, total: state.totalExercises,
           step: state.exerciseStepIndex + 1, steps: state.exerciseTotalSteps })}</p>
         {/* UX §3.1, §6.2: lessons use the normal table, so exposed Dummy shows face up, on its own
             full-width row as on the practice table. */}
-        {state.view.dummy && <section className="lesson-dummy" aria-label={text('dummy.seat', { seat: text(`seat.${dummySeat}`) })}>
-          <p>{text('dummy.seat', { seat: text(`seat.${dummySeat}`) })}</p>
+        {state.view.dummy && <section className="lesson-dummy" data-seat={dummySeat} data-position={positions[dummySeat]} aria-label={text('dummy.seat', { seat: text(`seat.${dummySeat}`) })}>
+          <p>{seatLabel(dummySeat, state.view.contract.declarer)}</p>
           <Hand cards={state.view.dummy} dummy active={active && state.view.turn === dummySeat} legalCards={[]}
             selected={selected} onSelect={setSelected} onPlay={answer} />
         </section>}
-        <div className="lesson-seats">{(['west', 'north', 'east'] as const).filter(seat => !(seat === dummySeat && state.view.dummy)).map(seat =>
-          <section key={seat} aria-label={text(`seat.${seat}`)}>
-            <span>{text('opponent', { seat: text(`seat.${seat}`), count: state.view.cardCounts[seat] })}</span>
+        <div className="lesson-seats">{SEATS.filter(seat => seat !== state.view.seat && !(seat === dummySeat && state.view.dummy)).map(seat =>
+          <section key={seat} data-seat={seat} data-position={positions[seat]} aria-label={text(`seat.${seat}`)}>
+            <p>{seatLabel(seat, state.view.contract.declarer)}</p><span>{text('opponent', { seat: text(`seat.${seat}`), count: state.view.cardCounts[seat] })}</span>
             {state.exposed.filter(entry => entry.seat === seat).map(({ card }) =>
               <figure className="lesson-exposure" key={`${card.suit}-${card.rank}`}>
                 <Card card={card} /><figcaption>{text('lesson.exposed')}</figcaption>
@@ -91,11 +95,14 @@ export function LessonScreen({ onClose, provenanceLog, lesson = followSuit }: { 
         {/* WCAG 4.1.2: a labelled region, so the label is allowed and announced (a plain div's isn't). */}
         <section className="lesson-trick" aria-label={text('trick')}>
           {(state.view.currentTrick.length ? state.view.currentTrick : state.view.tricks.at(-1)?.cards ?? []).map(played =>
-            <article key={played.seat}><p>{text(`seat.${played.seat}`)}</p><Card card={played.card} /></article>)}
+            <article className={`played played-${positions[played.seat]}`} data-seat={played.seat} key={played.seat}><p>{text(`seat.${played.seat}`)}</p><Card card={played.card} /></article>)}
         </section>
-        <section aria-label={text('hand')}>
+        <p className="turn-banner lesson-turn" tabIndex={-1} aria-live="polite">{active && state.view.turn
+          ? declaring ? declaringTurn(state.view.turn, state.view.contract.declarer) : text('turn.seat', { seat: text(`seat.${state.view.turn}`) }) : ''}</p>
+        <section className="lesson-own" data-seat={state.view.seat} data-position={positions[state.view.seat]} aria-label={text('hand')}>
+          <p>{seatLabel(state.view.seat, state.view.contract.declarer)}</p>
           {/* UX P-1: no legal-card highlighting or accessible answer clues in following-suit lessons. */}
-          <Hand cards={state.view.hand} active={active && state.view.turn === 'south'} legalCards={[]} selected={selected} onSelect={setSelected} onPlay={answer} />
+          <Hand cards={state.view.hand} active={active && state.view.turn === state.view.seat} legalCards={[]} selected={selected} onSelect={setSelected} onPlay={answer} />
         </section>
       </section>
       <aside className="lesson-panel" aria-label={text('lesson.persona')}>
