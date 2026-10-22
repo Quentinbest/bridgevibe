@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { choosePractice } from './miniBridge';
+import { openPractice, choosePractice } from './miniBridge';
 
 // LR-3c: a rejection alone could be CORS; require the enforced CSP violation too.
 test('audit CSP blocks a cross-origin request while the app and worker still play', async ({ page }) => {
-  await page.goto('/');
+  await openPractice(page, '/');
   const policy = await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content');
   expect(policy).toContain("connect-src 'self';");
   expect(policy).toContain("default-src 'self';");

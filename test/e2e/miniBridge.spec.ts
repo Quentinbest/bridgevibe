@@ -1,9 +1,9 @@
-import { installPausedClock } from './miniBridge';
+import { openPractice, installPausedClock } from './miniBridge';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 test('US-06: ordered announcements, exposed dummy, keyboard strain/objective choice and opening lead', async ({ page }) => {
-  await installPausedClock(page); await page.goto('/');
+  await installPausedClock(page); await openPractice(page, '/');
   await expect(page.locator('.setup-points li')).toHaveCount(0);
   for (const [i, label] of ['South: 17 points', 'West: 8 points', 'North: 15 points', 'East: 0 points'].entries()) {
     await page.clock.runFor(500); await expect(page.locator('.setup-points li').nth(i)).toHaveText(label);
@@ -26,7 +26,7 @@ test('US-06: ordered announcements, exposed dummy, keyboard strain/objective cho
   await expect(page.locator('.dummy button[tabindex="0"]')).toBeFocused();
 });
 test('UX §4.2: reduced motion preserves announcement order and reveals the choice', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' }); await page.goto('/');
+  await page.emulateMedia({ reducedMotion: 'reduce' }); await openPractice(page, '/');
   await expect(page.getByRole('button', { name: 'Choose', exact: true })).toBeVisible();
   await expect(page.locator('.setup-points li')).toHaveText(['South: 17 points', 'West: 8 points', 'North: 15 points', 'East: 0 points']);
 });

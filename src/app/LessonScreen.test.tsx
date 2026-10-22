@@ -150,7 +150,7 @@ test('full lesson shows step states and an unplayable exposure, then counts this
   expect(screen.getByText('After a nudge (that counts too)').nextElementSibling?.textContent).toBe('1');
   expect(screen.getByText('Skill unlocked: Follow suit')).toBeTruthy();
   expect(screen.getByRole('main').textContent).not.toMatch(/score|star|streak|mastery/i);
-  fireEvent.click(screen.getByRole('button', { name: 'Next: Practice following suit' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Back to Home' }));
   fireEvent.click(screen.getByRole('button', { name: "That's enough for today" }));
   expect(onClose).toHaveBeenCalledTimes(2);
 });

@@ -1,3 +1,4 @@
+import { Home } from './Home';
 import HintSheet from './HintSheet';
 import { MiniBridgeSetup } from './MiniBridgeSetup';
 import { analysisHost } from './analysisHost';
@@ -25,7 +26,7 @@ function Opponent({ seat, count, cards, position }: { position: ScreenPosition; 
   </section>;
 }
 // ADR-0001, US-16.4: the UI gets deal metadata only, never the play session or its record of all four hands.
-export function TableScreen({ view, play, clearRejection, info, invalid, onNew, onShowRule, chooseContract, onHint, onToggleHints, onDismissHint }: { onHint?: () => void; onToggleHints?: () => void; onDismissHint?: () => void; chooseContract?: (choice: ContractChoice) => void; onShowRule?: () => void; info: Pick<Deal, 'dealId' | 'origin'>; invalid: boolean; onNew: () => void; view: LearnerView; clearRejection: () => void; play: (seat: 'north' | 'south', card: TableCard) => void }) {
+export function TableScreen({ view, play, clearRejection, info, invalid, onNew, onShowRule, chooseContract, onHint, onToggleHints, onDismissHint, onExit }: { onExit?: () => void; onHint?: () => void; onToggleHints?: () => void; onDismissHint?: () => void; chooseContract?: (choice: ContractChoice) => void; onShowRule?: () => void; info: Pick<Deal, 'dealId' | 'origin'>; invalid: boolean; onNew: () => void; view: LearnerView; clearRejection: () => void; play: (seat: 'north' | 'south', card: TableCard) => void }) {
   const [selected, setSelected] = useState<TableCard | null>(null);
   const [ruleOpen, setRuleOpen] = useState(false);
   const tableElement = useRef<HTMLElement | null>(null);
@@ -66,8 +67,9 @@ export function TableScreen({ view, play, clearRejection, info, invalid, onNew, 
   }
   return <>
     <header className="header"><div className="header-row">
-      <h1 className={invalid ? 'sr-only' : undefined} aria-label={text('product')}><span>{text('product.first')}</span><span className="wordmark-accent">{text('product.second')}</span></h1>
+      <h1 className={invalid || onExit ? 'sr-only' : undefined} aria-label={text('product')}><span>{text('product.first')}</span><span className="wordmark-accent">{text('product.second')}</span></h1>
       {invalid && <p className="deal-notice" role="status">{text('deal.invalid')}</p>}
+      {onExit && <button className="practice-exit" type="button" aria-label={text('home.exit')} onClick={onExit}><span aria-hidden="true">{text('home.exit-symbol')}</span></button>}
       <DealControls info={info} onNew={onNew} />
     </div></header>
     {view.setup ? <MiniBridgeSetup view={view.setup} southHand={view.hand} choose={choice => chooseContract?.(choice)} /> : view.contract && <main onKeyDown={event => { if (event.key === 'Escape') select(null); }}>
@@ -128,7 +130,7 @@ export function TableScreen({ view, play, clearRejection, info, invalid, onNew, 
     </main>}
   </>;
 }
-function PracticeScreen() {
+function PracticeScreen({ onExit, onCompleted }: { onExit: () => void; onCompleted: () => void }) {
   const [session, setSession] = useState(() => {
     const initial = dealFromUrl(window.location.search);
     return dealSession(initial.deal, initial.invalid);
@@ -144,6 +146,11 @@ function PracticeScreen() {
   }
   const view = useSyncExternalStore(play.subscribe, play.getSnapshot);
   const completed = useMemo(() => view.status === 'completed' ? play.completedRecord() : null, [play, view.status]);
+  const counted = useRef(false);
+  useEffect(() => {
+    if (completed && !counted.current) { counted.current = true; onCompleted(); }
+    if (!completed) counted.current = false;
+  }, [completed, onCompleted]);
   const analysis = useSyncExternalStore(analysisHost.subscribe, () => analysisHost.snapshot(completed));
   // §4.5, U-13: start at completion, before Hand review is opened.
   // §4.7: a New deal (or leaving) cancels the old record's analysis instead of leaving the solver running.
@@ -159,18 +166,37 @@ function PracticeScreen() {
     <ReviewScreen onTryAgain={() => { cancelAnalysis.current = analysisHost.retry(review, play.provenanceLog); }} analysis={analysis} record={review} onBack={() => setReview(null)} />
     {debug && <Suspense fallback={null}><DebugPanel play={play} /></Suspense>}
   </div>;
-  return <div className={debug ? 'debug-layout' : undefined}><TableScreen key={session.key} view={view} onHint={play.showHint} onToggleHints={() => { play.toggleHints(); hintsEnabled.current = !!play.getSnapshot().hint?.enabled; }} onDismissHint={play.dismissHint} chooseContract={play.chooseContract} play={play.play} clearRejection={play.clearRejection} onShowRule={play.showRule} info={session.info} invalid={session.invalid} onNew={newDeal} />
+  return <div className={debug ? 'debug-layout' : undefined}><TableScreen onExit={onExit} key={session.key} view={view} onHint={play.showHint} onToggleHints={() => { play.toggleHints(); hintsEnabled.current = !!play.getSnapshot().hint?.enabled; }} onDismissHint={play.dismissHint} chooseContract={play.chooseContract} play={play.play} clearRejection={play.clearRejection} onShowRule={play.showRule} info={session.info} invalid={session.invalid} onNew={newDeal} />
     {view.status === 'completed' && <div className="review-entry"><button ref={reviewButton} type="button" onClick={() => setReview(play.completedRecord())}>{text('review.title')}</button></div>}
     {debug && <Suspense fallback={null}><DebugPanel key={session.key} play={play} /></Suspense>}
   </div>;
 }
 
+// UX §2.1–2.3: Home is the phase V Learn landing; direct content links keep their meaning.
+function routeFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const lesson = lessonById(params.get('lesson'));
+  return lesson ? { screen: 'lesson' as const, lesson } : { screen: params.has('seed') || params.has('deal') || params.has('practice') ? 'practice' as const : 'home' as const };
+}
+
 export function App() {
-  const [lesson, setLesson] = useState(() => lessonById(new URLSearchParams(window.location.search).get('lesson')));
-  return lesson ? <LessonScreen lesson={lesson} onClose={() => {
+  const [route, setRoute] = useState(routeFromUrl);
+  const [dealsPlayed, setDealsPlayed] = useState(0);
+  const countCompleted = useCallback(() => setDealsPlayed(count => count + 1), []);
+  useEffect(() => {
+    const back = () => setRoute(routeFromUrl());
+    window.addEventListener('popstate', back);
+    return () => window.removeEventListener('popstate', back);
+  }, []);
+  function navigate(search: string) {
     const url = new URL(window.location.href);
-    url.searchParams.delete('lesson');
-    window.history.replaceState(null, '', url);
-    setLesson(undefined);
-  }} /> : <PracticeScreen />;
+    for (const key of ['lesson', 'seed', 'deal', 'practice']) url.searchParams.delete(key);
+    new URLSearchParams(search).forEach((value, key) => url.searchParams.set(key, value));
+    url.hash = '';
+    window.history.pushState(null, '', url);
+    setRoute(routeFromUrl());
+  }
+  if (route.screen === 'lesson') return <LessonScreen key={route.lesson.contentId} lesson={route.lesson} onClose={() => navigate('')} />;
+  if (route.screen === 'practice') return <PracticeScreen onExit={() => navigate('')} onCompleted={countCompleted} />;
+  return <Home dealsPlayed={dealsPlayed} navigate={navigate} />;
 }

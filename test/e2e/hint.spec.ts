@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { choosePractice } from './miniBridge';
+import { openPractice, choosePractice } from './miniBridge';
 // US-14: real workers, clocks and catalogue; the core and engines are not mocked.
 test('practice hint is requested, bounded, unmarked and dismissible; toggle hides its control', async ({ page }) => {
-  await page.goto('/?debug=1'); await choosePractice(page);
+  await openPractice(page, '/?debug=1'); await choosePractice(page);
   const hint = page.getByRole('button', { name: 'Hint', exact: true });
   await expect(hint).toBeVisible();
   await expect(page.getByRole('region', { name: 'Hint', exact: true })).toHaveCount(0);
@@ -26,7 +26,7 @@ test('practice hint is requested, bounded, unmarked and dismissible; toggle hide
 
 // US-14.2, UX §3.1: enabling hints must not grow the phone's existing action row.
 test('hint controls and Play it fit together without increasing the fixed Deal height', async ({ page }) => {
-  await page.goto('/'); await choosePractice(page);
+  await openPractice(page, '/'); await choosePractice(page);
   const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });
   await ace.click();
   await page.evaluate(() => document.fonts.ready);

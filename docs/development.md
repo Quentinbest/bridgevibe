@@ -590,3 +590,11 @@ statements include sampler, solver, sample count, enumeration and template prove
 
 The design's suggested-card ring is omitted under UX §5.2: computed hints never
 mark a card. All hint wording remains draft pending teacher sign-off (CI-8).
+
+## Home launcher (issue #19)
+
+`/` is the phase V Learn landing, with the multi-exercise `follow-suit-full` lesson and Quick game (MiniBridge Setup). Direct `?lesson=`, `?seed=&deal=` and `?practice=1` links bypass Home. Learn and Practice are the available destinations; Rules and Me stay hidden. Per UX §2.1 the phone bar becomes a left rail at 900px, and play screens replace navigation with Exit, resolving the mock-ups’ Home/Levels/Play/Rules and desktop top-bar conflict.
+
+The brief’s Home launcher is the phase V Learn landing for UX §2.3 (which has no separate Home destination). Learning steps count distinct declared Prompts with session Attempts; remaining time uses `PROVISIONAL_LESSON_DURATION_MINUTES`, a provisional four-minute midpoint of UX §1’s 3–5 minutes, scaled by unanswered Prompts. The session line counts completed practice Playthroughs, including replayed Deals, never starts or 20–20 redeals. Exiting leaves the current activity; no resume or persistence is claimed, and reload resets all session data. All new copy remains draft (CI-8).
+
+Home shows the content’s lesson title and skill tags without a level number. The future module/level slot is marked in `Home.tsx`; the missing `Lesson.module` field remains an open content question. Recommendation: add `module` to the Lesson model in a content ticket before displaying any level mapping.

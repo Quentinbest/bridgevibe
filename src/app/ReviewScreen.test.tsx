@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { openPractice } from '../../test/openPractice';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
 import { completeFixedDeal } from '../../test/strategy';
@@ -11,12 +12,12 @@ import { ReviewScreen } from './ReviewScreen';
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 test('US-16.1: the composition API refuses early review and the UI has no entry', () => {
   expect(() => createPlay().completedRecord()).toThrow('setup-in-progress');
-  render(<App />);
+  render(<App />); openPractice();
   expect(screen.queryByRole('button', { name: 'Hand review' })).toBeNull();
   expect(screen.queryByRole('note')).toBeNull();
 });
 test('US-16: completed composition opens review and returns to the table', () => {
-  vi.useFakeTimers(); render(<App />);
+  vi.useFakeTimers(); render(<App />); openPractice();
   act(() => vi.advanceTimersByTime(3000));
   fireEvent.click(screen.getByRole('button', { name: 'Game · 9 tricks' }));
   fireEvent.click(screen.getByRole('button', { name: 'Choose' }));

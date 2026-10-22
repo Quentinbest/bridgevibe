@@ -1,15 +1,15 @@
-import { choosePractice } from './miniBridge';
+import { openPractice, choosePractice } from './miniBridge';
 import { readFile } from 'node:fs/promises';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
 test('US-40.2: debug panel requires the URL opt-in', async ({ page }) => {
-  await page.goto('/'); await choosePractice(page, false);
+  await openPractice(page, '/'); await choosePractice(page, false);
   await expect(page.locator('.trick-area .card')).toHaveCount(1);
   await expect(page.getByRole('complementary', { name: 'Provenance log' })).toHaveCount(0);
 });
 test('US-40.1–3: entries, counters, grading download and current Seat Views', async ({ page }) => {
-  await page.goto('/?debug=1'); await choosePractice(page);
+  await openPractice(page, '/?debug=1'); await choosePractice(page);
   const panel = page.getByRole('complementary', { name: 'Provenance log' });
   await expect(panel).toBeVisible();
   await expect(panel.locator('ol li')).toHaveCount(1);

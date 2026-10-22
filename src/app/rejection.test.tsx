@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { openPractice } from '../../test/openPractice';
 import { choosePractice } from '../../test/miniBridge';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
@@ -29,7 +30,7 @@ test('US-01.9: real Table rejection fills the Template and preserves the positio
 });
 for (const nextAction of ['raise', 'play', 'Escape'] as const) {
   test(`UX §3.4: disclosure preserves feedback; ${nextAction} clears it`, () => {
-    vi.useFakeTimers(); render(<App />); chooseContract(); act(() => vi.advanceTimersByTime(500));
+    vi.useFakeTimers(); render(<App />); openPractice(); chooseContract(); act(() => vi.advanceTimersByTime(500));
     const queen = rejectCard();
     expect(queen.classList.contains('rejected-card')).toBe(true);
     expect(queen.getAttribute('aria-pressed')).toBe('false');
@@ -63,7 +64,7 @@ for (const nextAction of ['raise', 'play', 'Escape'] as const) {
 
 for (const dismissal of ['Escape', 'raise'] as const) {
   test(`UX §10: ${dismissal} restores focused disclosure to the rejected card and arrow navigation`, () => {
-    vi.useFakeTimers(); render(<App />); chooseContract(); act(() => vi.advanceTimersByTime(500));
+    vi.useFakeTimers(); render(<App />); openPractice(); chooseContract(); act(() => vi.advanceTimersByTime(500));
     const queen = rejectCard();
     // Keep the roving tab stop elsewhere, so restoring only that stop would fail.
     const ace = screen.getByRole('button', { name: 'Ace of spades, playable' });
@@ -83,7 +84,7 @@ for (const dismissal of ['Escape', 'raise'] as const) {
 }
 
 test('UX §3.4: consecutive rejections of the same card restart its animation', () => {
-  vi.useFakeTimers(); render(<App />); chooseContract(); act(() => vi.advanceTimersByTime(500));
+  vi.useFakeTimers(); render(<App />); openPractice(); chooseContract(); act(() => vi.advanceTimersByTime(500));
   const queen = screen.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades" });
   const animation = { cancel: vi.fn(), play: vi.fn() };
   Object.defineProperty(queen, 'getAnimations', { value: () => [animation] });

@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { openPractice } from '../../test/openPractice';
 import { StrictMode } from 'react';
 import type { ComponentProps } from 'react';
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
@@ -13,11 +14,11 @@ function chooseContract() {
   fireEvent.click(screen.getByRole('button', { name: 'Game · 9 tricks' }));
   fireEvent.click(screen.getByRole('button', { name: 'Choose' }));
 }
-afterEach(() => { cleanup(); vi.useRealTimers(); });
+afterEach(() => { cleanup(); vi.useRealTimers(); history.replaceState(null, '', '/'); });
 const advance = (ms: number) => act(() => vi.advanceTimersByTime(ms));
 test('real composition and React controls play all 52 cards under StrictMode', () => {
   vi.useFakeTimers();
-  render(<StrictMode><App /></StrictMode>); chooseContract();
+  render(<StrictMode><App /></StrictMode>); openPractice(); chooseContract();
   expect(screen.queryByRole('button', { name: 'Ace of spades, playable' })).toBeNull();
   for (const entry of completeFixedDeal().actions) {
     if (entry.controller === 'robot') advance(500);
@@ -34,9 +35,12 @@ test('real composition and React controls play all 52 cards under StrictMode', (
   expect(screen.getByText('You took 6 of 13 tricks (needed 9)')).toBeTruthy();
   // 52 card plays; trick winners are announced by the banner, not the log.
   expect(screen.getByRole('log').children).toHaveLength(52);
+  fireEvent.click(screen.getByRole('button', { name: 'Exit' }));
+  expect(screen.getByText(/1 deal played this session/)).toBeTruthy();
+  expect(screen.getByRole('heading', { name: 'Your next move' })).toBe(document.activeElement);
 });
 test('off-suit rejection lowers the selected card and roving arrows and Escape preserve the hand', () => {
-  vi.useFakeTimers(); render(<App />); chooseContract(); advance(500);
+  vi.useFakeTimers(); render(<App />); openPractice(); chooseContract(); advance(500);
   const queen = screen.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades" });
   fireEvent.click(queen); fireEvent.click(queen);
   expect(queen.getAttribute('aria-pressed')).toBe('false');
@@ -52,7 +56,7 @@ test('off-suit rejection lowers the selected card and roving arrows and Escape p
 });
 
 test('keyboard play of the last card retains a focused tab stop on the next active turn', () => {
-  vi.useFakeTimers(); render(<App />); chooseContract(); advance(500);
+  vi.useFakeTimers(); render(<App />); openPractice(); chooseContract(); advance(500);
   function playFirstLegal() {
     const button = screen.getAllByRole('button').find(button => button.querySelector('.sr-only')?.textContent?.endsWith(', playable'))!;
     fireEvent.click(button); fireEvent.click(button);
@@ -77,7 +81,7 @@ test('keyboard play of the last card retains a focused tab stop on the next acti
 });
 
 test('collection announces the winner before the next lead banner', () => {
-  vi.useFakeTimers(); render(<App />); chooseContract(); advance(500);
+  vi.useFakeTimers(); render(<App />); openPractice(); chooseContract(); advance(500);
   const ace = screen.getByRole('button', { name: 'Ace of spades, playable' });
   fireEvent.click(ace); fireEvent.click(ace); advance(500);
   const king = screen.getByRole('button', { name: 'King of spades, playable' });
@@ -90,7 +94,7 @@ test('collection announces the winner before the next lead banner', () => {
   expect(within(screen.getByRole('region', { name: 'North · Dummy' })).getAllByRole('button')).toHaveLength(12);
 });
 test('a rejected confirmation returns focus to the rejected card', () => {
-  vi.useFakeTimers(); render(<App />); chooseContract(); advance(500); // West leads a spade; Dummy (North) must follow.
+  vi.useFakeTimers(); render(<App />); openPractice(); chooseContract(); advance(500); // West leads a spade; Dummy (North) must follow.
   const queen = screen.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades" });
   queen.focus(); fireEvent.click(queen);
   const confirm = screen.getByRole('button', { name: 'Play it, Queen of hearts' });
