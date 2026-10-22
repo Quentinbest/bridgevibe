@@ -131,11 +131,18 @@ export function TableScreen({ view, play, clearRejection, info, invalid, onNew, 
     </main>}
   </>;
 }
-function PracticeScreen({ onExit, onCompleted }: { onExit: () => void; onCompleted: () => void }) {
+// US-07.1: `firstIndex` continues the session's practice count across launches; `onStarted` reports each
+// Playthrough this screen begins, once, even under StrictMode's repeated effects.
+function PracticeScreen({ onExit, onCompleted, firstIndex = 0, onStarted }: { onExit: () => void; onCompleted: () => void; firstIndex?: number; onStarted?: (index: number) => void }) {
   const [session, setSession] = useState(() => {
     const initial = dealFromUrl(window.location.search);
-    return dealSession(initial.deal, initial.invalid);
+    return dealSession(initial.deal, initial.invalid, firstIndex);
   });
+  const reported = useRef(new WeakSet<object>());
+  useEffect(() => {
+    if (reported.current.has(session)) return;
+    reported.current.add(session); onStarted?.(session.playthroughIndex);
+  }, [session, onStarted]);
   const [review, setReview] = useState<CompletedPlaythroughRecord | null>(null);
   const reviewButton = useRef<HTMLButtonElement>(null);
   const hintsEnabled = useRef(true);
@@ -184,6 +191,9 @@ export function App() {
   const [route, setRoute] = useState(routeFromUrl);
   const [dealsPlayed, setDealsPlayed] = useState(0);
   const countCompleted = useCallback(() => setDealsPlayed(count => count + 1), []);
+  // US-07.1: practice Playthroughs alternate across Home launches, not only within one screen.
+  const [nextPracticeIndex, setNextPracticeIndex] = useState(0);
+  const practiceStarted = useCallback((index: number) => setNextPracticeIndex(index + 1), []);
   useEffect(() => {
     const back = () => setRoute(routeFromUrl());
     window.addEventListener('popstate', back);
@@ -210,6 +220,6 @@ export function App() {
     if (launched) window.history.back();
   }
   if (route.screen === 'lesson') return <LessonScreen key={route.lesson.contentId} lesson={route.lesson} onClose={leave} />;
-  if (route.screen === 'practice') return <PracticeScreen onExit={leave} onCompleted={countCompleted} />;
+  if (route.screen === 'practice') return <PracticeScreen onExit={leave} onCompleted={countCompleted} firstIndex={nextPracticeIndex} onStarted={practiceStarted} />;
   return <Home dealsPlayed={dealsPlayed} navigate={navigate} />;
 }

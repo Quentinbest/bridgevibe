@@ -92,3 +92,16 @@ test('Exit and Close leave no activity entry behind for browser Back', async ({ 
   await page.goBack();
   expect(page.url()).not.toMatch(/practice=1|lesson=/);
 });
+
+// UX §2.1: New deal keeps the launcher's history marker, so Exit still consumes the practice entry.
+test('Exit after New deal leaves no duplicate Home entry', async ({ page }) => {
+  await page.goto('/');
+  const start = await page.evaluate(() => history.length);
+  await page.getByRole('link', { name: /^Quick deal/ }).click();
+  await page.getByRole('button', { name: 'New deal', exact: true }).click();
+  await expect(page).toHaveURL(/seed=/);
+  await page.getByRole('button', { name: 'Exit', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Your next move' })).toBeFocused();
+  expect(await page.evaluate(() => history.length)).toBe(start + 1);
+  expect(await page.evaluate(() => history.state)).toBeNull();
+});

@@ -30,15 +30,16 @@ export function dealSession(deal: Deal, invalid = false, playthroughIndex = 0) {
     const current = play.setupRecord().deal;
     if (current.dealId !== info.dealId) info = { dealId: current.dealId, origin: current.origin };
     return info;
-  }, invalid, play,
-    next() {
+  }, invalid, play, playthroughIndex,
+    next(index = playthroughIndex + 1) {
       const next = nextDeal(play.setupRecord().deal);
       if (next.origin.kind === 'seed') {
         const url = new URL(window.location.href);
         url.searchParams.set('seed', next.origin.seed);
         url.searchParams.set('deal', String(next.origin.index));
-        window.history.replaceState(null, '', url);
+        // Keep the entry's state (the Home launcher marker) when only the Deal changes.
+        window.history.replaceState(window.history.state, '', url);
       }
-      return dealSession(next, false, playthroughIndex + 1);
+      return dealSession(next, false, index);
     } };
 }

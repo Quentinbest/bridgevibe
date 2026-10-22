@@ -89,3 +89,18 @@ test('session Attempts count each declared learning step once, and session count
   expect(screen.getByText('About 3 min left')).toBeTruthy();
   expect(screen.getByText(/3 deals played this session/)).toBeTruthy();
 });
+
+test('US-07.1: practice launched again from Home continues the alternation', () => {
+  vi.useFakeTimers(); render(<StrictMode><App /></StrictMode>);
+  // Launch 1 is Playthrough 0 (the authored Deal); Exit, then launch 2 is Playthrough 1, so the
+  // following New deal is Playthrough 2, which targets North–South (a reset count would give East–West).
+  fireEvent.click(screen.getByRole('link', { name: /^Quick deal/ }));
+  act(() => vi.advanceTimersByTime(500));
+  fireEvent.click(screen.getByRole('button', { name: 'Exit' }));
+  fireEvent.click(screen.getByRole('link', { name: /^Quick deal/ }));
+  act(() => vi.advanceTimersByTime(500));
+  fireEvent.click(screen.getByRole('button', { name: 'New deal' }));
+  act(() => vi.advanceTimersByTime(6000));
+  expect(screen.getByText(/(North|South|East|West) declares/).textContent).toMatch(/(North|South) declares/);
+  vi.useRealTimers();
+});
