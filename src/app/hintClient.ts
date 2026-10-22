@@ -1,11 +1,12 @@
 import { encodeSeatView, seatViewSeed, type SeatView, type Card } from '../table';
 import { unavailable, type HintResult } from '../analysis/hintResult';
 import { HINT_DEADLINE_MS } from '../information/parameters';
-import { HINT_PROTOCOL_VERSION, validHintResponse, type HintRequest, type HintResponse } from './hintProtocol';
+import { HINT_PROTOCOL_VERSION, validHintResponse, type HintRequest, type HintResponse, type HintSource } from './hintProtocol';
 export type HintWorker = Pick<Worker, 'postMessage' | 'terminate'> & { onmessage: ((event: MessageEvent<HintResponse>) => void) | null; onerror: ((event: ErrorEvent) => void) | null };
-export type HintRunner = (view: SeatView, candidates: readonly Card[], done: (result: HintResult, durationMs: number) => void) => () => void;
+// `source` is present only for a result the worker produced; client-side failures have none.
+export type HintRunner = (view: SeatView, candidates: readonly Card[], done: (result: HintResult, durationMs: number, source?: HintSource) => void) => () => void;
 // U-01, US-14.12: the caller cancels this position's run on an action, toggle or teardown.
-export const runHint = (view: SeatView, candidates: readonly Card[], done: (result: HintResult, durationMs: number) => void, createWorker: () => HintWorker = () => new Worker(new URL('./hintWorker.ts', import.meta.url), { type: 'module' })) => {
+export const runHint = (view: SeatView, candidates: readonly Card[], done: (result: HintResult, durationMs: number, source?: HintSource) => void, createWorker: () => HintWorker = () => new Worker(new URL('./hintWorker.ts', import.meta.url), { type: 'module' })) => {
   let start = 0;
   let visibleDuration = 0;
   let worker: HintWorker | undefined;
@@ -22,10 +23,10 @@ export const runHint = (view: SeatView, candidates: readonly Card[], done: (resu
     terminate();
     if (typeof document !== 'undefined') document.removeEventListener('visibilitychange', visibilityChanged);
   }
-  function finish(result: HintResult) {
+  function finish(result: HintResult, source?: HintSource) {
     if (finished) return;
     finished = true; cleanup();
-    done(result, visibleDuration + Date.now() - start);
+    done(result, visibleDuration + Date.now() - start, source);
   }
   function connect() {
     try {
@@ -52,7 +53,9 @@ export const runHint = (view: SeatView, candidates: readonly Card[], done: (resu
           try {
             owned.postMessage({ type: 'hint', requestId: 1, view: encodeSeatView(view), candidates, seed: seatViewSeed(view), deadline: start + HINT_DEADLINE_MS } satisfies HintRequest);
           } catch { finish(unavailable()); }
-        } else if (ready && data.requestId === 1) finish(Date.now() > start + HINT_DEADLINE_MS ? unavailable('timeout') : data.result);
+        } else if (ready && data.requestId === 1) {
+          if (Date.now() > start + HINT_DEADLINE_MS) finish(unavailable('timeout')); else finish(data.result, data.source);
+        }
       };
     } catch { finish(unavailable()); }
   }

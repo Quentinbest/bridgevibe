@@ -3,7 +3,9 @@ import type { HintResult } from '../analysis/sampledEstimate';
 // ADR-0001, US-41.3: no record capability crosses this versioned boundary.
 export const HINT_PROTOCOL_VERSION = 1;
 export type HintRequest = { type: 'hint'; requestId: number; view: SeatViewMessage; candidates: readonly Card[]; seed: string; deadline: number };
-export type HintResponse = { type: 'hello'; protocolVersion: number } | { type: 'result'; requestId: number; result: HintResult };
+// §4.3.6, CI-5: the worker reports the engine and sampler that actually produced the result.
+export type HintSource = { engine: { name: string; version: string }; sampler: { name: string; version: string } };
+export type HintResponse = { type: 'hello'; protocolVersion: number } | { type: 'result'; requestId: number; result: HintResult; source: HintSource };
 
 type Check = (value: unknown) => boolean;
 const exact = (fields: Record<string, Check>): Check => value => !!value && typeof value === 'object' && !Array.isArray(value)
@@ -22,6 +24,8 @@ export function validHintResponse(value: unknown, candidates: readonly Card[]): 
     || exact({ abstention: a => exact({ reason: x => x === 'uncertain', cause: x => x === 'constraints' })(a)
       || exact({ reason: x => x === 'unavailable', cause: x => causes.includes(x as string) })(a),
     sampleCount: n => n === 0, enumerated: b => b === false })(r);
+  const identity = exact({ name: s => typeof s === 'string' && s.trim().length > 0, version: s => typeof s === 'string' && s.trim().length > 0 });
+  const source = exact({ engine: identity, sampler: identity });
   return exact({ type: x => x === 'hello', protocolVersion: n => Number.isSafeInteger(n) })(value)
-    || exact({ type: x => x === 'result', requestId: n => Number.isSafeInteger(n), result })(value);
+    || exact({ type: x => x === 'result', requestId: n => Number.isSafeInteger(n), result, source })(value);
 }

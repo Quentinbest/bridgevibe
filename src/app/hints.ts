@@ -37,12 +37,13 @@ export function createHints(changed: () => void, log: (entry: ReturnType<typeof 
       if (!next || !view) return;
       position = view.positionIndex;
       const owned = generation;
-      cancel = runner(view, candidates, (result, durationMs) => {
+      cancel = runner(view, candidates, (result, durationMs, source) => {
         if (owned !== generation) return;
         timings.push({ durationMs, exceededTarget: durationMs > HINT_DEADLINE_MS });
         const rendered = renderHint(result);
         state = { ...state, thinking: false, abstained: 'abstention' in result, advice: rendered.advice, reason: rendered.reason, durationMs, exceededTarget: durationMs > HINT_DEADLINE_MS };
-        statement = hintStatement(result, configuredEngine(), durationMs, rendered);
+        // CI-5: attribute worker results to the worker's reported engine and sampler.
+        statement = hintStatement(result, source?.engine ?? configuredEngine(), durationMs, rendered, source?.sampler);
         record(); changed();
       });
     },

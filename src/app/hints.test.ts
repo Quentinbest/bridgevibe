@@ -144,3 +144,13 @@ test.each(['act', 'disable'] as const)('a hidden hint does not resume when the l
   expect(workers).toHaveLength(1);
   expect(play.provenanceLog.entries().some(e => e.abstention)).toBe(false); stop();
 });
+test('CI-5, §4.3.6: provenance names the engine and sampler the worker reported, not the page bundle', () => {
+  vi.useFakeTimers();
+  const source = { engine: { name: 'older-engine', version: '0.9' }, sampler: { name: 'bv-layout', version: '0' } };
+  const { play, stop } = begin(fixedDeal, (_view, _cards, done) => { done({ abstention: { reason: 'uncertain', cause: 'constraints' }, sampleCount: 0, enumerated: false }, 80, source); return vi.fn(); });
+  play.showHint();
+  const [entry] = play.provenanceLog.entries().filter(e => e.abstention);
+  expect(entry.provenance).toMatchObject({ name: 'older-engine', version: '0.9', hint: { sampler: 'bv-layout', samplerVersion: '0' } });
+  expect(validateEntry(entry)).toEqual([]);
+  stop();
+});
