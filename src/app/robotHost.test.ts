@@ -3,11 +3,11 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { robotAudit, hiddenCard } from '../../test/robotAudit';
 import { fixedPlaythrough } from '../../test/strategy';
 import { basicPolicy } from '../robots';
-import { dealFromSeed, highCardPoints, seatViewSeed, type Action, type Hand, type Playthrough, type RobotProvenance } from '../table';
+import { dealFromSeed, highCardPoints, seatViewSeed, validProvenance, type Action, type Hand, type Playthrough, type RobotProvenance } from '../table';
 import { fixedDeal } from './fixture';
 import { createRobotHost, type RobotHostOptions, type RobotWorker } from './robotHost';
 import { handleRobotMessage } from './robotWorker';
-import { ROBOT_PROTOCOL_VERSION, type RobotMessage, type RobotRequest, type RobotResponse } from './robotProtocol';
+import { ROBOT_PROTOCOL_VERSION, type RobotMessage, type RobotRequest } from './robotProtocol';
 import { createPlay } from './play';
 
 class FakeWorker implements RobotWorker {
@@ -23,7 +23,7 @@ class FakeWorker implements RobotWorker {
     this.messages.push(message);
     if (this.latency !== undefined) setTimeout(() => handleRobotMessage(message, response => this.emit(response)), this.latency);
   }
-  emit(message: RobotResponse) { this.onmessage?.({ data: message } as MessageEvent<RobotResponse>); }
+  emit(message: unknown) { this.onmessage?.({ data: message } as MessageEvent<unknown>); }
   terminate() { this.terminated = true; }
   get request() { return this.messages.find((message): message is RobotRequest => message.type === 'decide')!; }
   answer(request = this.request) { handleRobotMessage(request, response => this.emit(response)); }
@@ -52,6 +52,85 @@ for (const latency of [1, 350]) test(`US-10.4: ${latency} ms policy displays at 
   expect(submit.mock.calls[0][1]).toMatchObject({ policy: 'bv-basic', version: '1', kind: 'robot' });
   expect(submit.mock.calls[0][1].fallback).toBeUndefined(); expect(audit).toHaveBeenCalled();
   expect(submit.mock.calls[0][1]).not.toHaveProperty('ruleId');
+});
+
+const malformedResponses: [string, (response: Record<string, unknown>) => unknown][] = [
+  ['unknown-type', response => ({ ...response, type: 'surprise' })],
+  ['missing-action', response => { delete response.action; return response; }],
+  ['wrong-action-kind', response => ({ ...response, action: { kind: 'pass' } })],
+  ['extra-envelope-key', response => ({ ...response, extra: true })],
+  ['extra-action-key', response => ({ ...response, action: { ...(response.action as object), extra: true } })],
+  ['missing-provenance', response => { delete response.provenance; return response; }],
+  ['wrong-provenance-kind', response => ({ ...response, provenance: { ...(response.provenance as object), kind: 'learner' } })],
+  ['invalid-duration', response => ({ ...response, provenance: { ...(response.provenance as object), durationMs: '1' } })],
+  ['extra-provenance-key', response => ({ ...response, provenance: { ...(response.provenance as object), extra: true } })],
+  ['null', () => null],
+  ['array', response => Object.assign([], response)],
+  ['non-plain-object', response => Object.assign(new Date(), response)],
+];
+for (const operation of ['decide', 'choose-contract'] as const) {
+  const actionVariants: typeof malformedResponses = operation === 'decide' ? [
+    ['invalid-suit', response => ({ ...response, action: { kind: 'play-card', card: { suit: 'stars', rank: 'A' } } })],
+    ['invalid-rank', response => ({ ...response, action: { kind: 'play-card', card: { suit: 'spades', rank: '1' } } })],
+    ['extra-card-key', response => ({ ...response, action: { kind: 'play-card', card: { suit: 'spades', rank: 'A', extra: true } } })],
+    ['contract-action', response => ({ ...response, action: { kind: 'choose-contract', strain: 'no-trumps', objective: 'game' } })],
+  ] : [
+    ['invalid-strain', response => ({ ...response, action: { kind: 'choose-contract', strain: 'stars', objective: 'game' } })],
+    ['invalid-objective', response => ({ ...response, action: { kind: 'choose-contract', strain: 'spades', objective: 'slam' } })],
+    ['card-action', response => ({ ...response, action: { kind: 'play-card', card: { suit: 'spades', rank: 'A' } } })],
+  ];
+  test.each([...malformedResponses, ...actionVariants])(`US-12.5: ${operation} rejects %s, restarts and completes with valid record provenance`, (_name, corrupt) => {
+    vi.useFakeTimers();
+    const workers: FakeWorker[] = [];
+    const audit = vi.fn();
+    const play = createPlay({ audit, createWorker: () => {
+      const worker = new FakeWorker(workers.length ? 1 : undefined); workers.push(worker); return worker;
+    } }, operation === 'decide' ? fixedDeal : dealFromSeed('setup-ui', 3));
+    const stop = play.start();
+    try {
+      if (operation === 'decide') choosePractice(play);
+      else vi.advanceTimersByTime(3000);
+      vi.advanceTimersByTime(1);
+      const request = workers[0].messages.find(message => message.type === operation)!;
+      handleRobotMessage(request, response => workers[0].emit(corrupt(structuredClone(response) as Record<string, unknown>)));
+      expect(workers[0].terminated).toBe(true);
+      expect(workers).toHaveLength(2);
+      vi.advanceTimersByTime(500);
+      const entry = operation === 'decide' ? play.record().actions[0] : play.record().setupEvents?.at(-1);
+      expect(entry).toMatchObject({ provenance: { kind: 'robot', fallback: 'engine-failure' } });
+      for (let step = 0; step < 120 && play.record().status !== 'completed'; step++) {
+        const view = play.getSnapshot();
+        if (view.collecting) vi.advanceTimersByTime(1000);
+        else if ((view.turn === 'north' || view.turn === 'south') && view.legalCards.length) play.play(view.turn, view.legalCards[0]);
+        else vi.advanceTimersByTime(500);
+      }
+      expect(play.record().status).toBe('completed');
+      for (const action of play.record().actions) {
+        if (action.controller === 'robot') {
+          expect(action.provenance.kind).toBe('robot');
+          expect(validProvenance('robot', action.provenance)).toBe(true);
+        }
+      }
+      for (const event of play.record().setupEvents ?? []) {
+        if (event.kind === 'contract-choice' && event.controller === 'robot') {
+          expect(event.provenance.kind).toBe('robot');
+          expect(validProvenance('robot', event.provenance)).toBe(true);
+        }
+      }
+      expect(audit).toHaveBeenCalled();
+    } finally { stop(); }
+  });
+}
+
+test('US-12.5: malformed responses count toward disabling the worker for the session', () => {
+  const { workers, decide, submit } = setup(undefined, { failureThreshold: 2 });
+  workers[0].emit(null); vi.advanceTimersByTime(500);
+  decide(); workers[1].emit({ type: 'unknown' }); vi.advanceTimersByTime(500);
+  decide(); vi.advanceTimersByTime(500);
+  expect(workers).toHaveLength(2);
+  expect(workers.every(worker => worker.terminated)).toBe(true);
+  expect(submit).toHaveBeenCalledTimes(3);
+  expect(submit.mock.calls.every(([, provenance]) => provenance.fallback === 'engine-failure')).toBe(true);
 });
 test('US-10.4: forced final play uses the same display delay', () => {
   const table = fixedPlaythrough();
