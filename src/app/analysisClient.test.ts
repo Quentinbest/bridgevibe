@@ -132,3 +132,20 @@ test('§4.3.6: a caller cancels its own ID without inspecting any posted request
   await expect(client.solver.solvePosition(layout, position, 'owned-third')).resolves.toMatchObject({ name: 'test' });
   client.close();
 });
+
+test('§4.3.6: a cancellation made before the handshake completes is never posted', async () => {
+  const worker = new FakeWorker(null);
+  const client = analysisClient(record, () => worker);
+  const owned = client.solver.solvePosition(layout, position, 'early');
+  const rejected = expect(owned).rejects.toThrow('AnalysisCancelled');
+  client.cancel('early');
+  worker.emit({ type: 'hello', protocolVersion: ANALYSIS_PROTOCOL_VERSION });
+  await rejected;
+  expect(worker.posted).toEqual([]);
+  // The client stays usable: a later request is posted and served normally.
+  const later = client.solver.solvePosition(layout, position, 'later');
+  await vi.waitFor(() => expect(worker.posted).toHaveLength(1));
+  worker.emit({ ...worker.posted[0], type: 'result', result: { name: 'test', version: '1', classes: [] } });
+  await expect(later).resolves.toMatchObject({ name: 'test' });
+  client.close();
+});

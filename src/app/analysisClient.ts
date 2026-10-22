@@ -61,14 +61,20 @@ export function analysisClient(record: CompletedPlaythroughRecord, createWorker:
     });
     return ready;
   }
+  // Caller-owned IDs still waiting for the handshake, and those cancelled meanwhile.
+  const waiting = new Set<string>(), cancelledEarly = new Set<string>();
   const solver: AnalysisSolver = { ...bridgeDdsEngine,
     solveTable: async () => { throw new Error('ReviewUsesPositions'); },
     solvePosition: async (_layout, _position, cancellationId) => {
       if (failed) throw new Error('AnalysisUnavailable');
       const requestedIndex = index;
       if (!Number.isInteger(requestedIndex) || requestedIndex < 0 || requestedIndex >= record.actions.length) throw new Error('InvalidAnalysisPosition');
-      const connected = await connect();
+      if (cancellationId) waiting.add(cancellationId);
+      let connected: AnalysisWorker;
+      try { connected = await connect(); } finally { if (cancellationId) waiting.delete(cancellationId); }
       if (failed) throw new Error('AnalysisUnavailable');
+      // §4.3.6: a cancellation made during the handshake prevents the request from being posted.
+      if (cancellationId && cancelledEarly.delete(cancellationId)) throw new Error('AnalysisCancelled');
       const requestId = ++sequence;
       const request: AnalysisRequest = { type: 'solve', requestId, record, index: requestedIndex,
         playthroughId: record.playthroughId, positionKey: keys[requestedIndex], deadline: Date.now() + timeoutMs,
@@ -82,6 +88,7 @@ export function analysisClient(record: CompletedPlaythroughRecord, createWorker:
   };
   return { solver, at(value: number) { index = value; },
     cancel(cancellationId: string) {
+      if (waiting.has(cancellationId)) cancelledEarly.add(cancellationId);
       for (const [id, item] of pending) {
         if (item.request.cancellationId !== cancellationId) continue;
         pending.delete(id); clearTimeout(item.timer);
