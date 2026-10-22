@@ -1,4 +1,4 @@
-import { bridgeDdsAdapter } from '../analysis/bridgeDdsAdapter';
+import { loadConfiguredSolver } from '../analysis/solverSelection';
 import { completedRecord, type PlaythroughRecord } from '../table';
 import { doubleDummy } from '../analysis';
 import { ANALYSIS_PROTOCOL_VERSION, type AnalysisRequest, type AnalysisResponse } from './analysisProtocol';
@@ -7,7 +7,7 @@ import { ANALYSIS_PROTOCOL_VERSION, type AnalysisRequest, type AnalysisResponse 
 export async function handleAnalysisRequest(data: AnalysisRequest, post: (response: AnalysisResponse) => void) {
   try {
     post({ type: 'result', requestId: data.requestId,
-      result: await doubleDummy(bridgeDdsAdapter, completedRecord(data.record as PlaythroughRecord), data.index) });
+      result: await doubleDummy(await loadConfiguredSolver(), completedRecord(data.record as PlaythroughRecord), data.index) });
   } catch { post({ type: 'error', requestId: data.requestId }); }
 }
 // §4.1.3: guard permits direct handler tests without starting a Worker.

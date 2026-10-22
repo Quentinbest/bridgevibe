@@ -13,5 +13,10 @@
     "licenceFile": "public/licences/fonts/ibm-plex-sans-LICENSE.txt",
     "licence": "OFL-1.1",
     "attribution": "IBM Plex Sans font licence notice"
+  },
+  "src/analysis/macroxue/solver.wasm": {
+    "licenceFile": "src/analysis/macroxue/LICENSE-MIT",
+    "licence": "MIT",
+    "attribution": "macroxue/bridge-solver 630705d97bc9205b7310ce6cecafbfb031b289e6; emscripten 5.0.7. MIT alternative (also available under Apache-2.0, src/analysis/macroxue/LICENSE-APACHE)."
   }
 }

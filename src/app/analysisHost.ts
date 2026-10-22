@@ -1,4 +1,5 @@
-import { bridgeDdsEngine, type SolverPort } from '../analysis';
+import { type SolverPort } from '../analysis';
+import { configuredEngine } from '../analysis/solverSelection';
 import { trickCosts, TrickCostFailure, type TrickCost } from '../coach/trickCost';
 import { type LogEntry, type AnalysisCause, type createProvenanceLog } from '../coach/provenance';
 import { completedRecord, type CompletedPlaythroughRecord } from '../table';
@@ -15,9 +16,9 @@ export function createAnalysisHost(createClient?: (record: CompletedPlaythroughR
   const publish = () => listeners.forEach(listener => listener());
   return {
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
-    snapshot(record: CompletedPlaythroughRecord | null, engine: { name: string; version: string } = bridgeDdsEngine): AnalysisState { return record ? cache.get(keyOf(record, engine)) ?? empty : empty; },
+    snapshot(record: CompletedPlaythroughRecord | null, engine: { name: string; version: string } = configuredEngine()): AnalysisState { return record ? cache.get(keyOf(record, engine)) ?? empty : empty; },
     retry(record: CompletedPlaythroughRecord, log: ReturnType<typeof createProvenanceLog>, fake?: SolverPort) {
-      const key = keyOf(record, fake ?? bridgeDdsEngine);
+      const key = keyOf(record, fake ?? configuredEngine());
       if (!cache.get(key)?.abstention) return () => {};
       cache.delete(key);
       return this.start(record, log, fake);
@@ -25,7 +26,8 @@ export function createAnalysisHost(createClient?: (record: CompletedPlaythroughR
     // Returns a cancel function: a replaced deal stops its analysis and frees the worker.
     start(record: CompletedPlaythroughRecord, log: ReturnType<typeof createProvenanceLog>, fake?: SolverPort): () => void {
       completedRecord(record);
-      const key = keyOf(record, fake ?? bridgeDdsEngine);
+      const engine = fake ?? configuredEngine();
+      const key = keyOf(record, engine);
       if (cache.has(key)) return () => {};
       // VAL-06: one identity per run, independent of interleaved provenance writes.
       const attemptId = `analysis-${record.playthroughId}-${++attempt}`;
@@ -46,7 +48,7 @@ export function createAnalysisHost(createClient?: (record: CompletedPlaythroughR
           } else close = () => client?.close();
           if (cancelled) { close(); return; }
           // US-17: worker requests reference positions in the completed record only.
-          const solver: SolverPort = { ...port, async solvePosition(layout, position) {
+          const solver: SolverPort = { ...port, name: engine.name, version: engine.version, async solvePosition(layout, position) {
             client?.at(52 - Object.values(layout).reduce((sum, cards) => sum + cards.length, 0));
             try { return await port.solvePosition(layout, position); }
             catch (error) {
@@ -68,7 +70,7 @@ export function createAnalysisHost(createClient?: (record: CompletedPlaythroughR
           const abstention: LogEntry = { id: failureId, playthroughId: record.playthroughId, positionIndex: failure?.positionIndex ?? 0,
             kind: 'statement', summary: JSON.stringify({ reason: 'unavailable', cause }), abstention: { reason: 'unavailable', cause },
             text: text('review.unavailable'), informationMode: 'ALL_HANDS', at: new Date().toISOString(),
-            provenance: { sourceKind: 'engine', name: (fake ?? bridgeDdsEngine).name, version: (fake ?? bridgeDdsEngine).version, mode: 'ALL_HANDS', sampleCount: 0 } };
+            provenance: { sourceKind: 'engine', name: engine.name, version: engine.version, mode: 'ALL_HANDS', sampleCount: 0 } };
           log.record(abstention);
           cache.set(key, { ...cache.get(key)!, abstention });
         }
