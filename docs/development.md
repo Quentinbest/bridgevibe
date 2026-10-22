@@ -40,6 +40,10 @@ file in the output directory is scanned, including binaries and NOTICE.
 Declare public files and imported artwork, icons or WebAssembly in
 `licences/assets.json` with their source or shipped path, repository licence file,
 licence name and attribution. The declared licence must match the file's grant.
+Every register entry must contain exactly `licenceFile`, `licence` and
+`attribution`, all non-empty strings; invalid entries fail even when unused.
+Package grant filenames include `UNLICENSE`, with the same separators and
+extensions as `LICENSE` (excluding code, JSON and source maps).
 First-party code is recorded separately with distribution model D2 still open.
 Track unanswered DEP-08 questions in `licences/open-items.json`; these are copied
 into the BOM, not treated as grants.
@@ -51,6 +55,11 @@ unrecognised grant, or, with `elected`, a dual-licensed artefact: `elected` name
 the non-GPL grant its own licence files make (for example `"MIT"` for "MIT or GPL"),
 and the BOM records that election. GPL-only artefacts and LR-3 violations cannot be
 exempted. The list starts empty.
+For an unrecognised asset licence, a reviewed `path` exception matching its exact
+version/content hash permits the registered name; the BOM records
+`licenceSource: "reviewed-register"` and the exception. The licence file is still
+required, known grants still use the classifier, and commercial-use or share-alike
+terms remain the owner's decision during review.
 For isolated builds, `licences({ reportPath })` or the
 `BRIDGEVIBE_LICENCE_REPORT` environment variable redirects the BOM destination.
 
