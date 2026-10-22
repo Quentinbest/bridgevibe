@@ -30,7 +30,7 @@ test('§4.7 / #21: requests carry the completed record; a stalled worker is term
   const pending = client.solver.solvePosition(layout, position);
   const failed = expect(pending).rejects.toThrow('AnalysisTimeout');
   await vi.advanceTimersByTimeAsync(0);
-  expect(workers[0].posted).toEqual([expect.objectContaining({ type: 'solve', requestId: 1, record, index: 1, playthroughId: record.playthroughId, positionKey: expect.stringMatching(/^[0-9a-f]{16}$/), deadline: Date.now() + 30000, cancellationId: 'analysis-1' })]);
+  expect(workers[0].posted).toEqual([expect.objectContaining({ type: 'solve', requestId: 1, record, index: 1, playthroughId: record.playthroughId, positionKey: expect.stringMatching(/^[0-9a-f]{16}$/), deadline: Date.now() + 30000, cancellationId: 'auto:1' })]);
   await vi.advanceTimersByTimeAsync(30000); await failed;
   expect(workers[0].terminated).toBe(true);
   await expect(client.solver.solvePosition(layout, position)).rejects.toThrow('AnalysisUnavailable');
@@ -103,7 +103,7 @@ test('§4.3.6: targeted cancellation preserves concurrent requests and the same 
     expect(worker.posted[i].positionKey).toBe(table.positionKey());
   }
   client.cancel('caller-first'); await cancelled;
-  expect(worker.cancelled).toEqual(['caller-first']); expect(worker.terminated).toBe(false);
+  expect(worker.cancelled).toEqual(['caller:caller-first']); expect(worker.terminated).toBe(false);
   const result = { name: 'test', version: '1', classes: [] };
   worker.emit({ ...a, type: 'result', result });
   worker.emit({ ...b, type: 'result', result });
@@ -116,7 +116,7 @@ test('§4.3.6: targeted cancellation preserves concurrent requests and the same 
 
 test('§4.3.6: a caller cancels its own ID without inspecting any posted request', async () => {
   const worker: AnalysisWorker = { onmessage: null, onerror: null, terminate: vi.fn(), postMessage(message: AnalysisMessage) {
-    if (message.type !== 'solve' || message.cancellationId === 'owned-first') return;
+    if (message.type !== 'solve' || message.cancellationId === 'caller:owned-first') return;
     queueMicrotask(() => worker.onmessage?.(new MessageEvent<AnalysisResponse>('message', { data: { type: 'result', requestId: message.requestId,
       playthroughId: message.playthroughId, positionKey: message.positionKey, result: { name: 'test', version: '1', classes: [] } } })));
   } };
@@ -160,5 +160,18 @@ test('US-45.1: a worker-side deadline error keeps its timeout cause', async () =
   await vi.waitFor(() => expect(worker.posted).toHaveLength(2));
   worker.emit({ type: 'error', requestId: worker.posted[1].requestId, playthroughId: worker.posted[1].playthroughId, positionKey: worker.posted[1].positionKey });
   await expect(failed).rejects.toThrow('AnalysisFailed');
+  client.close();
+});
+
+test('§4.3.6: caller and generated cancellation IDs never collide, and a duplicate caller ID is refused', async () => {
+  const worker = new FakeWorker(); const client = analysisClient(record, () => worker);
+  const owned = client.solver.solvePosition(layout, position, 'analysis-2');
+  const generated = client.solver.solvePosition(layout, position);
+  await vi.waitFor(() => expect(worker.posted).toHaveLength(2));
+  expect(new Set(worker.posted.map(request => request.cancellationId)).size).toBe(2);
+  await expect(client.solver.solvePosition(layout, position, 'analysis-2')).rejects.toThrow('DuplicateCancellationId');
+  const result = { name: 'test', version: '1', classes: [] };
+  for (const request of worker.posted) worker.emit({ ...request, type: 'result', result });
+  await expect(owned).resolves.toEqual(result); await expect(generated).resolves.toEqual(result);
   client.close();
 });

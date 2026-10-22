@@ -23,7 +23,7 @@ export function analysisClient(record: CompletedPlaythroughRecord, createWorker:
     if (table.submit(entry.seat, entry.controller, entry.action, entry.provenance).kind === 'rejected') throw new Error('InvalidAnalysisRecord');
     keys.push(table.positionKey());
   }
-  const pending = new Map<number, { request: AnalysisRequest; resolve: (result: PositionResult) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
+  const pending = new Map<number, { request: AnalysisRequest; owner?: string; resolve: (result: PositionResult) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   let worker: AnalysisWorker | undefined;
   let ready: Promise<AnalysisWorker> | undefined;
   let index = 0;
@@ -69,6 +69,8 @@ export function analysisClient(record: CompletedPlaythroughRecord, createWorker:
       if (failed) throw new Error('AnalysisUnavailable');
       const requestedIndex = index;
       if (!Number.isInteger(requestedIndex) || requestedIndex < 0 || requestedIndex >= record.actions.length) throw new Error('InvalidAnalysisPosition');
+      // §4.3.6: a caller ID in use by another pending or waiting request would share the worker's slot.
+      if (cancellationId && (waiting.has(cancellationId) || [...pending.values()].some(item => item.owner === cancellationId))) throw new Error('DuplicateCancellationId');
       if (cancellationId) waiting.add(cancellationId);
       let connected: AnalysisWorker;
       try { connected = await connect(); } finally { if (cancellationId) waiting.delete(cancellationId); }
@@ -78,10 +80,11 @@ export function analysisClient(record: CompletedPlaythroughRecord, createWorker:
       const requestId = ++sequence;
       const request: AnalysisRequest = { type: 'solve', requestId, record, index: requestedIndex,
         playthroughId: record.playthroughId, positionKey: keys[requestedIndex], deadline: Date.now() + timeoutMs,
-        cancellationId: cancellationId ?? `analysis-${requestId}` };
+        // Separate namespaces on the wire: caller IDs can never equal generated ones.
+        cancellationId: cancellationId === undefined ? `auto:${requestId}` : `caller:${cancellationId}` };
       return new Promise<PositionResult>((resolve, reject) => {
         const timer = setTimeout(() => fail('AnalysisTimeout'), timeoutMs);
-        pending.set(requestId, { request, resolve, reject, timer });
+        pending.set(requestId, { request, owner: cancellationId, resolve, reject, timer });
         try { connected.postMessage(request); } catch { fail('AnalysisFailed'); }
       });
     },
@@ -90,9 +93,9 @@ export function analysisClient(record: CompletedPlaythroughRecord, createWorker:
     cancel(cancellationId: string) {
       if (waiting.has(cancellationId)) cancelledEarly.add(cancellationId);
       for (const [id, item] of pending) {
-        if (item.request.cancellationId !== cancellationId) continue;
+        if (item.owner !== cancellationId) continue;
         pending.delete(id); clearTimeout(item.timer);
-        worker?.postMessage({ type: 'cancel', cancellationId });
+        worker?.postMessage({ type: 'cancel', cancellationId: item.request.cancellationId });
         item.reject(new Error('AnalysisCancelled'));
       }
     },
