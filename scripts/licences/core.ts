@@ -127,7 +127,10 @@ export function buildBom(shipped: Shipped[], allowList: Exception[], assets: Rec
     const covers = (entry: Exception) => entry.version === item.version && (entry.package === item.name || (entry.path !== undefined && entry.path === source));
     // US-46.5: an unrecognised asset grant may use the owner's reviewed register name.
     // Known grants still use the classifier; missing files and GPL cannot use this fallback.
-    const reviewed = registered && (item.kind === 'asset' || item.kind === 'wasm')
+    // LR-4: a GPL-family name is never exempted, even for text the classifier doesn't recognise.
+    const gplName = !!registered && (/\b(?:A|L)?GPL\b|General Public Licen[cs]e/i.test(registered.licence) || classifyLicence(registered.licence) === 'GPL-family');
+    if (gplName && (item.kind === 'asset' || item.kind === 'wasm')) violations.push(`${item.name}: GPL-family licence in browser distribution (LR-4)`);
+    const reviewed = registered && !gplName && (item.kind === 'asset' || item.kind === 'wasm')
       && licence === 'no explicit grant' && own.length > 0
       ? valid.find(entry => entry.path === source && covers(entry) && entry.elected === undefined
         && entry.licence === registered.licence && entry.licenceText === licenceTextHash(own)) : undefined;

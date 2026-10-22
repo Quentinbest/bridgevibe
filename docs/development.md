@@ -58,7 +58,9 @@ exempted. The list starts empty.
 For an unrecognised asset licence, a reviewed `path` exception matching its exact
 version/content hash, the registered licence name (`licence`) and the licence text's
 hash (`licenceText`, from `licenceTextHash`) permits the registered name; changing the
-name or the text after review fails the build again. The BOM records
+name or the text after review fails the build again. A GPL-family registered name
+never uses this path (LR-4), and a registered asset with licence text clears only
+through this pinned review, never a generic missing-grant exception. The BOM records
 `licenceSource: "reviewed-register"` and the exception. The licence file is still
 required, known grants still use the classifier, and commercial-use or share-alike
 terms remain the owner's decision during review.

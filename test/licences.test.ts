@@ -95,6 +95,16 @@ it('uses a reviewed asset register name only for an unrecognised grant', () => {
   const generic: Exception = { path: source, version: item.version, reason: 'Old review', reviewer: 'Fixture owner', date: '2026-10-22' };
   expect(bom([relicensed], [generic], sentinel).violations.join()).toContain('Invalid asset register entry');
   expect(bom([relicensed], [generic], assets).violations.join()).toContain('no explicit grant (LR-2 / LR-7)');
+  // LR-4: a pinned review can't register a GPL-family name for unrecognised (e.g. translated) GPL text.
+  for (const name of ['GPL-3.0-only', 'LGPL-2.1', 'GNU General Public License v3']) {
+    const gplAssets = { [source]: { ...assets[source], licence: name } };
+    const gplReview = { ...review, licence: name, licenceText: licenceTextHash(['Lizenz: GNU Allgemeine Öffentliche Lizenz']) };
+    writeFileSync(path.join(dir, 'CC-BY.txt'), 'Lizenz: GNU Allgemeine Öffentliche Lizenz');
+    const translated = resolveArtefact(dir, source, source, gplAssets, Buffer.from('<svg/>'));
+    const report = bom([translated], [gplReview], gplAssets);
+    expect(report.violations.join()).toContain('GPL-family licence in browser distribution (LR-4)');
+    expect(report.artefacts[0].licenceSource).toBeUndefined();
+  }
   writeFileSync(path.join(dir, 'CC-BY.txt'), text('MIT'));
   const known = resolveArtefact(dir, source, source, assets, Buffer.from('<svg/>'));
   expect(bom([known], [review], assets).violations.join()).toContain('registered licence does not match');
