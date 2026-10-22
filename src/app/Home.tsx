@@ -16,6 +16,14 @@ export function Home({ dealsPlayed, navigate }: { dealsPlayed: number; navigate:
   const done = prompts.filter(prompt => attempts.some(attempt => attempt.promptContentId === prompt.contentId)).length;
   const progress = text('home.steps', { done, total: prompts.length });
   const lessonUrl = '?lesson=follow-suit-full';
+  // Native URLs keep the page's other query context (e.g. ?debug=1), as SPA navigation does.
+  function hrefFor(search: string) {
+    const url = new URL(window.location.href);
+    for (const key of ['lesson', 'seed', 'deal', 'practice']) url.searchParams.delete(key);
+    new URLSearchParams(search).forEach((value, key) => url.searchParams.set(key, value));
+    url.hash = '';
+    return url.pathname + url.search;
+  }
   function follow(event: MouseEvent<HTMLAnchorElement>, search: string) {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault(); navigate(search);
@@ -24,7 +32,7 @@ export function Home({ dealsPlayed, navigate }: { dealsPlayed: number; navigate:
     <header className="home-brand"><h1 aria-label={text('product')}><span>{text('product.first')}</span><span className="wordmark-accent">{text('product.second')}</span></h1></header>
     <main className="home-content">
       <h2 ref={heading} tabIndex={-1}>{text('home.next')}</h2>
-      <a className="home-lesson" href={lessonUrl} onClick={event => follow(event, lessonUrl)}>
+      <a className="home-lesson" href={hrefFor(lessonUrl)} onClick={event => follow(event, lessonUrl)}>
         {/* FR-P3: future lesson module/level slot; render only when Lesson declares that metadata. */}
         {fullFollowSuit.skillTags.map(skill => <p className="home-skill" key={skill}>
           {text('home.skill', { skill: text(`skill.${skill}` as StringId) })}
@@ -36,7 +44,7 @@ export function Home({ dealsPlayed, navigate }: { dealsPlayed: number; navigate:
         <p>{text('home.time', { minutes: Math.ceil(PROVISIONAL_LESSON_DURATION_MINUTES * (prompts.length - done) / prompts.length) })}</p>
         <span className="home-start">{text('home.open-lesson')}</span>
       </a>
-      <a className="home-practice" href="?practice=1" onClick={event => follow(event, '?practice=1')}>
+      <a className="home-practice" href={hrefFor('?practice=1')} onClick={event => follow(event, '?practice=1')}>
         <h3>{text('home.quick')}</h3><p>{text('home.practice-description')}</p>
       </a>
       <p className="home-session">{text(dealsPlayed === 1 ? 'home.session-one' : 'home.session', { count: dealsPlayed })} {text('home.unsaved')}</p>
@@ -44,8 +52,9 @@ export function Home({ dealsPlayed, navigate }: { dealsPlayed: number; navigate:
     {/* UX §2.1: only destinations with phase V content are offered. */}
     <nav className="home-nav" aria-label={text('home.navigation')}>
       {/* UX §2.3: this landing is Learn itself, so its tab stays here; the lesson card starts the lesson. */}
-      <a href="./" aria-current="page" onClick={event => follow(event, '')}>{text('home.learn')}</a>
-      <a href="?practice=1" onClick={event => follow(event, '?practice=1')}>{text('home.practice')}</a>
+      {/* The current tab is a no-op: no history entry for the page already shown. */}
+      <a href={hrefFor('')} aria-current="page" onClick={event => { if (event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) { event.preventDefault(); heading.current?.focus(); } }}>{text('home.learn')}</a>
+      <a href={hrefFor('?practice=1')} onClick={event => follow(event, '?practice=1')}>{text('home.practice')}</a>
     </nav>
   </div>;
 }

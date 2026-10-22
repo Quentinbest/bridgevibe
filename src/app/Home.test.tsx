@@ -104,3 +104,15 @@ test('US-07.1: practice launched again from Home continues the alternation', () 
   expect(screen.getByText(/(North|South|East|West) declares/).textContent).toMatch(/(North|South) declares/);
   vi.useRealTimers();
 });
+
+test('the current Learn tab adds no history entry, and launcher hrefs keep query context', () => {
+  history.replaceState(null, '', '/?debug=1');
+  render(<App />);
+  const before = history.length;
+  fireEvent.click(screen.getByRole('link', { name: 'Learn' }));
+  expect(history.length).toBe(before);
+  expect(location.search).toBe('?debug=1');
+  expect(screen.getByRole('link', { name: 'Practice' }).getAttribute('href')).toBe('/?debug=1&practice=1');
+  expect(screen.getByRole('link', { name: /Skill: Follow suit.*Open lesson/ }).getAttribute('href')).toBe('/?debug=1&lesson=follow-suit-full');
+  history.replaceState(null, '', '/');
+});
