@@ -175,3 +175,10 @@ test('§4.3.6: caller and generated cancellation IDs never collide, and a duplic
   await expect(owned).resolves.toEqual(result); await expect(generated).resolves.toEqual(result);
   client.close();
 });
+
+test('§4.3.6: an empty caller cancellation ID is refused, never sent as caller:', async () => {
+  const worker = new FakeWorker(); const client = analysisClient(record, () => worker);
+  await expect(client.solver.solvePosition(layout, position, '')).rejects.toThrow('InvalidCancellationId');
+  expect(worker.posted).toEqual([]);
+  client.close();
+});

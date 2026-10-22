@@ -69,14 +69,15 @@ export function analysisClient(record: CompletedPlaythroughRecord, createWorker:
       if (failed) throw new Error('AnalysisUnavailable');
       const requestedIndex = index;
       if (!Number.isInteger(requestedIndex) || requestedIndex < 0 || requestedIndex >= record.actions.length) throw new Error('InvalidAnalysisPosition');
+      if (cancellationId !== undefined && (typeof cancellationId !== 'string' || cancellationId.length === 0)) throw new Error('InvalidCancellationId');
       // §4.3.6: a caller ID in use by another pending or waiting request would share the worker's slot.
-      if (cancellationId && (waiting.has(cancellationId) || [...pending.values()].some(item => item.owner === cancellationId))) throw new Error('DuplicateCancellationId');
-      if (cancellationId) waiting.add(cancellationId);
+      if (cancellationId !== undefined && (waiting.has(cancellationId) || [...pending.values()].some(item => item.owner === cancellationId))) throw new Error('DuplicateCancellationId');
+      if (cancellationId !== undefined) waiting.add(cancellationId);
       let connected: AnalysisWorker;
-      try { connected = await connect(); } finally { if (cancellationId) waiting.delete(cancellationId); }
+      try { connected = await connect(); } finally { if (cancellationId !== undefined) waiting.delete(cancellationId); }
       if (failed) throw new Error('AnalysisUnavailable');
       // §4.3.6: a cancellation made during the handshake prevents the request from being posted.
-      if (cancellationId && cancelledEarly.delete(cancellationId)) throw new Error('AnalysisCancelled');
+      if (cancellationId !== undefined && cancelledEarly.delete(cancellationId)) throw new Error('AnalysisCancelled');
       const requestId = ++sequence;
       const request: AnalysisRequest = { type: 'solve', requestId, record, index: requestedIndex,
         playthroughId: record.playthroughId, positionKey: keys[requestedIndex], deadline: Date.now() + timeoutMs,
