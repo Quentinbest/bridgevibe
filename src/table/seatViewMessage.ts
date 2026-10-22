@@ -85,6 +85,6 @@ export function decodeSetupSeatView(data: unknown): SetupSeatView {
   const nullableSeat: Check = value => value === null || seat(value);
   if (!object({ seat, hand: array(card, 13), dummy: value => value === null || array(card, 13)(value), dummySeat: nullableSeat,
     announcements: announcementList, declarer: nullableSeat, tied: choice([true, false]),
-    step: choice(['announcements', 'redeal', 'declarer', 'dummy', 'contract-choice', 'complete']) })(data)) throw new Error('Invalid SetupSeatView message');
+    step: choice(['announcements', 'redeal', 'redeal-unavailable', 'declarer', 'dummy', 'contract-choice', 'complete']) })(data)) throw new Error('Invalid SetupSeatView message');
   return { ...JSON.parse(JSON.stringify(data)), [setupSeatViewBrand]: true };
 }

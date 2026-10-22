@@ -15,6 +15,8 @@ export function MiniBridgeSetup({ view, choose }: { view: SetupSeatView; choose:
     <div aria-live="polite" aria-atomic="true">
       <ol className="setup-points">{view.announcements.map(a => <li key={a.seat} className={a.seat === view.declarer ? 'setup-declarer' : undefined}>{text('setup.points', { seat: text(`seat.${a.seat}`), hcp: a.hcp })}</li>)}</ol>
       {view.step === 'redeal' && <p>{text('setup.redeal')}</p>}
+      {/* US-06.2: the last seed index has no next Deal; New deal starts a fresh seed. */}
+      {view.step === 'redeal-unavailable' && <p role="status">{text('setup.redeal-unavailable')}</p>}
       {view.declarer && <><p>{text('setup.totals', { ns, ew: 40 - ns })}</p><p>{text(view.tied ? 'setup.tie' : 'setup.declarer', { seat: text(`seat.${view.declarer}`) })}</p></>}
     </div>
     {view.dummy && view.dummySeat && <section className={`setup-dummy setup-${view.dummySeat}`} aria-label={text(`seat.${view.dummySeat}`)}>

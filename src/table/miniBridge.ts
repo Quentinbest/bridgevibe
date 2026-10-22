@@ -10,7 +10,7 @@ export type SetupEvent = Readonly<({ kind: 'announcement' } & Announcement)
   | { kind: 'declarer'; seat: Seat; tied: boolean }
   | { kind: 'dummy-exposed'; seat: Seat }
   | { kind: 'contract-choice'; seat: Seat; controller: Controller; action: ContractChoice; provenance: ActionProvenance }>;
-export type SetupStep = 'announcements' | 'redeal' | 'declarer' | 'dummy' | 'contract-choice' | 'complete';
+export type SetupStep = 'announcements' | 'redeal' | 'redeal-unavailable' | 'declarer' | 'dummy' | 'contract-choice' | 'complete';
 export const highCardPoints = (hand: readonly Card[]): number => hand.reduce((sum, card) => sum + (card.rank === 'A' ? 4 : card.rank === 'K' ? 3 : card.rank === 'Q' ? 2 : card.rank === 'J' ? 1 : 0), 0);
 const copy = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 const partner = (seat: Seat): Seat => SEATS[(SEATS.indexOf(seat) + 2) % 4];
@@ -34,7 +34,8 @@ export function startMiniBridge(input: Omit<Parameters<typeof startPlaythrough>[
         const ns = announcements.filter(a => sideOf(a.seat) === 'northSouth').reduce((n, a) => n + a.hcp, 0);
         if (ns === 20) {
           if (deal.origin.kind === 'authored') throw new Error('Authored MiniBridge Deal cannot be redealt');
-          step = 'redeal';
+          // US-06.2: the final safe index has no deterministic successor.
+          step = deal.origin.index === Number.MAX_SAFE_INTEGER ? 'redeal-unavailable' : 'redeal';
         } else {
           const candidates = announcements.filter(a => sideOf(a.seat) === (ns > 20 ? 'northSouth' : 'eastWest'));
           tied = candidates[0].hcp === candidates[1].hcp;

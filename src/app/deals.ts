@@ -16,7 +16,7 @@ export function dealFromUrl(search: string): { deal: Deal; invalid: boolean } {
   }
 }
 export function nextDeal(deal: Deal): Deal {
-  if (deal.origin.kind === 'seed') return redeal(deal);
+  if (deal.origin.kind === 'seed' && deal.origin.index < Number.MAX_SAFE_INTEGER) return redeal(deal);
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-';
   const seed = Array.from(crypto.getRandomValues(new Uint8Array(12)), byte => alphabet[byte & 63]).join('');
   return dealFromSeed(seed, 1);

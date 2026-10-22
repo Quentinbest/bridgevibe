@@ -92,6 +92,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     if (!running) return;
     if (!table) {
       const view = setup.seatView('south');
+      if (view.step === 'redeal-unavailable') return;
       if (view.step === 'contract-choice') {
         const seat = view.declarer!;
         if (setup.controllerOf(seat) === 'robot') robots.decide({ kind: 'contract', view: setup.seatView(seat), seed: JSON.stringify(encodeSetupSeatView(setup.seatView(seat))),
