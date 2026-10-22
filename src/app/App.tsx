@@ -189,15 +189,27 @@ export function App() {
     window.addEventListener('popstate', back);
     return () => window.removeEventListener('popstate', back);
   }, []);
-  function navigate(search: string) {
+  function urlFor(search: string) {
     const url = new URL(window.location.href);
     for (const key of ['lesson', 'seed', 'deal', 'practice']) url.searchParams.delete(key);
     new URLSearchParams(search).forEach((value, key) => url.searchParams.set(key, value));
     url.hash = '';
-    window.history.pushState(null, '', url);
+    return url;
+  }
+  // UX §2.1: launchers push an entry marked as opened from Home.
+  function navigate(search: string) {
+    window.history.pushState({ launchedFromHome: search !== '' }, '', urlFor(search));
     setRoute(routeFromUrl());
   }
-  if (route.screen === 'lesson') return <LessonScreen key={route.lesson.contentId} lesson={route.lesson} onClose={() => navigate('')} />;
-  if (route.screen === 'practice') return <PracticeScreen onExit={() => navigate('')} onCompleted={countCompleted} />;
+  // Leaving replaces the activity's entry with Home at once, so browser Back never reopens or restarts
+  // it; an activity launched from Home also steps back onto that Home entry, leaving no duplicate.
+  function leave() {
+    const launched = (window.history.state as { launchedFromHome?: boolean } | null)?.launchedFromHome;
+    window.history.replaceState(null, '', urlFor(''));
+    setRoute(routeFromUrl());
+    if (launched) window.history.back();
+  }
+  if (route.screen === 'lesson') return <LessonScreen key={route.lesson.contentId} lesson={route.lesson} onClose={leave} />;
+  if (route.screen === 'practice') return <PracticeScreen onExit={leave} onCompleted={countCompleted} />;
   return <Home dealsPlayed={dealsPlayed} navigate={navigate} />;
 }

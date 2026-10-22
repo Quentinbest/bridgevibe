@@ -74,3 +74,21 @@ test('navigation changes from bottom bar to left rail exactly at 900px', async (
   box = (await page.getByRole('navigation').boundingBox())!;
   expect(box.height).toBe(900); expect(box.width).toBeLessThan(899); expect(box.y).toBe(0);
 });
+
+// UX §2.1: leaving an activity consumes its history entry, so Back never reopens or restarts it.
+test('Exit and Close leave no activity entry behind for browser Back', async ({ page }) => {
+  await page.goto('/');
+  const start = await page.evaluate(() => history.length);
+  await page.getByRole('link', { name: /^Quick deal/ }).click();
+  await expect(page).toHaveURL(/practice=1/);
+  await page.getByRole('button', { name: 'Exit', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Your next move' })).toBeFocused();
+  await expect(page).not.toHaveURL(/practice=1/);
+  await page.getByRole('link', { name: /Skill: Follow suit.*Open lesson/ }).click();
+  await page.getByRole('button', { name: 'Close lesson', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Your next move' })).toBeFocused();
+  // Back from Home now leaves the app's Home entry; it never lands on practice or the lesson.
+  expect(await page.evaluate(() => history.length)).toBe(start + 1);
+  await page.goBack();
+  expect(page.url()).not.toMatch(/practice=1|lesson=/);
+});
