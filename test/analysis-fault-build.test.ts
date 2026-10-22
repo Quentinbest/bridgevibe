@@ -5,7 +5,7 @@ import { build } from 'vite';
 import { expect, test, vi } from 'vitest';
 
 // US-45.1: verify the fault selector and wrappers cannot ship in production.
-test('production excludes the analysis fault-injection module and URL selector', async () => {
+test('production excludes the analysis and hint fault-injection modules and URL selectors', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'bridgevibe-fault-build-'));
   vi.stubEnv('BRIDGEVIBE_LICENCE_REPORT', join(dir, 'bom.json'));
   try {
@@ -14,7 +14,9 @@ test('production excludes the analysis fault-injection module and URL selector',
     for (const output of built.output) {
       if (output.type === 'chunk') {
         expect(Object.keys(output.modules).some(id => id.includes('analysisFaults'))).toBe(false);
+        expect(Object.keys(output.modules).some(id => id.includes('hintFaults'))).toBe(false);
         expect(output.code).not.toContain('analysisFault');
+        expect(output.code).not.toContain('hintFault');
       }
     }
   } finally { vi.unstubAllEnvs(); rmSync(dir, { recursive: true, force: true }); }

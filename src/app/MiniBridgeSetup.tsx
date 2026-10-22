@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { SUITS, OBJECTIVES, trickTarget, sideOf, type Card, type ContractChoice, type SetupSeatView } from '../table';
 import { text } from '../explanation';
+import HintSheet from './HintSheet';
+import type { HintSnapshot } from './hints';
 import { Hand } from './Hand';
 import { seatLabel, tablePositions } from './rotation';
 
-export function MiniBridgeSetup({ view, southHand, choose }: { view: SetupSeatView; southHand: readonly Card[]; choose: (choice: ContractChoice) => void }) {
+export function MiniBridgeSetup({ view, southHand, choose, hint, onHint, onDismissHint, onToggleHints }: { hint?: HintSnapshot; onHint?: () => void; onDismissHint?: () => void; onToggleHints?: () => void; view: SetupSeatView; southHand: readonly Card[]; choose: (choice: ContractChoice) => void }) {
   const [strain, setStrain] = useState<ContractChoice['strain']>('no-trumps');
   const [objective, setObjective] = useState<ContractChoice['objective']>('part-score');
   const first = useRef<HTMLButtonElement>(null);
@@ -34,6 +36,11 @@ export function MiniBridgeSetup({ view, southHand, choose }: { view: SetupSeatVi
       <fieldset><legend>{text('setup.objective')}</legend>{OBJECTIVES.map(value => <button key={value} type="button" aria-pressed={objective === value} onClick={() => setObjective(value)}>{text(`setup.${value}`, { target: trickTarget(strain, value) })}</button>)}</fieldset>
       <button type="button" onClick={() => choose({ kind: 'choose-contract', strain, objective })}>{text('setup.choose')}</button>
     </section> : <p>{text('setup.robot', { seat: text(`seat.${view.declarer!}`) })}</p>)}
+    {view.step === 'contract-choice' && learner && hint && <>
+      <label className="hint-toggle"><input type="checkbox" checked={hint.enabled} onChange={onToggleHints} aria-label={text('hint.toggle')} /><span>{text('hint.toggle-short')}</span></label>
+      {hint.enabled && <button type="button" onClick={onHint} aria-expanded={hint.open}>{text('hint.button')}</button>}
+      {hint.open && <HintSheet hint={hint} dismiss={() => onDismissHint?.()} contractChoice />}
+    </>}
     <section className="setup-own" data-seat="south" data-position={positions.south} aria-label={text('seat.south')}><p className="seat-label">{seatLabel('south', null)}</p><Hand cards={southHand} active={false} legalCards={[]} selected={null} onSelect={() => {}} onPlay={() => {}} /></section>
   </main>;
 }

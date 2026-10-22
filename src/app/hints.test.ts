@@ -1,14 +1,16 @@
 import { afterEach, expect, test, vi } from 'vitest';
-import { encodeSeatView, sameCard, seatViewSeed, type Deal, type SeatView, type Card } from '../table';
-import { sampledEstimate } from '../analysis/sampledEstimate';
+import { encodeSeatView, startPlaythrough, sameCard, seatViewSeed, type Deal, type SeatView, type Card } from '../table';
+import { visibleClasses, sampledEstimate } from '../analysis/sampledEstimate';
 import type { SolverPort } from '../analysis';
 import { runHint, type HintRunner, type HintWorker } from './hintClient';
 import { createPlay } from './play';
 import { fixedDeal } from './fixture';
 import { choosePractice } from '../../test/miniBridge';
-import { renderHint } from './hints';
-import { catalogue, text } from '../explanation';
+import { createHints, hintSeat, renderHint } from './hints';
+import { cardName, catalogue, text } from '../explanation';
 import { hintStatement } from '../coach/hint';
+import { faultHintRunner, type HintFault } from './hintFaults';
+import { completeFixedDeal } from '../../test/strategy';
 import { validateEntry } from '../coach/provenance';
 const engine = { name: 'test', version: '1' };
 const solver: SolverPort = { ...engine, solveTable: vi.fn(), solvePosition: async layout => ({ ...engine, classes: Object.values(layout).flat().map(card => ({ cards: [card], tricks: 3 })) }) };
@@ -101,7 +103,7 @@ test('a shown unavailable abstention logs its timeout cause and a missed U-01 ta
   vi.useFakeTimers();
   const { play, stop } = begin(fixedDeal, (_view, _cards, done) => { done({ abstention: { reason: 'unavailable', cause: 'timeout' }, sampleCount: 0, enumerated: false }, 3001); return vi.fn(); });
   play.showHint();
-  expect(play.getSnapshot().hint?.advice).toBe(text('hint.unavailable'));
+  expect(play.getSnapshot().hint?.advice).toBe(text('hint.unavailable-timeout'));
   expect(play.provenanceLog.entries().find(e => e.abstention)).toMatchObject({ abstention: { reason: 'unavailable', cause: 'timeout' }, provenance: { hint: { durationMs: 3001, exceededTarget: true } } });
   expect(play.hintTimings()).toEqual([{ durationMs: 3001, exceededTarget: true }]); stop();
 });
@@ -121,7 +123,7 @@ test.each(['worker-crash', 'protocol-mismatch'] as const)('US-45.1: %s survives 
     workers[1].onmessage!({ data: { type: 'hello', protocolVersion: 99 } } as MessageEvent);
   }
   const entry = play.provenanceLog.entries().find(e => e.abstention)!;
-  expect(entry).toMatchObject({ informationMode: 'VISIBLE', abstention: { reason: 'unavailable', cause }, summary: 'hint.unavailable' });
+  expect(entry).toMatchObject({ informationMode: 'VISIBLE', abstention: { reason: 'unavailable', cause }, summary: 'hint.unavailable-failure' });
   expect(validateEntry(entry)).toEqual([]); stop();
 });
 
@@ -153,4 +155,116 @@ test('CI-5, §4.3.6: provenance names the engine and sampler the worker reported
   expect(entry.provenance).toMatchObject({ name: 'older-engine', version: '0.9', hint: { sampler: 'bv-layout', samplerVersion: '0' } });
   expect(validateEntry(entry)).toEqual([]);
   stop();
+});
+
+test('US-14.11: forced cards bypass the runner throughout a Playthrough and log VISIBLE templates', () => {
+  vi.useFakeTimers();
+  const calls: number[] = [];
+  const { play, stop } = begin(fixedDeal, (view) => { calls.push(view.positionIndex); return vi.fn(); });
+  const forced = new Set<string>();
+  for (const entry of completeFixedDeal().actions) {
+    if (entry.controller === 'robot') vi.advanceTimersByTime(500);
+    else {
+      const snapshot = play.getSnapshot();
+      const view = play.seatView(hintSeat(play.record().contract.declarer));
+      if (!('contract' in view)) throw new Error('expected card play');
+      if (visibleClasses(view, snapshot.legalCards).length === 1) {
+        const templateId = snapshot.legalCards.length === 1 ? 'hint.forced-card' : 'hint.forced-class';
+        forced.add(templateId);
+        expect(calls).not.toContain(view.positionIndex);
+        play.showHint();
+        expect(play.getSnapshot().hint).toMatchObject({ thinking: false, abstained: false,
+          advice: text(templateId, { card: cardName(snapshot.legalCards[0]), cards: snapshot.legalCards.map(cardName).join(', ') }) });
+        const logged = play.provenanceLog.entries().at(-1)!;
+        expect(logged).toMatchObject({ informationMode: 'VISIBLE', provenance: { sourceKind: 'template', templateId } });
+        expect(validateEntry(logged)).toEqual([]);
+      }
+      play.play(entry.seat as 'north' | 'south', entry.action.card);
+    }
+    if (entry.index % 4 === 3) vi.advanceTimersByTime(1000);
+  }
+  expect([...forced]).toEqual(['hint.forced-card']);
+  stop();
+});
+
+test.each([false, true])('US-14.11: contract choice uses authored lookup (%s), never sampling', authored => {
+  vi.useFakeTimers();
+  const runner = vi.fn<HintRunner>(() => vi.fn());
+  const lookup = vi.fn(() => authored ? { textRef: 'lesson.hint-text' as const, contentId: 'setup-test', version: '1' } : undefined);
+  const play = createPlay({}, fixedDeal, 'northSouth', runner, lookup);
+  const stop = play.start(); vi.advanceTimersByTime(3000);
+  play.showHint();
+  expect(runner).not.toHaveBeenCalled(); expect(lookup).toHaveBeenCalled();
+  expect(play.getSnapshot().hint).toMatchObject({ open: true, thinking: false, abstained: !authored,
+    advice: text(authored ? 'lesson.hint-text' : 'hint.not-covered') });
+  const entry = play.provenanceLog.entries().at(-1)!;
+  expect(entry).toMatchObject({ informationMode: 'VISIBLE', provenance: { sourceKind: authored ? 'authored' : 'template' } });
+  if (!authored) expect(entry.abstention).toEqual({ reason: 'not-covered', cause: 'no-authored-hint' });
+  expect(validateEntry(entry)).toEqual([]);
+  play.toggleHints(); play.showHint(); expect(play.getSnapshot().hint?.open).toBe(false);
+  stop();
+});
+
+test.each<HintFault>(['timeout', 'no-layout', 'low-confidence', 'error', 'worker-crash', 'protocol-mismatch'])('US-45.1: injected %s shows and logs the matching abstention without fallback', async fault => {
+  vi.useFakeTimers();
+  const { play, stop } = begin(fixedDeal, faultHintRunner(fault));
+  play.showHint(); await vi.advanceTimersByTimeAsync(3001);
+  const reason = fault === 'no-layout' || fault === 'low-confidence' ? 'uncertain' : 'unavailable';
+  const cause = reason === 'uncertain' ? 'constraints' : fault;
+  const templateId = reason === 'uncertain' ? 'hint.uncertain'
+    : fault === 'timeout' ? 'hint.unavailable-timeout' : 'hint.unavailable-failure';
+  const snapshot = play.getSnapshot().hint!;
+  expect(snapshot).toMatchObject({ open: true, thinking: false, abstained: true });
+  expect(snapshot.advice).toBe(text(templateId));
+  expect(snapshot.advice).not.toMatch(/samples|rule of thumb|best card/i);
+  const entries = play.provenanceLog.entries().filter(entry => entry.abstention);
+  expect(entries).toHaveLength(1);
+  expect(entries[0]).toMatchObject({ summary: templateId, abstention: { reason, cause }, provenance: { hint: { templateId } } });
+  expect(validateEntry(entries[0])).toEqual([]);
+  expect(play.provenanceLog.counters().silentFallbacks).toBe(0);
+  stop();
+});
+
+test('US-14.11: setup lookup state is discarded on entering card play', () => {
+  const entries: unknown[] = [];
+  const hints = createHints(vi.fn(), entry => entries.push(entry), vi.fn(() => vi.fn()));
+  hints.syncSetup('choice'); hints.show();
+  hints.sync(null, []); hints.show();
+  expect(hints.snapshot().open).toBe(false);
+  expect(entries).toHaveLength(1);
+});
+
+
+test('US-14.11: a real Table with an entire legal suit in one visible class starts no worker', () => {
+  const suits = ['spades', 'hearts', 'diamonds', 'clubs'] as const;
+  const seats = ['north', 'east', 'south', 'west'] as const;
+  const all = Object.values(fixedDeal.hands).flat();
+  const hands = Object.fromEntries(seats.map((seat, i) => [seat, all.filter(card => card.suit === suits[i])])) as unknown as Deal['hands'];
+  const table = startPlaythrough({ deal: { ...fixedDeal, hands }, contract: { level: 1, strain: 'no-trumps', declarer: 'east' }, learnerSide: 'northSouth' });
+  const view = table.seatView('south');
+  const cards = table.legalActions('south').map(action => action.card);
+  const runner = vi.fn<HintRunner>(() => vi.fn()); const log = vi.fn();
+  const hints = createHints(vi.fn(), log, runner);
+  hints.sync(view, cards); hints.show();
+  expect(cards).toHaveLength(13); expect(runner).not.toHaveBeenCalled();
+  expect(hints.snapshot()).toMatchObject({ open: true, thinking: false, abstained: false,
+    advice: text('hint.forced-class', { cards: cards.map(cardName).join(', ') }) });
+  expect(log).toHaveBeenCalledWith(expect.objectContaining({ summary: 'hint.forced-class', provenance: { sourceKind: 'template', templateId: 'hint.forced-class' } }), 0);
+  const entry = { ...log.mock.calls[0][0], id: 'equivalent', playthroughId: table.record().playthroughId, positionIndex: 0, informationMode: 'VISIBLE', at: new Date().toISOString() };
+  expect(validateEntry(entry)).toEqual([]);
+});
+
+test.each([false, true])('US-14.12: deferred fault wrapper respects cancellation before import (cancelled: %s)', async cancelled => {
+  vi.stubEnv('MODE', 'internal');
+  try {
+    const table = startPlaythrough({ deal: fixedDeal, contract: { level: 1, strain: 'no-trumps', declarer: 'east' }, learnerSide: 'northSouth' });
+    const runner = vi.fn<HintRunner>(() => vi.fn());
+    const hints = createHints(vi.fn(), vi.fn(), runner);
+    hints.sync(table.seatView('south'), table.legalActions('south').map(action => action.card));
+    expect(runner).not.toHaveBeenCalled();
+    if (cancelled) hints.sync(null, []);
+    await vi.dynamicImportSettled();
+    expect(runner).toHaveBeenCalledTimes(cancelled ? 0 : 1);
+    hints.stop();
+  } finally { vi.unstubAllEnvs(); }
 });

@@ -6,7 +6,7 @@ import { dealFromSeed, rotateDeal } from '../table';
 import { cardName } from '../explanation';
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers(); history.replaceState(null, '', '/'); });
-test('US-06, UX §4.2: focus, strain/objective targets, explicit confirmation, and no Hint', () => {
+test('US-06, UX §4.2: focus, strain/objective targets, explicit confirmation, and contract-choice Hint', () => {
   vi.useFakeTimers(); const scroll = vi.fn();
   Object.defineProperty(Element.prototype, 'scrollIntoView', { configurable: true, value: scroll });
   render(<App />);
@@ -16,7 +16,7 @@ test('US-06, UX §4.2: focus, strain/objective targets, explicit confirmation, a
   fireEvent.click(spades); expect(spades.getAttribute('aria-pressed')).toBe('true');
   expect(screen.getByRole('button', { name: 'Part-score · 7 tricks' })).toBeTruthy();
   fireEvent.click(screen.getByRole('button', { name: 'Game · 10 tricks' }));
-  expect(screen.queryByRole('button', { name: /Hint/ })).toBeNull();
+  expect(screen.getByRole('button', { name: 'Hint' })).toBeTruthy();
   expect(document.querySelector('.contract')).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: 'Choose' }));
   expect(scroll).toHaveBeenCalledOnce();

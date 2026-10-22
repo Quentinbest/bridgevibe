@@ -70,7 +70,7 @@ export function TableScreen({ view, play, clearRejection, info, invalid, onNew, 
       {invalid && <p className="deal-notice" role="status">{text('deal.invalid')}</p>}
       <DealControls info={info} onNew={onNew} />
     </div></header>
-    {view.setup ? <MiniBridgeSetup view={view.setup} southHand={view.hand} choose={choice => chooseContract?.(choice)} /> : view.contract && <main onKeyDown={event => { if (event.key === 'Escape') select(null); }}>
+    {view.setup ? <MiniBridgeSetup hint={view.hint} onHint={onHint} onDismissHint={onDismissHint} onToggleHints={onToggleHints} view={view.setup} southHand={view.hand} choose={choice => chooseContract?.(choice)} /> : view.contract && <main onKeyDown={event => { if (event.key === 'Escape') select(null); }}>
       <section className="status" aria-label={text('status')}>
         <span className="contract">{text('contract.chosen', { objective: view.objective ? text(`objective.${view.objective}`) : '', strain: text(view.contract.strain === 'no-trumps' ? 'strain.no-trumps' : `symbol.${view.contract.strain}`) })}</span>
         {/* 390×844: one status line fits every strain and objective (US-06.5). */}
