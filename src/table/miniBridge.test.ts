@@ -1,6 +1,7 @@
 import { expect, test } from 'vitest';
 import { SEATS, SUITS, dealFromSeed, highCardPoints, startMiniBridge, sideOf, trickTarget, encodeSetupSeatView, decodeSetupSeatView,
   exportRecordJson, importRecordJson, exportPbn, importPbn, replay, startPlaythrough, type Deal } from './index';
+import { reconstruct } from './replay';
 
 function findDeal(predicate: (deal: Deal) => boolean) {
   for (let index = 1; index <= 2000; index++) { const deal = dealFromSeed('minibridge-f1', index); if (predicate(deal)) return deal; }
@@ -40,6 +41,50 @@ test('F1 US-06.2: 20–20 redeals to the next index of the same seed and records
   const authored = startMiniBridge({ deal: { ...deal, origin: { kind: 'authored', contentId: 'test', version: 1 } }, learnerSide: 'northSouth' });
   for (let i = 0; i < 3; i++) authored.advance();
   expect(() => authored.advance()).toThrow(/cannot be redealt/);
+});
+test.each([false, true])('ADR-0001, US-06: all card-play views retain only final Announcements through completion (Redeal: %s)', redealt => {
+  const initial = findDeal(deal => (nsPoints(deal) === 20) === redealt);
+  const setup = ready(initial), final = setup.record().deal;
+  const expected = SEATS.map((_, index) => {
+    const seat = SEATS[(SEATS.indexOf(final.dealer) + index) % 4];
+    return { seat, hcp: highCardPoints(final.hands[seat]) };
+  });
+  if (redealt) {
+    expect(final.dealId).not.toBe(initial.dealId);
+    expect(setup.record().setupEvents.filter(event => event.kind === 'announcement').length).toBeGreaterThan(4);
+  }
+  const declarer = setup.seatView('south').declarer!, controller = setup.controllerOf(declarer);
+  expect(setup.submit(declarer, controller, { kind: 'choose-contract', strain: 'no-trumps', objective: 'part-score' },
+    controller === 'robot' ? { kind: 'robot', policy: 'test', version: '1', durationMs: 0 } : undefined).kind).toBe('accepted');
+  const table = setup.playthrough()!;
+  for (let position = 0; position <= 52; position++) {
+    for (const viewer of SEATS) expect(table.seatView(viewer).announcements).toEqual(expected);
+    if (position === 52) break;
+    const seat = table.seatView('south').turn!, controller = table.controllerOf(seat);
+    expect(table.submit(seat, controller, table.legalActions(seat)[0], controller === 'robot'
+      ? { kind: 'robot', policy: 'test', version: '1', durationMs: 0 } : undefined).kind).toBe('accepted');
+  }
+  expect(table.seatView('south').status).toBe('completed');
+});
+test('US-04.2: replay reconstruction keeps the recorded Announcements in every view', () => {
+  const setup = ready(findDeal(deal => nsPoints(deal) !== 20));
+  const declarer = setup.seatView('south').declarer!, controller = setup.controllerOf(declarer);
+  expect(setup.submit(declarer, controller, { kind: 'choose-contract', strain: 'no-trumps', objective: 'part-score' },
+    controller === 'robot' ? { kind: 'robot', policy: 'test', version: '1', durationMs: 0 } : undefined).kind).toBe('accepted');
+  const table = setup.playthrough()!;
+  for (let position = 0; position < 52; position++) {
+    const seat = table.seatView('south').turn!, controller = table.controllerOf(seat);
+    expect(table.submit(seat, controller, table.legalActions(seat)[0], controller === 'robot'
+      ? { kind: 'robot', policy: 'test', version: '1', durationMs: 0 } : undefined).kind).toBe('accepted');
+  }
+  const rebuilt = reconstruct(table.record()).table;
+  for (const seat of SEATS) expect(rebuilt.seatView(seat).announcements).toEqual(table.seatView(seat).announcements);
+  expect(rebuilt.seatView('south').announcements).toHaveLength(4);
+});
+test('ADR-0001: Contract Bridge views have no Announcements without setup events', () => {
+  const table = startPlaythrough({ deal: dealFromSeed('legacy', 1), learnerSide: 'northSouth',
+    contract: { level: 3, strain: 'no-trumps', declarer: 'south' } });
+  for (const seat of SEATS) expect(table.seatView(seat).announcements).toEqual([]);
 });
 test.each(SEATS)('F1 US-06.3: %s wins the declaring-side tie by announcing first', dealer => {
   const deal = findDeal(d => {
@@ -84,6 +129,9 @@ test('ADR-0001: setup decode rejects extra fields; returned views and events are
   const setup = ready(findDeal(d => nsPoints(d) !== 20));
   const encoded = encodeSetupSeatView(setup.seatView('south'));
   expect(() => decodeSetupSeatView({ ...encoded, leak: [] })).toThrow();
+  // US-06.2: a partial list is valid during setup, a repeated Seat never is.
+  expect(decodeSetupSeatView({ ...encoded, announcements: encoded.announcements.slice(0, 2) }).announcements).toHaveLength(2);
+  expect(() => decodeSetupSeatView({ ...encoded, announcements: [encoded.announcements[0], encoded.announcements[0]] })).toThrow();
   const changed = JSON.parse(JSON.stringify(encoded)); changed.hand.length = 0; changed.announcements[0].hcp = 99;
   expect(setup.seatView('south').hand).toHaveLength(13);
   expect(setup.seatView('south').announcements[0].hcp).not.toBe(99);

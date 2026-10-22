@@ -54,6 +54,77 @@ exempted. The list starts empty.
 For isolated builds, `licences({ reportPath })` or the
 `BRIDGEVIBE_LICENCE_REPORT` environment variable redirects the BOM destination.
 
+### Network review (LR-3c, US-46.3)
+
+`scripts/network/` runs on every Vite build, including `audit` and `internal`.
+It validates `licences/network-allow-list.json` and scans every emitted JS and HTML
+file on disk, including worker chunks and public files, plus emitted CSS and SVG/XHTML.
+Phase V's `origins` is empty.
+To add an origin, obtain the owner's review of the service and its LR-3 rights
+before adding `{ origin, reason, reviewer, date }`; use an exact canonical HTTP(S)
+or WS(S) origin without a path, credentials or trailing slash, and an ISO date.
+An origin entry also supplies production CSP `connect-src`; dev/HMR is unaffected.
+
+The scanner parses JavaScript with the existing TypeScript compiler. Computed
+targets are checked per rendered source module in `generateBundle`, before chunk
+minification, in both the app build and each worker build. Virtual Vite/Rolldown
+helpers are scanned too; first-party and virtual modules can never claim a
+computed-call exception. Emitted JS and HTML are still checked for literal targets
+and absolute URL literals. Public/generated files without module attribution and
+inline HTML scripts also fail on computed targets.
+HTML request attributes (`src`, `href`, each `srcset` candidate, `poster`, `data`,
+`action`, `formaction`, each `ping` target, `background`, `manifest`, SVG `xlink:href`)
+and CSS `url(...)`/`@import` targets use the same origin and relative-`api` rules.
+HTML entities and CSS escapes are decoded first; inline styles are checked too.
+CSS data URLs are embedded bytes and pass the static scanner, but the current CSP
+blocks their use as images/fonts unless a future reviewed directive permits `data:`.
+It checks direct and property network API calls, XHR construction/open targets,
+worker `importScripts` arguments and dynamic imports. Literal relative assets pass;
+**any case-insensitive `api` substring anywhere in a relative target** needs review
+(including query strings and innocent substrings such as `rapid`). Protocol-relative
+targets require an origin entry; other schemes and computed targets fail closed.
+Targets are trimmed before checking, and backslash paths are rejected conservatively.
+This conservative rule catches `/api/bba/analyse` even on our own origin.
+It is a static guard, not data-flow analysis: aliased or obfuscated APIs can escape
+detection, and CSP permits same-origin connections, including same-origin API paths.
+
+`licences/non-network-urls.json` lists exact diagnostic URL fragments and React DOM
+namespace URIs found in current output, each with a reason, reviewer and date.
+This includes the diagnostic literals in production builds invoked by existing
+unit tests with `NODE_ENV=test` (React development and Vite browser-external text).
+No other diagnostic URLs are listed.
+No hostname or namespace regex exempts them. An exception for diagnostic text
+never permits passing that URL directly to a network API. New entries need owner
+review; implementation entries explicitly record that owner review is pending.
+Until the owner approves an entry, its reviewer field is exactly `"pending owner review"`.
+
+The bridge-dds 1.4.0 loader embeds its WebAssembly as base64 bytes, decoded by
+`findWasmBinary()` and instantiated directly; normal analysis does not fetch a
+`.wasm` file. Emscripten nevertheless retains computed `fetch`, XHR and filesystem
+fallback paths. `computed` entries pin the package name, exact installed version,
+module path inside the package, exact rendered call text and maximum count with
+review metadata. Identity comes from the module's installed package path and its
+`package.json`; our own `src/` code is never exceptionable. A dependency version,
+module, call or count change requires review; unrelated analysis/worker changes
+do not. The same entries cover normal and `NODE_ENV=test` builds, without chunk
+hashes. These are loader exceptions,
+not permission to call services. Vite's redundant modulepreload fetch polyfill is
+disabled; native modulepreload and dynamic imports still work.
+
+The production HTML prepends a CSP meta tag before scripts: `default-src 'self'`
+restricts unspecified fetch directives (images, fonts, media, frames, manifests);
+`object-src 'none'` disables plugins and `base-uri 'self'` limits base URLs.
+The existing directives remain: `connect-src 'self'`
+plus reviewed origins, `script-src 'self' 'wasm-unsafe-eval'`, `worker-src 'self'`,
+`style-src 'self'`, and `style-src-attr 'unsafe-inline'` (React's inline layout
+attributes need it; inline style elements remain blocked).
+Emitted CSS uses only self-hosted font files and has no data/blob URLs. Emitted JS
+contains Emscripten checks for `data:`/`blob:` script locations, not requests or
+asset creation using those schemes. No image/font/worker scheme exception is needed.
+No `unsafe-eval` or blob worker permission is added. A deployment follow-up is an equivalent server CSP header, including on
+worker responses: document meta CSP does not govern a separately loaded worker's
+connections. Static scanning covers those worker files meanwhile.
+
 ## Modules
 
 `src/<module>/` follows engineering spec §4.2: one module per bounded context, created by the ticket that needs it. Today there are four:
@@ -68,7 +139,7 @@ For isolated builds, `licences({ reportPath })` or the
 Rules every later module must keep:
 
 - The Table is the only authority on rules: the UI and robots only submit actions (INV-1).
-- Robots and in-play hints receive only a Seat View, never a full Deal. Only **table** constructs Seat Views and completed playthrough records (ADR-0001).
+- Robots and in-play hints receive only a Seat View, never a full Deal. Only **table** constructs Seat Views and completed playthrough records (ADR-0001). Card-play Seat Views include the final Deal’s ordered MiniBridge Announcements; Contract Bridge views have an empty list.
 - The UI is built from a learner view: face-up cards plus a count for each hidden hand. No hidden card identity reaches React props, page text or accessibility names (US-16.4). The fixed Deal lives in `src/app/fixture.ts` for composition; `src/app/play.ts` projects South’s SeatView into the learner view. The authored Deal is necessarily present in the client bundle in this fixed-Deal slice.
 - When the learner's side declares, the learner plays Declarer, and the display rotates so Declarer is at the bottom (ADR-0003).
 - Robots run `bv-basic` in a versioned Web Worker from an encoded Seat View (#8). The host enforces a 400 ms deadline and a constant 500 ms display delay, records marked timeout/engine-failure fallbacks, and disables the worker after three session failures. Hidden pages cancel pending requests; interrupted decisions restart with fresh deadline and display windows on return. Trick collection remains 1 s. The trivial fallback uses the same Seat View on the main thread; neither policy needs WebAssembly.

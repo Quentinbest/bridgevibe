@@ -112,6 +112,9 @@ export function startPlaythrough(input: { deal: Deal; contract: Contract; learne
     return decodeSeatView({
       seat, positionIndex: actions.length,
       hand: hands[seat].map(copyCard), dummy: actions.length || gameFormat === 'minibridge' ? hands[dummySeat].map(copyCard) : null,
+      // ADR-0001, US-06.2: only the final Deal's public Announcements survive a Redeal.
+      announcements: setupEvents.slice(setupEvents.reduce((start, event, index) => event.kind === 'redeal' ? index + 1 : start, 0))
+        .flatMap(event => event.kind === 'announcement' ? [{ seat: event.seat, hcp: event.hcp }] : []),
       contract: { ...contract }, tricks: tricks.map(trick => ({ cards: trick.cards.map(copyPlay), winner: trick.winner })),
       currentTrick: currentTrick.map(copyPlay), turn, tricksWon: { ...tricksWon },
       cardCounts: { north: hands.north.length, east: hands.east.length, south: hands.south.length, west: hands.west.length }, status,

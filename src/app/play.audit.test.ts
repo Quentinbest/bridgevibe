@@ -23,7 +23,7 @@ for (const mode of ['test', 'development', 'internal']) test(`${mode} mode insta
   const worker: RobotWorker = { onmessage: null, onerror: null, onmessageerror: null, terminate() {},
     postMessage(message) { posted.push(message); } };
   const play = createPlay({ createWorker: () => {
-    queueMicrotask(() => worker.onmessage?.({ data: { type: 'hello', protocolVersion: 2 } } as MessageEvent<RobotResponse>));
+    queueMicrotask(() => worker.onmessage?.({ data: { type: 'hello', protocolVersion: 3 } } as MessageEvent<RobotResponse>));
     return worker;
   } });
   const stop = play.start(); choosePractice(play);

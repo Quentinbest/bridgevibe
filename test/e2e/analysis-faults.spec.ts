@@ -19,6 +19,8 @@ for (const fault of ['timeout', 'error', 'crash', 'protocol-mismatch', 'success'
     }
     await page.clock.resume();
     await page.getByRole('button', { name: 'Hand review', exact: true }).click();
+    // US-16.2: setup precedes tricks; retain the analysis checks at trick 1.
+    for (let step = 0; step < 3; step++) await page.getByRole('button', { name: 'Next step', exact: true }).click();
     const panel = page.getByTestId('provenance-debug-panel');
     const counter = panel.locator('.debug-counters > div').filter({ hasText: 'Silent fallbacks' }).locator('dd');
     if (fault !== 'success') {

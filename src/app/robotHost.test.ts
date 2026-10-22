@@ -3,7 +3,7 @@ import { afterEach, expect, test, vi } from 'vitest';
 import { robotAudit, hiddenCard } from '../../test/robotAudit';
 import { fixedPlaythrough } from '../../test/strategy';
 import { basicPolicy } from '../robots';
-import { dealFromSeed, seatViewSeed, type Action, type Hand, type Playthrough, type RobotProvenance } from '../table';
+import { dealFromSeed, highCardPoints, seatViewSeed, type Action, type Hand, type Playthrough, type RobotProvenance } from '../table';
 import { fixedDeal } from './fixture';
 import { createRobotHost, type RobotHostOptions, type RobotWorker } from './robotHost';
 import { handleRobotMessage } from './robotWorker';
@@ -221,7 +221,10 @@ test('US-10.3, US-44: composition seed and view ignore cards hidden from West', 
   // MiniBridge exposes North before the lead; South and East remain hidden from West.
   const changed = structuredClone(fixedDeal);
   const east: [...Hand] = [...changed.hands.east]; const south: [...Hand] = [...changed.hands.south];
+  // CI-9, US-10.3: swapping spot cards preserves every public HCP Announcement.
   [east[0], south[1]] = [south[1], east[0]];
+  expect(highCardPoints(east)).toBe(highCardPoints(fixedDeal.hands.east));
+  expect(highCardPoints(south)).toBe(highCardPoints(fixedDeal.hands.south));
   const permuted = { ...changed, hands: { ...changed.hands, east, south } };
   const requests = [fixedDeal, permuted].map(deal => {
     const worker = new FakeWorker();
@@ -234,6 +237,7 @@ test('US-10.3, US-44: composition seed and view ignore cards hidden from West', 
       expect(worker.request.seat).toBe('west');
       expect(worker.request.view.positionIndex).toBe(0);
       expect(worker.request.view.dummy).toEqual(fixedDeal.hands.north);
+      expect(worker.request.view.announcements).toHaveLength(4);
       expect(audit).toHaveBeenCalledOnce();
       return worker.request;
     } finally { stop(); }

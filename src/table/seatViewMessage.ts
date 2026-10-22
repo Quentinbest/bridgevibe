@@ -10,6 +10,7 @@ export type SeatView = Readonly<{
   positionIndex: number;
   hand: readonly Card[];
   dummy: readonly Card[] | null;
+  announcements: readonly import('./miniBridge').Announcement[];
   contract: Contract;
   tricks: readonly Trick[];
   currentTrick: readonly PlayedCard[];
@@ -31,12 +32,17 @@ const object = (fields: Record<string, Check>): Check => value => {
   return keys.length === Object.keys(fields).length && keys.every(key => typeof key === 'string'
     && Object.hasOwn(fields, key) && fields[key]((value as Record<string, unknown>)[key]));
 };
+// US-06.2: at most one Announcement per Seat; card play has none (Contract Bridge) or all four (MiniBridge).
+const announcementList: Check = value => array(object({ seat: choice(SEATS), hcp: integer(40) }), 4)(value)
+  && new Set((value as { seat: string }[]).map(entry => entry.seat)).size === (value as unknown[]).length;
+const announcements: Check = value => announcementList(value) && [0, 4].includes((value as unknown[]).length);
 function valid(value: unknown): boolean {
   const seat = choice(SEATS);
   const card = object({ suit: choice(SUITS), rank: choice(RANKS) });
   const played = object({ seat, card });
   const schema = object({
     seat, positionIndex: integer(52), hand: array(card, 13), dummy: value => value === null || array(card, 13)(value),
+    announcements,
     contract: object({ level: value => integer(7)(value) && value !== 0, strain: choice([...SUITS, 'no-trumps']), declarer: seat }),
     tricks: array(object({ cards: value => array(played, 4)(value) && (value as unknown[]).length === 4, winner: seat }), 13),
     currentTrick: array(played, 3), turn: value => value === null || seat(value),
@@ -48,8 +54,8 @@ function valid(value: unknown): boolean {
 }
 export function encodeSeatView(view: SeatView): SeatViewMessage {
   // ADR-0001: explicit fields prevent accidental additions leaking across the boundary.
-  const { seat, positionIndex, hand, dummy, contract, tricks, currentTrick, turn, tricksWon, cardCounts, status } = view;
-  return JSON.parse(JSON.stringify({ seat, positionIndex, hand, dummy, contract, tricks, currentTrick, turn, tricksWon, cardCounts, status }));
+  const { seat, positionIndex, hand, dummy, announcements, contract, tricks, currentTrick, turn, tricksWon, cardCounts, status } = view;
+  return JSON.parse(JSON.stringify({ seat, positionIndex, hand, dummy, announcements, contract, tricks, currentTrick, turn, tricksWon, cardCounts, status }));
 }
 export function decodeSeatView(data: unknown): SeatView {
   if (!valid(data)) throw new Error('Invalid SeatView message');
@@ -78,7 +84,7 @@ export function decodeSetupSeatView(data: unknown): SetupSeatView {
   const seat = choice(SEATS), card = object({ suit: choice(SUITS), rank: choice(RANKS) });
   const nullableSeat: Check = value => value === null || seat(value);
   if (!object({ seat, hand: array(card, 13), dummy: value => value === null || array(card, 13)(value), dummySeat: nullableSeat,
-    announcements: array(object({ seat, hcp: integer(40) }), 4), declarer: nullableSeat, tied: choice([true, false]),
+    announcements: announcementList, declarer: nullableSeat, tied: choice([true, false]),
     step: choice(['announcements', 'redeal', 'declarer', 'dummy', 'contract-choice', 'complete']) })(data)) throw new Error('Invalid SetupSeatView message');
   return { ...JSON.parse(JSON.stringify(data)), [setupSeatViewBrand]: true };
 }
