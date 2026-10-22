@@ -139,6 +139,7 @@ export const catalogue = {
   "deal.seed": { text: "Seed", status: 'draft' },
   "deal.authored": { text: "Authored", status: 'draft' },
   "deal.index": { text: "Deal index", status: 'draft' },
+  "deal.rotation": { text: "Rotation", status: 'draft' },
   "deal.algorithm": { text: "Algorithm ID", status: 'draft' },
   "deal.content": { text: "Content ID", status: 'draft' },
   "deal.version": { text: "Version", status: 'draft' },

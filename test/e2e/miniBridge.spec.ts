@@ -40,7 +40,9 @@ test('US-06.2: redeal message lasts 1500 ms and deal metadata advances', async (
 });
 for (const [index, dummy] of [[2, 'east'], [3, 'west']] as const) test(`robot contract exposes ${dummy} in its own place`, async ({ page }) => {
   await installPausedClock(page);
-  await page.goto(`/?seed=setup-ui&deal=${index}`); await page.clock.runFor(3500);
+  await page.goto(`/?seed=setup-ui&deal=${index - 1}`);
+  await page.getByRole('button', { name: 'New deal', exact: true }).click();
+  await page.clock.runFor(3500);
   await expect(page.locator(`.opponent.${dummy} .card`)).toHaveCount(13, { timeout: 10000 });
   await expect(page.locator('.dummy .card')).toHaveCount(0);
   await expect(page.locator('.contract')).toBeVisible();

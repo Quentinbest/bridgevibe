@@ -1,4 +1,4 @@
-import { SEATS, SUITS, redeal, type Card, type Deal, type Seat } from './index';
+import { SEATS, SUITS, redeal, rotateDeal, type Card, type Deal, type Side, type Seat } from './index';
 import { startPlaythrough, sideOf, validProvenance, type ActionProvenance, type Contract, type Controller, type Submission } from './playthrough';
 import { decodeSetupSeatView } from './seatViewMessage';
 import { OBJECTIVES, trickTarget, type Objective } from './miniBridgeRules';
@@ -7,6 +7,7 @@ export type Announcement = Readonly<{ seat: Seat; hcp: number }>;
 export type ContractChoice = Readonly<{ kind: 'choose-contract'; strain: Contract['strain']; objective: Objective }>;
 export type SetupEvent = Readonly<({ kind: 'announcement' } & Announcement)
   | { kind: 'redeal'; from: Deal; to: Deal }
+  | { kind: 'rotation'; from: Deal; to: Deal }
   | { kind: 'declarer'; seat: Seat; tied: boolean }
   | { kind: 'dummy-exposed'; seat: Seat }
   | { kind: 'contract-choice'; seat: Seat; controller: Controller; action: ContractChoice; provenance: ActionProvenance }>;
@@ -15,7 +16,7 @@ export const highCardPoints = (hand: readonly Card[]): number => hand.reduce((su
 const copy = <T>(value: T): T => JSON.parse(JSON.stringify(value));
 const partner = (seat: Seat): Seat => SEATS[(SEATS.indexOf(seat) + 2) % 4];
 // US-06: setup produces a Contract; card play remains format-independent.
-export function startMiniBridge(input: Omit<Parameters<typeof startPlaythrough>[0], 'contract' | 'setupEvents' | 'gameFormat'>) {
+export function startMiniBridge(input: Omit<Parameters<typeof startPlaythrough>[0], 'contract' | 'setupEvents' | 'gameFormat'> & { targetDeclaringSide?: Side }) {
   let deal = copy(input.deal);
   let step: SetupStep = 'announcements';
   let announcements: Announcement[] = [];
@@ -25,6 +26,16 @@ export function startMiniBridge(input: Omit<Parameters<typeof startPlaythrough>[
   const events: SetupEvent[] = [];
   let playthrough: ReturnType<typeof startPlaythrough> | null = null;
   if (input.learnerSide !== 'northSouth') throw new Error('The learner sits South');
+  // US-07.1: exclude 20–20 before rotating; all final Announcements use the new Deal.
+  function applyRoleMix() {
+    if (deal.origin.kind !== 'seed' || !input.targetDeclaringSide) return;
+    const ns = highCardPoints(deal.hands.north) + highCardPoints(deal.hands.south);
+    if (ns === 20 || (ns > 20 ? 'northSouth' : 'eastWest') === input.targetDeclaringSide) return;
+    const next = rotateDeal(deal);
+    events.push({ kind: 'rotation', from: deal, to: next });
+    deal = next;
+  }
+  applyRoleMix();
   function advance() {
     if (step === 'announcements') {
       const seat = SEATS[(SEATS.indexOf(deal.dealer) + announcements.length) % 4];
@@ -46,7 +57,7 @@ export function startMiniBridge(input: Omit<Parameters<typeof startPlaythrough>[
     } else if (step === 'redeal') {
       const next = redeal(deal);
       events.push({ kind: 'redeal', from: deal, to: next });
-      deal = next; announcements = []; step = 'announcements';
+      deal = next; applyRoleMix(); announcements = []; step = 'announcements';
     } else if (step === 'declarer') {
       exposed = true; events.push({ kind: 'dummy-exposed', seat: partner(declarer!) }); step = 'dummy';
     } else if (step === 'dummy') step = 'contract-choice';

@@ -17,6 +17,9 @@ export function DealControls({ info, onNew }: { info: Pick<Deal, 'dealId' | 'ori
         {origin.kind === 'seed' ? <>
           <dt>{text('deal.seed')}</dt><dd>{origin.seed}</dd>
           <dt>{text('deal.index')}</dt><dd>{origin.index}</dd>
+          {origin.rotation !== 0 && <>
+            <dt>{text('deal.rotation')}</dt><dd>{origin.rotation}</dd>
+          </>}
           <dt>{text('deal.algorithm')}</dt><dd>{text('deal.value', { value: origin.algorithm })}</dd>
         </> : <>
           <dt>{text('deal.content')}</dt><dd>{origin.contentId}</dd>

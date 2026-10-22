@@ -1,6 +1,6 @@
 import { createProvenanceLog, type LogEntry } from '../coach/provenance';
 import { basicPolicy, fallbackRobotPolicy, contractChoicePolicy } from '../robots';
-import { startMiniBridge, encodeSetupSeatView, sideOf, SEATS, seatViewSeed, type Playthrough, type SetupSeatView, type ContractChoice, type Objective, type Card, type Deal, type SeatView, type Seat, type PlayedCard, type ReasonCode, type RobotProvenance } from '../table';
+import { startMiniBridge, encodeSetupSeatView, sideOf, SEATS, seatViewSeed, type Playthrough, type SetupSeatView, type ContractChoice, type Objective, type Side, type Card, type Deal, type SeatView, type Seat, type PlayedCard, type ReasonCode, type RobotProvenance } from '../table';
 import { createRobotHost, type RobotHostOptions } from './robotHost';
 import { cardName, reasonStrings, text } from '../explanation';
 import { fixedDeal } from './fixture';
@@ -26,8 +26,8 @@ export type LearnerView = Readonly<Pick<SeatView,
 }>;
 
 // US-06: MiniBridge Setup is the entry point for every practice Deal.
-export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fixedDeal) {
-  const setup = startMiniBridge({ deal, learnerSide: 'northSouth',
+export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fixedDeal, targetDeclaringSide: Side = 'northSouth') {
+  const setup = startMiniBridge({ deal, targetDeclaringSide, learnerSide: 'northSouth',
     versions: { appVersion: '0.0.0', engineVersions: { [basicPolicy.name]: basicPolicy.version, [fallbackRobotPolicy.name]: fallbackRobotPolicy.version,
       [contractChoicePolicy.name]: contractChoicePolicy.version } } });
   let table: Playthrough | null = null;

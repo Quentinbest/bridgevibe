@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest';
-import { dealFromSeed, highCardPoints, SEATS, sideOf, startMiniBridge, type Seat, type Deal, importRecordJson, exportRecordJson } from '../table';
+import { dealFromSeed, rotateDeal, highCardPoints, SEATS, sideOf, startMiniBridge, type Seat, type Deal, importRecordJson, exportRecordJson } from '../table';
 import { contractChoicePolicy } from '../robots';
 import { createPlay } from './play';
 import { fixedDeal } from './fixture';
@@ -58,7 +58,7 @@ test('UX §4.2: 20–20 message lasts 1500 ms before the next seeded Deal', () =
 });
 test.each(['east', 'west'] as const)('US-06.6, CI-5: %s chooses in the worker with audited inputs and logged provenance', declarer => {
   vi.useFakeTimers(); const messages: RobotMessage[] = [], deal = fixture(declarer);
-  const play = createPlay({ createWorker: () => new PolicyWorker(messages) }, deal); const stop = play.start();
+  const play = createPlay({ createWorker: () => new PolicyWorker(messages) }, deal, 'eastWest'); const stop = play.start();
   vi.advanceTimersByTime(3499); expect(play.getSnapshot().contract).toBeNull();
   const request = messages.find(message => message.type === 'choose-contract');
   expect(request?.type).toBe('choose-contract');
@@ -82,7 +82,7 @@ test.each(['timeout', 'engine-failure'] as const)('US-12: robot Contract Choice 
   vi.useFakeTimers(); const play = createPlay({ createWorker: () => {
     if (fallback === 'engine-failure') throw new Error('unavailable');
     return { onmessage: null, onerror: null, onmessageerror: null, postMessage() {}, terminate() {} };
-  } }, fixture('east'));
+  } }, fixture('east'), 'eastWest');
   const stop = play.start(); vi.advanceTimersByTime(3500);
   expect(play.record().setupEvents?.at(-1)).toMatchObject({ provenance: { kind: 'robot', policy: 'bv-contract-placeholder', version: '0', ruleId: 'placeholder-dep-02', fallback, durationMs: expect.any(Number) } });
   expect(play.provenanceLog.counters().silentFallbacks).toBe(0); stop();
@@ -125,9 +125,31 @@ test('US-11.1: rejected robot choice falls back with provenance instead of start
       worker.onmessage?.({ data } as MessageEvent);
     });
     return worker;
-  } }, fixture('east'));
+  } }, fixture('east'), 'eastWest');
   const stop = play.start(); vi.advanceTimersByTime(3500);
   expect(play.record().setupEvents?.at(-1)).toMatchObject({ kind: 'contract-choice', provenance: { policy: 'bv-contract-placeholder', version: '0', ruleId: 'placeholder-dep-02', fallback: 'engine-failure' } });
   expect(play.provenanceLog.counters().silentFallbacks).toBe(0);
   expect(play.getSnapshot().reason).toBe(''); stop();
+});
+
+// US-07.1, ADR-0001: the worker receives only the rotated Deal's declaring Seat View.
+test('rotated practice setup sends final cards and Announcements to the robot', () => {
+  vi.useFakeTimers();
+  const deal = fixture('north'), final = rotateDeal(deal), messages: RobotMessage[] = [];
+  const play = createPlay({ createWorker: () => new PolicyWorker(messages) }, deal, 'eastWest');
+  const stop = play.start();
+  vi.advanceTimersByTime(3499);
+  const request = messages.find(message => message.type === 'choose-contract');
+  if (!request || request.type !== 'choose-contract') throw new Error('Missing request');
+  expect(request.view.hand).toEqual(final.hands[request.seat]);
+  const dummy = SEATS[(SEATS.indexOf(request.seat) + 2) % 4];
+  expect(request.view.dummy).toEqual(final.hands[dummy]);
+  expect(request.view.announcements).toEqual(SEATS.map((_, i) => {
+    const seat = SEATS[(SEATS.indexOf(final.dealer) + i) % 4];
+    return { seat, hcp: highCardPoints(final.hands[seat]) };
+  }));
+  expect(() => robotAudit(() => play.setupRecord())(request, request.seat)).not.toThrow();
+  vi.advanceTimersByTime(1);
+  expect(play.record().deal).toEqual(final);
+  stop();
 });

@@ -2,7 +2,7 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
 import { App } from './App';
-import { dealFromSeed } from '../table';
+import { dealFromSeed, rotateDeal } from '../table';
 import { cardName } from '../explanation';
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers(); history.replaceState(null, '', '/'); });
@@ -29,7 +29,8 @@ test('US-06, UX §4.2: focus, strain/objective targets, explicit confirmation, a
   expect(document.querySelector('.dummy')?.contains(document.activeElement)).toBe(true);
 });
 for (const [index, dummy] of [[2, 'east'], [3, 'west']] as const) test(`US-06: robot choice places exposed dummy in ${dummy}`, () => {
-  vi.useFakeTimers(); history.replaceState(null, '', `/?seed=setup-ui&deal=${index}`); render(<App />);
+  vi.useFakeTimers(); history.replaceState(null, '', `/?seed=setup-ui&deal=${index - 1}`); render(<App />);
+  fireEvent.click(screen.getByRole('button', { name: 'New deal' }));
   act(() => vi.advanceTimersByTime(3500));
   expect(document.querySelectorAll(`.opponent.${dummy} .card`)).toHaveLength(13);
   expect(document.querySelectorAll('.dummy .card')).toHaveLength(0);
@@ -70,7 +71,7 @@ test.each([2, 3, 6, null])('setup keeps South at bottom for seeded index %s', in
     expect(document.querySelector('.setup-screen')?.lastElementChild).toBe(own);
     if (index) {
       const names = [...own.querySelectorAll('[role="img"]')].map(card => card.getAttribute('aria-label'));
-      expect(names.sort()).toEqual(dealFromSeed('setup-ui', index).hands.south.map(cardName).sort());
+      expect(names.sort()).toEqual((index === 2 || index === 3 ? rotateDeal(dealFromSeed('setup-ui', index)) : dealFromSeed('setup-ui', index)).hands.south.map(cardName).sort());
     }
     if (phase < 6) act(() => vi.advanceTimersByTime(500));
   }
