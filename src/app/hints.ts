@@ -15,9 +15,9 @@ export function renderHint(result: HintResult) {
   const reason = 'abstention' in result ? '' : text('hint.reason');
   return { templateId, advice, reason, text: [text('hint.label'), advice, reason, text('hint.choose')].filter(Boolean).join('\n') };
 }
-export type HintSnapshot = { enabled: boolean; open: boolean; thinking: boolean; advice: string; reason: string; durationMs: number | null; exceededTarget: boolean };
+export type HintSnapshot = { enabled: boolean; open: boolean; thinking: boolean; abstained: boolean; advice: string; reason: string; durationMs: number | null; exceededTarget: boolean };
 export function createHints(changed: () => void, log: (entry: ReturnType<typeof hintStatement>, positionIndex: number) => void, runner: HintRunner = runHint) {
-  let state: HintSnapshot = { enabled: true, open: false, thinking: false, advice: '', reason: '', durationMs: null, exceededTarget: false };
+  let state: HintSnapshot = { enabled: true, open: false, thinking: false, abstained: false, advice: '', reason: '', durationMs: null, exceededTarget: false };
   const timings: { durationMs: number; exceededTarget: boolean }[] = [];
   let cancel: (() => void) | undefined;
   let key: string | undefined;
@@ -33,7 +33,7 @@ export function createHints(changed: () => void, log: (entry: ReturnType<typeof 
       const next = state.enabled && view && candidates.length ? `${view.seat}:${view.positionIndex}` : undefined;
       if (next === key) return;
       cancel?.(); generation++; key = next; statement = undefined; logged = false;
-      state = { ...state, open: false, thinking: !!next, advice: '', reason: '' };
+      state = { ...state, open: false, thinking: !!next, abstained: false, advice: '', reason: '' };
       if (!next || !view) return;
       position = view.positionIndex;
       const owned = generation;
@@ -41,7 +41,7 @@ export function createHints(changed: () => void, log: (entry: ReturnType<typeof 
         if (owned !== generation) return;
         timings.push({ durationMs, exceededTarget: durationMs > HINT_DEADLINE_MS });
         const rendered = renderHint(result);
-        state = { ...state, thinking: false, advice: rendered.advice, reason: rendered.reason, durationMs, exceededTarget: durationMs > HINT_DEADLINE_MS };
+        state = { ...state, thinking: false, abstained: 'abstention' in result, advice: rendered.advice, reason: rendered.reason, durationMs, exceededTarget: durationMs > HINT_DEADLINE_MS };
         statement = hintStatement(result, configuredEngine(), durationMs, rendered);
         record(); changed();
       });

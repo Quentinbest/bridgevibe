@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type KeyboardEvent } from 'react';
 import { text } from '../explanation';
 import type { HintSnapshot } from './hints';
 
@@ -10,10 +10,22 @@ export default function HintSheet({ hint, dismiss }: { hint: HintSnapshot; dismi
     close.current?.focus();
     return () => { if (previous instanceof HTMLElement && previous.isConnected) previous.focus(); };
   }, []);
-  return <aside className="hint-sheet" role="region" aria-labelledby="hint-title" onKeyDown={event => { if (event.key === 'Escape') { event.stopPropagation(); dismiss(); } }}>
+  // UX §10: a bottom sheet traps focus until dismissed.
+  function keyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.key === 'Escape') { event.stopPropagation(); dismiss(); return; }
+    if (event.key !== 'Tab') return;
+    const focusable = [...event.currentTarget.querySelectorAll<HTMLElement>('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])')];
+    if (!focusable.length) return;
+    const first = focusable[0], last = focusable[focusable.length - 1];
+    if (event.shiftKey ? document.activeElement === first : document.activeElement === last) {
+      event.preventDefault(); (event.shiftKey ? last : first).focus();
+    }
+  }
+  return <aside className="hint-sheet" role="region" aria-labelledby="hint-title" onKeyDown={keyDown}>
     <h2 id="hint-title">{text('hint.button')}</h2>
     <p className="hint-label">{text('hint.label')}</p>
-    <div role="status" aria-live="polite" aria-busy={hint.thinking}>
+    {/* UX §10: abstentions are announced assertively; advice politely. */}
+    <div role={hint.abstained ? 'alert' : 'status'} aria-live={hint.abstained ? 'assertive' : 'polite'} aria-busy={hint.thinking}>
       <p>{hint.thinking ? text('hint.thinking') : hint.advice}</p>
       {hint.reason && <p>{hint.reason}</p>}
     </div>

@@ -7,7 +7,8 @@ const view = () => startPlaythrough({ deal: dealFromSeed('hint-worker', 1), cont
 function worker(): HintWorker { return { postMessage: vi.fn(), terminate: vi.fn(), onmessage: null, onerror: null }; }
 const send = (owned: HintWorker, data: HintResponse) => owned.onmessage!({ data } as MessageEvent<HintResponse>);
 const hello = (owned: HintWorker, protocolVersion = HINT_PROTOCOL_VERSION) => send(owned, { type: 'hello', protocolVersion });
-const success: HintResponse = { type: 'result', requestId: 1, result: { classes: [{ cards: [{ suit: 'spades', rank: 'K' }], tricks: 3 }], sampleCount: 50, enumerated: false } };
+// The view is deterministic, so its first card is always a valid candidate.
+const success: HintResponse = { type: 'result', requestId: 1, result: { classes: [{ cards: [view().hand[0]], tricks: 3 }], sampleCount: 50, enumerated: false } };
 afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); });
 test('hello gates requests containing only encoded Seat View and candidates, and cancellation terminates', () => {
   vi.useFakeTimers(); const owned = worker(); const done = vi.fn(); const v = view();
@@ -75,4 +76,20 @@ test('a cancelled position never restarts after visibility returns, and initiall
   visibility.mockReturnValue('hidden'); document.dispatchEvent(new Event('visibilitychange')); cancel();
   visibility.mockReturnValue('visible'); document.dispatchEvent(new Event('visibilitychange')); vi.advanceTimersByTime(10000);
   expect(factory).toHaveBeenCalledOnce(); expect(done).not.toHaveBeenCalled();
+});
+test.each([
+  ['a missing result', { type: 'result', requestId: 1 }],
+  ['an unknown type', { type: 'answer', requestId: 1, result: {} }],
+  ['a card that is not a candidate', { type: 'result', requestId: 1, result: { classes: [{ cards: [{ suit: 'spades', rank: 'X' }], tricks: 3 }], sampleCount: 50, enumerated: false } }],
+  ['non-finite tricks', { type: 'result', requestId: 1, result: { classes: [{ cards: [view().hand[0]], tricks: NaN }], sampleCount: 50, enumerated: false } }],
+  ['no classes', { type: 'result', requestId: 1, result: { classes: [], sampleCount: 50, enumerated: false } }],
+  ['an unknown abstention cause', { type: 'result', requestId: 1, result: { abstention: { reason: 'unavailable', cause: 'gremlins' }, sampleCount: 0, enumerated: false } }],
+  ['an extra key', { type: 'result', requestId: 1, result: { classes: [{ cards: [view().hand[0]], tricks: 3 }], sampleCount: 50, enumerated: false, leak: [] } }],
+])('US-12.5: %s becomes an unavailable abstention, never published advice', (_name, data) => {
+  vi.useFakeTimers(); const owned = worker(), done = vi.fn(); const v = view();
+  runHint(v, v.hand, done, () => owned); hello(owned);
+  owned.onmessage!({ data } as MessageEvent<HintResponse>);
+  expect(done).toHaveBeenCalledOnce();
+  expect(done.mock.calls[0][0]).toMatchObject({ abstention: { reason: 'unavailable', cause: 'error' }, sampleCount: 0 });
+  expect(owned.terminate).toHaveBeenCalledOnce();
 });

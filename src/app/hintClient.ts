@@ -1,7 +1,7 @@
 import { encodeSeatView, seatViewSeed, type SeatView, type Card } from '../table';
 import { unavailable, type HintResult } from '../analysis/hintResult';
 import { HINT_DEADLINE_MS } from '../information/parameters';
-import { HINT_PROTOCOL_VERSION, type HintRequest, type HintResponse } from './hintProtocol';
+import { HINT_PROTOCOL_VERSION, validHintResponse, type HintRequest, type HintResponse } from './hintProtocol';
 export type HintWorker = Pick<Worker, 'postMessage' | 'terminate'> & { onmessage: ((event: MessageEvent<HintResponse>) => void) | null; onerror: ((event: ErrorEvent) => void) | null };
 export type HintRunner = (view: SeatView, candidates: readonly Card[], done: (result: HintResult, durationMs: number) => void) => () => void;
 // U-01, US-14.12: the caller cancels this position's run on an action, toggle or teardown.
@@ -38,6 +38,7 @@ export const runHint = (view: SeatView, candidates: readonly Card[], done: (resu
       owned.onmessage = ({ data }) => {
         if (worker !== owned || finished) return;
         if (hidden()) { visibilityChanged(); return; }
+        if (!validHintResponse(data, candidates)) { finish(unavailable('error')); return; }
         if (data.type === 'hello') {
           if (ready) return;
           if (data.protocolVersion !== HINT_PROTOCOL_VERSION) {
