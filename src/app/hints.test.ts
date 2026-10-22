@@ -15,7 +15,7 @@ const solver: SolverPort = { ...engine, solveTable: vi.fn(), solvePosition: asyn
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 
 function begin(deal = fixedDeal, runner?: HintRunner) {
-  const play = createPlay({}, deal, runner); const stop = play.start(); choosePractice(play); vi.advanceTimersByTime(500); return { play, stop };
+  const play = createPlay({}, deal, 'northSouth', runner); const stop = play.start(); choosePractice(play); vi.advanceTimersByTime(500); return { play, stop };
 }
 test('speculates without showing, request shows thinking, action cancels and stale replies are discarded', () => {
   vi.useFakeTimers();
@@ -49,7 +49,7 @@ test.each(['north', 'south', 'east'] as const)('composition uses the correct Sea
   const offset = (source.indexOf(declarer) - source.indexOf('south') + 4) % 4;
   const deal: Deal = { ...fixedDeal, hands: Object.fromEntries(source.map((seat, i) => [source[(i + offset) % 4], fixedDeal.hands[seat]])) as Deal['hands'] };
   const seen: { view: SeatView; cards: readonly Card[] }[] = [];
-  const play = createPlay({}, deal, (view, cards) => { seen.push({ view, cards }); return vi.fn(); });
+  const play = createPlay({}, deal, 'northSouth', (view, cards) => { seen.push({ view, cards }); return vi.fn(); });
   const stop = play.start(); vi.advanceTimersByTime(3000);
   if (declarer !== 'east') play.chooseContract({ kind: 'choose-contract', strain: 'no-trumps', objective: 'game' });
   for (let i = 0; i < 40; i++) {

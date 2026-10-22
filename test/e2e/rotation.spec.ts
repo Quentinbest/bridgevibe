@@ -5,10 +5,13 @@ import { choosePractice, installPausedClock } from './miniBridge';
 
 // US-02: find reproducible fixtures through the Table, never HCP assumptions in the UI test.
 function fixture(declarer: Seat) {
+  const defending = declarer === 'east' || declarer === 'west';
   for (let index = 1; index < 100; index++) {
     const setup = startMiniBridge({ deal: dealFromSeed('table-turns', index), learnerSide: 'northSouth' });
     for (let i = 0; i < 4; i++) setup.advance();
-    if (setup.seatView('south').declarer === declarer) return `/?seed=table-turns&deal=${index}`;
+    if (setup.seatView('south').declarer === declarer && (index > 1 || !defending)) {
+      return `/?seed=table-turns&deal=${defending ? index - 1 : index}`;
+    }
   }
   throw new Error('Missing fixture');
 }
@@ -74,6 +77,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) test(`North de
 for (const declarer of ['south', 'east', 'west'] as const) test(`${declarer} declaring keeps South at bottom`, async ({ page }) => {
   await installPausedClock(page);
   await page.goto(fixture(declarer));
+  if (declarer === 'east' || declarer === 'west') await page.getByRole('button', { name: 'New deal', exact: true }).click();
   if (declarer === 'south') await choosePractice(page, true);
   else await page.clock.runFor(3500);
   await expect(page.locator('.table > [data-seat="south"]')).toHaveAttribute('data-position', 'bottom');

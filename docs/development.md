@@ -527,6 +527,16 @@ needs a non-empty reason. An `accept` review requires the card to
 also appear in `expectedAnswers`; otherwise validation reports an error. Only
 `expectedAnswers` controls what the player accepts.
 
+US-07 (#18) adopts the proposed U-05 role mix for phase V; U-05 still awaits
+teacher and engineering sign-off. Practice sessions target NS on even Playthroughs
+(starting at zero, including seed links) and EW on odd ones. Table rotates a seeded
+Deal clockwise if needed, after 20–20 Redeals and before final Announcements;
+`dealFromSeed` stays unrotated and board metadata stays fixed. JSON and the PBN
+supplement carry a `rotation` setup event with `from`/`to` Deals. Imports replay
+and compare that event and the final Deal, without session state. This record
+encoding was delegated to the implementer (Delegated to Claude), not approved.
+Lesson origins still require rotation zero.
+
 ## MiniBridge setup
 
 Practice now starts with `startMiniBridge` (US-06); authored lessons retain

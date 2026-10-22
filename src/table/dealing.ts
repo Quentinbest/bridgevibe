@@ -88,3 +88,13 @@ export function redeal(deal: Deal): Deal {
   if (deal.origin.kind !== 'seed') throw new RangeError('Authored Deals cannot be redealt');
   return dealFromSeed(deal.origin.seed, deal.origin.index + 1);
 }
+
+// US-07.2: rotate hands clockwise while retaining the board's dealer and vulnerability.
+export function rotateDeal(deal: Deal): Deal {
+  if (deal.origin.kind !== 'seed') throw new RangeError('Authored Deals cannot be rotated');
+  const hands = Object.freeze({ north: deal.hands.west, east: deal.hands.north,
+    south: deal.hands.east, west: deal.hands.south });
+  const content = { hands, dealer: deal.dealer, vulnerability: deal.vulnerability };
+  const rotation = ((deal.origin.rotation + 1) % 4) as 0 | 1 | 2 | 3;
+  return Object.freeze({ ...content, dealId: dealIdOf(content), origin: Object.freeze({ ...deal.origin, rotation }) });
+}

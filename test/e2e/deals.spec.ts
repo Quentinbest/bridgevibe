@@ -1,10 +1,9 @@
-import { choosePractice } from './miniBridge';
+import { choosePractice, installPausedClock } from './miniBridge';
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 test('seed links reproduce South and IDs; New deal advances; info is keyboard accessible', async ({ page }) => {
-  // #55: one fixed time for both calls.
-  const time = new Date(); await page.clock.install({ time }); await page.clock.pauseAt(time);
+  await installPausedClock(page);
   await page.goto('/?seed=abc&deal=3');
   const hand = () => page.locator('.setup-own .card').allTextContents();
   const firstHand = await hand();
@@ -49,7 +48,9 @@ test('authored info shows its origin and New deal creates a seed link', async ({
 });
 
 test('long seeded suits remain inside the viewport with 44px targets', async ({ page }) => {
-  await page.goto('/?seed=abc&deal=17');
+  // US-07.1: Playthrough 1 targets East–West, so abc/17 keeps its original orientation.
+  await page.goto('/?seed=abc&deal=16');
+  await page.getByRole('button', { name: 'New deal', exact: true }).click();
   await expect(page.locator('.learner .card')).toHaveCount(13);
   const width = page.viewportSize()!.width;
   for (const card of await page.locator('.learner .card').all()) {
@@ -104,8 +105,7 @@ test('header controls and invalid-link feedback preserve the fixed Deal height',
 
 // UX §10: the learner's turn arriving never pulls focus away from the header's deal controls.
 test('a robot play reaching the learner keeps focus on Deal info', async ({ page }) => {
-  await page.clock.install();
-  await page.clock.pauseAt(new Date(Date.now() + 1000));
+  await installPausedClock(page);
   await page.goto('/?seed=abc&deal=3');
   await choosePractice(page, true);
   const trigger = page.getByRole('button', { name: 'Deal info', exact: true });
