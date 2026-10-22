@@ -92,7 +92,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
   function publish() {
     const view = table && running && !collecting ? table.seatView(hintSeat(record().contract.declarer)) : null;
     const candidates = view?.turn && table?.controllerOf(view.turn) === 'learner' ? table.legalActions(view.turn).map(a => a.card) : [];
-    hints.sync(view, candidates);
+    hints.sync(view, candidates, table ? { playthroughId: record().playthroughId, positionKey: table.positionKey() } : null);
     snapshot = learnerView(); listeners.forEach(listener => listener()); }
   function schedule() {
     clearTimeout(timer);

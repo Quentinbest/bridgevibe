@@ -1,5 +1,5 @@
 import { bridgeDdsEngine, type PositionResult, type SolverPort } from '../analysis';
-import { type CompletedPlaythroughRecord } from '../table';
+import { completedRecord, startPlaythrough, type CompletedPlaythroughRecord } from '../table';
 import { ANALYSIS_PROTOCOL_VERSION, type AnalysisRequest, type AnalysisResponse } from './analysisProtocol';
 
 export type AnalysisWorker = Pick<Worker, 'postMessage' | 'terminate'> & {
@@ -10,13 +10,35 @@ export const defaultWorker = (): AnalysisWorker => new Worker(new URL('./analysi
 
 // §4.7: imported at completion; the solver is bundled exclusively in this worker.
 export function analysisClient(record: CompletedPlaythroughRecord, createWorker: () => AnalysisWorker = defaultWorker, timeoutMs = 30000) {
+  completedRecord(record);
+  // §4.3.6: obtain each historical key from the Table, never from an action-list encoding.
+  const table = startPlaythrough({ deal: record.deal, contract: record.contract, learnerSide: record.learnerSide,
+    gameFormat: record.gameFormat, setupEvents: record.setupEvents });
+  const keys = [table.positionKey()];
+  for (const entry of record.actions) {
+    if (table.submit(entry.seat, entry.controller, entry.action, entry.provenance).kind === 'rejected') throw new Error('InvalidAnalysisRecord');
+    keys.push(table.positionKey());
+  }
+  const pending = new Map<number, { request: AnalysisRequest; resolve: (result: PositionResult) => void; reject: (error: Error) => void; timer: ReturnType<typeof setTimeout> }>();
   let worker: AnalysisWorker | undefined;
   let ready: Promise<AnalysisWorker> | undefined;
   let index = 0;
   let sequence = 0;
   let failed = false;
   let reloads = 0;
-  const fail = () => { failed = true; worker?.terminate(); worker = undefined; ready = undefined; };
+  const fail = (message = 'AnalysisUnavailable') => {
+    failed = true; worker?.terminate(); worker = undefined; ready = undefined;
+    for (const item of pending.values()) { clearTimeout(item.timer); item.reject(new Error(message)); }
+    pending.clear();
+  };
+  function receive({ data }: MessageEvent<AnalysisResponse>) {
+    if (data.type === 'hello') return;
+    const item = pending.get(data.requestId);
+    // §4.3.6: stale results and errors neither settle a request nor clear its deadline.
+    if (!item || data.playthroughId !== item.request.playthroughId || data.positionKey !== item.request.positionKey) return;
+    pending.delete(data.requestId); clearTimeout(item.timer);
+    if (data.type === 'result') item.resolve(data.result); else item.reject(new Error('AnalysisFailed'));
+  }
   // US-41.3: wait for the worker's protocol version; on a mismatch reload it once before any request.
   function connect(): Promise<AnalysisWorker> {
     ready ??= new Promise<AnalysisWorker>((resolve, reject) => {
@@ -27,7 +49,7 @@ export function analysisClient(record: CompletedPlaythroughRecord, createWorker:
       owned.onmessage = ({ data }) => {
         if (data.type !== 'hello') return;
         clearTimeout(timer);
-        if (data.protocolVersion === ANALYSIS_PROTOCOL_VERSION) { resolve(owned); return; }
+        if (data.protocolVersion === ANALYSIS_PROTOCOL_VERSION) { owned.onmessage = receive; owned.onerror = () => fail('AnalysisWorkerCrash'); resolve(owned); return; }
         owned.terminate(); worker = undefined; ready = undefined;
         if (++reloads > 1) { failed = true; reject(new Error('AnalysisProtocolMismatch')); return; }
         connect().then(resolve, reject);
@@ -39,20 +61,30 @@ export function analysisClient(record: CompletedPlaythroughRecord, createWorker:
     solveTable: async () => { throw new Error('ReviewUsesPositions'); },
     solvePosition: async () => {
       if (failed) throw new Error('AnalysisUnavailable');
+      const requestedIndex = index;
+      if (!Number.isInteger(requestedIndex) || requestedIndex < 0 || requestedIndex >= record.actions.length) throw new Error('InvalidAnalysisPosition');
       const connected = await connect();
+      if (failed) throw new Error('AnalysisUnavailable');
       const requestId = ++sequence;
+      const request: AnalysisRequest = { type: 'solve', requestId, record, index: requestedIndex,
+        playthroughId: record.playthroughId, positionKey: keys[requestedIndex], deadline: Date.now() + timeoutMs,
+        cancellationId: `analysis-${requestId}` };
       return new Promise<PositionResult>((resolve, reject) => {
-        const timer = setTimeout(() => { fail(); reject(new Error('AnalysisTimeout')); }, timeoutMs);
-        connected.onmessage = ({ data }) => {
-          // §4.3.6: only the response to this request counts.
-          if (data.type === 'hello' || data.requestId !== requestId) return;
-          clearTimeout(timer);
-          if (data.type === 'result') resolve(data.result); else reject(new Error('AnalysisFailed'));
-        };
-        connected.onerror = () => { clearTimeout(timer); fail(); reject(new Error('AnalysisWorkerCrash')); };
-        connected.postMessage({ type: 'solve', requestId, record, index } satisfies AnalysisRequest);
+        const timer = setTimeout(() => fail('AnalysisTimeout'), timeoutMs);
+        pending.set(requestId, { request, resolve, reject, timer });
+        try { connected.postMessage(request); } catch { fail('AnalysisFailed'); }
       });
     },
   };
-  return { solver, at(value: number) { index = value; }, close() { fail(); } };
+  return { solver, at(value: number) { index = value; },
+    cancel(cancellationId: string) {
+      for (const [id, item] of pending) {
+        if (item.request.cancellationId !== cancellationId) continue;
+        pending.delete(id); clearTimeout(item.timer);
+        worker?.postMessage({ type: 'cancel', cancellationId });
+        item.reject(new Error('AnalysisCancelled'));
+      }
+    },
+    close() { fail(); } };
+
 }

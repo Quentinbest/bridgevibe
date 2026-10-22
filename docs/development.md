@@ -590,3 +590,14 @@ statements include sampler, solver, sample count, enumeration and template prove
 
 The design's suggested-card ring is omitted under UX §5.2: computed hints never
 mark a card. All hint wording remains draft pending teacher sign-off (CI-8).
+
+Issue #54 / §4.3.6: analysis and hint protocol 2 requests carry `playthroughId`,
+`positionKey`, `deadline` and `cancellationId`; results (including analysis errors)
+echo the position identity and request ID. Clients discard mismatched identities.
+Analysis obtains historical keys by replaying accepted actions through the Table;
+`cancel(cancellationId)` rejects only the targeted request and sends a cancel message,
+while the worker suppresses its eventual result. Synchronous solver work cannot be
+interrupted. Hint cancellation still terminates its dedicated worker. ADR-0001:
+analysis accepts completed records only; hints receive encoded Seat Views and
+candidates plus metadata. The Table key is a 64-bit FNV-1a digest (16 hex characters),
+not an action list; hint sampling still uses `seatViewSeed(view)` exclusively.

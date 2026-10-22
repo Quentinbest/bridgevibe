@@ -4,6 +4,7 @@ import type { HintResult } from '../analysis/sampledEstimate';
 import { hintStatement } from '../coach/hint';
 import { cardName, text } from '../explanation';
 import { RANKS, sideOf, type Card, type SeatView } from '../table';
+import type { HintIdentity } from './hintProtocol';
 import { runHint, type HintRunner } from './hintClient';
 
 // US-14.3: Dummy's controller reasons from Declarer's view in both declaring orientations.
@@ -29,12 +30,12 @@ export function createHints(changed: () => void, log: (entry: ReturnType<typeof 
   return {
     snapshot: () => state,
     timings: () => timings.map(timing => ({ ...timing })),
-    sync(view: SeatView | null, candidates: readonly Card[]) {
-      const next = state.enabled && view && candidates.length ? `${view.seat}:${view.positionIndex}` : undefined;
+    sync(view: SeatView | null, candidates: readonly Card[], identity: HintIdentity | null) {
+      const next = state.enabled && view && identity && candidates.length ? `${identity.playthroughId}:${identity.positionKey}:${view.seat}` : undefined;
       if (next === key) return;
       cancel?.(); generation++; key = next; statement = undefined; logged = false;
       state = { ...state, open: false, thinking: !!next, abstained: false, advice: '', reason: '' };
-      if (!next || !view) return;
+      if (!next || !view || !identity) return;
       position = view.positionIndex;
       const owned = generation;
       cancel = runner(view, candidates, (result, durationMs, source) => {
@@ -45,7 +46,7 @@ export function createHints(changed: () => void, log: (entry: ReturnType<typeof 
         // CI-5: attribute worker results to the worker's reported engine and sampler.
         statement = hintStatement(result, source?.engine ?? configuredEngine(), durationMs, rendered, source?.sampler);
         record(); changed();
-      });
+      }, identity);
     },
     toggle() { state = { ...state, enabled: !state.enabled, open: false }; changed(); },
     show() { if (!state.enabled || !key) return; state = { ...state, open: true }; record(); changed(); },
