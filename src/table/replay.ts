@@ -12,7 +12,9 @@ export function replay(record: CompletedPlaythroughRecord): readonly ReplayTrick
 }
 
 export function reconstruct(record: PlaythroughRecord) {
-  const table = startPlaythrough({ deal: record.deal, contract: record.contract, learnerSide: record.learnerSide });
+  // US-04.2: rebuild from the whole record, so MiniBridge views keep their public Announcements.
+  const table = startPlaythrough({ deal: record.deal, contract: record.contract, learnerSide: record.learnerSide,
+    gameFormat: record.gameFormat, setupEvents: record.setupEvents });
   const tricks: ReplayTrick[] = [];
   let hands = snapshot();
   function snapshot(): Record<Seat, readonly Card[]> {

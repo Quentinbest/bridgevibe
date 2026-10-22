@@ -4,7 +4,7 @@ import type { SeatView } from '../src/table';
 
 // ADR-0001: even a structurally complete literal cannot forge the private brand.
 // @ts-expect-error Only Table can provide the non-exported symbol.
-const forged: SeatView = { seat: 'south', positionIndex: 0, hand: [], dummy: null, contract: { level: 3, strain: 'no-trumps', declarer: 'south' }, tricks: [], currentTrick: [], turn: 'west', tricksWon: { northSouth: 0, eastWest: 0 }, cardCounts: { north: 13, east: 13, south: 13, west: 13 }, status: 'in-progress' };
+const forged: SeatView = { seat: 'south', positionIndex: 0, hand: [], dummy: null, announcements: [], contract: { level: 3, strain: 'no-trumps', declarer: 'south' }, tricks: [], currentTrick: [], turn: 'west', tricksWon: { northSouth: 0, eastWest: 0 }, cardCounts: { north: 13, east: 13, south: 13, west: 13 }, status: 'in-progress' };
 void forged;
 for (const assertion of ['value as SeatView', '<SeatView>value']) {
   test(`ESLint rejects forged SeatView: ${assertion}`, async () => {
