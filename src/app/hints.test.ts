@@ -229,7 +229,7 @@ test('US-14.11: setup lookup state is discarded on entering card play', () => {
   const entries: unknown[] = [];
   const hints = createHints(vi.fn(), entry => entries.push(entry), vi.fn(() => vi.fn()));
   hints.syncSetup('choice'); hints.show();
-  hints.sync(null, []); hints.show();
+  hints.sync(null, [], null); hints.show();
   expect(hints.snapshot().open).toBe(false);
   expect(entries).toHaveLength(1);
 });
@@ -245,7 +245,7 @@ test('US-14.11: a real Table with an entire legal suit in one visible class star
   const cards = table.legalActions('south').map(action => action.card);
   const runner = vi.fn<HintRunner>(() => vi.fn()); const log = vi.fn();
   const hints = createHints(vi.fn(), log, runner);
-  hints.sync(view, cards); hints.show();
+  hints.sync(view, cards, { playthroughId: table.record().playthroughId, positionKey: table.positionKey() }); hints.show();
   expect(cards).toHaveLength(13); expect(runner).not.toHaveBeenCalled();
   expect(hints.snapshot()).toMatchObject({ open: true, thinking: false, abstained: false,
     advice: text('hint.forced-class', { cards: cards.map(cardName).join(', ') }) });
@@ -260,9 +260,9 @@ test.each([false, true])('US-14.12: deferred fault wrapper respects cancellation
     const table = startPlaythrough({ deal: fixedDeal, contract: { level: 1, strain: 'no-trumps', declarer: 'east' }, learnerSide: 'northSouth' });
     const runner = vi.fn<HintRunner>(() => vi.fn());
     const hints = createHints(vi.fn(), vi.fn(), runner);
-    hints.sync(table.seatView('south'), table.legalActions('south').map(action => action.card));
+    hints.sync(table.seatView('south'), table.legalActions('south').map(action => action.card), { playthroughId: table.record().playthroughId, positionKey: table.positionKey() });
     expect(runner).not.toHaveBeenCalled();
-    if (cancelled) hints.sync(null, []);
+    if (cancelled) hints.sync(null, [], null);
     await vi.dynamicImportSettled();
     expect(runner).toHaveBeenCalledTimes(cancelled ? 0 : 1);
     hints.stop();

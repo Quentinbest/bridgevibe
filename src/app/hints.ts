@@ -35,11 +35,11 @@ export function createHints(changed: () => void, log: (entry: Statement, positio
   // US-45.1, US-14.12: omit fault code from production and cancel even while it loads.
   if (import.meta.env.MODE === 'audit' || import.meta.env.MODE === 'internal' || import.meta.env.MODE === 'development') {
     const baseRunner = runner;
-    runner = (view, candidates, done) => {
+    runner = (view, candidates, done, identity) => {
       let cancelled = false;
       let stop: (() => void) | undefined;
       void import('./hintFaults').then(({ auditHintRunner }) => {
-        if (!cancelled) stop = auditHintRunner(baseRunner)(view, candidates, done);
+        if (!cancelled) stop = auditHintRunner(baseRunner)(view, candidates, done, identity);
       }, () => {
         if (!cancelled) done({ abstention: { reason: 'unavailable', cause: 'error' }, sampleCount: 0, enumerated: false }, 0);
       });
