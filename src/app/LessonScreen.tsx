@@ -4,6 +4,7 @@ import { createLessonPlayer } from '../curriculum/lessonPlayer';
 import type { Lesson } from '../curriculum/model';
 import { sessionAttempts } from '../progress/attemptStore';
 import { createProvenanceLog } from '../coach/provenance';
+import { APP_VERSION } from './appVersion';
 type ProvenanceLog = ReturnType<typeof createProvenanceLog>;
 import { cardName, text, type StringId } from '../explanation';
 import { SEATS, type Card as TableCard } from '../table';
@@ -15,7 +16,7 @@ import { LevelComplete } from './LevelComplete';
 export function LessonScreen({ onClose, provenanceLog, lesson = followSuit }: { onClose: () => void; provenanceLog?: ProvenanceLog; lesson?: Lesson }) {
   const [player] = useState(() => createLessonPlayer(lesson, sessionAttempts, 'session-learner'));
   // US-40, CI-5: lesson statements are logged like the practice table's; #49 replaces the literal version.
-  const [log] = useState(() => provenanceLog ?? createProvenanceLog('0.0.0'));
+  const [log] = useState(() => provenanceLog ?? createProvenanceLog(APP_VERSION));
   const [state, setState] = useState(player.snapshot);
   const [selected, setSelected] = useState<TableCard | null>(null);
   const [ruleOpen, setRuleOpen] = useState(false);

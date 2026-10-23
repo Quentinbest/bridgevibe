@@ -2,6 +2,9 @@ import { choosePractice } from './miniBridge';
 import { readFile } from 'node:fs/promises';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+// #49: the export names the injected package version.
+const { version } = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8')) as { version: string };
 
 test('US-40.2: debug panel requires the URL opt-in', async ({ page }) => {
   await page.goto('/'); await choosePractice(page, false);
@@ -22,7 +25,7 @@ test('US-40.1–3: entries, counters, grading download and current Seat Views', 
   const file = await download;
   expect(file.suggestedFilename()).toBe('bridgevibe-f5.json');
   const document = JSON.parse(await readFile((await file.path())!, 'utf8'));
-  expect(document).toMatchObject({ schemaVersion: 1, format: 'bridgevibe-f5', appVersion: '0.0.0', entries: [
+  expect(document).toMatchObject({ schemaVersion: 1, format: 'bridgevibe-f5', appVersion: version, entries: [
     { kind: 'robot-action', informationMode: 'VISIBLE', provenance: { sourceKind: 'robot' }, grade: null, graderNote: null },
   ] });
   await panel.getByRole('button', { name: 'Show seat view' }).click();

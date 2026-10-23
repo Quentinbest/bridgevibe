@@ -3,7 +3,8 @@ import { configuredEngine } from '../analysis/solverSelection';
 import { visibleClasses, type HintResult } from '../analysis/sampledEstimate';
 import { hintStatement } from '../coach/hint';
 import { cardName, text } from '../explanation';
-import { RANKS, sideOf, type Card, type SeatView } from '../table';
+import { RANKS, sideOf, seatViewSeed, type Card, type SeatView } from '../table';
+import type { HintIdentity } from './hintProtocol';
 import { runHint, type HintRunner } from './hintClient';
 import type { LogEntry } from '../coach/provenance';
 
@@ -64,12 +65,12 @@ export function createHints(changed: () => void, log: (entry: Statement, positio
         ...(authored ? {} : { abstention: { reason: 'not-covered', cause: 'no-authored-hint' } as const }),
         provenance: authored ? { sourceKind: 'authored', contentId: authored.contentId, version: authored.version } : { sourceKind: 'template', templateId } };
     },
-    sync(view: SeatView | null, candidates: readonly Card[]) {
-      const next = state.enabled && view && candidates.length ? `${view.seat}:${view.positionIndex}` : undefined;
+    sync(view: SeatView | null, candidates: readonly Card[], identity: HintIdentity | null) {
+      const next = state.enabled && view && identity && candidates.length ? `${identity.playthroughId}:${identity.positionKey}:${view.seat}` : undefined;
       if (next === key) return;
       cancel?.(); cancel = undefined; generation++; key = next; statement = undefined; logged = false;
       state = { ...state, open: false, thinking: !!next, abstained: false, advice: '', reason: '', durationMs: null, exceededTarget: false };
-      if (!next || !view) return;
+      if (!next || !view || !identity) return;
       position = view.positionIndex;
       // US-14.11: visible equivalence proves a forced play without sampling.
       if (visibleClasses(view, candidates).length === 1) {
@@ -80,6 +81,7 @@ export function createHints(changed: () => void, log: (entry: Statement, positio
         return;
       }
       const owned = generation;
+      // ADR-0001: the full Table key stays in `key`; only the visible digest crosses the boundary.
       cancel = runner(view, candidates, (result, durationMs, source) => {
         if (owned !== generation) return;
         timings.push({ durationMs, exceededTarget: durationMs > HINT_DEADLINE_MS });
@@ -88,7 +90,7 @@ export function createHints(changed: () => void, log: (entry: Statement, positio
         // CI-5: attribute worker results to the worker's reported engine and sampler.
         statement = hintStatement(result, source?.engine ?? configuredEngine(), durationMs, rendered, source?.sampler);
         record(); changed();
-      });
+      }, { playthroughId: identity.playthroughId, positionKey: seatViewSeed(view) });
     },
     toggle() { state = { ...state, enabled: !state.enabled, open: false }; changed(); },
     show() { if (!state.enabled || !key) return; state = { ...state, open: true }; record(); changed(); },
