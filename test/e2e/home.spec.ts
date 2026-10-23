@@ -8,9 +8,8 @@ test('Home, token themes, session progress, responsive navigation and axe at eve
   await expect(page.getByRole('heading', { name: 'Your next move' })).toBeFocused();
   await expect(page.getByRole('progressbar')).toHaveAttribute('value', '0');
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuetext', '0 of 3 learning steps done this session');
-  await expect(page.getByRole('heading', { name: 'Follow suit' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Level 2 · Follow suit' })).toBeVisible();
   await expect(page.getByText('Skill: Follow suit')).toBeVisible();
-  await expect(page.getByText(/Level [0-9]/)).toHaveCount(0);
   await expect(page.getByText('About 4 min left')).toBeVisible();
   await expect(page.getByText(/0 deals played this session/)).toBeVisible();
   const navigation = page.getByRole('navigation', { name: 'Main' });

@@ -477,7 +477,12 @@ Script Actions and each Step kind. Unknown keys are rejected on all authored
 objects so misspellings such as `countRejections` cannot silently change behaviour.
 Malformed input returns findings; the first structural failure stops deeper
 checks for that Exercise, while other Exercises are still checked. A malformed
-Lesson header stops the whole Lesson.
+Lesson header stops the whole Lesson. A Lesson requires an integer `module` from
+1 to 10 (FR-L2); Home displays it as the level through draft catalogue copy.
+Both following-suit Lessons declare module 2, pending teaching-advisor confirmation
+(CI-8). Their Lesson versions increase from 1 to 2 under ADR-0004 because this
+metadata changes presentation, not correctness. Content IDs, Exercise and Prompt
+versions, Deals, Scripts and Expected Answers stay unchanged.
 
 Lessons, Exercises and Prompts require a non-empty `contentId` and a positive
 safe-integer `version`. `schemaVersion` is `1`, `learnerSide` is `northSouth`,

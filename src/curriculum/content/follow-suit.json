@@ -1,11 +1,12 @@
 {
   "contentId": "follow-suit",
-  "version": 1,
+  "version": 2,
   "signOff": {
     "status": "unsigned-draft"
   },
   "rights": { "source": "original", "licence": "draft" },
   "schemaVersion": 1,
+  "module": 2,
   "gameFormat": "contract-bridge",
   "titleRef": "lesson.title",
   "skillTags": [

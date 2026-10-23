@@ -2,6 +2,7 @@ import type { Card, ReasonCode } from '../table';
 
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
+  'home.level-title': { text: 'Level {module} · {title}', status: 'draft' },
   'home.next': { text: 'Your next move', status: 'draft' },
   'home.skill': { text: 'Skill: {skill}', status: 'draft' },
   'home.lesson-description': { text: "Same suit as the lead, if you've got it.", status: 'draft' },
