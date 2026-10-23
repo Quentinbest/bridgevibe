@@ -104,3 +104,11 @@ test('US-14.11: an engine-backed entry can never be recorded as not covered', ()
   expect(validateEntry(engine)).toContain('abstention.provenance');
   expect(validateEntry({ ...engine, abstention: { reason: 'unavailable', cause: 'timeout' } })).not.toContain('abstention.provenance');
 });
+
+test('US-14.11: forced-play templates are never recorded with engine provenance', () => {
+  for (const summary of ['hint.forced-card', 'hint.forced-class']) {
+    const engine = { ...entry({ sourceKind: 'engine', name: 'test', version: '1', mode: 'VISIBLE', sampleCount: 50,
+      hint: { sampler: 'bv-layout', samplerVersion: '1', enumerated: false, templateId: summary, durationMs: 1, exceededTarget: false } } as Provenance), summary };
+    expect(validateEntry(engine)).toContain('provenance.template');
+  }
+});
