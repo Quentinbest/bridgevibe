@@ -46,3 +46,23 @@ test('hint controls and Play it fit together without increasing the fixed Deal h
     expect(controls!.x).toBeGreaterThan(viewport.width / 2);
   }
 });
+
+for (const fault of ['timeout', 'no-layout'] as const) {
+  test(`US-45.1: hint ${fault} is shown and logged with zero silent fallbacks`, async ({ page }) => {
+    await page.goto(`/?debug=1&hintFault=${fault}`); await choosePractice(page);
+    await page.getByRole('button', { name: 'Hint', exact: true }).click();
+    const sheet = page.getByRole('region', { name: 'Hint', exact: true });
+    const alert = sheet.getByRole('alert');
+    await expect(alert).toHaveText(fault === 'timeout'
+      ? "The hint helper didn't finish in time. You can keep playing."
+      : "I can't tell from what you can see: too many hidden layouts fit, or none does.");
+    const panel = page.getByTestId('provenance-debug-panel');
+    const entry = panel.locator('li pre').filter({ hasText: fault === 'timeout' ? 'unavailable' : 'uncertain' });
+    await expect(entry).toHaveCount(1);
+    await expect(entry).toContainText(fault === 'timeout' ? 'timeout' : 'constraints');
+    await expect(panel.locator('.debug-counters > div').filter({ hasText: 'Silent fallbacks' }).locator('dd')).toHaveText('0');
+    expect(await sheet.innerText()).not.toMatch(/samples|rule of thumb|best card/i);
+    await sheet.getByRole('button', { name: 'Got it', exact: true }).click();
+    await expect(page.getByRole('button', { name: 'Hint', exact: true })).toBeFocused();
+  });
+}

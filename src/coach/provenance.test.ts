@@ -84,3 +84,31 @@ test('CI-4 / VAL-06: abstentions require valid cause and engine provenance; only
   log.record(abstention);
   expect(log.counters().silentFallbacks).toBe(1);
 });
+
+test('INV-7: a not-covered hint template must carry its not-covered abstention', () => {
+  const notCovered = { ...entry({ sourceKind: 'template', templateId: 'hint.not-covered' } as Provenance), summary: 'hint.not-covered' };
+  expect(validateEntry(notCovered)).toContain('abstention.not-covered');
+  expect(validateEntry({ ...notCovered, abstention: { reason: 'not-covered', cause: 'no-authored-hint' } })).toEqual([]);
+});
+
+test('INV-7: only the not-covered template may carry a not-covered abstention', () => {
+  const forced = { ...entry({ sourceKind: 'template', templateId: 'hint.forced-card' } as Provenance), summary: 'hint.forced-card',
+    abstention: { reason: 'not-covered' as const, cause: 'no-authored-hint' as const } };
+  expect(validateEntry(forced)).toContain('abstention.provenance');
+});
+
+test('US-14.11: an engine-backed entry can never be recorded as not covered', () => {
+  const engine = { ...entry({ sourceKind: 'engine', name: 'test', version: '1', mode: 'VISIBLE', sampleCount: 50,
+    hint: { sampler: 'bv-layout', samplerVersion: '1', enumerated: false, templateId: 'hint.advice', durationMs: 1, exceededTarget: false } } as Provenance),
+    summary: 'hint.advice', abstention: { reason: 'not-covered' as const, cause: 'no-authored-hint' as const } };
+  expect(validateEntry(engine)).toContain('abstention.provenance');
+  expect(validateEntry({ ...engine, abstention: { reason: 'unavailable', cause: 'timeout' } })).not.toContain('abstention.provenance');
+});
+
+test('US-14.11: forced-play templates are never recorded with engine provenance', () => {
+  for (const summary of ['hint.forced-card', 'hint.forced-class']) {
+    const engine = { ...entry({ sourceKind: 'engine', name: 'test', version: '1', mode: 'VISIBLE', sampleCount: 50,
+      hint: { sampler: 'bv-layout', samplerVersion: '1', enumerated: false, templateId: summary, durationMs: 1, exceededTarget: false } } as Provenance), summary };
+    expect(validateEntry(engine)).toContain('provenance.template');
+  }
+});

@@ -1,4 +1,4 @@
-import { createHints, hintSeat, type HintSnapshot } from './hints';
+import { createHints, hintSeat, type AuthoredSetupHint, type HintSnapshot } from './hints';
 import type { HintRunner } from './hintClient';
 import { createProvenanceLog, type LogEntry } from '../coach/provenance';
 import { APP_VERSION } from './appVersion';
@@ -32,7 +32,7 @@ export type LearnerView = Readonly<Pick<SeatView,
 // ADR-0001: setup identity is independent of Deal content.
 let nextSetupId = 0;
 // US-06: MiniBridge Setup is the entry point for every practice Deal.
-export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fixedDeal, targetDeclaringSide: Side = 'northSouth', hintRunner?: HintRunner) {
+export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fixedDeal, targetDeclaringSide: Side = 'northSouth', hintRunner?: HintRunner, setupHint?: (view: SetupSeatView) => AuthoredSetupHint | undefined) {
   const setupId = `setup-${++nextSetupId}`;
   const setup = startMiniBridge({ deal, targetDeclaringSide, learnerSide: 'northSouth',
     versions: { appVersion: APP_VERSION, engineVersions: { [basicPolicy.name]: basicPolicy.version, [fallbackRobotPolicy.name]: fallbackRobotPolicy.version,
@@ -42,7 +42,9 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
   const provenanceLog = createProvenanceLog(APP_VERSION);
   let entryId = 0;
   function log(entry: Pick<LogEntry, 'kind' | 'summary' | 'text' | 'provenance' | 'positionIndex' | 'abstention'>) {
-    provenanceLog.record({ ...entry, id: `${record().playthroughId}-${++entryId}`, playthroughId: record().playthroughId,
+    // US-14.11: setup precedes the card-play record; use its Deal identity until then.
+    const playthroughId = table ? record().playthroughId : `${setup.record().deal.dealId}-setup`;
+    provenanceLog.record({ ...entry, id: `${playthroughId}-${++entryId}`, playthroughId,
       informationMode: 'VISIBLE', at: new Date().toISOString() });
   }
   const hints = createHints(publish, (entry, positionIndex) => log({ ...entry, positionIndex }), hintRunner);
@@ -96,7 +98,12 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
   function publish() {
     const view = table && running && !collecting ? table.seatView(hintSeat(record().contract.declarer)) : null;
     const candidates = view?.turn && table?.controllerOf(view.turn) === 'learner' ? table.legalActions(view.turn).map(a => a.card) : [];
-    hints.sync(view, candidates, table ? { playthroughId: record().playthroughId, positionKey: table.positionKey() } : null);
+    if (!table) {
+      const setupView = setup.seatView('south');
+      // US-14.3: the authored lookup sees the acting declarer's own Setup view.
+      const declaring = running && setupView.step === 'contract-choice' && setupView.declarer && setup.controllerOf(setupView.declarer) === 'learner' ? setupView.declarer : null;
+      hints.syncSetup(declaring ? setup.positionKey() : undefined, declaring ? setupHint?.(setup.seatView(declaring)) : undefined);
+    } else hints.sync(view, candidates, { playthroughId: record().playthroughId, positionKey: table.positionKey() });
     snapshot = learnerView(); listeners.forEach(listener => listener()); }
   function schedule() {
     clearTimeout(timer);

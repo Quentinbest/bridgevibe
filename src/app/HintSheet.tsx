@@ -2,7 +2,7 @@ import { useEffect, useRef, type KeyboardEvent } from 'react';
 import { text } from '../explanation';
 import type { HintSnapshot } from './hints';
 
-export default function HintSheet({ hint, dismiss }: { hint: HintSnapshot; dismiss: () => void }) {
+export default function HintSheet({ hint, dismiss, contractChoice = false }: { contractChoice?: boolean; hint: HintSnapshot; dismiss: () => void }) {
   const close = useRef<HTMLButtonElement>(null);
   // UX §10: keyboard dismissal and focus return without selecting any card.
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function HintSheet({ hint, dismiss }: { hint: HintSnapshot; dismi
       <p>{hint.thinking ? text('hint.thinking') : hint.advice}</p>
       {hint.reason && <p>{hint.reason}</p>}
     </div>
-    <p>{text('hint.choose')}</p>
+    <p>{text(contractChoice ? 'hint.choose-contract' : 'hint.choose')}</p>
     <button ref={close} type="button" onClick={dismiss}>{text('hint.dismiss')}</button>
   </aside>;
 }

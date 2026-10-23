@@ -125,7 +125,7 @@ export function LessonScreen({ onClose, provenanceLog, lesson = followSuit }: { 
             <button type="button" aria-expanded={ruleOpen} aria-controls="lesson-rule" onClick={() => setRuleOpen(!ruleOpen)}>{text('rule.why')}</button>
             <p id="lesson-rule" hidden={!ruleOpen}>{text(`rule.${state.rejection.reason}`)}</p>
           </>}
-          {!state.outcome && state.prompt.hint && <button type="button" onClick={hint}>{text('lesson.hint')}</button>}
+          {!state.outcome && state.hintTiers.includes('a') && state.prompt.hint && <button type="button" onClick={hint}>{text('lesson.hint')}</button>}
           {selected && active && <button type="button" onClick={() => answer(selected)} aria-label={text('play.card', { card: cardName(selected) })}>{text('play')}</button>}
           {offerShowMe && <button ref={showMe} type="button" onClick={() => setState(player.showAnswer(Date.now()))}>{text('lesson.show')}</button>}
           {state.hint && <section className="lesson-hint" role="status"><p>{text(state.hint.textRef as StringId)}</p>

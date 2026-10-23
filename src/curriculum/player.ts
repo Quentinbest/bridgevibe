@@ -42,7 +42,8 @@ export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: 
       textRef: current.kind === 'commentary' ? current.textRef : null,
       prompt: current.kind === 'prompt' ? current.prompt : null,
       view: table.seatView(exercise.contract.declarer === 'north' ? 'north' : 'south'), wrongAnswers, outcome, rejection, hint, complete,
-      exposed: visibleExposures };
+      // US-14.10: lessons offer tier (a) only, including after an Exposure.
+      hintTiers: ['a'] as readonly ('a' | 'c')[], exposed: visibleExposures };
   }
   function finish(result: Attempt['outcome'], time: number) {
     const current = step();
@@ -109,7 +110,7 @@ export function createPlayer(exercise: Exercise, store: AttemptSink, learnerId: 
   }
   function showHint() {
     const current = step();
-    if (current.kind === 'prompt' && current.prompt.hint && !outcome && !hint) {
+    if (snapshot().hintTiers.includes('a') && current.kind === 'prompt' && current.prompt.hint && !outcome && !hint) {
       hintTiming = wrongAnswers ? 'after-wrong-answer' : 'before-first-answer';
       // US-14.4: expose authored provenance; #9 wires this to the coach log after both tickets land.
       hint = { textRef: current.prompt.hint.textRef, provenance: {

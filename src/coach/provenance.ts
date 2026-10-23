@@ -2,7 +2,7 @@ import { HINT_DEADLINE_MS } from '../information/parameters';
 import { REASON_CODES, type ReasonCode, type RobotProvenance } from '../table';
 
 export type AnalysisCause = 'timeout' | 'error' | 'worker-crash' | 'protocol-mismatch';
-export type Abstention = { reason: 'unavailable'; cause: AnalysisCause } | { reason: 'uncertain'; cause: 'constraints' };
+export type Abstention = { reason: 'not-covered'; cause: 'no-authored-hint' } | { reason: 'unavailable'; cause: AnalysisCause } | { reason: 'uncertain'; cause: 'constraints' };
 export type InformationMode = 'VISIBLE' | 'ALL_HANDS';
 export type Provenance =
   | { sourceKind: 'authored'; contentId: string; version: string }
@@ -34,13 +34,27 @@ export function validateEntry(entry: unknown): string[] {
   if (!mode(entry.informationMode)) errors.push('informationMode');
   if (entry.abstention !== undefined) {
     const a = entry.abstention;
-    if (!object(a) || !((a.reason === 'uncertain' && a.cause === 'constraints') || (a.reason === 'unavailable' && ['timeout', 'error', 'worker-crash', 'protocol-mismatch'].includes(String(a.cause))))) errors.push('abstention');
+    if (!object(a) || !((a.reason === 'not-covered' && a.cause === 'no-authored-hint') || (a.reason === 'uncertain' && a.cause === 'constraints') || (a.reason === 'unavailable' && ['timeout', 'error', 'worker-crash', 'protocol-mismatch'].includes(String(a.cause))))) errors.push('abstention');
     if (entry.kind !== 'statement') errors.push('abstention.kind');
   }
   const p = entry.provenance;
   if (!object(p)) return [...errors, 'provenance'];
-  if (typeof entry.summary === 'string' && entry.summary.startsWith('hint.') && (p.sourceKind !== 'engine' || !object(p.hint))) errors.push('provenance.hint');
-  if (entry.abstention !== undefined && p.sourceKind !== 'engine') errors.push('abstention.provenance');
+  // US-14.11: forced plays and uncovered Setup use VISIBLE templates without an engine.
+  const templateHint = p.sourceKind === 'template' && p.templateId === entry.summary
+    && ['hint.forced-card', 'hint.forced-class', 'hint.not-covered'].includes(String(entry.summary)) && entry.informationMode === 'VISIBLE';
+  if (typeof entry.summary === 'string' && entry.summary.startsWith('hint.')
+    && (p.sourceKind === 'engine' ? !object(p.hint) : !(templateHint || (p.sourceKind === 'authored' && entry.informationMode === 'VISIBLE')))) errors.push('provenance.hint');
+  // US-14.11: forced plays bypass sampling, so their templates never carry engine provenance.
+  if (['hint.forced-card', 'hint.forced-class', 'hint.not-covered'].includes(String(entry.summary)) && p.sourceKind !== 'template') errors.push('provenance.template');
+  // INV-7: a not-covered template is itself an abstention and must carry its reason and cause.
+  if (entry.summary === 'hint.not-covered' && !(object(entry.abstention) && entry.abstention.reason === 'not-covered')) errors.push('abstention.not-covered');
+  // US-14.11: not-covered belongs only to the uncovered contract-choice template; engines abstain
+  // only as uncertain or unavailable.
+  if (object(entry.abstention)) {
+    const notCovered = entry.abstention.reason === 'not-covered';
+    const template = p.sourceKind === 'template' && entry.summary === 'hint.not-covered' && p.templateId === 'hint.not-covered';
+    if (notCovered ? !template : p.sourceKind !== 'engine') errors.push('abstention.provenance');
+  }
   const fields = (...keys: string[]) => { for (const key of keys) if (!nonempty(p[key])) errors.push(`provenance.${key}`); };
   switch (p.sourceKind) {
     case 'authored': fields('contentId', 'version'); break;

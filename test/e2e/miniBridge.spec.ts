@@ -16,7 +16,7 @@ test('US-06: ordered announcements, exposed dummy, keyboard strain/objective cho
   await expect(spades).toBeFocused(); await page.keyboard.press('Enter'); await expect(spades).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: 'Game · 10 tricks' })).toBeVisible();
   await page.getByRole('button', { name: 'Game · 10 tricks' }).focus(); await page.keyboard.press('Enter');
-  await expect(page.getByRole('button', { name: /Hint/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Hint', exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.clock.resume(); expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole('button', { name: 'Choose', exact: true }).focus(); await page.keyboard.press('Enter');

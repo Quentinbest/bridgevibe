@@ -591,6 +591,19 @@ statements include sampler, solver, sample count, enumeration and template prove
 The design's suggested-card ring is omitted under UX §5.2: computed hints never
 mark a card. All hint wording remains draft pending teacher sign-off (CI-8).
 
+### Hint abstentions and guards (#24)
+
+US-14.6/10–12, US-45.1: practice hints bypass the worker for a single legal card
+or one visible-equivalence class. Contract choice uses an optional authored-hint
+lookup (practice has no authored content), otherwise a `not-covered` abstention.
+Lessons currently wire only tier (a); the player exposes that tier restriction to
+the UI, including after hidden-card exposures. Cancelled position generations
+ignore late replies. In audit/internal/development builds, `?hintFault=` accepts
+`timeout`, `no-layout`, `low-confidence`, `error`, `worker-crash` and
+`protocol-mismatch`; every shown fault logs its abstention reason and cause.
+The design's timeout labelled “UNSURE” follows the spec as `unavailable`; the
+“Rule of thumb” is omitted because tier (b) is MVP scope. All new copy is draft.
+
 Issue #54 / §4.3.6: analysis and hint protocol 2 requests carry `playthroughId`,
 `positionKey`, `deadline` and `cancellationId`; results (including analysis errors)
 echo the position identity and request ID. Clients discard mismatched identities.

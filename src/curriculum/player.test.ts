@@ -272,3 +272,21 @@ test('North-declared fixture projects Declarer before and after the opening lead
     ['east', 'robot'], ['south', 'learner'], ['west', 'robot'], ['north', 'learner'],
   ]);
 });
+
+test.each([true, false])('US-14.10: after hidden-card exposure, the hint seam offers only tier (a) (authored: %s)', authored => {
+  const promptStep = exercise.steps.find(step => step.kind === 'prompt')!;
+  if (promptStep.kind !== 'prompt') throw new Error('expected prompt');
+  const hidden = { seat: 'west' as const, card: exercise.deal.hands.west[0] };
+  const content: Exercise = { ...exercise, steps: [
+    { kind: 'exposure', cards: [hidden] }, exercise.steps[1],
+    { ...promptStep, prompt: { ...promptStep.prompt, hint: authored ? promptStep.prompt.hint : undefined } },
+  ] };
+  const player = createPlayer(content, createAttemptStore(), 'exposure-test');
+  player.next(); player.advanceScript(); player.advanceScript();
+  const state = player.showHint();
+  expect(state.exposed).toContainEqual(hidden);
+  expect(state.hintTiers).toEqual(['a']);
+  expect(state.hintTiers).not.toContain('c');
+  if (authored) expect(state.hint?.provenance.sourceKind).toBe('authored');
+  else expect(state.hint).toBeNull();
+});
