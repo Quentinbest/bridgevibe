@@ -432,9 +432,9 @@ The full F2 set is `src/analysis/f2-full.json`: 100 Deals from endplay
 node scripts/solver/generate-f2.ts --full
 ```
 
-Both smoke and full suites run against both adapters and both committed references,
-checking every legal card and exact class coverage. No native tools are needed to
-run the tests. Generation preserves both references and is byte-identical on rerun.
+Both smoke and full suites run against all three adapters and both committed references,
+checking every legal card, exact class coverage and the same classes as bridge-dds.
+No native tools are needed to run the tests. Generation preserves both references and is byte-identical on rerun.
 
 `scripts/solver/build-macroxue.sh` builds the standalone WASM with emscripten 5.0.7
 from macroxue commit `630705d`. The vendored `src/analysis/macroxue/VERSION` records
@@ -444,9 +444,20 @@ The adapter loads inline base64 bytes without a network request or Emscripten JS
 Vite and Vitest both set `assetsInclude: ['**/*.wasm']` so `solver.wasm?inline`
 returns a base64 data URL in the built worker and in Node tests.
 
-Set `VITE_SOLVER=macroxue` when starting Vite or building to select macroxue;
+`scripts/solver/build-dds31.sh` supplies the standalone single-threaded DDS 3.1
+WASM, pinned to v3.1.0 commit `fe6a6581a13535779eda5d9141aa704b3f6c8965`
+and emscripten 5.0.7. `src/analysis/dds31/VERSION` records this pin; the BOM
+attributes the bytes by content hash under the accompanying Apache-2.0 `LICENSE`.
+The adapter imports `dds31.wasm?inline` on the first solve, instantiates it directly
+without fetch or an Emscripten JS loader, and calls `_initialize()` then `bv_init()`
+once to use one DDS thread. Provenance identifies `dds-3.1` version
+`3.1.0 fe6a658 single-threaded`. The threaded build and COOP/COEP headers belong
+to #82 and are not required for this adapter.
+
+Set `VITE_SOLVER=dds31` when starting Vite or building to select DDS 3.1,
+or `VITE_SOLVER=macroxue` to select macroxue;
 `VITE_SOLVER=bridge-dds` (or unset) selects the default bridge-dds adapter.
-Only the selected engine ships in the analysis worker graph; neither engine enters
+Only the selected engine ships in the analysis worker graph; no engine enters
 the initial page graph. Audit and e2e builds retain the unset default. This is
 configuration for validation, not the device gate's final solver choice.
 
@@ -462,6 +473,16 @@ its loading path. Equivalent cards are grouped by rank (GLOSSARY *Equivalent Act
 a card on the current trick separates ranks, matching DDS's `equals` on every F2 position.
 The browser and e2e suites pass with the default; with macroxue selected, review shows the
 same trick costs, with macroxue named in provenance.
+
+Verified in Node 24 on 2026-10-23: all three adapters have zero mismatches on
+both F2 sets, including equivalence-class parity. Isolated suite timings
+(smoke / full, including reference class comparisons) were bridge-dds
+3.66 s / 22.86 s, macroxue 4.04 s / 14.00 s, and DDS 3.1 3.39 s / 18.17 s.
+These are local test timings, not device benchmarks. All 4,451 Node tests passed,
+including composition parity and built analysis/hint worker execution for DDS 3.1.
+Default and `VITE_SOLVER=dds31` production builds passed licence and network checks.
+Browser and e2e verification for #63 requires a run outside this sandbox: both
+were blocked by local-port binding permissions (`EPERM`).
 
 ## Content checks
 
