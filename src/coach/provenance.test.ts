@@ -90,3 +90,9 @@ test('INV-7: a not-covered hint template must carry its not-covered abstention',
   expect(validateEntry(notCovered)).toContain('abstention.not-covered');
   expect(validateEntry({ ...notCovered, abstention: { reason: 'not-covered', cause: 'no-authored-hint' } })).toEqual([]);
 });
+
+test('INV-7: only the not-covered template may carry a not-covered abstention', () => {
+  const forced = { ...entry({ sourceKind: 'template', templateId: 'hint.forced-card' } as Provenance), summary: 'hint.forced-card',
+    abstention: { reason: 'not-covered' as const, cause: 'no-authored-hint' as const } };
+  expect(validateEntry(forced)).toContain('abstention.provenance');
+});
