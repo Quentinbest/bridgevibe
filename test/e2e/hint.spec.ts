@@ -49,7 +49,8 @@ test('hint controls and Play it fit together without increasing the fixed Deal h
 
 for (const fault of ['timeout', 'no-layout'] as const) {
   test(`US-45.1: hint ${fault} is shown and logged with zero silent fallbacks`, async ({ page }) => {
-    await page.goto(`/?debug=1&hintFault=${fault}`); await choosePractice(page);
+    // #19: / opens Home, so enter practice through the launcher, which keeps the query context.
+    await openPractice(page, `/?debug=1&hintFault=${fault}`); await choosePractice(page);
     await page.getByRole('button', { name: 'Hint', exact: true }).click();
     const sheet = page.getByRole('region', { name: 'Hint', exact: true });
     const alert = sheet.getByRole('alert');
