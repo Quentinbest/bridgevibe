@@ -1,4 +1,4 @@
-import { choosePractice, installPausedClock } from './miniBridge';
+import { openPractice, choosePractice, installPausedClock } from './miniBridge';
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -37,7 +37,7 @@ test('seed links reproduce South and IDs; New deal advances; info is keyboard ac
 });
 
 test('authored info shows its origin and New deal creates a seed link', async ({ page }) => {
-  await page.goto('/');
+  await openPractice(page, '/');
   await page.getByRole('button', { name: 'Deal info', exact: true }).click();
   const dialog = page.getByRole('dialog');
   await expect(dialog).toContainText('fixture.issue-2');
@@ -77,7 +77,7 @@ test('long seeded suits remain inside the viewport with 44px targets', async ({ 
 test('header controls and invalid-link feedback preserve the fixed Deal height', async ({ page }) => {
   let headerHeight = 0;
   for (const url of ['/', '/?seed=bad!&deal=3']) {
-    await page.goto(url); await choosePractice(page);
+    if (url === '/') await openPractice(page); else await page.goto(url); await choosePractice(page);
     await page.evaluate(() => document.fonts.ready);
     const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });
     await ace.click();

@@ -1,4 +1,4 @@
-import { choosePractice, installPausedClock } from './miniBridge';
+import { openPractice, choosePractice, installPausedClock } from './miniBridge';
 import { expect, test, type Page } from '@playwright/test';
 import { cardName, text } from '../../src/explanation';
 import { fixedDeal } from '../../src/app/fixture';
@@ -7,7 +7,7 @@ import { completeFixedDeal } from '../strategy';
 
 async function open(page: Page) {
   await installPausedClock(page);
-  await page.goto('/'); await choosePractice(page, true);
+  await openPractice(page, '/'); await choosePractice(page, true);
 }
 // US-10.2: assert real-worker audit coverage, not just absence of visible leaks.
 async function robotAuditPassed(page: Page) {
@@ -62,6 +62,11 @@ test('full fixed Deal through clicks and Play it', async ({ page }, testInfo) =>
   await expect(page.getByText('You took 6 of 13 tricks (needed 9)', { exact: true })).toBeVisible();
   await expect(page.locator('.hand .card, .suit-column .card')).toHaveCount(0);
   await robotAuditPassed(page);
+  await page.getByRole('button', { name: 'Exit', exact: true }).click();
+  await expect(page.getByText(/1 deal played this session/)).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Your next move' })).toBeFocused();
+  await page.reload();
+  await expect(page.getByText(/0 deals played this session/)).toBeVisible();
 });
 test('keyboard arrows, Enter, Escape and Space play from the active hand', async ({ page }) => {
   await open(page); await page.clock.runFor(500);

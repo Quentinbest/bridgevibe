@@ -608,3 +608,11 @@ worker keys use `seatViewSeed(view)`; setup keys hash `encodeSetupSeatView(view)
 Setup uses an opaque session counter and card play uses the record's counter-based
 Playthrough ID. The robot message shape is unchanged (protocol 3); hint protocol
 remains 2. Only completed-record ALL_HANDS analysis may receive full Table keys.
+
+## Home launcher (issue #19)
+
+`/` is the phase V Learn landing, with the multi-exercise `follow-suit-full` lesson and Quick deal (MiniBridge Setup). Direct `?lesson=`, `?seed=&deal=` and `?practice=1` links bypass Home. Learn and Practice are the available destinations; Rules and Me stay hidden. Per UX §2.1 the phone bar becomes a left rail at 900px, and play screens replace navigation with Exit, resolving the mock-ups’ Home/Levels/Play/Rules and desktop top-bar conflict.
+
+The brief’s Home launcher is the phase V Learn landing for UX §2.3 (which has no separate Home destination). Learning steps count distinct declared Prompts with session Attempts; remaining time uses `PROVISIONAL_LESSON_DURATION_MINUTES`, a provisional four-minute midpoint of UX §1’s 3–5 minutes, scaled by unanswered Prompts. The session line counts completed practice Playthroughs, including replayed Deals, never starts or 20–20 redeals. Exiting leaves the current activity; no resume or persistence is claimed, and reload resets all session data. All new copy remains draft (CI-8).
+
+Home shows the content’s lesson title and skill tags without a level number. The future module/level slot is marked in `Home.tsx`; the missing `Lesson.module` field remains an open content question. Recommendation: add `module` to the Lesson model in a content ticket before displaying any level mapping.

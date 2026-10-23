@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { openPractice } from '../../test/openPractice';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
 import { App } from './App';
@@ -9,7 +10,7 @@ afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers(); history.
 test('US-06, UX §4.2: focus, strain/objective targets, explicit confirmation, and no Hint', () => {
   vi.useFakeTimers(); const scroll = vi.fn();
   Object.defineProperty(Element.prototype, 'scrollIntoView', { configurable: true, value: scroll });
-  render(<App />);
+  render(<App />); openPractice();
   act(() => vi.advanceTimersByTime(3000));
   const spades = screen.getByRole('button', { name: 'spades' });
   expect(document.activeElement).toBe(spades);
@@ -60,7 +61,7 @@ test('ADR-0003: North and South rotate, with correct roles and learner controls'
 test.each([2, 3, 6, null])('setup keeps South at bottom for seeded index %s', index => {
   vi.useFakeTimers();
   if (index) history.replaceState(null, '', `/?seed=setup-ui&deal=${index}`);
-  render(<App />);
+  render(<App />); openPractice();
   for (let phase = 0; phase <= 6; phase++) {
     const own = document.querySelector('.setup-own')!;
     expect(own.getAttribute('aria-label')).toBe('South');

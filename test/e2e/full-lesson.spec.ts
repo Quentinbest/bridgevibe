@@ -57,7 +57,10 @@ test('full lesson, labelled exposure, hidden-card boundary and accessible comple
   expect(await page.getByRole('main').textContent()).not.toMatch(/score|star|streak|mastery/i);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
-  await enter(page, info.project.name.endsWith('dark') ? "That's enough for today" : 'Next: Practice following suit');
+  await enter(page, info.project.name.endsWith('dark') ? "That's enough for today" : 'Back to Home');
   await expect(page).not.toHaveURL(/lesson=/);
   await expect(page.getByRole('heading', { name: 'BridgeVibe' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Your next move' })).toBeFocused();
+  await expect(page.getByRole('progressbar')).toHaveAttribute('value', '3');
+  await expect(page.getByText('3 of 3 learning steps done this session')).toBeVisible();
 });

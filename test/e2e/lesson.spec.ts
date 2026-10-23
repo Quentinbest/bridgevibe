@@ -11,7 +11,7 @@ async function openPrompt(page: import('@playwright/test').Page) {
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '3');
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuetext', 'Step 3 of 5');
 }
-test('lesson accepts alternatives, keeps progress synchronized, and closes to practice', async ({ page }) => {
+test('lesson accepts alternatives, keeps progress synchronized, and closes to Home', async ({ page }) => {
   await openPrompt(page);
   const card = page.getByRole('button', { name: 'King of hearts', exact: true });
   await card.click();

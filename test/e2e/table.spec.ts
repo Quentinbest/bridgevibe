@@ -1,4 +1,4 @@
-import { choosePractice, installPausedClock } from './miniBridge';
+import { openPractice, choosePractice, installPausedClock } from './miniBridge';
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -7,7 +7,7 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
   page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
   page.on('pageerror', error => errors.push(error.message));
   await installPausedClock(page);
-  await page.goto('/'); await choosePractice(page, true);
+  await openPractice(page, '/'); await choosePractice(page, true);
   await page.evaluate(() => document.fonts.ready);
   await expect(page.getByRole('heading', { level: 1, name: 'BridgeVibe' })).toHaveCount(1);
   await expect(page.getByText('West is playing', { exact: true })).toBeVisible();

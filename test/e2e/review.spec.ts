@@ -1,4 +1,4 @@
-import { choosePractice, installPausedClock } from './miniBridge';
+import { openPractice, choosePractice, installPausedClock } from './miniBridge';
 import { readFile } from 'node:fs/promises';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
@@ -30,7 +30,7 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
   await page.route('**/assets/analysisClient-*.js', async route => {
     solverRequested = true; await solverGate; await route.continue();
   });
-  await installPausedClock(page); await page.goto('/'); await choosePractice(page, true);
+  await installPausedClock(page); await openPractice(page, '/'); await choosePractice(page, true);
   const played: Card[] = [];
   await noHiddenCards(page, played);
   await expect(page.getByRole('img', { name: 'Ace of spades', exact: true })).toBeVisible();

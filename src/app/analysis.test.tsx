@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { openPractice } from '../../test/openPractice';
 import { useSyncExternalStore } from 'react';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, test, vi } from 'vitest';
@@ -18,7 +19,7 @@ vi.mock('./analysisClient', () => ({ analysisClient: vi.fn(() => ({
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.clearAllMocks(); });
 
 test('§4.5: completion requests analysis before Hand review opens, never during play or lesson', async () => {
-  vi.useFakeTimers(); render(<App />);
+  vi.useFakeTimers(); render(<App />); openPractice();
   act(() => vi.advanceTimersByTime(3000));
   fireEvent.click(screen.getByRole('button', { name: 'Game · 9 tricks' }));
   fireEvent.click(screen.getByRole('button', { name: 'Choose' }));
