@@ -96,3 +96,11 @@ test('INV-7: only the not-covered template may carry a not-covered abstention', 
     abstention: { reason: 'not-covered' as const, cause: 'no-authored-hint' as const } };
   expect(validateEntry(forced)).toContain('abstention.provenance');
 });
+
+test('US-14.11: an engine-backed entry can never be recorded as not covered', () => {
+  const engine = { ...entry({ sourceKind: 'engine', name: 'test', version: '1', mode: 'VISIBLE', sampleCount: 50,
+    hint: { sampler: 'bv-layout', samplerVersion: '1', enumerated: false, templateId: 'hint.advice', durationMs: 1, exceededTarget: false } } as Provenance),
+    summary: 'hint.advice', abstention: { reason: 'not-covered' as const, cause: 'no-authored-hint' as const } };
+  expect(validateEntry(engine)).toContain('abstention.provenance');
+  expect(validateEntry({ ...engine, abstention: { reason: 'unavailable', cause: 'timeout' } })).not.toContain('abstention.provenance');
+});
