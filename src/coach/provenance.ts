@@ -44,6 +44,8 @@ export function validateEntry(entry: unknown): string[] {
     && ['hint.forced-card', 'hint.forced-class', 'hint.not-covered'].includes(String(entry.summary)) && entry.informationMode === 'VISIBLE';
   if (typeof entry.summary === 'string' && entry.summary.startsWith('hint.')
     && (p.sourceKind === 'engine' ? !object(p.hint) : !(templateHint || (p.sourceKind === 'authored' && entry.informationMode === 'VISIBLE')))) errors.push('provenance.hint');
+  // INV-7: a not-covered template is itself an abstention and must carry its reason and cause.
+  if (entry.summary === 'hint.not-covered' && !(object(entry.abstention) && entry.abstention.reason === 'not-covered')) errors.push('abstention.not-covered');
   if (entry.abstention !== undefined && p.sourceKind !== 'engine' && !(object(entry.abstention) && entry.abstention.reason === 'not-covered' && p.sourceKind === 'template')) errors.push('abstention.provenance');
   const fields = (...keys: string[]) => { for (const key of keys) if (!nonempty(p[key])) errors.push(`provenance.${key}`); };
   switch (p.sourceKind) {

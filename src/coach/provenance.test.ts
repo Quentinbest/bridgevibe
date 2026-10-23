@@ -84,3 +84,9 @@ test('CI-4 / VAL-06: abstentions require valid cause and engine provenance; only
   log.record(abstention);
   expect(log.counters().silentFallbacks).toBe(1);
 });
+
+test('INV-7: a not-covered hint template must carry its not-covered abstention', () => {
+  const notCovered = { ...entry({ sourceKind: 'template', templateId: 'hint.not-covered' } as Provenance), summary: 'hint.not-covered' };
+  expect(validateEntry(notCovered)).toContain('abstention.not-covered');
+  expect(validateEntry({ ...notCovered, abstention: { reason: 'not-covered', cause: 'no-authored-hint' } })).toEqual([]);
+});

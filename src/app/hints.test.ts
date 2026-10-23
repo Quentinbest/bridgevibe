@@ -278,3 +278,18 @@ test('§4.3.6: composition supplies the Playthrough ID and a Table digest for ea
   expect(identity.positionKey).toMatch(/^[0-9a-f]{16}$/);
   stop();
 });
+
+test('US-14.3: the setup hint lookup receives the declaring learner\'s own view when North declares', () => {
+  vi.useFakeTimers();
+  // Rotate the authored hands so North holds South's (declaring) cards.
+  const source = ['north', 'east', 'south', 'west'] as const;
+  const deal: Deal = { ...fixedDeal, hands: Object.fromEntries(source.map((seat, i) => [source[(i + 2) % 4], fixedDeal.hands[seat]])) as Deal['hands'] };
+  const lookup = vi.fn(() => undefined);
+  const play = createPlay({}, deal, 'northSouth', vi.fn<HintRunner>(() => vi.fn()), lookup);
+  const stop = play.start(); vi.advanceTimersByTime(3000);
+  expect(lookup).toHaveBeenCalled();
+  for (const [view] of lookup.mock.calls as unknown as [{ seat: string; declarer: string }][]) {
+    expect(view.declarer).toBe('north'); expect(view.seat).toBe('north');
+  }
+  stop();
+});

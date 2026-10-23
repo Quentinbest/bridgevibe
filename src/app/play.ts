@@ -100,7 +100,9 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     const candidates = view?.turn && table?.controllerOf(view.turn) === 'learner' ? table.legalActions(view.turn).map(a => a.card) : [];
     if (!table) {
       const setupView = setup.seatView('south');
-      hints.syncSetup(running && setupView.step === 'contract-choice' && setupView.declarer && setup.controllerOf(setupView.declarer) === 'learner' ? setup.positionKey() : undefined, setupHint?.(setupView));
+      // US-14.3: the authored lookup sees the acting declarer's own Setup view.
+      const declaring = running && setupView.step === 'contract-choice' && setupView.declarer && setup.controllerOf(setupView.declarer) === 'learner' ? setupView.declarer : null;
+      hints.syncSetup(declaring ? setup.positionKey() : undefined, declaring ? setupHint?.(setup.seatView(declaring)) : undefined);
     } else hints.sync(view, candidates, { playthroughId: record().playthroughId, positionKey: table.positionKey() });
     snapshot = learnerView(); listeners.forEach(listener => listener()); }
   function schedule() {
