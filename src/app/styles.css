@@ -32,6 +32,8 @@ main { max-width: 1164px; margin: auto; padding: var(--space-16) var(--space-32)
 .hand { display: flex; width: max-content; margin: auto; padding: var(--space-4) 0 var(--space-8); }
 .hand-suit { display: flex; }
 .hand-suit + .hand-suit, .hand .card + .card { margin-left: -36px; }
+/* US-03.1: a void suit's empty group would add a second -36px overlap and bury the card before it. */
+@media (min-width: 720px) { .hand-suit:empty { display: none; } }
 .learner .seat-label { margin: 0; }
 @media (max-width: 399px) {
   .header { padding: 0 var(--space-12); }
