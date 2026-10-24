@@ -96,6 +96,8 @@ function discardLow(c: Context) {
   return low(longest(small).flat());
 }
 function bothVoid(c: Context, suit: Suit) {
+  // A ruff and discard needs trumps: in no-trumps a double void leaves the defender's cards as winners.
+  if (c.view.contract.strain === 'no-trumps') return false;
   const declarerVoid = c.view.tricks.some(t => t.cards[0].card.suit === suit && t.cards.some(p => p.seat === c.view.contract.declarer && p.card.suit !== suit));
   return declarerVoid && c.view.dummy !== null && !c.view.dummy.some(k => k.suit === suit);
 }
@@ -118,6 +120,8 @@ function needsRuff(c: Context) {
   const shorter = a.length < b.length ? c.hand : c.other, longer = a.length < b.length ? c.other : c.hand;
   return suited(shorter, trump).length > 0 && longer.some(k => k.suit !== trump && !c.top(k) && !shorter.some(s => s.suit === k.suit));
 }
+// Never cash a trump the short hand is keeping for a ruff (declarer-draw-trumps delayed it).
+const keepsForRuff = (c: Context, k: Card) => k.suit === c.view.contract.strain && needsRuff(c);
 function declarerDrawTrumps(c: Context) {
   if (c.led || needsRuff(c)) return;
   const outstanding = suited(c.unseen, c.view.contract.strain), trumps = suited(c.hand, c.view.contract.strain);
@@ -147,7 +151,7 @@ function declarerHighFromShortSide(c: Context) {
       return low(c.following.filter(k => c.top(k) && c.beats(k, c.winning!.card)));
     return;
   }
-  return high(c.hand.filter(k => c.top(k) && suited(c.hand, k.suit).length < suited(c.other, k.suit).length));
+  return high(c.hand.filter(k => !keepsForRuff(c, k) && c.top(k) && suited(c.hand, k.suit).length < suited(c.other, k.suit).length));
 }
 function declarerFinesse(c: Context) {
   // declarer-finesse: try the Q under a missing K, or K under a missing A, only when no lower rule promises a winner.
@@ -160,7 +164,8 @@ function declarerFinesse(c: Context) {
 }
 function declarerCashWinners(c: Context) {
   if (c.led) return;
-  return high(c.hand.filter(c.top)) ?? low(longest(c.hand).flat());
+  const cashable = c.hand.filter(k => !keepsForRuff(c, k));
+  return high(cashable.filter(c.top)) ?? low(longest(cashable.length ? cashable : c.hand).flat());
 }
 
 // DEP-03: exact rule IDs, in document order within each position. Opening guards precede selection;

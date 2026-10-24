@@ -1017,13 +1017,13 @@ Declarer: west; no-trumps; game.
 | 11 | 2 | north | clubs/3 | second-hand-low |
 | 11 | 3 | east | hearts/8 | fallback-lowest |
 | 11 | 4 | south | clubs/Q | fourth-hand-win-cheaply |
-| 12 | 1 | south | clubs/K | lead-through-strength |
-| 12 | 2 | west | clubs/8 | second-hand-low |
-| 12 | 3 | north | hearts/7 | discard-low |
+| 12 | 1 | south | spades/Q | return-partners-suit |
+| 12 | 2 | west | clubs/8 | discard-low |
+| 12 | 3 | north | spades/9 | third-hand-win-cheaply |
 | 12 | 4 | east | hearts/J | fallback-lowest |
-| 13 | 1 | south | spades/Q | fallback-lowest |
-| 13 | 2 | west | clubs/10 | discard-low |
-| 13 | 3 | north | spades/9 | third-hand-win-cheaply |
+| 13 | 1 | south | clubs/K | fallback-lowest |
+| 13 | 2 | west | clubs/10 | second-hand-low |
+| 13 | 3 | north | hearts/7 | discard-low |
 | 13 | 4 | east | hearts/Q | fallback-lowest |
 
 ## Deal 17: deal-b50f0dd32e55a953
@@ -1205,18 +1205,18 @@ Declarer: west; no-trumps; game.
 | 10 | 2 | east | hearts/4 | discard-low |
 | 10 | 3 | south | spades/10 | discard-low |
 | 10 | 4 | west | spades/6 | discard-low |
-| 11 | 1 | north | diamonds/9 | lead-through-strength |
-| 11 | 2 | east | diamonds/10 | second-hand-low |
+| 11 | 1 | north | clubs/5 | return-partners-suit |
+| 11 | 2 | east | diamonds/10 | discard-low |
 | 11 | 3 | south | hearts/7 | fallback-lowest |
-| 11 | 4 | west | diamonds/4 | fourth-hand-win-cheaply |
-| 12 | 1 | east | spades/Q | declarer-cash-winners |
-| 12 | 2 | south | hearts/8 | fallback-lowest |
-| 12 | 3 | west | spades/9 | third-hand-win-cheaply |
-| 12 | 4 | north | spades/7 | fourth-hand-win-cheaply |
-| 13 | 1 | east | spades/2 | declarer-cash-winners |
-| 13 | 2 | south | hearts/J | fallback-lowest |
-| 13 | 3 | west | hearts/5 | discard-low |
-| 13 | 4 | north | clubs/5 | discard-low |
+| 11 | 4 | west | diamonds/4 | discard-low |
+| 12 | 1 | north | diamonds/9 | lead-through-strength |
+| 12 | 2 | east | spades/2 | fallback-lowest |
+| 12 | 3 | south | hearts/8 | fallback-lowest |
+| 12 | 4 | west | hearts/5 | discard-low |
+| 13 | 1 | north | spades/7 | lead-through-strength |
+| 13 | 2 | east | spades/Q | second-hand-low |
+| 13 | 3 | south | hearts/J | fallback-lowest |
+| 13 | 4 | west | spades/9 | fourth-hand-win-cheaply |
 
 ## Deal 20: deal-1db9068e0d8e0619
 

@@ -146,6 +146,18 @@ test('lead-through-strength: with honours in every safe Dummy suit, still avoid 
   const plays: [Seat, Card][] = [['west', s('A')[0]], ['north', h('Q')[0]], ['east', s('2')[0]], ['south', h('J')[0]]];
   check(position(hands, plays, 'south', 'clubs'), 'lead-through-strength', h('2')[0]);
 });
+test('declarer-high-from-short-side: keeps the short hand\'s last trump while a ruff is still needed', () => {
+  const hands = { west: [...s('A K 9 8 7'), ...h('A'), ...d('9 8 7 6 5 4 3')], east: [...s('4'), ...h('K Q J 10 9'), ...d('A K Q'), ...c('5 4 3 2')], south: s('2'), north: s('3') };
+  const plays: [Seat, Card][] = [['south', s('2')[0]], ['west', s('A')[0]], ['north', s('3')[0]], ['east', s('4')[0]]];
+  const decision = position(hands, plays, 'east', 'hearts');
+  expect(decision.card).not.toEqual(h('A')[0]);
+});
+test('lead-through-strength: in no-trumps a double void leaves the defender\'s suit as winners', () => {
+  const hands = { west: [...s('A K Q J 10 9 8'), ...h('2 3'), ...d('2 3 4 5')], north: [...h('A K Q'), ...d('A K Q'), ...c('A K Q J 10 9 8')],
+    south: [...h('J 10 9 8'), ...d('J 10 9 8 7'), ...c('7 6 5 4')], east: [...s('7 6 5 4 3 2'), ...h('7 6 5 4'), ...d('6'), ...c('3 2')] };
+  const plays: [Seat, Card][] = [['west', s('A')[0]], ['north', h('Q')[0]], ['east', s('2')[0]], ['south', h('J')[0]]];
+  check(position(hands, plays, 'south', 'no-trumps'), 'lead-through-strength', s('8')[0]);
+});
 test('declarer-finesse: lead low towards Q missing K, or K missing A', () => {
   for (const honour of ['Q', 'K']) check(declarerLead([...s('A'), ...h('8 7 6 2'), ...d('9 8 7 6'), ...c('9 8 7 6')], [...s('2 K Q J 10'), ...h(`${honour} 3`), ...d('A K Q'), ...c('A K Q')]), 'declarer-finesse', h('2')[0]);
 });
@@ -178,7 +190,8 @@ test('lead-through-strength and return-partners-suit: never offer a known ruff a
   const east = [...s('A K 2'), ...filler];
   const north = [...h('A K Q J 10 9 8 7 6 5 4 3 2')];
   const south = [...d('A K Q J 10 4 3 2'), ...c('A K Q J 10')];
-  const result = position({ east, north, south, west: s('3') }, [['west', s('3')[0]], ['north', h('2')[0]], ['east', s('A')[0]], ['south', d('2')[0]]]);
+  // A ruff and discard needs a trump suit (clubs here); in no-trumps the guard doesn't apply.
+  const result = position({ east, north, south, west: s('3') }, [['west', s('3')[0]], ['north', h('2')[0]], ['east', s('A')[0]], ['south', d('2')[0]]], 'south', 'clubs');
   expect(result.ruleId).toBe('lead-through-strength');
   expect(result.card.suit).not.toBe('spades');
 });
