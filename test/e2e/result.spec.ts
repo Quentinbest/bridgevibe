@@ -2,12 +2,12 @@ import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { completeFixedDeal } from '../strategy';
 import { cardName } from '../../src/explanation';
-import { choosePractice, installPausedClock, openPractice } from './miniBridge';
+import { choosePractice, installPausedClock, openPractice, robotTurn } from './miniBridge';
 
 test('US-09: complete MiniBridge, inspect score, review the same result and start next deal', async ({ page }) => {
   await installPausedClock(page); await openPractice(page); await choosePractice(page, true);
-  for (const entry of completeFixedDeal().actions) {
-    if (entry.controller === 'robot') await page.clock.runFor(500);
+  for (const entry of completeFixedDeal('principles').actions) {
+    if (entry.controller === 'robot') await robotTurn(page);
     else {
       await page.getByRole('button', { name: `${cardName(entry.action.card)}, playable`, exact: true }).click();
       await page.getByRole('button', { name: `Play it, ${cardName(entry.action.card)}`, exact: true }).click();
@@ -23,7 +23,7 @@ test('US-09: complete MiniBridge, inspect score, review the same result and star
   const breakdown = result.locator('summary');
   await breakdown.focus(); await page.keyboard.press('Enter');
   await expect(breakdown).toHaveAttribute('aria-expanded', 'true');
-  await expect(result.getByRole('listitem')).toContainText('Tricks short of the goal: 3 × 50 subtracts 150');
+  await expect(result.getByRole('listitem')).toContainText('Tricks short of the goal: 4 × 50 subtracts 200');
   await page.clock.resume();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await result.getByRole('button', { name: 'Review this deal' }).click();
