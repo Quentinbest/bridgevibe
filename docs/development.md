@@ -236,6 +236,21 @@ The standalone duplicate scorer is `src/table/scoring.ts`, exported by Table (US
 
 ## Gameplay checks
 
+**F3 permutation suite (#25).** `test/f3Permutation.test.ts` runs with `npm test`
+(CI-9, US-44.1, VAL-05): 20 pinned MiniBridge positions × 10 distinct hidden-card
+permutations, plus an original baseline per position. Test helpers preserve HCP,
+visible and played cards, hand sizes and revealed voids, and replay every prefix
+legally through Table. Fourteen robot positions use the real host, worker handler,
+principles policy and audit; six learner hint positions use `createHints`, the real
+sampler and `bridgeDdsAdapter` at the unchanged sample count. Encoded views and
+actions/rule IDs or VISIBLE template IDs/text must match; every case completes its
+Playthrough. A second run injects a test-only hidden-card reader and must detect
+changed actions. Run `npx vitest run --project node test/f3Permutation.test.ts
+--disableConsoleIntercept` to see separate robot/hint timings. A local Node 24 run
+took 13.1 s overall (normal: 4.0 s robot / 1.9 s hint; planted: 4.5 s / 2.5 s).
+Timers are simulated and sampling has no wall-clock deadline, so the suite checks
+information independence rather than performance or timeout behaviour.
+
 F1 in `src/table/playthrough.test.ts` runs unchanged in Node and Chromium. It checks reason precedence, rejection immutability, controller rules, blind leads, trick winners, completion and snapshot isolation. `test/boundaries.test.ts` checks the private SeatView brand at typecheck time and exercises ESLint restrictions through its API. Dependency fixtures include a robot importing explanation.
 
 The shared first-legal learner strategy completes the fixed Deal with 6 declaring-side tricks against fallback defenders. Node tests cover the Table and timer composition seams. Playwright uses its clock for a full Deal on `390-light` and `1440-dark`; keyboard, rejection, hidden-card, layout, theme and axe checks run on every project. Layout checks advance through the opening lead to expose Dummy, then resume timers before axe audits the initial, raised-card and rejected-card states. They also check viewport height and footer overlap. Browser checks require permission to bind local ports; in a sandbox that blocks ports, leave them for an unrestricted runner.
