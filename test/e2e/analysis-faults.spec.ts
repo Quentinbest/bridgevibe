@@ -17,7 +17,7 @@ for (const fault of ['timeout', 'error', 'crash', 'protocol-mismatch', 'success'
       if (entry.index % 4 === 3) await page.clock.runFor(1000);
     }
     await page.clock.resume();
-    await page.getByRole('button', { name: 'Hand review', exact: true }).click();
+    await page.getByRole('button', { name: 'Review this deal', exact: true }).click();
     // US-16.2: setup precedes tricks; retain the analysis checks at trick 1.
     for (let step = 0; step < 3; step++) await page.getByRole('button', { name: 'Next step', exact: true }).click();
     const panel = page.getByTestId('provenance-debug-panel');

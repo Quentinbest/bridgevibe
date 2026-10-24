@@ -21,3 +21,4 @@ export { exportRecordJson, importRecordJson, exportPbn, importPbn } from './reco
 export * from './miniBridge';
 export * from './miniBridgeRules';
 export { encodeSetupSeatView, decodeSetupSeatView, type SetupSeatView, type SetupSeatViewMessage } from './seatViewMessage';
+export * from './miniBridgeScoring';

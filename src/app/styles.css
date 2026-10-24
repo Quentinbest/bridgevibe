@@ -368,3 +368,17 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
   .deal-controls { gap: var(--space-4); font-size: var(--type-14); }
   .deal-controls button { padding-inline: var(--space-6); }
 }
+
+/* US-09, UX §5.3–5.4: one result surface, above replay on phones and beside it on desktop. */
+.result-card { margin: 16px auto; padding: 20px; max-width: 640px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-20); }
+.result-card h2 { margin-top: 0; }
+.result-card summary { min-height: 44px; padding: 12px 0; cursor: pointer; }
+.result-card summary:focus-visible, .result-card button:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 3px; }
+.result-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; }
+.result-actions button { min-height: 44px; padding: 8px 16px; background: var(--surface); color: var(--text); border: 1px solid var(--border); border-radius: var(--radius-pill); font: inherit; cursor: pointer; }
+.review-result .result-card { margin: 0; }
+@media (min-width: 1000px) {
+  .review-screen:has(.review-result) { display: grid; grid-template-columns: minmax(0, 1fr) 320px; align-items: start; }
+  .review-screen:has(.review-result) > :not(.review-result) { grid-column: 1; }
+  .review-screen:has(.review-result) > .review-result { grid-column: 2; grid-row: 2 / span 6; }
+}

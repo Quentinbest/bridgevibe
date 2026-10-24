@@ -13,7 +13,7 @@ afterEach(() => { cleanup(); vi.useRealTimers(); });
 test('US-16.1: the composition API refuses early review and the UI has no entry', () => {
   expect(() => createPlay().completedRecord()).toThrow('setup-in-progress');
   render(<App />); openPractice();
-  expect(screen.queryByRole('button', { name: 'Hand review' })).toBeNull();
+  expect(screen.queryByRole('button', { name: 'Review this deal' })).toBeNull();
   expect(screen.queryByRole('note')).toBeNull();
 });
 test('US-16: completed composition opens review and returns to the table', () => {
@@ -29,11 +29,11 @@ test('US-16: completed composition opens review and returns to the table', () =>
     }
     if (entry.index % 4 === 3) act(() => vi.advanceTimersByTime(1000));
   }
-  fireEvent.click(screen.getByRole('button', { name: 'Hand review' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Review this deal' }));
   expect(screen.getByRole('heading', { name: 'Hand review' })).toBe(document.activeElement);
   expect(screen.getByRole('note').textContent).toContain('X-ray view: now you can see all 4 hands');
   fireEvent.click(screen.getByRole('button', { name: 'Back to table' }));
-  expect(screen.getByRole('button', { name: 'Hand review' })).toBeTruthy();
+  expect(screen.getByRole('button', { name: 'Review this deal' })).toBeTruthy();
 });
 test('US-16.2: stepper, winner and start-of-trick hands follow the completed record', () => {
   render(<ReviewScreen record={completedRecord(completeFixedDeal())} onBack={() => {}} />);

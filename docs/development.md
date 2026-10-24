@@ -669,3 +669,16 @@ remains 2. Only completed-record ALL_HANDS analysis may receive full Table keys.
 The brief’s Home launcher is the phase V Learn landing for UX §2.3 (which has no separate Home destination). Learning steps count distinct declared Prompts with session Attempts; remaining time uses `PROVISIONAL_LESSON_DURATION_MINUTES`, a provisional four-minute midpoint of UX §1’s 3–5 minutes, scaled by unanswered Prompts. The session line counts completed practice Playthroughs, including replayed Deals, never starts or 20–20 redeals. Exiting leaves the current activity; no resume or persistence is claimed, and reload resets all session data. All new copy remains draft (CI-8).
 
 Home shows the content’s lesson title and skill tags without a level number. The future module/level slot is marked in `Home.tsx`; the missing `Lesson.module` field remains an open content question. Recommendation: add `module` to the Lesson model in a content ticket before displaying any level mapping.
+
+## MiniBridge result and score (#17)
+
+`table/miniBridgeScoring.ts` implements approved DEP-01, EBU Laws 10 and 16–17:
+odd tricks plus the chosen objective's bonus when made, or −50 per trick short.
+The Table derives Result from completed records, preferring the recorded Contract
+Choice and falling back to the strain's part-score/game level. `ResultCard` shares
+its headline, contract, signed learner-Side score and itemised words with review;
+review places it above replay on phones and beside replay at desktop widths.
+The design's vulnerability wording is omitted under DEP-01 S5. All wording remains
+draft (CI-8). F6 includes the nine DEP-01 examples; scoring and rendered breakdowns
+cover all 140 strain × objective × tricks cases. Next deal reuses New deal and is
+never automatically focused.

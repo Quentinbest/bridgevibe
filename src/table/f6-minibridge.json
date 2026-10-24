@@ -1,0 +1,14 @@
+{
+  "source": "DEP-01 §3; EBU Laws of MiniBridge (2008), Laws 16–17; https://ebu.co.uk/node/122",
+  "cases": [
+    { "strain": "clubs", "objective": "part-score", "tricks": 8, "score": 90 },
+    { "strain": "clubs", "objective": "part-score", "tricks": 6, "score": -50 },
+    { "strain": "spades", "objective": "part-score", "tricks": 10, "score": 170 },
+    { "strain": "spades", "objective": "game", "tricks": 10, "score": 420 },
+    { "strain": "hearts", "objective": "game", "tricks": 8, "score": -100 },
+    { "strain": "no-trumps", "objective": "part-score", "tricks": 9, "score": 150 },
+    { "strain": "no-trumps", "objective": "game", "tricks": 9, "score": 400 },
+    { "strain": "no-trumps", "objective": "game", "tricks": 8, "score": -50 },
+    { "strain": "diamonds", "objective": "game", "tricks": 12, "score": 420 }
+  ]
+}
