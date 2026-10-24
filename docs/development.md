@@ -109,7 +109,7 @@ No other diagnostic URLs are listed.
 No hostname or namespace regex exempts them. An exception for diagnostic text
 never permits passing that URL directly to a network API. New entries need owner
 review; implementation entries explicitly record that owner review is pending.
-Until the owner approves an entry, its reviewer field is exactly `"pending owner review"`.
+Until the owner approves an entry, its reviewer field is exactly `"pending owner review"`. The entries present on 2026-10-24 were reviewed under the owner's delegation, and record it as "Delegated to Claude by the owner (2026-10-24)". The review confirmed bridge-dds 1.4.0 decodes its embedded WebAssembly (`findWasmBinary`) and never uses its `fetch`/XHR fallbacks, and that the diagnostic URLs are never requested.
 
 The bridge-dds 1.4.0 loader embeds its WebAssembly as base64 bytes, decoded by
 `findWasmBinary()` and instantiated directly; normal analysis does not fetch a

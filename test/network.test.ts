@@ -119,8 +119,10 @@ it('validates the committed policy and minimal literal exceptions', () => {
   expect(() => validatePolicy(policy, urls)).not.toThrow();
   validatePolicy(policy, urls);
   expect(policy.origins).toEqual([]);
-  expect(policy.computed.every(entry => entry.reviewer === 'pending owner review')).toBe(true);
-  expect((urls as { reviewer: string }[]).every(entry => entry.reviewer === 'pending owner review')).toBe(true);
+  // Reviewed on 2026-10-24 under the owner's delegation, recorded as delegated, never as an owner approval.
+  const delegated = 'Delegated to Claude by the owner (2026-10-24)';
+  expect(policy.computed.every(entry => entry.reviewer === delegated)).toBe(true);
+  expect((urls as { reviewer: string }[]).every(entry => entry.reviewer === delegated)).toBe(true);
   expect(() => validatePolicy(empty, [{ url: 'https://example.com', reason: '' }])).toThrow();
   expect(() => validatePolicy(empty, [{ url: 'https://', ...review }])).toThrow();
 });
