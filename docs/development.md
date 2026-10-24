@@ -723,3 +723,15 @@ shorter hand overtakes partner's winner with a master when it keeps a card back.
 A; this is a deterministic attempt, not a claim about hidden placement. Unmatched
 positions use the unchanged lowest-card fallback. No solver, sampling or signals
 are used; teacher sign-off remains US-11.3.
+
+## F4 draft (DEP-05)
+
+Run `npm run f4:draft` with Node 24 to regenerate the deterministic 30-Deal
+teacher draft in `docs/domain/f4-draft/`; the command reports scan counts,
+selection categories and runtime. The scan uses real principles robots and
+bridge-dds with 50 visible-information samples per decision, bounded to 1000
+Deals and 15 minutes. Give teachers only `labelling-sheet.md`: the JSON contains
+reproduction data and the private selection notes contain hidden cards and
+metrics. Labels come only from both teachers (T7a, CI-3); all labels, graders and
+resolution fields start blank. This draft is not an app fixture or VAL-07 result;
+#26 integrates resolved labels, excluding unresolved disagreements (US-18.5).
