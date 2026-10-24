@@ -98,10 +98,15 @@ test('US-07.1: practice launched again from Home continues the alternation', () 
   fireEvent.click(screen.getByRole('button', { name: 'Exit' }));
   fireEvent.click(screen.getByRole('link', { name: /^Quick deal/ }));
   act(() => vi.advanceTimersByTime(500));
+  // US-06.2: pin New deal's random seed to one that is redealt twice, so Setup takes longer than
+  // any fixed wait; wait until a Declarer shows instead.
+  const random = vi.spyOn(crypto, 'getRandomValues').mockImplementation(array => {
+    (array as Uint8Array).set([23, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); return array;
+  });
   fireEvent.click(screen.getByRole('button', { name: 'New deal' }));
-  act(() => vi.advanceTimersByTime(6000));
+  for (let step = 0; step < 120 && !screen.queryByText(/(North|South|East|West) declares/); step++) act(() => vi.advanceTimersByTime(500));
   expect(screen.getByText(/(North|South|East|West) declares/).textContent).toMatch(/(North|South) declares/);
-  vi.useRealTimers();
+  random.mockRestore(); vi.useRealTimers();
 });
 
 test('the current Learn tab adds no history entry, and launcher hrefs keep query context', () => {
