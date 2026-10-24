@@ -2,12 +2,13 @@ import { existsSync, readFileSync } from 'node:fs';
 import { expect, test } from 'vitest';
 import { SUITS, type Card } from '../table';
 import { bridgeDdsAdapter } from './bridgeDdsAdapter';
+import { dds31Adapter } from './dds31Adapter';
 import { macroxueAdapter } from './macroxueAdapter';
 import { type CardClass, type Layout, type Position } from './index';
 
 type Reference = { table: number[][]; positions: number[][] };
 // US-17.4: no skipped cases or substitutes when offline reference generation is pending.
-const suites = [bridgeDdsAdapter, macroxueAdapter].flatMap(adapter => [
+const suites = [bridgeDdsAdapter, macroxueAdapter, dds31Adapter].flatMap(adapter => [
   { adapter, name: adapter.name, file: 'f2-smoke.json', deals: 20, positions: 40, command: '' },
   { adapter, name: adapter.name, file: 'f2-full.json', deals: 100, positions: 200, command: ' --full' },
 ]);

@@ -12,7 +12,7 @@ test('switching VITE_SOLVER changes adapter identity, cache and failure provenan
   const record = completedRecord(completeFixedDeal());
   const createClient = vi.fn(() => { throw new Error('AnalysisWorkerCrash'); });
   const host = createAnalysisHost(createClient);
-  for (const value of ['bridge-dds', 'macroxue']) {
+  for (const value of ['bridge-dds', 'macroxue', 'dds31']) {
     vi.stubEnv('VITE_SOLVER', value);
     expect(host.snapshot(record).abstention).toBeUndefined();
     expect(await loadConfiguredSolver()).toMatchObject(configuredEngine());
@@ -22,7 +22,7 @@ test('switching VITE_SOLVER changes adapter identity, cache and failure provenan
     expect(host.snapshot(record).abstention?.provenance).toMatchObject(configuredEngine());
     host.start(record, log);
   }
-  expect(createClient).toHaveBeenCalledTimes(2);
+  expect(createClient).toHaveBeenCalledTimes(3);
 });
 
 test('the default remains bridge-dds and unknown configuration fails', () => {

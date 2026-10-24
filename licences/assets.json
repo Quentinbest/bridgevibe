@@ -18,5 +18,10 @@
     "licenceFile": "src/analysis/macroxue/LICENSE-MIT",
     "licence": "MIT",
     "attribution": "macroxue/bridge-solver 630705d97bc9205b7310ce6cecafbfb031b289e6; emscripten 5.0.7. MIT alternative (also available under Apache-2.0, src/analysis/macroxue/LICENSE-APACHE)."
+  },
+  "src/analysis/dds31/dds31.wasm": {
+    "licenceFile": "src/analysis/dds31/LICENSE",
+    "licence": "Apache-2.0",
+    "attribution": "dds-bridge/dds v3.1.0 fe6a6581a13535779eda5d9141aa704b3f6c8965; emscripten 5.0.7; single-threaded."
   }
 }
