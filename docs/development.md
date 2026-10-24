@@ -670,6 +670,19 @@ The brief’s Home launcher is the phase V Learn landing for UX §2.3 (which has
 
 Home shows the content’s lesson title and skill tags without a level number. The future module/level slot is marked in `Home.tsx`; the missing `Lesson.module` field remains an open content question. Recommendation: add `module` to the Lesson model in a content ticket before displaying any level mapping.
 
+## MiniBridge result and score (#17)
+
+`table/miniBridgeScoring.ts` implements approved DEP-01, EBU Laws 10 and 16–17:
+odd tricks plus the chosen objective's bonus when made, or −50 per trick short.
+The Table derives Result from completed records, preferring the recorded Contract
+Choice and falling back to the strain's part-score/game level. `ResultCard` shares
+its headline, contract, signed learner-Side score and itemised words with review;
+review places it above replay on phones and beside replay at desktop widths.
+The design's vulnerability wording is omitted under DEP-01 S5. All wording remains
+draft (CI-8). F6 includes the nine DEP-01 examples; scoring and rendered breakdowns
+cover all 140 strain × objective × tricks cases. Next deal reuses New deal and is
+never automatically focused.
+
 ## Principled robots (#13)
 
 `bv-principles` version `1` applies DEP-03's ordered rules using only a Table
@@ -685,13 +698,13 @@ trumps and honour doubletons. Covering assumes possible promotion except touchin
 Dummy honours or a jack with no lower own/unseen card. A known opponent void
 justifies taking an ace second. Third hand uses the lowest winning honour over
 Dummy, otherwise the lowest equivalent high card. Weak Dummy suits lack J or
-higher; known double voids are avoided on subsequent leads. Declarer counts
+higher; in suit contracts known double voids are avoided on subsequent leads. Declarer counts
 outstanding trumps from visible/played cards, delays drawing for a visible void
 opposite a loser in the longer trump hand, and uses the highest available winning
 trump for a short-hand ruff. Establishment requires a non-master honour in the
 longest combined side suit and a visible master in another suit as an entry.
-Short-side masters are cashed first, with a master overtake when partner has no
-cards left in that suit. Finesses target Q under a missing K or K under a missing
+Short-side masters are cashed first (never a trump kept for a needed ruff), and the
+shorter hand overtakes partner's winner with a master when it keeps a card back. Finesses target Q under a missing K or K under a missing
 A; this is a deterministic attempt, not a claim about hidden placement. Unmatched
 positions use the unchanged lowest-card fallback. No solver, sampling or signals
 are used; teacher sign-off remains US-11.3.

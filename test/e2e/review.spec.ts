@@ -18,7 +18,7 @@ async function noHiddenCards(page: Page, played: readonly Card[]) {
     expect(accessibility).not.toContain(cardName(card));
     expect(await page.locator(`[data-suit="${card.suit}"][data-rank="${card.rank}"]`).count()).toBe(0);
   }
-  await expect(page.getByRole('button', { name: 'Hand review', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Review this deal', exact: true })).toHaveCount(0);
   await expect(page.getByRole('note')).toHaveCount(0);
 }
 
@@ -47,7 +47,7 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
     if ([0, 9, 25, 47].includes(entry.index)) { await noHiddenCards(page, played); expect(solverRequested).toBe(false); }
   }
   await expect.poll(() => solverRequested).toBe(true);
-  const entry = page.getByRole('button', { name: 'Hand review', exact: true });
+  const entry = page.getByRole('button', { name: 'Review this deal', exact: true });
   await entry.focus(); await page.keyboard.press('Enter');
   await expect(page.getByRole('heading', { name: 'Hand review' })).toBeFocused();
   await expect(page.getByRole('status')).toHaveText('Working out the X-ray view…');
@@ -59,7 +59,11 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
   await page.clock.resume();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   const setupNext = page.getByRole('button', { name: 'Next step', exact: true });
-  // US-16.2: Tab from the focused heading into the stepper, then use native buttons.
+  // US-09.4: the result disclosures precede the replay stepper in keyboard order.
+  await page.keyboard.press('Tab');
+  await expect(page.getByText('How the score was worked out', { exact: true })).toBeFocused();
+  await page.keyboard.press('Tab');
+  await expect(page.getByText('How scoring works', { exact: true })).toBeFocused();
   await page.keyboard.press('Tab');
   await expect(setupNext).toBeFocused();
   await page.keyboard.press('Enter');
@@ -131,7 +135,7 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole('button', { name: 'Back to table' }).click();
-  await expect(page.getByRole('button', { name: 'Hand review', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Review this deal', exact: true })).toBeVisible();
 });
 
 // §4.7: the first lesson never fetches the analysis host's dynamic client or worker.

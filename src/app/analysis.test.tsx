@@ -37,9 +37,9 @@ test('§4.5: completion requests analysis before Hand review opens, never during
   await waitFor(() => expect(analysisClient).toHaveBeenCalledOnce());
   expect(screen.queryByRole('heading', { name: 'Hand review' })).toBeNull();
   expect(vi.mocked(analysisClient).mock.calls[0][0].status).toBe('completed');
-  fireEvent.click(screen.getByRole('button', { name: 'Hand review' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Review this deal' }));
   fireEvent.click(screen.getByRole('button', { name: 'Back to table' }));
-  fireEvent.click(screen.getByRole('button', { name: 'Hand review' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Review this deal' }));
   expect(analysisClient).toHaveBeenCalledOnce();
   cleanup(); vi.clearAllMocks();
   window.history.replaceState(null, '', '?lesson=follow-suit');

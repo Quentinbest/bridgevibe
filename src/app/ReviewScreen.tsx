@@ -1,3 +1,4 @@
+import { ResultCard } from './ResultCard';
 import { type AnalysisState } from './analysisHost';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { replay, exportPbn, exportRecordJson, SEATS, SUITS, type CompletedPlaythroughRecord } from '../table';
@@ -31,6 +32,7 @@ export function ReviewScreen({ record, onBack, analysis, onTryAgain }: { onTryAg
   return <main className="review-screen">
     <header className="review-header"><button type="button" onClick={onBack}>{text('review.back')}</button>
       <h1 ref={heading} tabIndex={-1}>{text('review.title')}</h1></header>
+    {record.gameFormat === 'minibridge' && <aside className="review-result"><ResultCard record={record} reference /></aside>}
     <p role="note" className="review-xray"><span aria-hidden="true">▦</span>{text('review.xray')}</p>
     {analysis?.running && <p role="status" className="review-analysis-skeleton">{text('review.working')}</p>}
     {analysis?.abstention && <div className="review-unavailable">

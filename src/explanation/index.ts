@@ -2,6 +2,28 @@ import type { Card, ReasonCode } from '../table';
 
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
+  'result.title': { text: "MiniBridge result", status: 'draft' },
+  'result.made': { text: "Made exactly.", status: 'draft' },
+  'result.overtricks': { text: "Made, +{count}.", status: 'draft' },
+  'result.down-one': { text: "So close. Down 1.", status: 'draft' },
+  'result.down': { text: "So close. Down {count} tricks.", status: 'draft' },
+  'result.contract': { text: "{objective} in {strain} by {seat}", status: 'draft' },
+  'result.no-trumps': { text: "no-trumps", status: 'draft' },
+  'result.score': { text: "Score: {score} for {side}", status: 'draft' },
+  'result.northSouth': { text: "North–South", status: 'draft' },
+  'result.eastWest': { text: "East–West", status: 'draft' },
+  'result.breakdown': { text: "How the score was worked out", status: 'draft' },
+  'result.perspective': { text: "Breakdown for the Declaring Side, {side}. The other Side has the opposite score.", status: 'draft' },
+  'result.item.odd-tricks': { text: "Odd tricks after the first six: {count} × {value} adds {amount} to the score.", status: 'draft' },
+  'result.item.first-no-trump': { text: "The first odd trick in no-trumps adds {amount} to the score.", status: 'draft' },
+  'result.item.part-score-bonus': { text: "Making the part-score goal adds a bonus of {amount}.", status: 'draft' },
+  'result.item.game-bonus': { text: "Making the game goal adds a bonus of {amount}.", status: 'draft' },
+  'result.item.tricks-short': { text: "Tricks short of the goal: {count} × {value} subtracts {amount} from the score.", status: 'draft' },
+  'result.review': { text: "Review this deal", status: 'draft' },
+  'result.next': { text: "Next deal", status: 'draft' },
+  'result.rules-title': { text: "How scoring works", status: 'draft' },
+  'result.rules': { text: "EBU Laws of MiniBridge, Laws 10, 16 and 17: part-score needs 7 tricks. Game needs 9 in no-trumps, 10 in hearts or spades, or 11 in clubs or diamonds. Reach the goal and every trick after six scores 20 in clubs or diamonds, 30 in hearts or spades, or 40 for the first in no-trumps and 30 for each later one. Add 50 for part-score or 300 for game. Miss the goal and the defenders score 50 per trick short; the Declaring Side has the opposite score. There is no vulnerability, doubling or slam bonus.", status: 'draft' },
+
   'home.level-title': { text: 'Level {module} · {title}', status: 'draft' },
   'home.next': { text: 'Your next move', status: 'draft' },
   'home.skill': { text: 'Skill: {skill}', status: 'draft' },
