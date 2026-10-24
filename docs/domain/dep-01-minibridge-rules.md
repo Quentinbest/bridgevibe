@@ -1,6 +1,6 @@
-# DEP-01: MiniBridge rules specification (AI draft)
+# DEP-01: MiniBridge rules specification
 
-> **Status: AI draft, awaiting the teaching advisor's review.** Drafted by Claude on 2026-10-24 at the owner's request. It is **not** the approved DEP-01 and is not a teacher sign-off (CI-8). Every rule below cites its source; the questions for the advisor are at the end.
+> **Status: approved by the owner on 2026-10-24 as DEP-01.** Drafted by Claude from the sources below. The owner's approval adopts the rules, goals and scoring, and leaves the optional variants (§4) out of v1. It is **not** a teacher sign-off: the learner-facing wording (question 4) stays draft until a teacher signs it off (CI-8), and the remaining questions in §5 stay open for the teaching advisor without blocking work.
 
 **Main source:** English Bridge Union, *All About MiniBridge*, March 2008 edition, "The Laws of MiniBridge" (Laws 1–25) and its "Summary of MiniBridge". **Cross-checked against:** EBU, ["How to score in MiniBridge"](https://ebu.co.uk/node/122), and No Fear Bridge, [MiniBridge Part 1, lesson 2](https://www.nofearbridge.co.uk/minibridge/app_courses.php?C=612&L=2).
 

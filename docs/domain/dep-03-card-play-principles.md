@@ -1,6 +1,6 @@
-# DEP-03: Robot card-play principles (AI draft)
+# DEP-03: Robot card-play principles
 
-> **Status: AI draft, awaiting the teaching advisor's review.** Drafted by Claude on 2026-10-24 at the owner's request. It is **not** the approved DEP-03 and is not a teacher sign-off (CI-8). It is the list #13 builds the robot policy against (US-11.2); each rule ID becomes the rule recorded in robot provenance.
+> **Status: approved by the owner on 2026-10-24 as DEP-03, including the five rules marked Proposal.** Drafted by Claude from the sources below. It is **not** a teacher sign-off: US-11.3 (both teachers review robot play on the F7 sample) still applies, and the questions in §9 stay open for the teaching advisor without blocking work. It is the list #13 builds the robot policy against (US-11.2); each rule ID becomes the rule recorded in robot provenance.
 
 Robots sit East and West and may defend or declare. Each rule decides only from the robot's own **Seat View** (ADR-0001): its own Hand, Dummy once exposed, the Announcements and the cards already played. Rules are tried in the order listed for the robot's position in the trick; the first rule that applies picks the card, and any remaining choice between equal cards uses the fixed tie-break (spec §4.6.7: lowest card of the class, then suit order).
 
