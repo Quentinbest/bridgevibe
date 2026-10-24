@@ -3,15 +3,13 @@ import path from 'node:path';
 import { builtinModules } from 'node:module';
 import { createHash } from 'node:crypto';
 import type { Plugin, ResolvedConfig } from 'vite';
-import { buildBom, isAsset, prohibitedPaths, renderNotice, scanBytes } from './core.js';
+import { buildBom, isAsset, isLicenceFile, prohibitedPaths, renderNotice, scanBytes } from './core.js';
 import type { Asset, Exception, OpenItem, Shipped } from './core.js';
 import denylist from './denylist.json' with { type: 'json' };
 
 const relative = (root: string, file: string) => path.relative(root, file).split(path.sep).join('/');
 const hashOf = (bytes?: Uint8Array) => bytes ? `sha256:${createHash('sha256').update(bytes).digest('hex')}` : 'unknown';
-// US-46.1: licence and notice files, including third-party collections such as THIRD-PARTY-LICENSE
-// or THIRD_PARTY_NOTICES.txt, but not code or data that merely mentions a licence.
-export const isLicenceFile = (name: string) => /^(?:[^.]*[-_. ])?(?:licen[cs]es?|unlicen[cs]e|copying|notices?)(?:[-_. ][^/]*)?$/i.test(name) && !/\.(?:[cm]?[jt]sx?|json|map)$/i.test(name);
+export { isLicenceFile } from './core.js';
 const readJson = <T>(file: string): T => JSON.parse(readFileSync(file, 'utf8')) as T;
 export function filesIn(dir: string): string[] {
   if (!existsSync(dir)) return [];

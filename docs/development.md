@@ -67,6 +67,20 @@ terms remain the owner's decision during review.
 For isolated builds, `licences({ reportPath })` or the
 `BRIDGEVIBE_LICENCE_REPORT` environment variable redirects the BOM destination.
 
+### Candidate licence report
+
+Run `npm run licences:candidates -- <candidatesRoot>` (Node 24) on demand for
+T3 / VAL-10; this does not run on builds. Claude keeps the pinned checkouts under
+`.reference-solvers/`; pass that directory as the candidates root. Paths and pins
+are in `licences/candidates.json`; `root: "repo"` resolves bridge-dds against this
+repository instead. The scanner writes `docs/reports/licence-candidates.md` and
+`licences/candidates-report.json`, including DEP-08 questions, file evidence,
+metadata claims and skipped files. Files over 50 MiB and `.git` are skipped;
+symlinks are not followed. BEN's metadata-only tree cannot establish byte-scan
+clearance. Pins identify the intended checkouts; confirm their revisions and
+cleanliness before running. Reports record evidence, not gate decisions.
+Candidate byte scans ignore matches followed by an ASCII lowercase letter only when the needle ends in an alphanumeric character, avoiding camelCase continuations while keeping `american_bba_` substring matching and the build scanner unchanged.
+
 ### Network review (LR-3c, US-46.3)
 
 `scripts/network/` runs on every Vite build, including `audit` and `internal`.

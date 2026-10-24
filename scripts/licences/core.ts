@@ -179,3 +179,7 @@ export function renderNotice(bom: Bom): string {
     return `${item.name} ${item.version} — ${item.licence}\n${notices.join('\n\n')}`;
   }).join('\n\n========================================\n\n') + '\n';
 }
+
+// US-46.1: licence and notice files, including third-party collections such as THIRD-PARTY-LICENSE
+// or THIRD_PARTY_NOTICES.txt, but not code or data that merely mentions a licence.
+export const isLicenceFile = (name: string) => /^(?:[^.]*[-_. ])?(?:licen[cs]es?|unlicen[cs]e|copying|notices?)(?:[-_. ][^/]*)?$/i.test(name) && !/\.(?:[cm]?[jt]sx?|json|map)$/i.test(name);

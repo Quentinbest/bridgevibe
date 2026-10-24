@@ -1,0 +1,116 @@
+[
+  {
+    "name": "bridge-dds",
+    "responsibility": "Double-dummy analysis",
+    "source": "npm:bridge-dds",
+    "version": "1.4.0",
+    "path": "node_modules/bridge-dds",
+    "notes": "DDS 2.9 compiled to WebAssembly; package metadata is not licence evidence.",
+    "root": "repo"
+  },
+  {
+    "name": "macroxue bridge-solver",
+    "responsibility": "Double-dummy analysis",
+    "source": "https://github.com/macroxue/bridge-solver",
+    "commit": "630705d97bc9205b7310ce6cecafbfb031b289e6",
+    "path": "bridge-solver",
+    "notes": "WebAssembly solver candidate."
+  },
+  {
+    "name": "DDS 3.1",
+    "responsibility": "Double-dummy analysis",
+    "source": "https://github.com/dds-bridge/dds",
+    "commit": "fe6a6581a13535779eda5d9141aa704b3f6c8965",
+    "path": "dds",
+    "notes": "Official WebAssembly build candidate."
+  },
+  {
+    "name": "pons-dds",
+    "responsibility": "Double-dummy analysis",
+    "source": "https://github.com/jdh8/pons-dds",
+    "commit": "12689f0ddbd9a95fd07b4d4bca6c273bb05e640c",
+    "path": "candidates/pons-dds",
+    "notes": "Optional solver candidate."
+  },
+  {
+    "name": "pons",
+    "responsibility": "Bidding and explanations",
+    "source": "https://github.com/jdh8/pons",
+    "commit": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01",
+    "path": "candidates/pons",
+    "notes": "american_instinct() assessment covers the whole crate; a build without american_bba_* weights belongs to #34."
+  },
+  {
+    "name": "ts-contractbridge",
+    "responsibility": "Rules and state core",
+    "source": "https://github.com/RalphLipe/ts-contractbridge",
+    "commit": "8a788cf0a926ea0413f9d21091858bf4dc95bcfc",
+    "path": "candidates/ts-contractbridge",
+    "notes": "Candidate scope is packages/ts-contractbridge; other repository licences are context only.",
+    "subpath": "packages/ts-contractbridge"
+  },
+  {
+    "name": "Bridge-Classroom",
+    "responsibility": "Lesson foundation",
+    "source": "https://github.com/bridge-craftwork/Bridge-Classroom",
+    "commit": "f4ec8c097652699394979d667f7a3f38b53f959b",
+    "path": "candidates/Bridge-Classroom",
+    "notes": "PRD records BBA-based grading; static hits require review of use."
+  },
+  {
+    "name": "Baker-Bridge",
+    "responsibility": "Lesson content",
+    "source": "https://github.com/bridge-craftwork/Baker-Bridge",
+    "commit": "600985422a0b6fc764301c0b087f372512790582",
+    "path": "candidates/Baker-Bridge",
+    "notes": "Code licence does not establish rights to third-party lesson content.",
+    "contentRights": [
+      "EPBot-filtered deals: selection rights require case-by-case review (PRD LR-3/LR-5).",
+      "Third-party content permission scope is unverified; confirm original site permission before copying (PRD LR-5/LR-6)."
+    ]
+  },
+  {
+    "name": "rusty-bidding-bot",
+    "responsibility": "Bidding and explanations",
+    "source": "https://github.com/bridge-craftwork/rusty-bidding-bot",
+    "commit": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79",
+    "path": "candidates/rusty-bidding-bot",
+    "notes": "WebAssembly bidding candidate; stock convention card origins require review.",
+    "contentRights": [
+      "Bundled stock convention cards need their origin checked (PRD §12.2)."
+    ]
+  },
+  {
+    "name": "saycbridge",
+    "responsibility": "Bidding and explanations",
+    "source": "https://github.com/eseidel/saycbridge",
+    "commit": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462",
+    "path": "candidates/saycbridge",
+    "notes": "Python and Z3 server candidate for SAYC."
+  },
+  {
+    "name": "Bridgit",
+    "responsibility": "Bidding and explanations",
+    "source": "https://github.com/TricksterCards/Bridgit",
+    "commit": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3",
+    "path": "candidates/Bridgit",
+    "notes": "C# bidding candidate for 2/1."
+  },
+  {
+    "name": "endplay",
+    "responsibility": "Lesson content",
+    "source": "https://github.com/dominicprice/endplay",
+    "commit": "260af100d7dacc0e81babd839d5596ca7f20017a",
+    "path": "candidates/endplay",
+    "notes": "Offline content tooling candidate."
+  },
+  {
+    "name": "BEN",
+    "responsibility": "Robot policy",
+    "source": "https://github.com/lorserker/ben",
+    "commit": "ad8608af6e6bfe095863023f344f3cb2cbafec3d",
+    "path": "candidates/ben-meta",
+    "notes": "Deferred server candidate. Metadata only: tree.txt, LICENSE and COMMIT; full repository was too large to clone.",
+    "metadataOnly": true
+  }
+]
