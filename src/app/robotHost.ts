@@ -29,7 +29,7 @@ function submitDecision(decision: Decision, action: Action | ContractChoice, pro
 }
 function fallbackAction(decision: Decision, now: number): Action | ContractChoice {
   return decision.kind === 'contract' ? contractChoicePolicy.decide(decision.view)
-    : fallbackRobotPolicy.decide(decision.view, decision.seed, now);
+    : { kind: 'play-card', card: fallbackRobotPolicy.decide(decision.view, decision.seed, now).card };
 }
 export function createRobotHost(options: RobotHostOptions = {}) {
   // Browser timer functions throw "Illegal invocation" when called as methods of another object,
@@ -92,7 +92,7 @@ export function createRobotHost(options: RobotHostOptions = {}) {
     const policy = active.kind === 'contract' ? contractChoicePolicy : fallbackRobotPolicy;
     result = { action: fallbackAction(active, clock.now()),
       provenance: { kind: 'robot', policy: policy.name, version: policy.version,
-        ...(active.kind === 'contract' ? { ruleId: contractChoicePolicy.ruleId } : {}),
+        ...(active.kind === 'contract' ? { ruleId: contractChoicePolicy.ruleId } : { ruleId: 'fallback-lowest' }),
         fallback: reason, durationMs: clock.now() - started } };
     cancelRequest();
   }
@@ -148,7 +148,7 @@ export function createRobotHost(options: RobotHostOptions = {}) {
     const policy = decision.kind === 'contract' ? contractChoicePolicy : fallbackRobotPolicy;
     submitDecision(decision, fallbackAction(decision, clock.now()), { kind: 'robot',
       policy: policy.name, version: policy.version,
-      ...(decision.kind === 'contract' ? { ruleId: contractChoicePolicy.ruleId } : {}),
+      ...(decision.kind === 'contract' ? { ruleId: contractChoicePolicy.ruleId } : { ruleId: 'fallback-lowest' }),
       fallback: 'engine-failure', durationMs: clock.now() - started });
   }
   function begin() {
@@ -182,6 +182,8 @@ export function createRobotHost(options: RobotHostOptions = {}) {
       begin();
     },
     cancel,
+    // US-10.2 audit builds: a decision is pending until the worker answers or a fallback replaces it.
+    pending: () => !!active && !result,
     stop() { cancel(); terminate(); unsubscribe?.(); unsubscribe = undefined; },
   };
 }

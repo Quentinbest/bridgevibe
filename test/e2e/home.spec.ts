@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { installPausedClock } from './miniBridge';
+import { installPausedClock, robotTurn } from './miniBridge';
 
 test('Home, token themes, session progress, responsive navigation and axe at every configured size', async ({ page }) => {
   await page.goto('/');
@@ -58,7 +58,7 @@ test('Quick deal starts setup; browser Back returns to Home and reload clears th
   await installPausedClock(page); await page.goto('/');
   await page.getByRole('link', { name: /^Quick deal/ }).click();
   await expect(page.getByRole('heading', { name: 'MiniBridge Setup' })).toBeVisible();
-  await page.clock.runFor(500);
+  await robotTurn(page);
   await expect(page.locator('.setup-points li')).toHaveCount(1);
   await page.goBack();
   await expect(page.getByRole('heading', { name: 'Your next move' })).toBeFocused();

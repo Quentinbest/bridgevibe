@@ -1,4 +1,4 @@
-import { openPractice, choosePractice, installPausedClock } from './miniBridge';
+import { openPractice, choosePractice, installPausedClock, robotTurn } from './miniBridge';
 import { readFile } from 'node:fs/promises';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
@@ -23,7 +23,7 @@ async function noHiddenCards(page: Page, played: readonly Card[]) {
 }
 
 test('US-04, US-16: review, keyboard stepper, four hands and record downloads', async ({ page }) => {
-  const reference = completeFixedDeal();
+  const reference = completeFixedDeal('principles');
   let solverRequested = false;
   let releaseSolver!: () => void;
   const solverGate = new Promise<void>(resolve => { releaseSolver = resolve; });
@@ -37,7 +37,7 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
   await expect(page.locator('.dummy .card')).toHaveCount(13);
   expect(solverRequested).toBe(false);
   for (const entry of reference.actions) {
-    if (entry.controller === 'robot') await page.clock.runFor(500);
+    if (entry.controller === 'robot') await robotTurn(page);
     else {
       const card = page.getByRole('button', { name: `${cardName(entry.action.card)}, playable`, exact: true });
       await card.click(); await page.getByRole('button', { name: `Play it, ${cardName(entry.action.card)}`, exact: true }).click();

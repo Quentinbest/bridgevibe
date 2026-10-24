@@ -157,7 +157,7 @@ connections. Static scanning covers those worker files meanwhile.
 `src/<module>/` follows engineering spec §4.2: one module per bounded context, created by the ticket that needs it. Today there are four:
 
 - **table**: the authoritative rules core. `startPlaythrough({ deal, contract })` returns a handle with `legalActions(seat)`, `submit(seat, controller, action)`, `seatView(seat)` and `record()`. It checks card plays, owns turns and trick winners, exposes Dummy after the opening lead, and completes after 13 tricks. Rejections preserve all state. It **may depend on nothing**: no other module, package or Node builtin (its tests may import Vitest).
-- **robots**: the `RobotPolicy` port, `bv-basic` and deterministic `bv-fallback` (§4.6.6), receiving only a branded `SeatView`, seed and deadline. Both policies currently use the same card rule; #13 replaces the basic policy rules. It imports only Table. ESLint prohibits full-Deal types and SeatView assertions outside Table.
+- **robots**: the `RobotPolicy` port, `bv-principles` and deterministic `bv-fallback` (§4.6.6), receiving only a branded `SeatView`, seed and deadline. The principle policy follows DEP-03 (#13); the fallback keeps the lowest-card rule. It imports only Table. ESLint prohibits full-Deal types and SeatView assertions outside Table.
 - **explanation**: the string catalogue (`catalogue` keyed by ID, `text(id, params)` with `{param}` interpolation). Every entry carries `status: 'draft'` until a teacher signs it off (CI-8).
 - **app**: the composition root and all UI. Only **app** may import **app**.
 
@@ -169,7 +169,7 @@ Rules every later module must keep:
 - Robots and in-play hints receive only a Seat View, never a full Deal. Only **table** constructs Seat Views and completed playthrough records (ADR-0001). Card-play Seat Views include the final Deal’s ordered MiniBridge Announcements; Contract Bridge views have an empty list.
 - The UI is built from a learner view: face-up cards plus a count for each hidden hand. No hidden card identity reaches React props, page text or accessibility names (US-16.4). The fixed Deal lives in `src/app/fixture.ts` for composition; `src/app/play.ts` projects South’s SeatView into the learner view. The authored Deal is necessarily present in the client bundle in this fixed-Deal slice.
 - When the learner's side declares, the learner plays Declarer, and the display rotates so Declarer is at the bottom (ADR-0003).
-- Robots run `bv-basic` in a versioned Web Worker from an encoded Seat View (#8). The host enforces a 400 ms deadline and a constant 500 ms display delay, records marked timeout/engine-failure fallbacks, and disables the worker after three session failures. Hidden pages cancel pending requests; interrupted decisions restart with fresh deadline and display windows on return. Trick collection remains 1 s. The trivial fallback uses the same Seat View on the main thread; neither policy needs WebAssembly.
+- Robots run `bv-principles` in a versioned Web Worker from an encoded Seat View (#8). The host enforces a 400 ms deadline and a constant 500 ms display delay, records marked timeout/engine-failure fallbacks, and disables the worker after three session failures. Hidden pages cancel pending requests; interrupted decisions restart with fresh deadline and display windows on return. Trick collection remains 1 s. The trivial fallback uses the same Seat View on the main thread; neither policy needs WebAssembly.
 
 ## No hard-coded learner-facing text (US-38)
 
@@ -682,3 +682,29 @@ The design's vulnerability wording is omitted under DEP-01 S5. All wording remai
 draft (CI-8). F6 includes the nine DEP-01 examples; scoring and rendered breakdowns
 cover all 140 strain × objective × tricks cases. Next deal reuses New deal and is
 never automatically focused.
+
+## Principled robots (#13)
+
+`bv-principles` version `1` applies DEP-03's ordered rules using only a Table
+Seat View. Dummy decisions use Declarer's existing view, with the message/audit
+identity still Declarer and the submitted seat still Dummy. Decisions carry
+`ruleId` into the worker response, record and provenance log; host failures keep
+`bv-fallback` and `fallback-lowest`. `basicPolicy` remains for legacy callers.
+Run `npm run robots:sample` to export 20 fixed seeded MiniBridge Playthroughs to
+`docs/reports/robot-sample.md` for F7 teacher review; the report is generated,
+not maintained as source. Node tests cover 100 deals and byte-identical exports.
+DEP-03 approximations: weak opening hands have at most 7 HCP; short leads exclude
+trumps and honour doubletons. Covering assumes possible promotion except touching
+Dummy honours or a jack with no lower own/unseen card. A known opponent void
+justifies taking an ace second. Third hand uses the lowest winning honour over
+Dummy, otherwise the lowest equivalent high card. Weak Dummy suits lack J or
+higher; in suit contracts known double voids are avoided on subsequent leads. Declarer counts
+outstanding trumps from visible/played cards, delays drawing for a visible void
+opposite a loser in the longer trump hand, and uses the highest available winning
+trump for a short-hand ruff. Establishment requires a non-master honour in the
+longest combined side suit and a visible master in another suit as an entry.
+Short-side masters are cashed first (never a trump kept for a needed ruff), and the
+shorter hand overtakes partner's winner with a master when it keeps a card back. Finesses target Q under a missing K or K under a missing
+A; this is a deterministic attempt, not a claim about hidden placement. Unmatched
+positions use the unchanged lowest-card fallback. No solver, sampling or signals
+are used; teacher sign-off remains US-11.3.

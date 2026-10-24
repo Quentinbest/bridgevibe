@@ -26,6 +26,7 @@ declare global {
   interface Window {
     __robotAuditCount?: number;
     __robotAuditViolations?: string[];
+    __robotPending?: () => boolean;
   }
 }
 // §4.3.6: audit builds expose evidence without sending the Deal to a worker.
@@ -43,3 +44,6 @@ export function browserRobotAudit(record: () => AuditRecord, hiddenCardFound?: (
     }
   };
 }
+// #13: e2e pauses the clock; it advances only once the worker has answered, so the 400 ms deadline
+// can't fall back merely because fake time outran a real-time worker.
+export function exposeRobotPending(pending: () => boolean) { window.__robotPending = pending; }

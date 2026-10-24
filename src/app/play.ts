@@ -2,12 +2,12 @@ import { createHints, hintSeat, type AuthoredSetupHint, type HintSnapshot } from
 import type { HintRunner } from './hintClient';
 import { createProvenanceLog, type LogEntry } from '../coach/provenance';
 import { APP_VERSION } from './appVersion';
-import { basicPolicy, fallbackRobotPolicy, contractChoicePolicy } from '../robots';
+import { principlesPolicy, fallbackRobotPolicy, contractChoicePolicy } from '../robots';
 import { startMiniBridge, encodeSetupSeatView, sideOf, SEATS, seatViewSeed, type Playthrough, type SetupSeatView, type ContractChoice, type Objective, type Side, type Card, type Deal, type SeatView, type Seat, type PlayedCard, type ReasonCode, type RobotProvenance } from '../table';
 import { createRobotHost, type RobotHostOptions } from './robotHost';
 import { cardName, reasonStrings, text } from '../explanation';
 import { fixedDeal } from './fixture';
-import { browserRobotAudit, robotAudit } from './robotAudit';
+import { browserRobotAudit, exposeRobotPending, robotAudit } from './robotAudit';
 
 export type LearnerView = Readonly<Pick<SeatView,
   'positionIndex' | 'hand' | 'dummy' | 'turn' | 'tricksWon' | 'cardCounts' | 'status'> & {
@@ -35,7 +35,7 @@ let nextSetupId = 0;
 export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fixedDeal, targetDeclaringSide: Side = 'northSouth', hintRunner?: HintRunner, setupHint?: (view: SetupSeatView) => AuthoredSetupHint | undefined) {
   const setupId = `setup-${++nextSetupId}`;
   const setup = startMiniBridge({ deal, targetDeclaringSide, learnerSide: 'northSouth',
-    versions: { appVersion: APP_VERSION, engineVersions: { [basicPolicy.name]: basicPolicy.version, [fallbackRobotPolicy.name]: fallbackRobotPolicy.version,
+    versions: { appVersion: APP_VERSION, engineVersions: { [principlesPolicy.name]: principlesPolicy.version, [fallbackRobotPolicy.name]: fallbackRobotPolicy.version,
       [contractChoicePolicy.name]: contractChoicePolicy.version } } });
   let table: Playthrough | null = null;
   const record = () => { if (!table) throw new Error('setup-in-progress'); return table.record(); };
@@ -59,6 +59,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     options = { ...robotOptions, audit(message, seat) { audit(message, seat); robotOptions.audit?.(message, seat); } };
   }
   const robots = createRobotHost(options);
+  if (import.meta.env.MODE === 'audit') exposeRobotPending(robots.pending);
   const listeners = new Set<() => void>();
   let timer: ReturnType<typeof setTimeout> | undefined;
   let running = false;
@@ -128,7 +129,10 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     } else if (snapshot.turn && table.controllerOf(snapshot.turn) === 'robot') {
       // ADR-0003: the Table decides which seats robots control.
       const seat = snapshot.turn;
-      const view = table.seatView(seat);
+      // ADR-0001: Dummy uses Declarer's existing view, as hints do (#23).
+      const declarer = record().contract.declarer;
+      const dummySeat = SEATS[(SEATS.indexOf(declarer) + 2) % 4];
+      const view = table.seatView(seat === dummySeat ? declarer : seat);
       robots.decide({ view, seed: seatViewSeed(view),
         playthroughId: record().playthroughId, positionKey: table.positionKey(), currentPositionKey: table.positionKey,
         submit: (action, provenance) => accept(seat, action.card, 'robot', provenance) });
@@ -150,7 +154,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     } else {
       if (controller === 'robot' && provenance) log({ positionIndex, kind: 'robot-action', summary: JSON.stringify({ seat, action: { kind: 'play-card', card } }),
         provenance: { sourceKind: 'robot', kind: 'robot', policy: provenance.policy, version: provenance.version,
-          durationMs: provenance.durationMs, ...(provenance.fallback ? { fallback: provenance.fallback } : {}) } });
+          durationMs: provenance.durationMs, ...(provenance.ruleId ? { ruleId: provenance.ruleId } : {}), ...(provenance.fallback ? { fallback: provenance.fallback } : {}) } });
       for (const event of result.events) {
         if (event.kind === 'card-played') announcements.push(text('announce.play', { seat: text(`seat.${event.seat}`), card: cardName(event.card) }));
         // The winner is announced once, by the turn banner's live region during collection (UX §10).

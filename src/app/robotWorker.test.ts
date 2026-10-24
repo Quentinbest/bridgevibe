@@ -18,12 +18,12 @@ test('US-12.6: worker handler decides without WebAssembly and reports policy pro
     const post = vi.fn(); let time = 0;
     handleRobotMessage(request, post, undefined, () => time++);
     expect(post).toHaveBeenCalledWith({ type: 'decided', requestId: '1', playthroughId: table.record().playthroughId, positionKey: table.positionKey(),
-      action: { kind: 'play-card', card: { suit: 'spades', rank: '9' } },
-      provenance: { kind: 'robot', policy: 'bv-basic', version: '1', durationMs: 1 } });
+      action: { kind: 'play-card', card: { suit: 'hearts', rank: 'J' } },
+      provenance: { kind: 'robot', policy: 'bv-principles', version: '1', ruleId: 'lead-sequence', durationMs: 1 } });
     handleRobotMessage({ type: 'cancel', cancellationId: '1' }, post); expect(post).toHaveBeenCalledOnce();
     handleRobotMessage({ ...request, view: { ...request.view, extra: true } } as RobotRequest, post);
     expect(post.mock.calls.at(-1)?.[0]).toMatchObject({ type: 'error', requestId: '1', playthroughId: table.record().playthroughId,
-      positionKey: table.positionKey(), provenance: { kind: 'robot', policy: 'bv-basic', version: '1' } });
+      positionKey: table.positionKey(), provenance: { kind: 'robot', policy: 'bv-principles', version: '1' } });
   } finally { if (descriptor) Object.defineProperty(globalThis, 'WebAssembly', descriptor); }
 });
 

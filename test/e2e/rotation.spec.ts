@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { dealFromSeed, startMiniBridge, type Seat } from '../../src/table';
-import { choosePractice, installPausedClock } from './miniBridge';
+import { choosePractice, installPausedClock, robotTurn } from './miniBridge';
 
 // US-02: find reproducible fixtures through the Table, never HCP assumptions in the UI test.
 function fixture(declarer: Seat) {
@@ -33,7 +33,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) test(`North de
   await expect(page.getByRole('dialog')).toHaveCount(0);
   const gotIt = page.getByRole('button', { name: 'Got it' });
   await gotIt.focus();
-  await page.clock.runFor(500);
+  await robotTurn(page);
   await expect(gotIt).toBeFocused();
   await expect(page.locator('.turn-banner')).toHaveText('Play from South (dummy)');
   const openingLead = page.locator('.played-left');
@@ -58,7 +58,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) test(`North de
   const dummyCard = south.getByRole('button', { name: /, playable$/ }).first();
   await dummyCard.focus(); await dummyCard.press('ArrowRight');
   await dummyCard.focus(); await dummyCard.press('Enter'); await dummyCard.press('Enter');
-  await page.clock.runFor(500);
+  await robotTurn(page);
   await expect(page.locator('.turn-banner')).toHaveText('Play from North (declarer)');
   await expect(page.locator('.played-top')).toHaveAttribute('data-seat', 'south');
   await expect(page.locator('.played-right')).toHaveAttribute('data-seat', 'west');
