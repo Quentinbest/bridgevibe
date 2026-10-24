@@ -745,9 +745,9 @@ The teachers review the fallback policy, because its actions can show up in play
 
 | ID | Dependency | Needed by | Owner |
 |---|---|---|---|
-| DEP-01 | One-page MiniBridge rules specification with the EBU text: objectives and trick targets, slam availability, vulnerability, the named scoring convention (Q5) | Before week 1 | Teaching advisor |
+| DEP-01 | One-page MiniBridge rules specification with the EBU text: objectives and trick targets, slam availability, vulnerability, the named scoring convention (Q5). Approved by the owner 2026-10-24: [`docs/domain/dep-01-minibridge-rules.md`](../domain/dep-01-minibridge-rules.md) | Before week 1 | Teaching advisor |
 | DEP-02 | The teacher-approved robot contract-choice rule for MiniBridge | Week 1 | Teaching advisor |
-| DEP-03 | The teacher-approved list of robot card-play principles | Week 2 | Teaching advisor |
+| DEP-03 | The teacher-approved list of robot card-play principles. Approved by the owner 2026-10-24: [`docs/domain/dep-03-card-play-principles.md`](../domain/dep-03-card-play-principles.md) | Week 2 | Teaching advisor |
 | DEP-04 | Signed-off wording for reason codes, abstentions, the hindsight label and assessment verdicts (CI-2, CI-8; UX §5) | Week 3 for the slice | Teachers |
 | DEP-05 | F4 teacher labels | Before week 2 | Both teachers (T7a) |
 | DEP-06 | The two reference phones | Week 0 | Owner |
