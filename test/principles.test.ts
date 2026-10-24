@@ -158,6 +158,11 @@ test('lead-through-strength: in no-trumps a double void leaves the defender\'s s
   const plays: [Seat, Card][] = [['west', s('A')[0]], ['north', h('Q')[0]], ['east', s('2')[0]], ['south', h('J')[0]]];
   check(position(hands, plays, 'south', 'no-trumps'), 'lead-through-strength', s('8')[0]);
 });
+test('declarer-high-from-short-side: Dummy unblocks the ace on the long hand\'s king, keeping a card to return', () => {
+  const hands = { east: [...s('A'), ...h('K Q J 10 9 8 7 6'), ...d('A K Q'), ...c('A')], west: [...h('A 2'), ...s('3')], south: [...s('2'), ...h('3')], north: s('4') };
+  const plays: [Seat, Card][] = [['south', s('2')[0]], ['west', s('3')[0]], ['north', s('4')[0]], ['east', s('A')[0]], ['east', h('K')[0]], ['south', h('3')[0]]];
+  check(position(hands, plays, 'east'), 'declarer-high-from-short-side', h('A')[0]);
+});
 test('declarer-finesse: lead low towards Q missing K, or K missing A', () => {
   for (const honour of ['Q', 'K']) check(declarerLead([...s('A'), ...h('8 7 6 2'), ...d('9 8 7 6'), ...c('9 8 7 6')], [...s('2 K Q J 10'), ...h(`${honour} 3`), ...d('A K Q'), ...c('A K Q')]), 'declarer-finesse', h('2')[0]);
 });

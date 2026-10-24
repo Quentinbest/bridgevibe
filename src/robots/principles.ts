@@ -147,7 +147,10 @@ function declarerEstablishLongSuit(c: Context) {
 function declarerHighFromShortSide(c: Context) {
   // declarer-high-from-short-side: preserve the longer side's entry; overtake a blocking partner winner only with a master.
   if (c.led) {
-    if (c.ours && c.winning?.seat === partner(c.seat) && !c.other.some(k => k.suit === c.led!.card.suit) && c.following.length > 1)
+    const partnerLeft = suited(c.other, c.led.card.suit).length;
+    // Overtake with a master, keeping a card back: to unblock when this hand is the shorter (partner has
+    // at least as many left as this hand holds), or when partner has none left in the suit.
+    if (c.ours && c.winning?.seat === partner(c.seat) && c.following.length > 1 && (partnerLeft === 0 || c.following.length <= partnerLeft))
       return low(c.following.filter(k => c.top(k) && c.beats(k, c.winning!.card)));
     return;
   }
