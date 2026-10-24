@@ -119,6 +119,17 @@ describe('T3 / VAL-10 candidate licence assessment', () => {
     expect(result.verdicts['LR-4']).toBe('pass');
     expect(result.evidence.find(item => item.path.endsWith('THIRD-PARTY-LICENSE'))?.scope).toBe('context');
   });
+  it('ignores sibling package metadata outside the subpath', () => {
+    const base = temp();
+    mkdirSync(path.join(base, 'scoped/packages/core'), { recursive: true });
+    mkdirSync(path.join(base, 'scoped/packages/other'), { recursive: true });
+    writeFileSync(path.join(base, 'scoped/packages/core/LICENSE'), readFileSync(path.join(root, 'mit/LICENSE')));
+    writeFileSync(path.join(base, 'scoped/packages/other/LICENSE'), readFileSync(path.join(root, 'gpl/LICENSE')));
+    writeFileSync(path.join(base, 'scoped/packages/other/package.json'), JSON.stringify({ license: 'MIT' }));
+    const result = scanCandidates([candidate('scoped', { subpath: 'packages/core' })], base, base, denylist).candidates[0];
+    expect(result.verdicts['LR-7']).toBe('pass');
+    expect(result.metadata).toEqual([]);
+  });
   it('scans metadata tree paths without claiming a complete byte scan', () => {
     const result = scan('metadata', { metadataOnly: true });
     expect(result.findings).toContain('BBA/engine.dll: prohibited path (LR-3)');

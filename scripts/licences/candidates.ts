@@ -176,7 +176,8 @@ function assess(candidate: Candidate, candidatesRoot: string, repoRoot: string, 
     } else if (['Cargo.toml', 'pyproject.toml'].includes(path.posix.basename(name))) {
       claim = /^license\s*=\s*["']([^"']+)["']/m.exec(text)?.[1];
     }
-    if (claim === undefined) continue;
+    // LR-7: a claim outside the candidate's subpath is another package's, not this candidate's.
+    if (claim === undefined || (candidate.subpath && !name.startsWith(candidate.subpath + '/'))) continue;
     const dir = path.posix.dirname(name);
     // LR-7: compare to the nearest licence scope, not a grant elsewhere in the repository.
     const applicable = result.evidence.filter(item => item.scope !== 'notice' && (path.posix.dirname(item.path) === '.'
