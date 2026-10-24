@@ -83,7 +83,7 @@ const exercise = fields({
 } satisfies Record<keyof Exercise, Check>);
 const lesson = fields({
   ...content, schemaVersion: choice([1]), gameFormat: choice(['contract-bridge', 'minibridge']), titleRef: reference,
-  skillTags: tags, exercises: array(() => null, 1),
+  module: integer(1, 10), skillTags: tags, exercises: array(() => null, 1),
 } satisfies Record<keyof Lesson, Check>);
 
 export function structuralFinding(value: unknown, kind: 'lesson' | 'exercise'): Finding | null {

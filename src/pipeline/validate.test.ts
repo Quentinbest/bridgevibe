@@ -7,7 +7,7 @@ import { validateLesson } from './validate';
 
 const fixture = (name: string) => JSON.parse(readFileSync(`test/fixtures/lessons/${name}.json`, 'utf8'));
 const rules = {
-  'lesson-shape': ['lesson-empty-exercises', 'exercise-empty-steps'],
+  'lesson-shape': ['lesson-empty-exercises', 'exercise-empty-steps', 'module-missing', 'module-out-of-range'],
   'equivalent-cards': ['equivalent-accepted-not-expected'],
   'deal-shape': ['deal-duplicate', 'deal-count', 'deal-id'],
   'script-replay': ['script-not-held', 'script-follow-suit', 'script-learner', 'script-unreferenced', 'script-empty-indices', 'script-index-bounds', 'script-index-repeated'],
@@ -360,4 +360,23 @@ test('seeded origins must reproduce the Deal', () => {
   expect(validateLesson(lesson).errors.map(f => f.rule)).not.toContain('deal-shape');
   exercise.deal = { ...fixture('valid').exercises[0].deal, origin: { kind: 'seed', seed: 'lesson-seed', index: 3, rotation: 0, algorithm: 'bv-deal-1' } };
   expect(validateLesson(lesson).errors).toEqual([expect.objectContaining({ rule: 'deal-shape', message: 'Seeded origin does not reproduce this Deal.' })]);
+});
+
+// FR-L2: modules are required integers in the ten-module curriculum.
+test.each([undefined, null, 0, 11, -1, 2.5, '2', true, NaN, Infinity])('rejects invalid module %s', module => {
+  const lesson = fixture('valid');
+  lesson.module = module;
+  expect(validateLesson(lesson)).toEqual({ errors: [{
+    rule: 'lesson-shape', contentId: lesson.contentId, message: 'Invalid lesson.module.',
+  }], warnings: [] });
+});
+test.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])('accepts curriculum module %i', module => {
+  const lesson = fixture('valid');
+  lesson.module = module;
+  expect(validateLesson(lesson)).toEqual({ errors: [], warnings: [] });
+});
+test.each(['follow-suit', 'follow-suit-full'])('FR-L2 / ADR-0004: %s declares module 2 at Lesson version 2', name => {
+  const lesson = JSON.parse(readFileSync(`src/curriculum/content/${name}.json`, 'utf8'));
+  expect(lesson).toMatchObject({ module: 2, version: 2, signOff: { status: 'unsigned-draft' } });
+  expect(validateLesson(lesson, new Set(Object.keys(catalogue)))).toEqual({ errors: [], warnings: [] });
 });

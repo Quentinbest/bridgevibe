@@ -33,11 +33,10 @@ export function Home({ dealsPlayed, navigate }: { dealsPlayed: number; navigate:
     <main className="home-content">
       <h2 ref={heading} tabIndex={-1}>{text('home.next')}</h2>
       <a className="home-lesson" href={hrefFor(lessonUrl)} onClick={event => follow(event, lessonUrl)}>
-        {/* FR-P3: future lesson module/level slot; render only when Lesson declares that metadata. */}
         {fullFollowSuit.skillTags.map(skill => <p className="home-skill" key={skill}>
           {text('home.skill', { skill: text(`skill.${skill}` as StringId) })}
         </p>)}
-        <h3 id="home-lesson-title">{text(fullFollowSuit.titleRef as StringId)}</h3>
+        <h3 id="home-lesson-title">{text('home.level-title', { module: fullFollowSuit.module, title: text(fullFollowSuit.titleRef as StringId) })}</h3>
         <p>{text('home.lesson-description')}</p>
         <progress aria-label={text('home.progress')} value={done} max={prompts.length} aria-valuetext={progress} />
         <p>{progress}</p>

@@ -9,6 +9,7 @@
     "licence": "draft"
   },
   "schemaVersion": 1,
+  "module": 2,
   "gameFormat": "contract-bridge",
   "titleRef": "lesson.title",
   "skillTags": [

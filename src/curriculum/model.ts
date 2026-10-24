@@ -24,6 +24,8 @@ export type Exercise = Content & Readonly<{
 }>;
 export type Lesson = Content & Readonly<{
   schemaVersion: 1; gameFormat: 'contract-bridge' | 'minibridge'; titleRef: string; skillTags: readonly string[];
+  // FR-L2: the curriculum module is the lesson’s level.
+  module: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10;
   exercises: readonly Exercise[];
 }>;
 export type Attempt = Readonly<{

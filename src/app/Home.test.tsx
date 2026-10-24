@@ -19,9 +19,8 @@ test('Home opens on Learn with accessible declared progress and session-only cop
   expect(progress.getAttribute('aria-valuetext')).toBe('0 of 3 learning steps done this session');
   const lessonCard = screen.getByRole('link', { name: /Skill: Follow suit.*Follow suit.*Open lesson/ });
   expect(lessonCard.contains(progress)).toBe(true);
-  expect(screen.getByRole('heading', { name: 'Follow suit' })).toBeTruthy();
+  expect(screen.getByRole('heading', { name: 'Level 2 · Follow suit' })).toBeTruthy();
   expect(screen.getByText('Skill: Follow suit')).toBeTruthy();
-  expect(screen.queryByText(/Level [0-9]/)).toBeNull();
   expect(screen.getByText('About 4 min left')).toBeTruthy();
   expect(screen.getByText(/0 deals played this session/)).toBeTruthy();
   expect(screen.getByText(/Nothing is saved after a reload/)).toBeTruthy();
@@ -115,4 +114,16 @@ test('the current Learn tab adds no history entry, and launcher hrefs keep query
   expect(screen.getByRole('link', { name: 'Practice' }).getAttribute('href')).toBe('/?debug=1&practice=1');
   expect(screen.getByRole('link', { name: /Skill: Follow suit.*Open lesson/ }).getAttribute('href')).toBe('/?debug=1&lesson=follow-suit-full');
   history.replaceState(null, '', '/');
+});
+
+// FR-L2: Home reads the level from content rather than a fixed mapping.
+test('Home displays a changed content module as the lesson level', () => {
+  const original = fullFollowSuit.module;
+  try {
+    Object.assign(fullFollowSuit, { module: 10 });
+    render(<Home dealsPlayed={0} navigate={() => {}} />);
+    expect(screen.getByRole('heading', { name: 'Level 10 · Follow suit' })).toBeTruthy();
+  } finally {
+    Object.assign(fullFollowSuit, { module: original });
+  }
 });

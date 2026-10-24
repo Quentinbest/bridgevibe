@@ -9,6 +9,7 @@
     "licence": "draft"
   },
   "schemaVersion": 1,
+  "module": 2,
   "gameFormat": "minibridge",
   "titleRef": "lesson.title",
   "skillTags": [
