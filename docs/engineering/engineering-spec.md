@@ -763,6 +763,12 @@ The teachers review the fallback policy, because its actions can show up in play
 | U-03 | Key moment ranking | §4.6.5 ordering | Teachers |
 | U-04 | Dealing generator, test vectors, and content-derived deal IDs | §4.6.1 | Engineering lead |
 | U-05 | Role-mix algorithm (rotation) | §4.6.3 | Teachers + engineering lead |
+
+**Status (2026-10-24).** The owner delegated these calls to Claude. Each is recorded as *Delegated to Claude*, not as an approval (AGENTS.md), and nothing here replaces a teacher's sign-off:
+
+- **U-01:** the proposal is adopted for phase V and built in #23: a 3 s deadline, logged against the 95th-percentile target. The sample count stays provisional (50) until T2 (#28) measures the cost per sample.
+- **U-02:** the engineering side is adopted and built in #23 (50 samples, or full enumeration; otherwise *uncertain*). **Teacher sign-off is still pending.**
+- **U-05:** the engineering side is adopted and built in #18. **Teacher sign-off is still pending.**
 | U-06 | Fallback policy for timed-out robots | §4.6.6 | Teachers |
 | U-07 | Whether the V provenance log persists beyond the session | Session plus export (A-05) | Owner |
 | U-08 | UI framework for the slice | Engineering lead's choice; MVP framework at the gate | Engineering lead |

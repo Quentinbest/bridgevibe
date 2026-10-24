@@ -8,8 +8,8 @@
       "call": "new XMLHttpRequest()",
       "count": 4,
       "reason": "bridge-dds Emscripten loader retains computed fetch and XHR filesystem fallbacks. Normal DDS analysis instantiates embedded WebAssembly bytes without a network request.",
-      "reviewer": "pending owner review",
-      "date": "2026-10-21"
+      "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+      "date": "2026-10-24"
     },
     {
       "package": "bridge-dds",
@@ -18,8 +18,8 @@
       "call": "xhr.open(\"GET\", url, false)",
       "count": 2,
       "reason": "bridge-dds Emscripten loader retains computed fetch and XHR filesystem fallbacks. Normal DDS analysis instantiates embedded WebAssembly bytes without a network request.",
-      "reviewer": "pending owner review",
-      "date": "2026-10-21"
+      "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+      "date": "2026-10-24"
     },
     {
       "package": "bridge-dds",
@@ -28,8 +28,8 @@
       "call": "xhr.open(\"GET\", url, true)",
       "count": 1,
       "reason": "bridge-dds Emscripten loader retains computed fetch and XHR filesystem fallbacks. Normal DDS analysis instantiates embedded WebAssembly bytes without a network request.",
-      "reviewer": "pending owner review",
-      "date": "2026-10-21"
+      "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+      "date": "2026-10-24"
     },
     {
       "package": "bridge-dds",
@@ -38,8 +38,8 @@
       "call": "fetch(url, { credentials: \"same-origin\" })",
       "count": 1,
       "reason": "bridge-dds Emscripten loader retains computed fetch and XHR filesystem fallbacks. Normal DDS analysis instantiates embedded WebAssembly bytes without a network request.",
-      "reviewer": "pending owner review",
-      "date": "2026-10-21"
+      "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+      "date": "2026-10-24"
     },
     {
       "package": "bridge-dds",
@@ -48,8 +48,8 @@
       "call": "xhr.open(\"HEAD\", url, false)",
       "count": 1,
       "reason": "bridge-dds Emscripten loader retains computed fetch and XHR filesystem fallbacks. Normal DDS analysis instantiates embedded WebAssembly bytes without a network request.",
-      "reviewer": "pending owner review",
-      "date": "2026-10-21"
+      "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+      "date": "2026-10-24"
     }
   ]
 }

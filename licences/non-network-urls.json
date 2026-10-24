@@ -2,199 +2,199 @@
   {
     "url": "http://www.w3.org/1998/Math/MathML",
     "reason": "React DOM namespace identifier; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "http://www.w3.org/1999/xhtml",
     "reason": "React DOM namespace identifier; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "http://www.w3.org/1999/xlink",
     "reason": "React DOM namespace identifier; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "http://www.w3.org/2000/svg",
     "reason": "React DOM namespace identifier; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "http://www.w3.org/XML/1998/namespace",
     "reason": "React DOM namespace identifier; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/docs/error-decoder.html?invariant=",
     "reason": "React production error-decoder link prefix; displayed in diagnostic text.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://emscripten.org/docs/getting_started/FAQ.html#how-do-i-run-a-local-webserver-for-testing-why-does-my-program-stall-in-downloading-or-preparing",
     "reason": "Emscripten local-server troubleshooting link in error text; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility",
     "reason": "Vite browser-external diagnostic in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://github.com/facebook/react/issues/3236).",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/special-props)",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/strict-mode-string-ref",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/invalid-hook-call",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/warning-keys",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://github.com/facebook/react/issues",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/controlled-components",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/dangerously-set-inner-html",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/invalid-aria-props",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/attribute-behavior",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/crossorigin-error",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/react-devtools",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/unsafe-component-lifecycles",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/derived-state",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/legacy-context",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/refs-must-have-owner",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/rules-of-hooks",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/error-boundaries",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/hooks-data-fetching",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/setstate-in-render",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/wrap-tests-with-act",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/strict-mode-find-node",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/switch-to-createroot",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/react-polyfills",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   },
   {
     "url": "https://reactjs.org/link/react-devtools-faq",
     "reason": "React development diagnostic link in NODE_ENV=test build; never requested.",
-    "reviewer": "pending owner review",
-    "date": "2026-10-21"
+    "reviewer": "Delegated to Claude by the owner (2026-10-24)",
+    "date": "2026-10-24"
   }
 ]
