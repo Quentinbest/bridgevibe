@@ -51,9 +51,10 @@ test('long seeded suits remain inside the viewport with 44px targets', async ({ 
   // US-07.1: Playthrough 1 targets East–West, so abc/17 keeps its original orientation.
   await page.goto('/?seed=abc&deal=16');
   await page.getByRole('button', { name: 'New deal', exact: true }).click();
-  await expect(page.locator('.learner .card')).toHaveCount(13);
+  // Hand.tsx remounts each card as a button when South becomes active, so measure only once it has.
+  await expect(page.locator('.learner button.card')).toHaveCount(13);
   const width = page.viewportSize()!.width;
-  for (const card of await page.locator('.learner .card').all()) {
+  for (const card of await page.locator('.learner button.card').all()) {
     const box = await card.boundingBox();
     expect(box!.x).toBeGreaterThanOrEqual(0);
     expect(box!.x + box!.width).toBeLessThanOrEqual(width);
