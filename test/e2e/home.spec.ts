@@ -29,8 +29,11 @@ test('Home, token themes, session progress, responsive navigation and axe at eve
 
 test('keyboard lesson card and both navigation destinations work, with Exit focus on Home', async ({ page }) => {
   await installPausedClock(page); await page.goto('/');
+  const lesson = page.getByRole('link', { name: /Skill: Follow suit.*Follow suit.*Open lesson/ });
+  // Tab only once Home has rendered, or focus lands on an empty body.
+  await expect(lesson).toBeVisible();
   await page.keyboard.press('Tab');
-  await expect(page.getByRole('link', { name: /Skill: Follow suit.*Follow suit.*Open lesson/ })).toBeFocused();
+  await expect(lesson).toBeFocused();
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/lesson=follow-suit-full/);
   await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuemax', '16');
