@@ -1,0 +1,647 @@
+{
+  "status": "AI draft, awaiting both teachers (T5). Not approved.",
+  "system": "Beginner subset common to SAYC and 2/1 (PRD T5, used while D1/DEP-07 is open)",
+  "auctions": [
+    {
+      "id": "T5-01",
+      "tags": [
+        "opening",
+        "1NT"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KQ4",
+        "H": "A93",
+        "D": "KJ72",
+        "C": "Q85"
+      },
+      "hcp": 15,
+      "shape": "3-3-4-3"
+    },
+    {
+      "id": "T5-02",
+      "tags": [
+        "opening",
+        "major"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AQJ74",
+        "H": "K82",
+        "D": "93",
+        "C": "K64"
+      },
+      "hcp": 13,
+      "shape": "5-3-2-3"
+    },
+    {
+      "id": "T5-03",
+      "tags": [
+        "opening",
+        "minor"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q83",
+        "D": "A72",
+        "C": "K95"
+      },
+      "hcp": 13,
+      "shape": "4-3-3-3"
+    },
+    {
+      "id": "T5-04",
+      "tags": [
+        "opening",
+        "minor"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "A4",
+        "H": "K72",
+        "D": "QJ83",
+        "C": "KJ65"
+      },
+      "hcp": 14,
+      "shape": "2-3-4-4"
+    },
+    {
+      "id": "T5-05",
+      "tags": [
+        "opening",
+        "strong"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AKQ8",
+        "H": "AKJ5",
+        "D": "AQ4",
+        "C": "K2"
+      },
+      "hcp": 26,
+      "shape": "4-4-3-2"
+    },
+    {
+      "id": "T5-06",
+      "tags": [
+        "opening",
+        "weak-two"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KQJ952",
+        "H": "84",
+        "D": "Q73",
+        "C": "62"
+      },
+      "hcp": 8,
+      "shape": "6-2-3-2"
+    },
+    {
+      "id": "T5-07",
+      "tags": [
+        "opening",
+        "2NT"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AQ5",
+        "H": "KQ4",
+        "D": "AK83",
+        "C": "Q92"
+      },
+      "hcp": 20,
+      "shape": "3-3-4-3"
+    },
+    {
+      "id": "T5-08",
+      "tags": [
+        "opening",
+        "pass"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "Q842",
+        "H": "K73",
+        "D": "J95",
+        "C": "K62"
+      },
+      "hcp": 9,
+      "shape": "4-3-3-3"
+    },
+    {
+      "id": "T5-09",
+      "tags": [
+        "response",
+        "raise"
+      ],
+      "dealer": "N",
+      "vulnerability": "none",
+      "auction": [
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "842",
+        "H": "KJ73",
+        "D": "Q95",
+        "C": "862"
+      },
+      "hcp": 6,
+      "shape": "3-4-3-3"
+    },
+    {
+      "id": "T5-10",
+      "tags": [
+        "response",
+        "limit-raise"
+      ],
+      "dealer": "N",
+      "vulnerability": "none",
+      "auction": [
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "AQ5",
+        "C": "9862"
+      },
+      "hcp": 10,
+      "shape": "2-4-3-4"
+    },
+    {
+      "id": "T5-11",
+      "tags": [
+        "response",
+        "up-the-line"
+      ],
+      "dealer": "N",
+      "vulnerability": "none",
+      "auction": [
+        "1C",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q983",
+        "D": "95",
+        "C": "862"
+      },
+      "hcp": 6,
+      "shape": "4-4-2-3"
+    },
+    {
+      "id": "T5-12",
+      "tags": [
+        "response",
+        "1NT"
+      ],
+      "dealer": "N",
+      "vulnerability": "none",
+      "auction": [
+        "1D",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "Q84",
+        "H": "K73",
+        "D": "952",
+        "C": "J862"
+      },
+      "hcp": 6,
+      "shape": "3-3-3-4"
+    },
+    {
+      "id": "T5-13",
+      "tags": [
+        "response",
+        "stayman"
+      ],
+      "dealer": "N",
+      "vulnerability": "none",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q983",
+        "D": "K5",
+        "C": "862"
+      },
+      "hcp": 9,
+      "shape": "4-4-2-3"
+    },
+    {
+      "id": "T5-14",
+      "tags": [
+        "response",
+        "transfer"
+      ],
+      "dealer": "N",
+      "vulnerability": "none",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "QJ8742",
+        "H": "83",
+        "D": "952",
+        "C": "62"
+      },
+      "hcp": 3,
+      "shape": "6-2-3-2"
+    },
+    {
+      "id": "T5-15",
+      "tags": [
+        "response",
+        "game"
+      ],
+      "dealer": "N",
+      "vulnerability": "none",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "K84",
+        "H": "Q73",
+        "D": "KJ5",
+        "C": "Q862"
+      },
+      "hcp": 11,
+      "shape": "3-3-3-4"
+    },
+    {
+      "id": "T5-16",
+      "tags": [
+        "response",
+        "new-suit"
+      ],
+      "dealer": "N",
+      "vulnerability": "none",
+      "auction": [
+        "1D",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ873",
+        "D": "95",
+        "C": "Q862"
+      },
+      "hcp": 6,
+      "shape": "2-5-2-4"
+    },
+    {
+      "id": "T5-17",
+      "tags": [
+        "rebid",
+        "forcing"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [
+        "1H",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "AQJ73",
+        "D": "K95",
+        "C": "Q62"
+      },
+      "hcp": 12,
+      "shape": "2-5-3-3"
+    },
+    {
+      "id": "T5-18",
+      "tags": [
+        "rebid",
+        "raise"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [
+        "1C",
+        "Pass",
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "A5",
+        "C": "KJ862"
+      },
+      "hcp": 12,
+      "shape": "2-4-2-5"
+    },
+    {
+      "id": "T5-19",
+      "tags": [
+        "rebid",
+        "1NT"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [
+        "1D",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "Q8",
+        "H": "K73",
+        "D": "AJ52",
+        "C": "K962"
+      },
+      "hcp": 13,
+      "shape": "2-3-4-4"
+    },
+    {
+      "id": "T5-20",
+      "tags": [
+        "rebid",
+        "reverse"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [
+        "1D",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "4",
+        "H": "AKJ7",
+        "D": "AQ952",
+        "C": "K62"
+      },
+      "hcp": 17,
+      "shape": "1-4-5-3"
+    },
+    {
+      "id": "T5-21",
+      "tags": [
+        "rebid",
+        "game-try"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [
+        "1H",
+        "Pass",
+        "2H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "A4",
+        "H": "AKJ73",
+        "D": "KQ5",
+        "C": "962"
+      },
+      "hcp": 17,
+      "shape": "2-5-3-3"
+    },
+    {
+      "id": "T5-22",
+      "tags": [
+        "competitive",
+        "overcall"
+      ],
+      "dealer": "E",
+      "vulnerability": "none",
+      "auction": [
+        "1D"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KQJ84",
+        "H": "73",
+        "D": "952",
+        "C": "A62"
+      },
+      "hcp": 10,
+      "shape": "5-2-3-3"
+    },
+    {
+      "id": "T5-23",
+      "tags": [
+        "competitive",
+        "takeout-double"
+      ],
+      "dealer": "E",
+      "vulnerability": "none",
+      "auction": [
+        "1H"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KQ84",
+        "H": "3",
+        "D": "AJ52",
+        "C": "K962"
+      },
+      "hcp": 13,
+      "shape": "4-1-4-4"
+    },
+    {
+      "id": "T5-24",
+      "tags": [
+        "competitive",
+        "1NT-overcall"
+      ],
+      "dealer": "E",
+      "vulnerability": "none",
+      "auction": [
+        "1C"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AJ4",
+        "H": "KQ3",
+        "D": "K972",
+        "C": "KJ5"
+      },
+      "hcp": 17,
+      "shape": "3-3-4-3"
+    },
+    {
+      "id": "T5-25",
+      "tags": [
+        "competitive",
+        "negative-double"
+      ],
+      "dealer": "N",
+      "vulnerability": "none",
+      "auction": [
+        "1C",
+        "1S"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "Q952",
+        "C": "862"
+      },
+      "hcp": 6,
+      "shape": "2-4-4-3"
+    },
+    {
+      "id": "T5-26",
+      "tags": [
+        "competitive",
+        "pass"
+      ],
+      "dealer": "N",
+      "vulnerability": "none",
+      "auction": [
+        "1H",
+        "2C"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "8642",
+        "H": "3",
+        "D": "Q952",
+        "C": "K762"
+      },
+      "hcp": 5,
+      "shape": "4-1-4-4"
+    },
+    {
+      "id": "T5-27",
+      "tags": [
+        "competitive",
+        "advance"
+      ],
+      "dealer": "W",
+      "vulnerability": "none",
+      "auction": [
+        "1C",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "K84",
+        "H": "Q73",
+        "D": "J952",
+        "C": "862"
+      },
+      "hcp": 6,
+      "shape": "3-3-4-3"
+    },
+    {
+      "id": "T5-28",
+      "tags": [
+        "valid-alternative"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "K4",
+        "H": "AQ973",
+        "D": "KJ5",
+        "C": "Q62"
+      },
+      "hcp": 15,
+      "shape": "2-5-3-3"
+    },
+    {
+      "id": "T5-29",
+      "tags": [
+        "not-covered"
+      ],
+      "dealer": "N",
+      "vulnerability": "none",
+      "auction": [
+        "1NT",
+        "2D"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AJ874",
+        "H": "KQ953",
+        "D": "4",
+        "C": "62"
+      },
+      "hcp": 10,
+      "shape": "5-5-1-2"
+    },
+    {
+      "id": "T5-30",
+      "tags": [
+        "rebid",
+        "accept-invite"
+      ],
+      "dealer": "S",
+      "vulnerability": "none",
+      "auction": [
+        "1S",
+        "Pass",
+        "3S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AKJ74",
+        "H": "K82",
+        "D": "Q3",
+        "C": "K64"
+      },
+      "hcp": 16,
+      "shape": "5-3-2-3"
+    }
+  ]
+}

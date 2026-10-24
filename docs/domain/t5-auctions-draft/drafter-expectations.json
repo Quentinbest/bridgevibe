@@ -1,0 +1,159 @@
+{
+  "status": "AI drafter expectations. Do not show to the graders until they have graded the engines.",
+  "expectations": {
+    "T5-01": {
+      "call": "1NT",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-02": {
+      "call": "1S",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-03": {
+      "call": "1C",
+      "alternatives": [],
+      "note": "3-3 in the minors: open 1C."
+    },
+    "T5-04": {
+      "call": "1D",
+      "alternatives": [],
+      "note": "4-4 in the minors: open 1D."
+    },
+    "T5-05": {
+      "call": "2C",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-06": {
+      "call": "2S",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-07": {
+      "call": "2NT",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-08": {
+      "call": "Pass",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-09": {
+      "call": "2H",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-10": {
+      "call": "3H",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-11": {
+      "call": "1H",
+      "alternatives": [],
+      "note": "4-4 in the majors: bid up the line."
+    },
+    "T5-12": {
+      "call": "1NT",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-13": {
+      "call": "2C",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-14": {
+      "call": "2H",
+      "alternatives": [],
+      "note": "Jacoby transfer to spades."
+    },
+    "T5-15": {
+      "call": "3NT",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-16": {
+      "call": "1H",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-17": {
+      "call": "1NT",
+      "alternatives": [],
+      "note": "Responder's new suit is forcing: opener must not pass."
+    },
+    "T5-18": {
+      "call": "2H",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-19": {
+      "call": "1NT",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-20": {
+      "call": "2H",
+      "alternatives": [],
+      "note": "A reverse shows extra strength."
+    },
+    "T5-21": {
+      "call": "3H",
+      "alternatives": [
+        "4H"
+      ],
+      "note": "Invite or bid game: both defensible."
+    },
+    "T5-22": {
+      "call": "1S",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-23": {
+      "call": "X",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-24": {
+      "call": "1NT",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-25": {
+      "call": "X",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-26": {
+      "call": "Pass",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-27": {
+      "call": "2S",
+      "alternatives": [],
+      "note": ""
+    },
+    "T5-28": {
+      "call": "1NT",
+      "alternatives": [
+        "1H"
+      ],
+      "note": "15 HCP, balanced, five hearts: 1NT and 1H are both sound."
+    },
+    "T5-29": {
+      "call": "not covered",
+      "alternatives": [],
+      "note": "Interference over our 1NT: the SAYC/2-over-1 beginner subset agrees no methods here (Lebensohl, \"systems on\" are not in it)."
+    },
+    "T5-30": {
+      "call": "4S",
+      "alternatives": [],
+      "note": ""
+    }
+  }
+}
