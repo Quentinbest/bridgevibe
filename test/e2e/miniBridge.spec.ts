@@ -1,4 +1,4 @@
-import { openPractice, installPausedClock } from './miniBridge';
+import { openPractice, installPausedClock, robotTurn } from './miniBridge';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
@@ -6,12 +6,12 @@ test('US-06: ordered announcements, exposed dummy, keyboard strain/objective cho
   await installPausedClock(page); await openPractice(page, '/');
   await expect(page.locator('.setup-points li')).toHaveCount(0);
   for (const [i, label] of ['South: 17 points', 'West: 8 points', 'North: 15 points', 'East: 0 points'].entries()) {
-    await page.clock.runFor(500); await expect(page.locator('.setup-points li').nth(i)).toHaveText(label);
+    await robotTurn(page); await expect(page.locator('.setup-points li').nth(i)).toHaveText(label);
   }
   await expect(page.getByText('North–South: 32 · East–West: 8')).toBeVisible();
-  await page.clock.runFor(500); await expect(page.locator('.setup-dummy .card')).toHaveCount(13);
+  await robotTurn(page); await expect(page.locator('.setup-dummy .card')).toHaveCount(13);
   await expect(page.getByRole('button', { name: 'Choose', exact: true })).toHaveCount(0);
-  await page.clock.runFor(500);
+  await robotTurn(page);
   const spades = page.getByRole('button', { name: 'spades', exact: true });
   await expect(spades).toBeFocused(); await page.keyboard.press('Enter'); await expect(spades).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: 'Game · 10 tricks' })).toBeVisible();
@@ -53,10 +53,10 @@ test('ADR-0003: North declares and both North and South have learner turns', asy
   await installPausedClock(page); await page.goto('/?seed=setup-ui&deal=6');
   await page.clock.runFor(3000); await expect(page.locator('.setup-own')).toHaveAccessibleName('South');
   await page.getByRole('button', { name: 'Choose', exact: true }).click();
-  await page.clock.runFor(500);
+  await robotTurn(page);
   const south = page.locator('.learner button.card').filter({ hasText: /, playable$/ }).first();
   await south.click(); await page.getByRole('button', { name: /^Play it,/ }).click();
-  await page.clock.runFor(500);
+  await robotTurn(page);
   await expect(page.locator('.dummy button.card')).toHaveCount(13);
   await expect(page.locator('.dummy')).toHaveAccessibleName('North');
 });

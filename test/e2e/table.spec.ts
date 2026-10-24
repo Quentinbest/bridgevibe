@@ -1,4 +1,4 @@
-import { openPractice, choosePractice, installPausedClock } from './miniBridge';
+import { openPractice, choosePractice, installPausedClock, robotTurn } from './miniBridge';
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
@@ -15,7 +15,7 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
   await expect(page.getByText('NT Game', { exact: true })).toBeVisible();
   await expect(page.getByText('South declares · 9 tricks', { exact: true })).toBeVisible();
   await expect(page.getByText('You 0 · Them 0', { exact: true })).toBeVisible();
-  await page.clock.runFor(500);
+  await robotTurn(page);
   await expect(page.getByText('Play from North (dummy)', { exact: true })).toBeVisible();
   await expect(page.locator('.dummy .card')).toHaveCount(13);
   await expect(page.locator('.hand .card')).toHaveCount(13);
@@ -75,7 +75,7 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
   expect(new Set(columnPositions.map(p => p.y)).size).toBe(1);
   await expect(page.getByRole('region', { name: 'West', exact: true })).toHaveText('W · West · 12 cards');
   await expect(page.getByRole('region', { name: 'East', exact: true })).toHaveText('E · East · 13 cards');
-  await expect(page.locator('.trick-area').getByRole('img', { name: '9 of spades' })).toBeVisible();
+  await expect(page.locator('.trick-area').getByRole('img', { name: 'Jack of hearts' })).toBeVisible();
   await expect(page.locator('.led')).toHaveText('LED');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   // UX §10: axe needs running timers; North's turn is stable without a robot timer.
@@ -85,9 +85,9 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
     expect(accessibility.violations.filter(v => ['serious', 'critical'].includes(v.impact ?? ''))).toEqual([]);
   }
   await checkAccessibility();
-  const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });
-  await ace.click();
-  await expect(ace).toHaveAttribute('aria-pressed', 'true');
+  const queen = page.getByRole('button', { name: 'Queen of hearts, playable', exact: true });
+  await queen.click();
+  await expect(queen).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: /^Play it, / })).toBeVisible();
   if (viewportWidth !== 320) {
     expect(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight)).toBe(true);
@@ -108,9 +108,9 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
     expect(trick!.height).toBe(trick!.width);
   }
   await checkAccessibility();
-  // Play North's spade, wait for East, then attempt an off-suit card from South.
+  // Play North's heart, wait for East, then attempt an off-suit card from South.
   await page.getByRole('button', { name: /^Play it, / }).click();
-  await expect(page.getByRole('button', { name: 'King of spades, playable', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Ace of hearts, playable', exact: true })).toBeVisible();
   // Three cards are on the table (West, North, East): none may cover an opponent's backs or label.
   await expect(page.locator('.played')).toHaveCount(3);
   const played = await page.locator('.played').evaluateAll(elements => elements.map(el => el.getBoundingClientRect().toJSON()));
@@ -121,11 +121,11 @@ test('table is accessible, responsive and follows the device theme', async ({ pa
       expect(overlaps, `played card ${JSON.stringify(card)} covers ${JSON.stringify(opponent)}`).toBe(false);
     }
   }
-  const heart = page.getByRole('button', { name: "Ace of hearts, can't play: you must follow spades", exact: true });
-  await heart.click();
+  const spade = page.getByRole('button', { name: "King of spades, can't play: you must follow hearts", exact: true });
+  await spade.click();
   await page.getByRole('button', { name: /^Play it, / }).click();
-  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Not that one. You still have spades.');
-  await expect(heart).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Not that one. You still have hearts.');
+  await expect(spade).toHaveAttribute('aria-pressed', 'false');
   await checkAccessibility();
   const initial = await page.locator('body').evaluate(el => getComputedStyle(el).backgroundColor);
   expect(initial).toBe(testInfo.project.use.colorScheme === 'dark' ? 'rgb(17, 18, 26)' : 'rgb(246, 244, 238)');

@@ -80,8 +80,8 @@ test('header controls and invalid-link feedback preserve the fixed Deal height',
   for (const url of ['/', '/?seed=bad!&deal=3']) {
     if (url === '/') await openPractice(page); else await page.goto(url); await choosePractice(page);
     await page.evaluate(() => document.fonts.ready);
-    const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });
-    await ace.click();
+    const queen = page.getByRole('button', { name: 'Queen of hearts, playable', exact: true });
+    await queen.click();
     const header = await page.locator('.header').boundingBox();
     const row = await page.locator('.header-row').boundingBox();
     expect(row!.height).toBe(44);

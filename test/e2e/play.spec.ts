@@ -1,4 +1,4 @@
-import { openPractice, choosePractice, installPausedClock } from './miniBridge';
+import { openPractice, choosePractice, installPausedClock, robotTurn } from './miniBridge';
 import { expect, test, type Page } from '@playwright/test';
 import { cardName, text } from '../../src/explanation';
 import { fixedDeal } from '../../src/app/fixture';
@@ -30,14 +30,14 @@ async function noHiddenCards(page: Page, played: readonly Card[]) {
 test('full fixed Deal through clicks and Play it', async ({ page }, testInfo) => {
   // Issue #2: the long journey runs only on these two representative projects.
   test.skip(!['390-light', '1440-dark'].includes(testInfo.project.name), 'Full Deal project coverage specified by issue #2');
-  const reference = completeFixedDeal();
-  expect(reference.result).toEqual({ northSouth: 6, eastWest: 7 });
+  const reference = completeFixedDeal('principles');
+  expect(reference.result).toEqual({ northSouth: 5, eastWest: 8 });
   const played: Card[] = [];
   await open(page);
   await noHiddenCards(page, played);
   for (const entry of reference.actions) {
     if (entry.controller === 'robot') {
-      await page.clock.runFor(500);
+      await robotTurn(page);
     } else {
       const region = page.getByRole('region', { name: entry.seat === 'north' ? 'North · Dummy' : 'Your hand', exact: true });
       const card = region.getByRole('button', { name: `${cardName(entry.action.card)}, playable`, exact: true });
@@ -59,7 +59,7 @@ test('full fixed Deal through clicks and Play it', async ({ page }, testInfo) =>
     }
     if ([0, 9, 25, 47].includes(entry.index)) await noHiddenCards(page, played);
   }
-  await expect(page.getByText('You took 6 of 13 tricks (needed 9)', { exact: true })).toBeVisible();
+  await expect(page.getByText('You took 5 of 13 tricks (needed 9)', { exact: true })).toBeVisible();
   await expect(page.locator('.hand .card, .suit-column .card')).toHaveCount(0);
   await robotAuditPassed(page);
   await page.getByRole('button', { name: 'Exit', exact: true }).click();
@@ -69,47 +69,52 @@ test('full fixed Deal through clicks and Play it', async ({ page }, testInfo) =>
   await expect(page.getByText(/0 deals played this session/)).toBeVisible();
 });
 test('keyboard arrows, Enter, Escape and Space play from the active hand', async ({ page }) => {
-  await open(page); await page.clock.runFor(500);
-  const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });
-  const five = page.getByRole('button', { name: '5 of spades, playable', exact: true });
-  await expect(ace).toBeFocused();
-  await page.keyboard.press('ArrowRight'); await expect(five).toBeFocused();
-  await page.keyboard.press('Enter'); await expect(five).toHaveAttribute('aria-pressed', 'true');
-  await page.keyboard.press('Escape'); await expect(five).toHaveAttribute('aria-pressed', 'false');
+  await open(page); await robotTurn(page);
+  const queen = page.getByRole('button', { name: 'Queen of hearts, playable', exact: true });
+  const four = page.getByRole('button', { name: '4 of hearts, playable', exact: true });
+  // UX §10: focus enters at the first card; arrows cross the spades North can't play to the hearts.
+  await expect(page.getByRole('button', { name: "Ace of spades, can't play: you must follow hearts", exact: true })).toBeFocused();
+  for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowRight');
+  await expect(queen).toBeFocused();
+  await page.keyboard.press('ArrowRight'); await expect(four).toBeFocused();
+  await page.keyboard.press('Enter'); await expect(four).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('Escape'); await expect(four).toHaveAttribute('aria-pressed', 'false');
   await expect(page.getByRole('button', { name: /^Play it, / })).toHaveCount(0);
-  await page.keyboard.press('ArrowLeft'); await expect(ace).toBeFocused();
-  await page.keyboard.press('Enter'); await expect(ace).toHaveAttribute('aria-pressed', 'true');
-  await page.keyboard.press('Enter'); await expect(ace).toHaveCount(0);
-  await page.clock.runFor(500);
-  const king = page.getByRole('button', { name: 'King of spades, playable', exact: true });
-  await expect(king).toBeFocused();
-  await page.keyboard.press('Space'); await expect(king).toHaveAttribute('aria-pressed', 'true');
-  await page.keyboard.press('Space'); await expect(king).toHaveCount(0);
+  await page.keyboard.press('ArrowLeft'); await expect(queen).toBeFocused();
+  await page.keyboard.press('Enter'); await expect(queen).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('Enter'); await expect(queen).toHaveCount(0);
+  await robotTurn(page);
+  const ace = page.getByRole('button', { name: 'Ace of hearts, playable', exact: true });
+  await expect(page.getByRole('button', { name: "King of spades, can't play: you must follow hearts", exact: true })).toBeFocused();
+  for (let i = 0; i < 3; i++) await page.keyboard.press('ArrowRight');
+  await expect(ace).toBeFocused();
+  await page.keyboard.press('Space'); await expect(ace).toHaveAttribute('aria-pressed', 'true');
+  await page.keyboard.press('Space'); await expect(ace).toHaveCount(0);
   await expect(page.locator('.trick-area .card')).toHaveCount(4);
 });
 test('off-suit card is rejected, retained and announced until the next action', async ({ page }) => {
-  await open(page); await page.clock.runFor(500);
-  const queen = page.getByRole('button', { name: "Queen of hearts, can't play: you must follow spades", exact: true });
-  await queen.click(); await queen.click();
-  await expect(queen).toHaveAttribute('aria-pressed', 'false');
-  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Not that one. You still have spades.');
+  await open(page); await robotTurn(page);
+  const spade = page.getByRole('button', { name: "Ace of spades, can't play: you must follow hearts", exact: true });
+  await spade.click(); await spade.click();
+  await expect(spade).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Not that one. You still have hearts.');
   await expect(page.locator('.dummy .card')).toHaveCount(13);
   await expect(page.locator('.trick-area .card')).toHaveCount(1);
   await page.clock.runFor(2000);
-  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Not that one. You still have spades.');
-  const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });
-  await ace.click(); await ace.click();
+  await expect(page.locator('[aria-live="assertive"]')).toHaveText('Not that one. You still have hearts.');
+  const queen = page.getByRole('button', { name: 'Queen of hearts, playable', exact: true });
+  await queen.click(); await queen.click();
   await expect(page.locator('[aria-live="assertive"]')).toBeEmpty();
 });
 test('MiniBridge exposes dummy before the lead and never exposes unplayed opponent cards', async ({ page }) => {
   await open(page); await noHiddenCards(page, []);
   await expect(page.getByRole('img', { name: 'Ace of spades', exact: true })).toBeVisible();
   await expect(page.locator('.dummy .card')).toHaveCount(13);
-  await page.clock.runFor(500);
-  await noHiddenCards(page, [{ suit: 'spades', rank: '9' }]);
-  const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });
-  await ace.click(); await page.getByRole('button', { name: /^Play it, / }).click();
-  await page.clock.runFor(500);
-  await noHiddenCards(page, [{ suit: 'spades', rank: '9' }, { suit: 'spades', rank: 'A' }, { suit: 'spades', rank: '3' }]);
+  await robotTurn(page);
+  await noHiddenCards(page, [{ suit: 'hearts', rank: 'J' }]);
+  const queen = page.getByRole('button', { name: 'Queen of hearts, playable', exact: true });
+  await queen.click(); await page.getByRole('button', { name: /^Play it, / }).click();
+  await robotTurn(page);
+  await noHiddenCards(page, [{ suit: 'hearts', rank: 'J' }, { suit: 'hearts', rank: '8' }]);
   await robotAuditPassed(page);
 });
