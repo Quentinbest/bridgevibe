@@ -129,6 +129,23 @@ test('declarer-finesse: an honour led by partner is not a finesse; keep partner\
   const plays: [Seat, Card][] = [['south', c('2')[0]], ['west', c('A')[0]], ['north', c('3')[0]], ['east', c('4')[0]], ['west', h('J')[0]], ['north', h('3')[0]]];
   check(position(hands, plays, 'east'), 'third-hand-win-cheaply', h('2')[0]);
 });
+// Review of #95: each case reproduces a position the first version got wrong.
+test('third-hand-high: a card in the current trick separates ranks, so K beats the Q where J would not', () => {
+  const plays: [Seat, Card][] = [['west', c('3')[0]], ['north', c('4')[0]], ['east', c('A')[0]], ['south', c('5')[0]], ['east', h('2')[0]], ['south', h('Q')[0]]];
+  check(position({ west: [...c('3'), ...h('K J 4'), ...s('2 3 4 5'), ...d('2 3 4 5 6')], north: c('4'), east: [...c('A'), ...h('2')], south: [...c('5'), ...h('Q')] }, plays),
+    'third-hand-high', h('K')[0]);
+});
+test('declarer-draw-trumps: equal trump lengths never delay the draw for a ruff', () => {
+  const hands = { west: [...s('A K'), ...h('K Q J 2'), ...c('K Q 2'), ...d('A K Q J')], east: [...s('4 5 6'), ...h('10 9 8 7'), ...d('10 9 8 7 6 5')], south: s('2'), north: s('3') };
+  const plays: [Seat, Card][] = [['south', s('2')[0]], ['west', s('A')[0]], ['north', s('3')[0]], ['east', s('4')[0]]];
+  check(position(hands, plays, 'east', 'hearts'), 'declarer-draw-trumps', h('K')[0]);
+});
+test('lead-through-strength: with honours in every safe Dummy suit, still avoid the ruff and discard', () => {
+  const hands = { west: [...s('A K Q J 10 9 8'), ...h('2 3'), ...d('2 3 4 5')], north: [...h('A K Q'), ...d('A K Q'), ...c('A K Q J 10 9 8')],
+    south: [...h('J 10 9 8'), ...d('J 10 9 8 7'), ...c('7 6 5 4')], east: [...s('7 6 5 4 3 2'), ...h('7 6 5 4'), ...d('6'), ...c('3 2')] };
+  const plays: [Seat, Card][] = [['west', s('A')[0]], ['north', h('Q')[0]], ['east', s('2')[0]], ['south', h('J')[0]]];
+  check(position(hands, plays, 'south', 'clubs'), 'lead-through-strength', h('2')[0]);
+});
 test('declarer-finesse: lead low towards Q missing K, or K missing A', () => {
   for (const honour of ['Q', 'K']) check(declarerLead([...s('A'), ...h('8 7 6 2'), ...d('9 8 7 6'), ...c('9 8 7 6')], [...s('2 K Q J 10'), ...h(`${honour} 3`), ...d('A K Q'), ...c('A K Q')]), 'declarer-finesse', h('2')[0]);
 });

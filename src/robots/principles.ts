@@ -80,7 +80,9 @@ function thirdHandHigh(c: Context) {
   }
   const highest = high(c.legal);
   // third-hand-high: equivalent cards include ranks already played; use the lowest of that class.
+  // A card already in this trick still separates ranks: only completed tricks make cards equivalent.
   return low(c.legal.filter(k => k.suit === highest.suit && !c.unseen.some(u => u.suit === k.suit && rank(u) > rank(k) && rank(u) < rank(highest))
+    && !c.view.currentTrick.some(p => p.card.suit === k.suit && rank(p.card) > rank(k) && rank(p.card) < rank(highest))
     && !(c.view.dummy ?? []).some(u => u.suit === k.suit && rank(u) > rank(k) && rank(u) < rank(highest))));
 }
 function fourthHandWinCheaply(c: Context) {
@@ -106,10 +108,13 @@ function leadThroughStrength(c: Context) {
   if (SEATS[(SEATS.indexOf(c.seat) + 1) % 4] !== partner(c.view.contract.declarer))
     return safe.length !== c.hand.length ? low(safe) : undefined;
   // lead-through-strength: weak Dummy means no J or higher; never give a known ruff and discard.
-  return low(c.hand.filter(k => !bothVoid(c, k.suit) && !c.view.dummy?.some(d => d.suit === k.suit && rank(d) >= 11)));
+  // With no weak Dummy suit, any safe suit still beats offering a ruff and discard.
+  return low(safe.filter(k => !c.view.dummy?.some(d => d.suit === k.suit && rank(d) >= 11))) ?? low(safe);
 }
 function needsRuff(c: Context) {
   const trump = c.view.contract.strain, a = suited(c.hand, trump), b = suited(c.other, trump);
+  // declarer-draw-trumps: only a hand with fewer trumps justifies delaying the draw.
+  if (a.length === b.length) return false;
   const shorter = a.length < b.length ? c.hand : c.other, longer = a.length < b.length ? c.other : c.hand;
   return suited(shorter, trump).length > 0 && longer.some(k => k.suit !== trump && !c.top(k) && !shorter.some(s => s.suit === k.suit));
 }
