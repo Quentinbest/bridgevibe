@@ -14,6 +14,12 @@ export async function installPausedClock(page: Page) {
   const time = Date.now(); await page.clock.install({ time }); await page.clock.pauseAt(time + 1000);
 }
 
+// #13: let the robot worker answer in real time before paused time passes its 400 ms deadline.
+export async function robotTurn(page: Page, ms = 500) {
+  await expect.poll(() => page.evaluate(() => !window.__robotPending?.())).toBe(true);
+  await page.clock.runFor(ms);
+}
+
 // UX §2.3: preserve query context (debug/fault injection) while entering practice from Home.
 export async function openPractice(page: Page, url = '/') {
   await page.goto(url);

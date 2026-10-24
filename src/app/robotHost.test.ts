@@ -2,7 +2,7 @@ import { choosePractice } from '../../test/miniBridge';
 import { afterEach, expect, test, vi } from 'vitest';
 import { robotAudit, hiddenCard } from '../../test/robotAudit';
 import { fixedPlaythrough } from '../../test/strategy';
-import { basicPolicy } from '../robots';
+import { principlesPolicy } from '../robots';
 import { dealFromSeed, highCardPoints, seatViewSeed, validProvenance, type Action, type Hand, type Playthrough, type RobotProvenance } from '../table';
 import { fixedDeal } from './fixture';
 import { createRobotHost, type RobotHostOptions, type RobotWorker } from './robotHost';
@@ -49,9 +49,9 @@ for (const latency of [1, 350]) test(`US-10.4: ${latency} ms policy displays at 
   const { submit, audit } = setup(latency);
   vi.advanceTimersByTime(499); expect(submit).not.toHaveBeenCalled();
   vi.advanceTimersByTime(1); expect(submit).toHaveBeenCalledOnce();
-  expect(submit.mock.calls[0][1]).toMatchObject({ policy: 'bv-basic', version: '1', kind: 'robot' });
+  expect(submit.mock.calls[0][1]).toMatchObject({ policy: 'bv-principles', version: '1', kind: 'robot' });
   expect(submit.mock.calls[0][1].fallback).toBeUndefined(); expect(audit).toHaveBeenCalled();
-  expect(submit.mock.calls[0][1]).not.toHaveProperty('ruleId');
+  expect(submit.mock.calls[0][1]).toHaveProperty('ruleId', 'lead-sequence');
 });
 
 const malformedResponses: [string, (response: Record<string, unknown>) => unknown][] = [
@@ -152,7 +152,7 @@ test('US-12.2: deadline timeout is marked, cancelled, and late answers discarded
   expect(submit).toHaveBeenCalledOnce();
   expect(submit.mock.calls[0][1]).toMatchObject({ policy: 'bv-fallback', fallback: 'timeout', durationMs: 400 });
   expect(audit).toHaveBeenCalledOnce();
-  expect(submit.mock.calls[0][1]).not.toHaveProperty('ruleId');
+  expect(submit.mock.calls[0][1]).toHaveProperty('ruleId', 'fallback-lowest');
 });
 for (const event of ['error', 'messageerror', 'response'] as const) test(`US-12.5: ${event} restarts and records engine-failure`, () => {
   const { workers, submit } = setup();
@@ -250,10 +250,10 @@ test('composition: complete fixed Deal through the real policy, auditing every w
     if (play.getSnapshot().collecting) vi.advanceTimersByTime(1000);
   }
   expect(play.record().status).toBe('completed');
-  expect(play.record().result).toEqual({ northSouth: 6, eastWest: 7 });
+  expect(play.record().result).toEqual({ northSouth: 5, eastWest: 8 });
   const robots = play.record().actions.filter(entry => entry.controller === 'robot');
   expect(robots).toHaveLength(26); expect(audit).toHaveBeenCalledTimes(26);
-  for (const entry of robots) expect(entry.provenance).toMatchObject({ kind: 'robot', policy: basicPolicy.name, version: '1' } satisfies Partial<RobotProvenance>);
+  for (const entry of robots) expect(entry.provenance).toMatchObject({ kind: 'robot', policy: principlesPolicy.name, version: '1' } satisfies Partial<RobotProvenance>);
   stop();
 });
 test('US-12.5: construction and posting failures are marked and bounded', () => {

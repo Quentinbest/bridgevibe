@@ -12,6 +12,7 @@
     "lint": "eslint .",
     "deps:check": "depcruise --config .dependency-cruiser.cjs src",
     "licences:candidates": "node scripts/licences/candidates.ts",
+    "robots:sample": "node scripts/robots/sample.ts",
     "content:check": "node scripts/content/check.ts",
     "test": "vitest run --project node",
     "test:browser": "vitest run --project browser",

@@ -27,8 +27,8 @@ test('practice hint is requested, bounded, unmarked and dismissible; toggle hide
 // US-14.2, UX §3.1: enabling hints must not grow the phone's existing action row.
 test('hint controls and Play it fit together without increasing the fixed Deal height', async ({ page }) => {
   await openPractice(page, '/'); await choosePractice(page);
-  const ace = page.getByRole('button', { name: 'Ace of spades, playable', exact: true });
-  await ace.click();
+  const queen = page.getByRole('button', { name: 'Queen of hearts, playable', exact: true });
+  await queen.click();
   await page.evaluate(() => document.fonts.ready);
   const footer = await page.locator('.action-bar').boundingBox();
   expect(footer!.height).toBe(64);
