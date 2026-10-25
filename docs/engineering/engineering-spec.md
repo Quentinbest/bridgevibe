@@ -538,7 +538,7 @@ Schemas are versioned. Each persisted or exported document carries a `schemaVers
 | `Statement` | fact ID or abstention, template ID, locale, rendered text, information mode, hindsight label flag | Exactly one mode (INV-5) |
 | `Abstention` | reason (`not-covered`, `uncertain`, `unavailable`), cause detail, provenance | Never replaced by a substantive default (INV-7) |
 | `DecisionAssessment` | decision index, quality (`acceptable`, `not-acceptable`, `uncertain`), quality source (`teacher-label`, `sampled`), outcome (trick cost), verdict (sound, unlucky, lucky, mistake, or none when quality is uncertain) | INV-9 |
-| `TeacherLabel` | deal ID, position key (the sequence of actions leading to the decision, not just its index; US-18.9), decision candidates, label per candidate, the two graders and each one's source (`teacher` or `ai`, PRD D10), resolution note | F4 input (T7a) |
+| `TeacherLabel` | deal ID, position key (the sequence of actions leading to the decision, not just its index; US-18.9), decision candidates, label per candidate, the two graders and each one's source (`teacher` or `ai`, PRD D10), resolution note and its source (the graders together, or an AI adjudicator under D10) | F4 input (T7a) |
 | `Lesson` | contentId, version, game format, convention profile ref *(M)*, exercises (content ID + version), skill tags, rights record, sign-offs | |
 | `Exercise` | contentId, version, deal or starting position, script, steps, teaching claim *(optional, FR-C2)* | Validity-checked (US-27) |
 | `Step` | kind: commentary (template or string refs, answer references), exposure (cards), scripted action, prompt | |

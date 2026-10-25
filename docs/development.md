@@ -730,6 +730,8 @@ are used; teacher sign-off remains US-11.3.
 `f4-decisions.json`. Under PRD D10 (owner, 2026-10-25) they come from two independent AI
 annotators; each grader records its source, and teachers' labels replace them when provided.
 Disagreements without a resolution are listed as unresolved and excluded from VAL-07 (US-18.5).
+The 23 disagreements were resolved by an AI adjudicator (D10, `source: ai-adjudicator`);
+the teachers' review of those options is pending and may overrule them.
 
 Run `npm run f4:draft` with Node 24 to regenerate the deterministic 30-Deal
 teacher draft in `docs/domain/f4-draft/`; the command reports scan counts,

@@ -1,5 +1,5 @@
 {
-  "status": "F4 labels from two independent AI annotators (PRD D10, owner decision 2026-10-25). Not teacher labels; teachers' labels replace these when provided.",
+  "status": "F4 labels from two independent AI annotators, with disagreements resolved by an AI adjudicator (PRD D10, owner decisions 2026-10-25). Not teacher labels; teachers review the adjudicated options and their labels replace these when provided.",
   "graders": {
     "A": {
       "name": "AI annotator A",
@@ -12,13 +12,19 @@
       "source": "ai",
       "date": "2026-10-25",
       "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+    },
+    "adjudicator": {
+      "name": "AI adjudicator",
+      "source": "ai",
+      "date": "2026-10-25",
+      "file": "F4-resolution-disputed-AI-proposed.xlsx"
     }
   },
   "summary": {
     "candidates": 151,
     "agreed": 128,
     "disagreed": 23,
-    "unresolved": [
+    "adjudicated": [
       "D01-C01",
       "D02-C07",
       "D02-C08",
@@ -42,7 +48,9 @@
       "D30-C04",
       "D30-C05",
       "D30-C10"
-    ]
+    ],
+    "unresolved": [],
+    "teacherReview": "pending for adjudicated options"
   },
   "labels": [
     {
@@ -66,7 +74,13 @@
         "acceptable": false,
         "comment": "A low heart wins; retain both honors."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "A stronger: an honor wins safely and five heart tricks remain available. B's low play is economical, not uniquely reasonable.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D01-C02",
@@ -226,7 +240,13 @@
         "acceptable": true,
         "comment": "Develops diamonds with A-K-Q protection."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "B stronger if dummy wins A: this is a safe transfer before drawing trumps. A's J risk applies to running 10, not this continuation.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D02-C08",
@@ -245,7 +265,13 @@
         "acceptable": true,
         "comment": "Crosses safely to dummy's diamond ace."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "B stronger: low to A safely enters dummy. Nine trumps provide communication; KQ are not stranded as A's blockage argument implies.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D02-C09",
@@ -329,7 +355,13 @@
         "acceptable": false,
         "comment": "Spends the entry before unblocking ♦A."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": false,
+        "note": "B stronger: unblock singleton diamond A first. Spending heart J now sacrifices a potential entry to the long diamonds.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D03-C03",
@@ -742,7 +774,13 @@
         "acceptable": false,
         "comment": "Throws away a sure diamond winner."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "A stronger: all enemy diamonds are gone. Even discarding A leaves three diamond rounds plus heart K; only three more tricks are needed.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D07-C05",
@@ -761,7 +799,13 @@
         "acceptable": false,
         "comment": "Shortens a fully established diamond suit."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "A stronger: three master diamond rounds plus heart K still suffice for seven. B correctly notes lost length, but that does not make the discard unsound.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D07-C06",
@@ -784,7 +828,13 @@
         "acceptable": false,
         "comment": "Shortens a fully established diamond suit."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "A stronger: either discard leaves three master diamond rounds plus heart K. B's length concern does not defeat the seven-trick plan.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D08-C01",
@@ -902,7 +952,13 @@
         "acceptable": true,
         "comment": "Attacks hearts, where dummy is void."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "B stronger: both attack dummy's heart void toward a 15-HCP partner. No specified lead convention makes these low spots unacceptable.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D08-C07",
@@ -1295,7 +1351,13 @@
         "acceptable": true,
         "comment": "Offers a heart finesse with king support."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": false,
+        "note": "A stronger: Q can cover J, consuming J and K together. B's claimed finesse lacks an extra honor; lead toward K, then back toward AJ.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D11-C06",
@@ -1371,7 +1433,13 @@
         "acceptable": true,
         "comment": "JUDGMENT_CALL: develop spades."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "B stronger: with no ready entry to lead toward KJ, active promotion is reasonable. K can promote J if AQ fall together; A's risk is real, not decisive.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D12-C02",
@@ -1390,7 +1458,13 @@
         "acceptable": true,
         "comment": "JUDGMENT_CALL: develop spades."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "B stronger: J can dislodge A while retaining K, for example against a singleton A. A identifies a risk, but promotion need not be guaranteed to be reasonable.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D12-C03",
@@ -1893,7 +1967,13 @@
         "acceptable": false,
         "comment": "Save the high heart sequence; follow low."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "A stronger: all five held hearts beat the only missing low heart, 3, and lose to KQJ10. B's saved sequence has no extra trick strength.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D16-C02",
@@ -2130,7 +2210,13 @@
         "acceptable": true,
         "comment": "Cashes a sure winner; no enemy trumps."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "B stronger: cashing a master leaves another trump. Two trump tricks, spade AK and heart A exceed the four still needed. A's ruff concern is not decisive.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D19-C01",
@@ -2393,7 +2479,13 @@
         "acceptable": false,
         "comment": "Risks the jack under higher club honors."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "A stronger: forcing a club honor can promote partner's cards. Partner has 2 HCP left, possibly club Q. B's unsupported-honor warning is not an absolute rule.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D23-C06",
@@ -2595,7 +2687,13 @@
         "acceptable": false,
         "comment": "Risks the lead before cashing three ♦ wins."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "A stronger: club AK are gone, so dummy Q wins over any remaining honor. Then diamond QJ9 supply three winners; B's loss-of-lead claim is false.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D26-C04",
@@ -2614,7 +2712,13 @@
         "acceptable": false,
         "comment": "Risks the lead before cashing three ♦ wins."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "A stronger: club Q is a certain entry, with AK already played. Cash Q and diamond QJ9. B's claimed lead risk does not exist.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D26-C05",
@@ -2633,7 +2737,13 @@
         "acceptable": false,
         "comment": "Risks the lead before cashing three ♦ wins."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "A stronger: club Q is a certain entry, with AK already played. Cash Q and diamond QJ9. B's claimed lead risk does not exist.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D27-C01",
@@ -2744,7 +2854,13 @@
         "acceptable": false,
         "comment": "Gives up an available ruff and the lead."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "A stronger: this loser-on-loser discard preserves trumps and creates a spade void. B assumes a ruff secures the lead, but East may overruff.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D28-C02",
@@ -2969,7 +3085,13 @@
         "acceptable": true,
         "comment": "JUDGMENT_CALL: remove dummy's trump."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "B stronger: removing dummy's sole trump is a defensible passive plan. The 8 also prevents a cheap win by dummy's 7. A's trump risk makes this optional, not unsound.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D30-C03",
@@ -2988,7 +3110,13 @@
         "acceptable": true,
         "comment": "JUDGMENT_CALL: remove dummy's trump."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "B stronger: a low trump removes dummy's last trump while retaining J8. A's side-suit attack is attractive, but the passive alternative is reasonable.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D30-C04",
@@ -3007,7 +3135,13 @@
         "acceptable": false,
         "comment": "Leads toward dummy's strong K-Q hearts."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "A stronger: the lead goes through dummy KQ toward partner, whose 5 HCP could be heart AJ. B treats visible strength as prohibiting a legitimate attack.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D30-C05",
@@ -3026,7 +3160,13 @@
         "acceptable": false,
         "comment": "Leads toward dummy's strong K-Q hearts."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "A stronger: a low heart through dummy can find partner's AJ, consistent with the announced points. B's objection does not rule out this development plan.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D30-C06",
@@ -3121,7 +3261,13 @@
         "acceptable": false,
         "comment": "Exposes ♣10 through dummy's A-J-8."
       },
-      "resolution": null
+      "resolution": {
+        "acceptable": true,
+        "note": "A stronger: 10 through dummy AJ8 can force a cover and find partner KQ, consistent with 5 HCP. B's exposure concern does not exclude this reasonable attack.",
+        "source": "ai-adjudicator",
+        "date": "2026-10-25",
+        "teacherReview": "pending"
+      }
     },
     {
       "ref": "D30-C11",

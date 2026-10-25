@@ -634,7 +634,7 @@ These targets are placeholders set by this draft, not derived from data. They ar
 | D7 | **Language-model phrasing in the MVP** | The gate | No; templates only |
 | D8 | **Practice scoring variant:** duplicate score per hand, Chicago or rubber | Before MVP design | Duplicate score per hand (FR-R5) |
 | D9 | **Target age group and tone** | **Decided 2026-10-17:** teenagers aged 13–17 | See §4 and §10.5. Coach wording in the teenage register (for example, "Good call, bad luck" for CI-3, "X-ray view" for CI-2) still needs teacher sign-off (CI-8) |
-| D10 | **Who labels F4** | **Decided 2026-10-25 (owner):** two independent AI annotators, A and B, may label the F4 decision points in place of the teachers (DEP-05, T7a) | Each label records its source (`ai` or `teacher`). Teachers' labels replace the AI labels when they are provided. While F4 carries AI labels, VAL-07 measures the coach against the AI annotators, not against teachers; reports say so. Lesson labels and teacher sign-off of wording (CI-8) are unchanged |
+| D10 | **Who labels F4** | **Decided 2026-10-25 (owner):** two independent AI annotators, A and B, may label the F4 decision points in place of the teachers (DEP-05, T7a) | Each label records its source (`ai` or `teacher`). Teachers' labels replace the AI labels when they are provided. While F4 carries AI labels, VAL-07 measures the coach against the AI annotators, not against teachers; reports say so. Disagreements between the two may be resolved by a third AI adjudicator (owner, 2026-10-25); each resolution records that source, and the teachers review the adjudicated options and may overrule them. Lesson labels and teacher sign-off of wording (CI-8) are unchanged |
 
 ### Planning assumptions
 

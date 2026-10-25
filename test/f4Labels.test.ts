@@ -10,7 +10,14 @@ test('F4 labels cover every candidate in order, with sourced graders and listed 
   expect(labels.labels.map(l => ({ ref: l.ref, dealId: l.dealId, cards: l.cards }))).toEqual(expected);
   for (const grader of ['A', 'B'] as const) expect(['ai', 'teacher']).toContain(labels.graders[grader].source);
   for (const label of labels.labels) for (const grader of ['A', 'B'] as const) expect(typeof label[grader].acceptable).toBe('boolean');
-  const unresolved = labels.labels.filter(l => l.A.acceptable !== l.B.acceptable && !l.resolution).map(l => l.ref);
-  expect(labels.summary.unresolved).toEqual(unresolved);
-  expect(labels.summary).toMatchObject({ candidates: expected.length, disagreed: unresolved.length, agreed: expected.length - unresolved.length });
+  const disagreed = labels.labels.filter(l => l.A.acceptable !== l.B.acceptable);
+  expect(labels.summary.unresolved).toEqual(disagreed.filter(l => !l.resolution).map(l => l.ref));
+  expect(labels.summary).toMatchObject({ candidates: expected.length, disagreed: disagreed.length, agreed: expected.length - disagreed.length });
+  // D10: a resolution records its source; only disagreements carry one.
+  for (const label of labels.labels) {
+    if (!label.resolution) continue;
+    expect(label.A.acceptable).not.toBe(label.B.acceptable);
+    expect(typeof label.resolution.acceptable).toBe('boolean');
+    expect(['ai-adjudicator', 'teachers']).toContain(label.resolution.source);
+  }
 });
