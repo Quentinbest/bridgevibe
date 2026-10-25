@@ -2,6 +2,39 @@
 
 The longer notes behind [`AGENTS.md`](../AGENTS.md): read the part a task needs.
 
+## Device benchmark (#28)
+
+Build with `npm run build:internal` (`vite build --mode internal`), then serve with
+`npm run preview -- --host` (`vite preview --host`). On the same LAN, open
+`http://<LAN-IP>:4173/?bench=1` on **iPhone 16 / Safari** and **Google Pixel 9 / Chrome**
+(DEP-06, 2026-10-25). Enter a device label and the cache/network settings, run each
+candidate or all available candidates, download the JSON, and attach both phones'
+reports to the gate PR. Keep the screen on and the page visible. The default run
+uses all 200 F2 positions, 100 F2 tables and a 100-Deal F7 soak per candidate.
+The unchanged robot host's 500 ms display delay means roughly 45 minutes per
+candidate plus solver time. Stop preserves partial results; a reload marks an
+unfinished checkpoint as interrupted (not a proven crash). Export recovered
+evidence before starting a new run, which replaces the stored report.
+
+P1 opens a fresh first-lesson iframe and times navigation to an enabled lesson
+control. It is an interactivity proxy with up to 20 ms polling overhead; app assets
+may already be cached, and internal-build overhead is included. Clear/disable the
+cache and set **Fast 4G** manually where supported; repeat with empty caches for
+actual cold-start evidence. Record unavailable throttling controls honestly.
+The report documents this limitation, the nearest-rank percentiles, worker timing,
+memory API coverage and hidden-time exclusions. `performance.memory` measures only
+the main-page JS heap, not solver WASM/worker memory; unsupported APIs are labelled
+unsupported. LAN HTTP usually cannot use `measureUserAgentSpecificMemory`.
+F7 uses real principles/Contract Choice workers through the real host and Table,
+then solves each completed Deal with the selected solver. Phase V robots do not
+use a solver. Fixed-position sampled estimates measure solve time per actual layout.
+DDS 3.1 threaded is `not-available (#82)`; pons-dds is `not-integrated`.
+
+The page is lazy-loaded only in internal/development modes; production and audit
+ignore `?bench=1`. Production exclusion has a build test and a route test. A tiny
+Chromium browser test runs two F2 positions and two complete Deals; it is not gate
+evidence. Physical-phone runs are manual, never CI. No gate budgets are chosen here.
+
 ## Checks
 
 | Command | What it runs |

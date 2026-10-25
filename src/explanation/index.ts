@@ -2,6 +2,18 @@ import type { Card, ReasonCode } from '../table';
 
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
+  // US-43: internal device-benchmark tool (owner-facing, internal builds only).
+  'bench.title': { text: "Device benchmark (#28)", status: 'draft' },
+  'bench.notice': { text: "Internal tool. Keep the screen on and this page visible. Reference phones: iPhone 16 / Safari and Google Pixel 9 / Chrome. Full runs take roughly 45 minutes per candidate, plus solver time. Download the JSON and attach it to the gate PR.", status: 'draft' },
+  'bench.label': { text: "Device label (optional)", status: 'draft' },
+  'bench.conditions': { text: "Cache / network conditions (record your manual settings)", status: 'draft' },
+  'bench.runAll': { text: "Run all available candidates", status: 'draft' },
+  'bench.run': { text: "Run selected candidate", status: 'draft' },
+  'bench.candidate': { text: "Solver candidate", status: 'draft' },
+  'bench.download': { text: "Download JSON", status: 'draft' },
+  'bench.cancel': { text: "Stop run", status: 'draft' },
+  'bench.idle': { text: "Ready", status: 'draft' },
+  'bench.storageError': { text: "Progress storage is unavailable. Enable local storage before running; otherwise interruptions cannot be detected.", status: 'draft' },
   'moment.heading': { text: "{count} big moments", status: 'draft' },
   'moment.heading-one': { text: "1 big moment", status: 'draft' },
   'moment.position': { text: "Trick {n} · you played {card}", status: 'draft' },
