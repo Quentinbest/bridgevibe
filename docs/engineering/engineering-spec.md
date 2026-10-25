@@ -230,7 +230,7 @@ Phase V (curated F4 cases), M (all deals) · FR-RV3, CI-3, INV-9, INV-11
 - US-18.2 Each key moment has an assessment of *sound*, *good decision, unlucky layout*, *lucky* or *mistake*, from decision quality and outcome (glossary *Decision Assessment*).
 - US-18.3 Decision quality comes from the teacher label for that position when one exists. Otherwise it comes from the sampled estimate on the **historical seat view** at that position, within the acceptability tolerance of the best alternative (provisional: 0.25 tricks over at least 50 samples).
 - US-18.4 If decision quality can't be established (no label, and the estimate is uncertain or unavailable), the assessment shows the outcome as an `ALL_HANDS` fact plus an *uncertain* abstention on quality. It is never *mistake* or *lucky*.
-- US-18.5 On F4, zero decisions labelled acceptable by the teachers are assessed as *mistake* (VAL-07). This includes at least five decisions where the correct play loses. Decision points on which the two teachers did not reach a resolved label are excluded from VAL-07 and listed in the report.
+- US-18.5 On F4, zero decisions labelled acceptable by the F4 graders (the teachers, or two AI annotators under PRD D10) are assessed as *mistake* (VAL-07). This includes at least five decisions where the correct play loses. Decision points on which the two teachers did not reach a resolved label are excluded from VAL-07 and listed in the report.
 - US-18.6 A *lucky* decision is never worded as praise (template review, CI-8).
 - US-18.7 *(M)* Calls can be key moments. Their quality comes from the expected call and the accepted alternatives, and their outcome is not assessed.
 - US-18.8 The review never contradicts a hint without saying so. Hints and review use the same sample derivation for a position (§4.6.5). If the learner followed a tier (c) hint and the review's larger sample would call the play *not acceptable*, decision quality is *uncertain*, and the review explains that the estimate was close.
@@ -538,7 +538,7 @@ Schemas are versioned. Each persisted or exported document carries a `schemaVers
 | `Statement` | fact ID or abstention, template ID, locale, rendered text, information mode, hindsight label flag | Exactly one mode (INV-5) |
 | `Abstention` | reason (`not-covered`, `uncertain`, `unavailable`), cause detail, provenance | Never replaced by a substantive default (INV-7) |
 | `DecisionAssessment` | decision index, quality (`acceptable`, `not-acceptable`, `uncertain`), quality source (`teacher-label`, `sampled`), outcome (trick cost), verdict (sound, unlucky, lucky, mistake, or none when quality is uncertain) | INV-9 |
-| `TeacherLabel` | deal ID, position key (the sequence of actions leading to the decision, not just its index; US-18.9), decision candidates, label per candidate, the two graders, resolution note | F4 input (T7a) |
+| `TeacherLabel` | deal ID, position key (the sequence of actions leading to the decision, not just its index; US-18.9), decision candidates, label per candidate, the two graders and each one's source (`teacher` or `ai`, PRD D10), resolution note and its source (the graders together, or an AI adjudicator under D10) | F4 input (T7a) |
 | `Lesson` | contentId, version, game format, convention profile ref *(M)*, exercises (content ID + version), skill tags, rights record, sign-offs | |
 | `Exercise` | contentId, version, deal or starting position, script, steps, teaching claim *(optional, FR-C2)* | Validity-checked (US-27) |
 | `Step` | kind: commentary (template or string refs, answer references), exposure (cards), scripted action, prompt | |
@@ -687,7 +687,7 @@ The teachers review the fallback policy, because its actions can show up in play
 ### 5.3 Notes on specific suites
 
 - **F3 must test the composition, not a single function.** Robots structurally receive only a `SeatView`, so permuting hidden cards at the robot interface proves nothing. The suite builds whole playthroughs from deals that differ only in the tested seat's hidden cards, drives the same public history through the real table, and compares robot actions and `VISIBLE` statements. This catches leaks in how seat views are built, how workers are wired, and how lessons expose cards.
-- **F4** carries teacher labels recorded before week 2 (T7a), with at least five correct-but-losing decisions.
+- **F4** carries labels from two independent graders recorded before week 2 (T7a; AI annotators allowed under PRD D10), with at least five correct-but-losing decisions.
 - **F6** includes MiniBridge scoring cases once DEP-01 fixes the convention.
 - **Accessibility** *(M)*: automated checks run in the end-to-end suite. The WCAG audit (US-39.2) is manual.
 
@@ -749,7 +749,7 @@ The teachers review the fallback policy, because its actions can show up in play
 | DEP-02 | The teacher-approved robot contract-choice rule for MiniBridge | Week 1 | Teaching advisor |
 | DEP-03 | The teacher-approved list of robot card-play principles. Approved by the owner 2026-10-24: [`docs/domain/dep-03-card-play-principles.md`](../domain/dep-03-card-play-principles.md) | Week 2 | Teaching advisor |
 | DEP-04 | Signed-off wording for reason codes, abstentions, the hindsight label and assessment verdicts (CI-2, CI-8; UX §5) | Week 3 for the slice | Teachers |
-| DEP-05 | F4 teacher labels | Before week 2 | Both teachers (T7a) |
+| DEP-05 | F4 labels | Before week 2 | Both teachers (T7a), or two AI annotators (PRD D10, owner, 2026-10-25) |
 | DEP-06 | The two reference phones | Week 0 | Owner |
 | DEP-07 | D1 bidding system (or the SAYC/2-over-1 common subset) | End of week 1 (T5) | Owner |
 | DEP-08 | Licence replies for candidates with unclear terms | During V (T3) | Owner |

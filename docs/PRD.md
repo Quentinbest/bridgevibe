@@ -486,7 +486,7 @@ Sampling is exercised only where it adds evidence: one hint path (FR-H3 tier c) 
 | **T4: Bridge-Classroom fit check** | Required | Answer for Bridge-Classroom the question the slice answers for the component path. At the cited commit, with BBA removed: can one lesson and one practice deal run offline on the reference phones? What would it take to add MiniBridge setup and our coach labels? This includes the full unit suite and a production build with the real Rusty WebAssembly | Weeks 2–3 | 4–5 days |
 | **T5: Bidding explanation comparison** (not MiniBridge) | Required | Candidates for the D1 system, run on 30 auctions reviewed by both teachers. They must include a valid alternative bid, a forcing auction and a case no rule covers. If D1 is not decided by the end of week 1, use the beginner subset common to SAYC and 2/1 | Weeks 2–4 | 3 days, plus 1 day per teacher |
 | **T6: Fair-feedback study** | Optional | On F4: compare the double-dummy cost with the sampled (single-dummy) cost of the learner's key decisions, and count how often double-dummy alone would blame a correct play [A §Smallest validation steps] | Weeks 3–4 | 2 days |
-| **T7a: Teacher grading** | Required | Both teachers label the F4 decision points (due before week 2) and grade F5 | Weeks 1–4 | 1–2 days per teacher |
+| **T7a: Teacher grading** | Required | Both teachers label the F4 decision points (due before week 2) and grade F5. Under D10, two AI annotators may label F4 instead | Weeks 1–4 | 1–2 days per teacher |
 | **T7b: Learner observation** | Optional | Three to five complete beginners each try the lesson and one MiniBridge deal | Week 4 | 1 day |
 | **T8: Landscape re-scan** | Required | Re-run the union of the three reports' searches and record why each candidate is excluded [R §9.3] | Week 4 | ½ day |
 
@@ -510,7 +510,7 @@ Sampling is exercised only where it adds evidence: one hint path (FR-H3 tier c) 
 | F1 | At least 40 rules cases: <br>• MiniBridge: 20–20 redeal, ties for declarer, dummy shown before the contract is chosen, choosing the contract; <br>• play: following suit, rejected plays when able to follow suit, playing a card not held, dummy control, turn order, trumps winning tricks, the last trick, duplicate-card input, malformed input |
 | F2 | 100 seeded deals (endplay `generate_deals(produce=100, seed=42)` reproduces A's set), plus **200 mid-play positions** from tricks 2 to 12, including positions in the middle of a trick. References: native DDS via endplay, and macroxue as an independent solver |
 | F3 | 20 positions × 10 permutations of the hidden cards, all consistent with the public information (CI-9) |
-| F4 | 30 beginner deals with curated decision points, including **at least 5** where the correct play loses on the actual layout (for example, a finesse). Each decision point carries the teachers' label (acceptable or not), recorded before week 2 |
+| F4 | 30 beginner deals with curated decision points, including **at least 5** where the correct play loses on the actual layout (for example, a finesse). Each decision point carries the labels of two independent graders (acceptable or not), recorded before week 2: the teachers, or two AI annotators under D10. Each label records its source |
 | F5 | At least 20 coach outputs (hints and review moments), plus the lesson, for teacher grading |
 | F6 | MiniBridge scoring cases; all 2,940 duplicate contract-score combinations against two reference scorers; 16 Law 77 examples |
 | F7 | A 100-deal automatic soak on each reference phone |
@@ -527,7 +527,7 @@ Criteria marked "Blocking" must pass, or the owner must accept a written deviati
 | VAL-04 | Device performance (T2, F7) | NFR-P1 to P6 budgets met on both reference phones by at least one solver candidate | Yes (decides browser versus server) |
 | VAL-05 | Information boundary (F3, plus inspection of requests and responses) | 0 hidden cards in hint or robot inputs; 0 permutation failures | Yes |
 | VAL-06 | Abstention (fault injection: solver timeout or failure, an uncovered situation) | 0 silent fallbacks; every case shows an abstention ("not covered", "uncertain" or "unavailable") | Yes |
-| VAL-07 | Review labelling (F4) | 100% of double-dummy statements labelled; 0 correct plays marked as mistakes in the curated cases | Yes |
+| VAL-07 | Review labelling (F4) | 100% of double-dummy statements labelled; 0 correct plays marked as mistakes in the curated cases. "Correct" is per the F4 labels; under D10 these may be AI labels, and the report names the source | Yes |
 | VAL-08 | Teacher grading (F5) | 0 critical factual errors; at least 90% rated clear (*provisional*). Disagreements between the two teachers are resolved before scoring | Yes |
 | VAL-09 | Learner observation (T7b, optional) | Beginners finish the lesson and one deal, and can state the lesson's point afterwards [B §Recommended route and the next validation gate] | No (findings feed the MVP) |
 | VAL-10 | Licence bill of materials (T3) | Every slice and gate-candidate artefact has a confirmed licence; 0 artefacts derived from EPBot or BBA | Yes |
@@ -634,6 +634,7 @@ These targets are placeholders set by this draft, not derived from data. They ar
 | D7 | **Language-model phrasing in the MVP** | The gate | No; templates only |
 | D8 | **Practice scoring variant:** duplicate score per hand, Chicago or rubber | Before MVP design | Duplicate score per hand (FR-R5) |
 | D9 | **Target age group and tone** | **Decided 2026-10-17:** teenagers aged 13–17 | See §4 and §10.5. Coach wording in the teenage register (for example, "Good call, bad luck" for CI-3, "X-ray view" for CI-2) still needs teacher sign-off (CI-8) |
+| D10 | **Who labels F4** | **Decided 2026-10-25 (owner):** two independent AI annotators, A and B, may label the F4 decision points in place of the teachers (DEP-05, T7a) | Each label records its source (`ai` or `teacher`). Teachers' labels replace the AI labels when they are provided. While F4 carries AI labels, VAL-07 measures the coach against the AI annotators, not against teachers; reports say so. Disagreements between the two may be resolved by a third AI adjudicator (owner, 2026-10-25); each resolution records that source, and the teachers review the adjudicated options and may overrule them. Lesson labels and teacher sign-off of wording (CI-8) are unchanged |
 
 ### Planning assumptions
 
