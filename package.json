@@ -14,6 +14,7 @@
     "licences:candidates": "node scripts/licences/candidates.ts",
     "f4:labels": "node scripts/f4/labels.ts",
     "f4:draft": "node scripts/f4/draft.ts",
+    "f4:fairness": "F4_FAIRNESS_REPORT=1 vitest run --project node test/f4Fairness.test.ts",
     "robots:sample": "node scripts/robots/sample.ts",
     "content:check": "node scripts/content/check.ts",
     "test": "vitest run --project node",
