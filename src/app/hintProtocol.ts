@@ -1,9 +1,9 @@
 import { RANKS, SUITS, sameCard, type Card, type SeatViewMessage } from '../table';
 import type { HintResult } from '../analysis/sampledEstimate';
 // ADR-0001, US-41.3: no record capability crosses this versioned boundary.
-export const HINT_PROTOCOL_VERSION = 2;
+export const HINT_PROTOCOL_VERSION = 3;
 export type HintIdentity = { playthroughId: string; positionKey: string };
-export type HintRequest = HintIdentity & { type: 'hint'; requestId: number; view: SeatViewMessage; candidates: readonly Card[]; seed: string; deadline: number; cancellationId: string };
+export type HintRequest = HintIdentity & { type: 'hint' | 'review'; requestId: number; view: SeatViewMessage; candidates: readonly Card[]; seed: string; deadline: number; cancellationId: string };
 // §4.3.6, CI-5: the worker reports the engine and sampler that actually produced the result.
 export type HintSource = { engine: { name: string; version: string }; sampler: { name: string; version: string } };
 export type HintResponse = { type: 'hello'; protocolVersion: number } | (HintIdentity & { type: 'result'; requestId: number; result: HintResult; source: HintSource });

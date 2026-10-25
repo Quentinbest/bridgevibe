@@ -7,7 +7,7 @@ type UncertainQualityEntry = LogEntry & {
 };
 // US-18.4, CI-5: absence of a label is a VISIBLE abstention, not a solver judgement.
 export function uncertainQualityEntry(decision: DecisionAssessment, playthroughId: string, words: string): UncertainQualityEntry | undefined {
-  if (decision.quality !== 'uncertain' || !decision.outcome) return undefined;
+  if (decision.quality !== 'uncertain' || !decision.outcome || decision.sampling) return undefined;
   const provenance: UncertainQualityEntry['provenance'] = { sourceKind: 'template', templateId: 'moment.uncertain',
     quality: { source: 'no-label' }, outcome: decision.outcome.statement.provenance };
   return { id: JSON.stringify(['uncertain-quality', playthroughId, decision.positionIndex, provenance]),

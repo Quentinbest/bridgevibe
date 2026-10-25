@@ -1,3 +1,6 @@
+import { reviewSampling } from './reviewSampling';
+import { qualityTemplate, sampledQualityEntry } from '../coach/sampledQuality';
+import type { DecisionAssessment } from '../coach/decisionAssessment';
 import { uncertainQualityEntry } from '../coach/uncertainQuality';
 import { momentLogEntries } from '../coach/momentStatement';
 import type { createProvenanceLog } from '../coach/provenance';
@@ -14,7 +17,19 @@ import { reviewSetup } from './reviewSetup';
 export function ReviewScreen({ record, onBack, analysis, onTryAgain, provenanceLog }: { provenanceLog?: ReturnType<typeof createProvenanceLog>; onTryAgain?: () => void; analysis?: AnalysisState; record: CompletedPlaythroughRecord; onBack: () => void }) {
   // US-16.1, §4.3.5: replay also refuses incomplete records at runtime.
   const tricks = useMemo(() => replay(record), [record]);
-  const decisions = useMemo(() => assessDecisions(record, analysis?.costs ?? []), [record, analysis?.costs]);
+  const initialDecisions = useMemo(() => assessDecisions(record, analysis?.costs ?? []), [record, analysis?.costs]);
+  const [sampled, setSampled] = useState<{ record: CompletedPlaythroughRecord; decisions: DecisionAssessment[] }>();
+  const decisions = sampled?.record === record ? sampled.decisions : initialDecisions;
+  const sampling = !!analysis && !analysis.running && !analysis.abstention && sampled?.record !== record;
+  useEffect(() => {
+    if (!analysis || analysis.running || analysis.abstention) return;
+    let active = true;
+    void reviewSampling(record, initialDecisions, provenanceLog?.entries() ?? [], provenanceLog?.hiddenCardFound)
+      .then(decisions => { if (active) setSampled({ record, decisions }); }, () => {
+        if (active) setSampled({ record, decisions: initialDecisions });
+      });
+    return () => { active = false; };
+  }, [record, initialDecisions, analysis, provenanceLog]);
   const moments = useMemo(() => keyMoments(decisions), [decisions]);
   // CI-5: log only displayed moments; stable IDs also deduplicate StrictMode and reopening review.
   useEffect(() => {
@@ -41,11 +56,12 @@ export function ReviewScreen({ record, onBack, analysis, onTryAgain, provenanceL
   useEffect(() => {
     if (!provenanceLog) return;
     const logged = new Set(provenanceLog.entries().map(entry => entry.id));
-    for (const decision of decisions.filter(decision => decision.trick === trickIndex + 1)) {
-      const entry = uncertainQualityEntry(decision, record.playthroughId, text('moment.uncertain'));
+    for (const decision of decisions.filter(decision => (decision.trick === trickIndex + 1 && decision.quality === 'uncertain') || moments.includes(decision))) {
+      const entry = sampledQualityEntry(decision, record.playthroughId, text(qualityTemplate(decision)))
+        ?? uncertainQualityEntry(decision, record.playthroughId, text('moment.uncertain'));
       if (entry && !logged.has(entry.id)) { provenanceLog.record(entry); logged.add(entry.id); }
     }
-  }, [decisions, trickIndex, record.playthroughId, provenanceLog]);
+  }, [decisions, moments, trickIndex, record.playthroughId, provenanceLog]);
   const trick = tricks[trickIndex];
   const hands = setupPosition ? record.deal.hands : trick.hands;
   // US-16.2: Previous is named by where it leads; from trick 1 it goes back a setup step.
@@ -65,6 +81,7 @@ export function ReviewScreen({ record, onBack, analysis, onTryAgain, provenanceL
     {record.gameFormat === 'minibridge' && <aside className="review-result"><ResultCard record={record} reference /></aside>}
     <p role="note" className="review-xray"><span aria-hidden="true">▦</span>{text('review.xray')}</p>
     {analysis?.running && <p role="status" className="review-analysis-skeleton">{text('review.working')}</p>}
+    {sampling && <p role="status" className="review-analysis-skeleton">{text('review.sampling')}</p>}
     {analysis?.abstention && <div className="review-unavailable">
       <p role="status">{analysis.abstention.text}</p>
       <button type="button" onClick={() => { heading.current?.focus(); onTryAgain?.(); }}>{text('review.try-again')}</button>
@@ -82,14 +99,15 @@ export function ReviewScreen({ record, onBack, analysis, onTryAgain, provenanceL
       <div className="review-layout" data-hands={showHands}>
         {trick && <ol className="review-plays">{trick.cards.map(({ seat, card }, offset) => {
           const badge = analysis?.costs.find(cost => cost.positionIndex === trickIndex * 4 + offset);
+          const decision = decisions.find(d => d.positionIndex === badge?.positionIndex);
           return <li key={seat}><Card card={card} /><span>{text(`seat.${seat}`)}</span>
             {badge && <span className={`review-cost ${badge.cost ? 'review-cost-xray' : 'review-cost-neutral'}`}
               role="img" aria-label={badge.statement.text}>
               <b>{text(badge.cost ? 'review.cost-negative' : 'review.cost-zero', { cost: badge.cost })}</b>
               <small>{text('review.hindsight')}</small>
             </span>}
-            {badge && decisions.find(d => d.positionIndex === badge.positionIndex)?.quality === 'uncertain'
-              && <small className="review-quality">{text('moment.uncertain')}</small>}</li>;
+            {badge && decision?.quality === 'uncertain'
+              && <small className="review-quality">{text(decision.sampling ? qualityTemplate(decision) : 'moment.uncertain')}</small>}</li>;
         })}</ol>}
         {showHands && <section id="review-hands" className="review-hands" aria-label={handsLabel}>
           {SEATS.map(seat => <section key={seat} className={`review-hand review-${seat}`} aria-label={text(`seat.${seat}`)}>

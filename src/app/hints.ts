@@ -24,7 +24,7 @@ export function renderHint(result: HintResult) {
   const reason = 'abstention' in result ? '' : text('hint.reason');
   return { templateId, advice, reason, text: [text('hint.label'), advice, reason, text('hint.choose')].filter(Boolean).join('\n') };
 }
-export type HintSnapshot = { enabled: boolean; open: boolean; thinking: boolean; abstained: boolean; advice: string; reason: string; durationMs: number | null; exceededTarget: boolean };
+export type HintSnapshot = { enabled: boolean; open: boolean; thinking: boolean; abstained: boolean; advice: string; reason: string; durationMs: number | null; exceededTarget: boolean; advisedClass?: readonly Card[]; positionIndex?: number };
 export function createHints(changed: () => void, log: (entry: Statement, positionIndex: number) => void, runner: HintRunner = runHint) {
   let state: HintSnapshot = { enabled: true, open: false, thinking: false, abstained: false, advice: '', reason: '', durationMs: null, exceededTarget: false };
   const timings: { durationMs: number; exceededTarget: boolean }[] = [];
@@ -57,7 +57,7 @@ export function createHints(changed: () => void, log: (entry: Statement, positio
       const next = state.enabled && positionKey ? `setup:${positionKey}` : undefined;
       if (next === key) return;
       cancel?.(); cancel = undefined; generation++; key = next; logged = false; statement = undefined; position = 0;
-      state = { ...state, open: false, thinking: false, abstained: !authored, advice: '', reason: '', durationMs: null, exceededTarget: false };
+      state = { ...state, open: false, thinking: false, abstained: !authored, advice: '', reason: '', durationMs: null, exceededTarget: false, advisedClass: undefined, positionIndex: undefined };
       if (!next) return;
       const templateId = authored?.textRef ?? 'hint.not-covered';
       state.advice = text(templateId);
@@ -69,7 +69,7 @@ export function createHints(changed: () => void, log: (entry: Statement, positio
       const next = state.enabled && view && identity && candidates.length ? `${identity.playthroughId}:${identity.positionKey}:${view.seat}` : undefined;
       if (next === key) return;
       cancel?.(); cancel = undefined; generation++; key = next; statement = undefined; logged = false;
-      state = { ...state, open: false, thinking: !!next, abstained: false, advice: '', reason: '', durationMs: null, exceededTarget: false };
+      state = { ...state, open: false, thinking: !!next, abstained: false, advice: '', reason: '', durationMs: null, exceededTarget: false, advisedClass: undefined, positionIndex: view?.positionIndex };
       if (!next || !view || !identity) return;
       position = view.positionIndex;
       // US-14.11: visible equivalence proves a forced play without sampling.
@@ -86,7 +86,8 @@ export function createHints(changed: () => void, log: (entry: Statement, positio
         if (owned !== generation) return;
         timings.push({ durationMs, exceededTarget: durationMs > HINT_DEADLINE_MS });
         const rendered = renderHint(result);
-        state = { ...state, thinking: false, abstained: 'abstention' in result, advice: rendered.advice, reason: rendered.reason, durationMs, exceededTarget: durationMs > HINT_DEADLINE_MS };
+        state = { ...state, thinking: false, abstained: 'abstention' in result, advice: rendered.advice, reason: rendered.reason, durationMs, exceededTarget: durationMs > HINT_DEADLINE_MS,
+          advisedClass: 'classes' in result ? result.classes[0].cards : undefined };
         // CI-5: attribute worker results to the worker's reported engine and sampler.
         statement = hintStatement(result, source?.engine ?? configuredEngine(), durationMs, rendered, source?.sampler);
         record(); changed();

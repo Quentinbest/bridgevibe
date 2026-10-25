@@ -16,8 +16,8 @@ const result: PositionResult = { name: 'test', version: '1', classes: [] };
 const request = (requestId: number): AnalysisRequest => ({ type: 'solve', requestId, record, index: 0,
   playthroughId: record.playthroughId, positionKey: '0123456789abcdef', deadline: Date.now() + 30000, cancellationId: `analysis-${requestId}` });
 
-test('US-41.3: both envelope changes require protocol version 2', () => {
-  expect(ANALYSIS_PROTOCOL_VERSION).toBe(2); expect(HINT_PROTOCOL_VERSION).toBe(2);
+test('US-41.3: analysis uses version 2; review sampling extends the hint protocol to version 3', () => {
+  expect(ANALYSIS_PROTOCOL_VERSION).toBe(2); expect(HINT_PROTOCOL_VERSION).toBe(3);
 });
 test('§4.3.6: the analysis worker suppresses a cancelled result and serves other requests', async () => {
   let finish!: (value: PositionResult) => void;
