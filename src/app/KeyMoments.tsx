@@ -1,5 +1,6 @@
 import { cardName, text } from '../explanation';
 import type { DecisionAssessment, Verdict } from '../coach/decisionAssessment';
+import { qualityTemplate } from '../coach/sampledQuality';
 import { momentStatement } from '../coach/momentStatement';
 
 const icons: Record<Verdict, string> = { sound: '✓', unlucky: '⚖', lucky: '↯', mistake: '↻' };
@@ -13,6 +14,7 @@ export function KeyMoments({ moments }: { moments: readonly DecisionAssessment[]
         <p className={`moment-badge moment-${moment.verdict}`}><span aria-hidden="true">{icons[moment.verdict!]}</span>{text(`moment.${moment.verdict!}`)}</p>
         <p>{text(statement.templateId)} <span className="moment-hindsight">{text('review.hindsight')}</span></p>
         {moment.alternative && <p>{text('moment.alternative', { card: cardName(moment.alternative) })}</p>}
+        {moment.sampling && <p className="moment-quality">{text(qualityTemplate(moment))}</p>}
         <p className="moment-outcome">{moment.outcome!.statement.text}</p>
       </li>;
     })}</ol>

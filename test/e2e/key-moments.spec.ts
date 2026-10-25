@@ -25,8 +25,8 @@ test('F4 practice review shows a labelled big moment with hindsight and keyboard
   await page.getByRole('button', { name: 'Review this deal', exact: true }).focus();
   await page.keyboard.press('Enter');
   await page.clock.resume();
-  await expect(page.getByRole('heading', { name: '1 big moment' })).toBeVisible();
-  const moment = page.locator('.key-moment');
+  await expect(page.getByRole('heading', { name: /^[1-3] big moments?$/ })).toBeVisible();
+  const moment = page.locator('.key-moment').filter({ hasText: 'Trick 2 · you played 8 of hearts' });
   await expect(moment).toContainText('Trick 2 · you played 8 of hearts');
   await expect(moment).toContainText('Better option');
   await expect(moment).toContainText('X-ray view: with all cards visible');

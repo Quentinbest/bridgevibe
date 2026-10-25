@@ -8,7 +8,8 @@ export type Verdict = 'sound' | 'unlucky' | 'lucky' | 'mistake';
 export type DecisionAssessment = {
   positionIndex: number; trick: number; card: Card;
   quality: 'acceptable' | 'not-acceptable' | 'uncertain';
-  qualitySource?: 'teacher-label'; labelSource?: LabelSource; labelRef?: string;
+  qualitySource?: 'teacher-label' | 'sampled'; labelled?: boolean;
+  sampling?: Extract<import('./provenance').Provenance, { sourceKind: 'engine' }>; hintFollowed?: boolean; labelSource?: LabelSource; labelRef?: string;
   outcome?: TrickCost; verdict?: Verdict; alternative?: Card;
 };
 // INV-9, CI-3: missing quality OR outcome means no verdict.
@@ -33,6 +34,7 @@ export function assessDecisions(record: CompletedPlaythroughRecord, costs: reado
       assessments.push({ positionIndex: entry.index, trick: Math.floor(entry.index / 4) + 1, card: entry.action.card,
         quality: acceptable === null ? 'uncertain' : acceptable ? 'acceptable' : 'not-acceptable',
         ...(acceptable !== null ? { qualitySource: 'teacher-label', labelSource: label!.source!, labelRef: label!.ref } as const : {}),
+        ...(point ? { labelled: true } : {}),
         outcome, verdict: decisionVerdict(acceptable, outcome?.cost),
         alternative: acceptable === false ? point?.candidates.find(candidate => candidate.acceptable === true)?.cards[0] : undefined });
     }

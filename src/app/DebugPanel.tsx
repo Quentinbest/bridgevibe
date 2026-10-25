@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useSyncExternalStore } from 'react';
 import { SEATS, type Seat } from '../table';
 import { text } from '../explanation';
 import type { createPlay } from './play';
 
 export default function DebugPanel({ play }: { play: ReturnType<typeof createPlay> }) {
+  useSyncExternalStore(play.provenanceLog.subscribe, play.provenanceLog.revision);
   const [seat, setSeat] = useState<Seat>('east');
   const [showSeat, setShowSeat] = useState(false);
   const counters = play.provenanceLog.counters();

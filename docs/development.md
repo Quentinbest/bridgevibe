@@ -154,6 +154,26 @@ connections. Static scanning covers those worker files meanwhile.
 
 ## Modules
 
+### Sampled decision quality (#27)
+
+Review reconstructs historical Seat Views and sends only their encoded views and legal
+candidates to the hint worker's `review` request. Labels always win. Unlabelled costly
+decisions come first (earlier tricks first), followed by zero-cost decisions whose
+double-dummy candidate values differed; that ordering metadata is ALL_HANDS, never a
+quality statement. One cached run per completed Playthrough has a shared 8-second
+visible-time budget and 50 samples per decision: **Provisional, U-14 (Delegated to Claude 2026-10-25)**.
+Hidden pages pause the budget and terminate the worker; showing the page resumes the
+first unfinished decision with the remaining budget and the same seed. Completed
+results and the cached run are retained.
+Quality is acceptable within 0.25 tricks of the best class, with 50 samples or complete
+enumeration. Both paths pass `seatViewSeed(view)` to the same estimator, which prefixes
+it with the same view digest, preserving the hint's sample prefix. Displayed tier (c)
+hints retain their advised class in provenance; following that class downgrades a
+contradictory sampled judgement to uncertain with draft explanatory copy. Displayed
+sampled quality is logged once in VISIBLE mode with seed, count and engine/sampler
+versions, separately from ALL_HANDS outcomes. Unfinished or unselected decisions stay
+uncertain without a verdict. The provisional budget does not resolve MVP U-14.
+
 `src/<module>/` follows engineering spec §4.2: one module per bounded context, created by the ticket that needs it. Today there are four:
 
 - **table**: the authoritative rules core. `startPlaythrough({ deal, contract })` returns a handle with `legalActions(seat)`, `submit(seat, controller, action)`, `seatView(seat)` and `record()`. It checks card plays, owns turns and trick winners, exposes Dummy after the opening lead, and completes after 13 tricks. Rejections preserve all state. It **may depend on nothing**: no other module, package or Node builtin (its tests may import Vitest).

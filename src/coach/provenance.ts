@@ -1,13 +1,14 @@
 import { HINT_DEADLINE_MS } from '../information/parameters';
-import { REASON_CODES, type ReasonCode, type RobotProvenance } from '../table';
+import { REASON_CODES, RANKS, SUITS, type Card, type ReasonCode, type RobotProvenance } from '../table';
 
 export type AnalysisCause = 'timeout' | 'error' | 'worker-crash' | 'protocol-mismatch';
-export type Abstention = { reason: 'not-covered'; cause: 'no-authored-hint' } | { reason: 'unavailable'; cause: AnalysisCause } | { reason: 'uncertain'; cause: 'constraints' | 'no-label' };
+export type Abstention = { reason: 'not-covered'; cause: 'no-authored-hint' } | { reason: 'unavailable'; cause: AnalysisCause } | { reason: 'uncertain'; cause: 'constraints' | 'no-label' | 'sample-confidence' | 'hint-conflict' };
 export type InformationMode = 'VISIBLE' | 'ALL_HANDS';
+export type SampledQualitySource = { qualitySource: 'sampled'; seed: string; seedDerivation: 'seatViewSeed'; sampler: string; samplerVersion: string; enumerated: boolean };
 export type Provenance =
   | { sourceKind: 'authored'; contentId: string; version: string }
   | { sourceKind: 'bidding-rule'; ruleId: string; profileVersion: string }
-  | { sourceKind: 'engine'; name: string; version: string; mode: InformationMode; sampleCount: number; hint?: { sampler: string; samplerVersion: string; enumerated: boolean; templateId: string; durationMs: number; exceededTarget: boolean } }
+  | { sourceKind: 'engine'; name: string; version: string; mode: InformationMode; sampleCount: number; sampled?: SampledQualitySource; hint?: { sampler: string; samplerVersion: string; enumerated: boolean; templateId: string; durationMs: number; exceededTarget: boolean; advisedClass?: readonly Card[] } }
   | { sourceKind: 'template'; templateId: string }
   | ({ sourceKind: 'table' } & ({ rulesCoreVersion: string; reasonCode?: ReasonCode } | { reasonCode: ReasonCode; rulesCoreVersion?: string }))
   | ({ sourceKind: 'robot' } & RobotProvenance);
@@ -34,7 +35,7 @@ export function validateEntry(entry: unknown): string[] {
   if (!mode(entry.informationMode)) errors.push('informationMode');
   if (entry.abstention !== undefined) {
     const a = entry.abstention;
-    if (!object(a) || !((a.reason === 'not-covered' && a.cause === 'no-authored-hint') || (a.reason === 'uncertain' && ['constraints', 'no-label'].includes(String(a.cause))) || (a.reason === 'unavailable' && ['timeout', 'error', 'worker-crash', 'protocol-mismatch'].includes(String(a.cause))))) errors.push('abstention');
+    if (!object(a) || !((a.reason === 'not-covered' && a.cause === 'no-authored-hint') || (a.reason === 'uncertain' && ['constraints', 'no-label', 'sample-confidence', 'hint-conflict'].includes(String(a.cause))) || (a.reason === 'unavailable' && ['timeout', 'error', 'worker-crash', 'protocol-mismatch'].includes(String(a.cause))))) errors.push('abstention');
     if (entry.kind !== 'statement') errors.push('abstention.kind');
   }
   const p = entry.provenance;
@@ -48,6 +49,9 @@ export function validateEntry(entry: unknown): string[] {
     if (!object(p.outcome) || p.outcome.sourceKind !== 'engine' || validateEntry({ ...entry, abstention: undefined,
       summary: 'review.cost-description', informationMode: 'ALL_HANDS', provenance: p.outcome }).length) errors.push('provenance.outcome');
   }
+  // CI-5: sampled quality statements must retain the VISIBLE estimator identity.
+  if (typeof entry.summary === 'string' && (entry.summary.startsWith('moment.sampled-') || entry.summary === 'moment.hint-close')
+    && (p.sourceKind !== 'engine' || !object(p.sampled))) errors.push('provenance.sampled');
   // US-14.11: forced plays and uncovered Setup use VISIBLE templates without an engine.
   const templateHint = p.sourceKind === 'template' && p.templateId === entry.summary
     && ['hint.forced-card', 'hint.forced-class', 'hint.not-covered'].includes(String(entry.summary)) && entry.informationMode === 'VISIBLE';
@@ -78,6 +82,14 @@ export function validateEntry(entry: unknown): string[] {
           || typeof h.enumerated !== 'boolean' || typeof h.durationMs !== 'number' || !Number.isFinite(h.durationMs) || h.durationMs < 0
           || h.exceededTarget !== (h.durationMs > HINT_DEADLINE_MS) || entry.informationMode !== 'VISIBLE') errors.push('provenance.hint');
       }
+      if (entry.summary === 'hint.advice' && (!object(p.hint) || !Array.isArray(p.hint.advisedClass) || !p.hint.advisedClass.length
+        || !p.hint.advisedClass.every(card => object(card) && SUITS.includes(card.suit as Card['suit']) && RANKS.includes(card.rank as Card['rank'])))) errors.push('provenance.advisedClass');
+      if (p.sampled !== undefined) {
+        const s = p.sampled;
+        if (!object(s) || s.qualitySource !== 'sampled' || s.seedDerivation !== 'seatViewSeed'
+          || !['seed', 'sampler', 'samplerVersion'].every(key => nonempty(s[key])) || typeof s.enumerated !== 'boolean'
+          || entry.informationMode !== 'VISIBLE') errors.push('provenance.sampled');
+      }
       break;
     case 'template': fields('templateId'); break;
     case 'table':
@@ -101,10 +113,16 @@ export function validateEntry(entry: unknown): string[] {
 // A-05, U-07: memory only; callers receive independent snapshots, including exports.
 export function createProvenanceLog(appVersion = 'development') {
   const entries: LogEntry[] = [];
+  const listeners = new Set<() => void>();
+  let revision = 0;
+  const publish = () => { revision++; listeners.forEach(listener => listener()); };
   let hiddenCardsInVisibleInputs = 0;
   let silentFallbacks = 0;
   const analysisFailures = new Set<string>();
   return {
+    // CI-5: asynchronous review statements must update the debug panel when recorded.
+    subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
+    revision: () => revision,
     record(entry: LogEntry) {
       const errors = validateEntry(entry);
       if (errors.length) throw new Error(`Incomplete provenance: ${errors.join(', ')}`);
@@ -112,11 +130,12 @@ export function createProvenanceLog(appVersion = 'development') {
       entries.push(structuredClone(entry));
       if (entry.abstention) analysisFailures.delete(entry.id);
       if (entry.provenance.sourceKind === 'robot' && entry.provenance.policy === 'bv-fallback' && !entry.provenance.fallback) silentFallbacks++;
+      publish();
     },
     entries: () => structuredClone(entries),
-    hiddenCardFound() { hiddenCardsInVisibleInputs++; },
+    hiddenCardFound() { hiddenCardsInVisibleInputs++; publish(); },
     // VAL-06: failures remain counted until a validated abstention accounts for them.
-    analysisFailed(id: string) { analysisFailures.add(id); },
+    analysisFailed(id: string) { analysisFailures.add(id); publish(); },
     counters: () => ({ hiddenCardsInVisibleInputs, silentFallbacks: silentFallbacks + analysisFailures.size }),
     export: () => ({ schemaVersion: 1 as const, format: 'bridgevibe-f5' as const, exportedAt: new Date().toISOString(), appVersion,
       entries: structuredClone(entries).map(entry => ({ ...entry, grade: null, graderNote: null })) }),

@@ -9,5 +9,6 @@ export function hintStatement(result: HintResult, engine: { name: string; versio
     ...('abstention' in result ? { abstention: result.abstention } : {}),
     provenance: { sourceKind: 'engine', ...engine, mode: 'VISIBLE', sampleCount: result.sampleCount,
       hint: { sampler: usedSampler.name, samplerVersion: usedSampler.version, enumerated: result.enumerated, templateId: rendered.templateId,
-        durationMs, exceededTarget: durationMs > HINT_DEADLINE_MS } } };
+        durationMs, exceededTarget: durationMs > HINT_DEADLINE_MS,
+        ...('classes' in result ? { advisedClass: result.classes[0].cards } : {}) } } };
 }
