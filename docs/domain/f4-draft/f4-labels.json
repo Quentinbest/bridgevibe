@@ -1,0 +1,3146 @@
+{
+  "status": "F4 labels from two independent AI annotators (PRD D10, owner decision 2026-10-25). Not teacher labels; teachers' labels replace these when provided.",
+  "graders": {
+    "A": {
+      "name": "AI annotator A",
+      "source": "ai",
+      "date": "2026-10-25",
+      "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+    },
+    "B": {
+      "name": "AI annotator B",
+      "source": "ai",
+      "date": "2026-10-25",
+      "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+    }
+  },
+  "summary": {
+    "candidates": 151,
+    "agreed": 128,
+    "disagreed": 23,
+    "unresolved": [
+      "D01-C01",
+      "D02-C07",
+      "D02-C08",
+      "D03-C02",
+      "D07-C04",
+      "D07-C05",
+      "D07-C06",
+      "D08-C06",
+      "D11-C05",
+      "D12-C01",
+      "D12-C02",
+      "D16-C01",
+      "D18-C05",
+      "D23-C05",
+      "D26-C03",
+      "D26-C04",
+      "D26-C05",
+      "D28-C01",
+      "D30-C02",
+      "D30-C03",
+      "D30-C04",
+      "D30-C05",
+      "D30-C10"
+    ]
+  },
+  "labels": [
+    {
+      "ref": "D01-C01",
+      "dealId": "deal-8eeef0532d608151",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "A"
+        },
+        {
+          "suit": "hearts",
+          "rank": "K"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Safe win; low also wins."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "A low heart wins; retain both honors."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D01-C02",
+      "dealId": "deal-8eeef0532d608151",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "5"
+        },
+        {
+          "suit": "hearts",
+          "rank": "4"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Both beat the 3. Hands show cards remaining."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Wins cheaply and preserves heart honors."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D02-C01",
+      "dealId": "deal-c889ac31c5e2fa86",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "Q"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Draw trumps, starting with the short-hand Q."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Draws trumps with the short-hand honor."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D02-C02",
+      "dealId": "deal-c889ac31c5e2fa86",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "9"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Lead toward dummy AK to draw trumps."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Draws trumps toward dummy's top honors."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D02-C03",
+      "dealId": "deal-c889ac31c5e2fa86",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Lead toward dummy AK to draw trumps."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Draws trumps toward dummy's top honors."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D02-C04",
+      "dealId": "deal-c889ac31c5e2fa86",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "8"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Opens weak hearts before removing trumps."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Concedes a heart before securing trumps."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D02-C05",
+      "dealId": "deal-c889ac31c5e2fa86",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Opens weak hearts before removing trumps."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Concedes a heart before securing trumps."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D02-C06",
+      "dealId": "deal-c889ac31c5e2fa86",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "K"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "Q"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Unblock diamonds toward A."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Cashes a safe diamond winner."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D02-C07",
+      "dealId": "deal-c889ac31c5e2fa86",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "10"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Risks losing to J with AKQ available."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Develops diamonds with A-K-Q protection."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D02-C08",
+      "dealId": "deal-c889ac31c5e2fa86",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Uses dummy A before unblocking KQ."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Crosses safely to dummy's diamond ace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D02-C09",
+      "dealId": "deal-c889ac31c5e2fa86",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "A"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Cash A, then ruff clubs."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Cashes a winner while retaining control."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D02-C10",
+      "dealId": "deal-c889ac31c5e2fa86",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "6"
+        },
+        {
+          "suit": "clubs",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Concedes a club with A and trumps available."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Gives up a club instead of drawing trumps."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D03-C01",
+      "dealId": "deal-ce58952d76591815",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "6"
+        },
+        {
+          "suit": "spades",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Returns the opponents' established suit."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Returns opponents' suit without a gain."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D03-C02",
+      "dealId": "deal-ce58952d76591815",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "J"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Develop hearts toward AK10; West has 0 HCP left."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Spends the entry before unblocking ♦A."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D03-C03",
+      "dealId": "deal-ce58952d76591815",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "K"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "Q"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "J"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "An honor must collide with the singleton A."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Wastes an honor under the singleton ace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D03-C04",
+      "dealId": "deal-ce58952d76591815",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "8"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Unblock the singleton A without wasting an honor."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Unblocks ♦A, retaining dummy's honors."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D03-C05",
+      "dealId": "deal-ce58952d76591815",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Unblock the singleton A without wasting an honor."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Unblocks ♦A, retaining dummy's honors."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D03-C06",
+      "dealId": "deal-ce58952d76591815",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "9"
+        },
+        {
+          "suit": "clubs",
+          "rank": "8"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Attacks clubs into East's known AKQ."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Delays the clear diamond-unblocking plan."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D03-C07",
+      "dealId": "deal-ce58952d76591815",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "6"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Attacks clubs into East's known AKQ."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Delays the clear diamond-unblocking plan."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D04-C01",
+      "dealId": "deal-e7acb33f2dbf7ae0",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "10"
+        },
+        {
+          "suit": "hearts",
+          "rank": "9"
+        },
+        {
+          "suit": "hearts",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "All lose to A. Preserve these future winners."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Keep the established high heart sequence."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D04-C02",
+      "dealId": "deal-e7acb33f2dbf7ae0",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Lose cheaply; retain the three top hearts."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Follows low under the winning ace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D05-C01",
+      "dealId": "deal-9fef6c2de870c07f",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "9"
+        },
+        {
+          "suit": "spades",
+          "rank": "8"
+        },
+        {
+          "suit": "spades",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Return partner's spades to develop long tricks."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Attacks the long suit after A-K-Q fell."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D05-C02",
+      "dealId": "deal-9fef6c2de870c07f",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: A spade return is sound."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Develops spades while retaining the 9."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D05-C03",
+      "dealId": "deal-9fef6c2de870c07f",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "2"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Return partner's spades, keeping higher cards."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Develops spades while retaining the 9."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D05-C04",
+      "dealId": "deal-9fef6c2de870c07f",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "5"
+        },
+        {
+          "suit": "clubs",
+          "rank": "4"
+        },
+        {
+          "suit": "clubs",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Gives dummy K an entry; return partner's suit."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Hands dummy its club king and the lead."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D06-C01",
+      "dealId": "deal-fdbd5cf994ddd51d",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "J"
+        },
+        {
+          "suit": "hearts",
+          "rank": "8"
+        },
+        {
+          "suit": "hearts",
+          "rank": "7"
+        },
+        {
+          "suit": "hearts",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "All trumps are masters. Cash enough for seven."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "All remaining trumps win; secure the goal."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D06-C02",
+      "dealId": "deal-fdbd5cf994ddd51d",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "K"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Establish Q; East has no honors."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Drives out ♦A and establishes ♦Q."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D06-C03",
+      "dealId": "deal-fdbd5cf994ddd51d",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "8"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Lead toward Q behind West's A."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Leads toward ♦Q to establish diamonds."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D06-C04",
+      "dealId": "deal-fdbd5cf994ddd51d",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "7"
+        },
+        {
+          "suit": "clubs",
+          "rank": "6"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Develop QJ10 through strong West."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Develops clubs against West's high cards."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D07-C01",
+      "dealId": "deal-648babe4d8526b2e",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "K"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Discards the secure heart entry/winner."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Throws away a sure heart winner."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D07-C02",
+      "dealId": "deal-648babe4d8526b2e",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "9"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Keep four diamond tricks and the heart K."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Spares the king and all winning diamonds."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D07-C03",
+      "dealId": "deal-648babe4d8526b2e",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Keep four diamond tricks and the heart K."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Spares the king and all winning diamonds."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D07-C04",
+      "dealId": "deal-648babe4d8526b2e",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "A"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: All diamonds are masters now."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Throws away a sure diamond winner."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D07-C05",
+      "dealId": "deal-648babe4d8526b2e",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "8"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Three diamonds plus K suffice."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Shortens a fully established diamond suit."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D07-C06",
+      "dealId": "deal-648babe4d8526b2e",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "5"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "4"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Three diamonds plus K suffice."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Shortens a fully established diamond suit."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D08-C01",
+      "dealId": "deal-dac48f273907be5e",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "J"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Leads an unsupported J into dummy's long spades."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Opens dummy's strong spades from J-high."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D08-C02",
+      "dealId": "deal-dac48f273907be5e",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "9"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Attacks dummy's long suit, weakening own J."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Opens dummy's strong spades from J-high."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D08-C03",
+      "dealId": "deal-dac48f273907be5e",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "6"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Attacks dummy's long suit, weakening own J."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Opens dummy's strong spades from J-high."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D08-C04",
+      "dealId": "deal-dac48f273907be5e",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Attacks dummy's long suit, weakening own J."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Opens dummy's strong spades from J-high."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D08-C05",
+      "dealId": "deal-dac48f273907be5e",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "9"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Attack dummy's void; top of a weak long suit."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Attacks hearts, where dummy is void."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D08-C06",
+      "dealId": "deal-dac48f273907be5e",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "5"
+        },
+        {
+          "suit": "hearts",
+          "rank": "4"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Middle heart spots lack a clear lead rationale."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Attacks hearts, where dummy is void."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D08-C07",
+      "dealId": "deal-dac48f273907be5e",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "2"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Attack dummy's void; low from four hearts."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Attacks hearts, where dummy is void."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D08-C08",
+      "dealId": "deal-dac48f273907be5e",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "10"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Attacks dummy's five diamonds and Q."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Leads into dummy's long diamond tenace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D08-C09",
+      "dealId": "deal-dac48f273907be5e",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "6"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Attacks dummy's five diamonds and Q."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Leads into dummy's long diamond tenace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D08-C10",
+      "dealId": "deal-dac48f273907be5e",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "7"
+        },
+        {
+          "suit": "clubs",
+          "rank": "6"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Seek strong partner's clubs."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: club to strong partner."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D09-C01",
+      "dealId": "deal-ff9f79044a513e1b",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "A"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Take control; can attack side suits now."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Takes control before planning the return."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D09-C02",
+      "dealId": "deal-ff9f79044a513e1b",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "8"
+        },
+        {
+          "suit": "spades",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Hold up A to retain trump control."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: retains the trump ace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D10-C01",
+      "dealId": "deal-68b5d8266396d923",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "K"
+        },
+        {
+          "suit": "spades",
+          "rank": "Q"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Cash spade winners; try to drop J."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Cashes established spade honors."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D10-C02",
+      "dealId": "deal-68b5d8266396d923",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "9"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Risks a spade loser before cashing KQ."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Lets the missing jack beat a spade."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D10-C03",
+      "dealId": "deal-68b5d8266396d923",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "7"
+        },
+        {
+          "suit": "hearts",
+          "rank": "6"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Develop hearts toward K10."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: develop hearts."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D10-C04",
+      "dealId": "deal-68b5d8266396d923",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "2"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Develop hearts toward dummy K10."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: develop hearts."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D10-C05",
+      "dealId": "deal-68b5d8266396d923",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "10"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Lead through West for the diamond finesse."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Takes the diamond finesse toward A-Q-J."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D10-C06",
+      "dealId": "deal-68b5d8266396d923",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "8"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Lead toward AQJ for the diamond finesse."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Leads toward the diamond tenace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D10-C07",
+      "dealId": "deal-68b5d8266396d923",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "3"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "2"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Lead toward AQJ for the diamond finesse."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Leads toward the diamond tenace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D10-C08",
+      "dealId": "deal-68b5d8266396d923",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Returns clubs after the only stopper is gone."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Returns clubs and yields the initiative."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D11-C01",
+      "dealId": "deal-e80b24ff88f9f1ce",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "10"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Draw out high enemy trumps."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Develops the long trump suit."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D11-C02",
+      "dealId": "deal-e80b24ff88f9f1ce",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "8"
+        },
+        {
+          "suit": "spades",
+          "rank": "7"
+        },
+        {
+          "suit": "spades",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Draw out high enemy trumps."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Develops the long trump suit."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D11-C03",
+      "dealId": "deal-e80b24ff88f9f1ce",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Draw out high enemy trumps."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Develops the long trump suit."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D11-C04",
+      "dealId": "deal-e80b24ff88f9f1ce",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "A"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Cash a safe heart winner while retaining entries."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Cashes a winner while retaining entries."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D11-C05",
+      "dealId": "deal-e80b24ff88f9f1ce",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "J"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Wrong-way finesse; lead toward AJ from South."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Offers a heart finesse with king support."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D11-C06",
+      "dealId": "deal-e80b24ff88f9f1ce",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Reach K, then lead a heart toward AJ."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Crosses toward the heart king."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D11-C07",
+      "dealId": "deal-e80b24ff88f9f1ce",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Avoidable loser: discard this on South's clubs."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Concedes a diamond with useful leads left."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D11-C08",
+      "dealId": "deal-e80b24ff88f9f1ce",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Reach club winners and discard the diamond."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Reaches club winners for useful discards."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D12-C01",
+      "dealId": "deal-064e42b5bbfa850a",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "K"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Exposes KJ to AQ without leading toward them."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: develop spades."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D12-C02",
+      "dealId": "deal-064e42b5bbfa850a",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "J"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Exposes J to Q; develop safer clubs first."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: develop spades."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D12-C03",
+      "dealId": "deal-064e42b5bbfa850a",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "2"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Develop spades/possible entry."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: seeks a dummy entry."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D12-C04",
+      "dealId": "deal-064e42b5bbfa850a",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "8"
+        },
+        {
+          "suit": "hearts",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Develop an entry via dummy 10."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: develops a heart entry."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D12-C05",
+      "dealId": "deal-064e42b5bbfa850a",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "2"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Develop an entry via dummy 10."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: develops a heart entry."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D12-C06",
+      "dealId": "deal-064e42b5bbfa850a",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "8"
+        },
+        {
+          "suit": "clubs",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Force out club 9 and establish the remaining clubs."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Develops clubs after the high honors fell."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D12-C07",
+      "dealId": "deal-064e42b5bbfa850a",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "May lose cheaply to 6 while 9 remains."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Lets a lower club win unnecessarily."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D13-C01",
+      "dealId": "deal-b2d6977c63fd668b",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "A"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Keep the sure spade winner."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Discards a certain spade winner."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D13-C02",
+      "dealId": "deal-b2d6977c63fd668b",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "Q"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Keep Q protected by A."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Breaks the strong A-Q spade holding."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D13-C03",
+      "dealId": "deal-b2d6977c63fd668b",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "8"
+        },
+        {
+          "suit": "spades",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Keep AQ and diamond K."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Keeps spade honors and the diamond king."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D13-C04",
+      "dealId": "deal-b2d6977c63fd668b",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Discard a small spade; keep both major controls."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Keeps spade honors and the diamond king."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D13-C05",
+      "dealId": "deal-b2d6977c63fd668b",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "K"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "K is now the top diamond; keep it."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Discards the top remaining diamond."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D13-C06",
+      "dealId": "deal-b2d6977c63fd668b",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Keep K and the long spades."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Keeps ♦K and the full spade length."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D14-C01",
+      "dealId": "deal-b9dd220458e5e4f5",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "9"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Can run 9 if West plays low."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Follows cheaply, retaining hand's honors."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D14-C02",
+      "dealId": "deal-b9dd220458e5e4f5",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "2"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Play low toward KQJ behind West."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Follows cheaply, retaining hand's honors."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D15-C01",
+      "dealId": "deal-771216e91b857fc2",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "10"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Lead 10 for a trump finesse toward AQ."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Offers the trump finesse toward A-Q."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D15-C02",
+      "dealId": "deal-771216e91b857fc2",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "8"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Lead toward AQ to draw trumps."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Leads toward the trump tenace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D15-C03",
+      "dealId": "deal-771216e91b857fc2",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Lead toward AQ to draw trumps."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Leads toward the trump tenace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D15-C04",
+      "dealId": "deal-771216e91b857fc2",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Lead toward AQ to draw trumps."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Leads toward the trump tenace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D15-C05",
+      "dealId": "deal-771216e91b857fc2",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "J"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Cash a master heart; A and Q have gone."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Cashes an established heart winner."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D15-C06",
+      "dealId": "deal-771216e91b857fc2",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "6"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Reach dummy's master hearts."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Crosses to the established heart king."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D15-C07",
+      "dealId": "deal-771216e91b857fc2",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "K"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Exposes K to A; prefer leading toward K."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Exposes ♦K with A-Q still outstanding."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D15-C08",
+      "dealId": "deal-771216e91b857fc2",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "9"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Opens weak diamonds instead of trumps/winners."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Attacks weak diamonds before useful suits."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D15-C09",
+      "dealId": "deal-771216e91b857fc2",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "K"
+        },
+        {
+          "suit": "clubs",
+          "rank": "Q"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Force out A to develop the club sequence."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Drives out ♣A to establish club winners."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D15-C10",
+      "dealId": "deal-771216e91b857fc2",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "10"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "May lose to J while A still remains."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Can lose to ♣J while K-Q remain unused."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D15-C11",
+      "dealId": "deal-771216e91b857fc2",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Underleads KQ10 and may give J a cheap trick."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Underleads K-Q toward a weak club holding."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D16-C01",
+      "dealId": "deal-43829142d724efbb",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "9"
+        },
+        {
+          "suit": "hearts",
+          "rank": "8"
+        },
+        {
+          "suit": "hearts",
+          "rank": "7"
+        },
+        {
+          "suit": "hearts",
+          "rank": "6"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "All remaining small hearts outrank enemy 3."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Save the high heart sequence; follow low."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D16-C02",
+      "dealId": "deal-43829142d724efbb",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "4"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Follow cheaply under A."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Follows low under declarer's ace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D17-C01",
+      "dealId": "deal-986de40ef946df5a",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "Q"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Discards a spade winner."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Throws away a useful spade honor/entry."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D17-C02",
+      "dealId": "deal-986de40ef946df5a",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "10"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Leaves singleton Q blocked by South's A."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Breaks the useful Q-10 spade holding."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D17-C03",
+      "dealId": "deal-986de40ef946df5a",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "10"
+        },
+        {
+          "suit": "hearts",
+          "rank": "8"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Discard from the weak hearts; both exceed 6."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Spares the spade entries and diamonds."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D17-C04",
+      "dealId": "deal-986de40ef946df5a",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "Q"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "J"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "10"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Wastes diamond honors needed to force K."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Throws away a diamond promotion card."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D17-C05",
+      "dealId": "deal-986de40ef946df5a",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "4"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "2"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Retain QJ10 and both spades."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: retain four diamonds."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D18-C01",
+      "dealId": "deal-3d56ccf1e02d16bd",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "A"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Unblock A before running dummy's spades."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Unblocks spades before crossing to dummy."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D18-C02",
+      "dealId": "deal-3d56ccf1e02d16bd",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "4"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Creates an avoidable spade blockage at A."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Blocks spades with the singleton ace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D18-C03",
+      "dealId": "deal-3d56ccf1e02d16bd",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "A"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Cash A, then develop hearts."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Cashes a winner while retaining control."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D18-C04",
+      "dealId": "deal-3d56ccf1e02d16bd",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "10"
+        },
+        {
+          "suit": "hearts",
+          "rank": "9"
+        },
+        {
+          "suit": "hearts",
+          "rank": "8"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Drive out heart honors to establish the suit."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Develops hearts toward dummy's jack."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D18-C05",
+      "dealId": "deal-3d56ccf1e02d16bd",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "10"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "8"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "No enemy trumps remain; consumes own trumps."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Cashes a sure winner; no enemy trumps."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D19-C01",
+      "dealId": "deal-98cbcb601db5b4f9",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "A"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Take A, then four club winners make seven."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Takes the lead to cash established winners."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D19-C02",
+      "dealId": "deal-98cbcb601db5b4f9",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Ducking risks the contract despite five cashers."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Yields the lead with enough winners ready."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D20-C01",
+      "dealId": "deal-c449c43ee07ea399",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "K"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "Q"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "J"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "10"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Force A; all four touching honors work."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Plays third-hand high to develop diamonds."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D20-C02",
+      "dealId": "deal-c449c43ee07ea399",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "6"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "May give West a cheap trick without using A."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Allows a cheap win instead of an honor."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D21-C01",
+      "dealId": "deal-e447109979d5accb",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "A"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Take control and avoid a blockage."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Takes control while preserving dummy's Q."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D21-C02",
+      "dealId": "deal-e447109979d5accb",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "4"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Duck toward dummy Q98."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: plays toward dummy's Q."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D22-C01",
+      "dealId": "deal-1b42bdeef702f129",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "K"
+        },
+        {
+          "suit": "diamonds",
+          "rank": "10"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Both are masters now that AQJ have gone."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Wins cheaply; A-Q-J have already gone."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D22-C02",
+      "dealId": "deal-1b42bdeef702f129",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "May lose to 8 or 9 despite holding two masters."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Can lose to a spot while top cards remain."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D23-C01",
+      "dealId": "deal-f27ae4ec98c45988",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "K"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Unsupported K risks A; lead toward partner."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Exposes the king under the missing ace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D23-C02",
+      "dealId": "deal-f27ae4ec98c45988",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Return partner's spades toward their strength."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: preserves ♠K for later."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D23-C03",
+      "dealId": "deal-f27ae4ec98c45988",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Gives dummy a heart winner/entry."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Gives dummy its established long hearts."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D23-C04",
+      "dealId": "deal-f27ae4ec98c45988",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "J"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Cash the top diamond; AKQ10 have gone."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Cashes the top remaining diamond."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D23-C05",
+      "dealId": "deal-f27ae4ec98c45988",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "J"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Develop clubs, forcing an honor."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Risks the jack under higher club honors."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D23-C06",
+      "dealId": "deal-f27ae4ec98c45988",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Develop clubs toward partner."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: leads toward partner."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D24-C01",
+      "dealId": "deal-e2a082153da22bec",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "9"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Preserve 9: it is master after this trick."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Sacrifices the highest remaining trump."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D24-C02",
+      "dealId": "deal-e2a082153da22bec",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "4"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Lose cheaply to 10 and keep the master 9."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Saves ♠9 while following under ♠10."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D25-C01",
+      "dealId": "deal-cffe2717f1591b6f",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "K"
+        },
+        {
+          "suit": "hearts",
+          "rank": "Q"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Preserve the two sure heart winners."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Discards a sure heart winner."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D25-C02",
+      "dealId": "deal-cffe2717f1591b6f",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "10"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Keep 10 as a potential third heart winner."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Breaks the useful K-Q-10 heart holding."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D25-C03",
+      "dealId": "deal-cffe2717f1591b6f",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "8"
+        },
+        {
+          "suit": "clubs",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Discard a spare club; retain a club entry route."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Spares the heart winners and promotion."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D25-C04",
+      "dealId": "deal-cffe2717f1591b6f",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Discard the lowest club; keep heart prospects."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Spares the heart winners and promotion."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D26-C01",
+      "dealId": "deal-e5ba19237b5fc504",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "K"
+        },
+        {
+          "suit": "hearts",
+          "rank": "J"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Risks losing control with seven tricks available."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Risks the lead before cashing three ♦ wins."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D26-C02",
+      "dealId": "deal-e5ba19237b5fc504",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "2"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Reach QJ9; lone enemy 10 falls. Seven tricks."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Reaches Q-J-9; the sole missing ♦10 drops."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D26-C03",
+      "dealId": "deal-e5ba19237b5fc504",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "10"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Reach the master Q, then cash dummy diamonds."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Risks the lead before cashing three ♦ wins."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D26-C04",
+      "dealId": "deal-e5ba19237b5fc504",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Reach the master Q, then cash dummy diamonds."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Risks the lead before cashing three ♦ wins."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D26-C05",
+      "dealId": "deal-e5ba19237b5fc504",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Reach the master Q, then cash dummy diamonds."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Risks the lead before cashing three ♦ wins."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D27-C01",
+      "dealId": "deal-018abef26c81a844",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "5"
+        },
+        {
+          "suit": "spades",
+          "rank": "4"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Draw trumps toward AJ."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Draws trumps toward dummy's A-J."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D27-C02",
+      "dealId": "deal-018abef26c81a844",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "Q"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "W is void; save master Q until trumps are handled."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Exposes a heart winner to West's ruff."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D27-C03",
+      "dealId": "deal-018abef26c81a844",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "9"
+        },
+        {
+          "suit": "hearts",
+          "rank": "8"
+        },
+        {
+          "suit": "hearts",
+          "rank": "7"
+        },
+        {
+          "suit": "hearts",
+          "rank": "5"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Ruff a low heart high in dummy."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Ruff a low heart high enough for West."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D27-C04",
+      "dealId": "deal-018abef26c81a844",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Create a diamond void for ruffs."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: develop diamonds."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D28-C01",
+      "dealId": "deal-b177d0711317bfb5",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Create a spade void for later ruffs."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Gives up an available ruff and the lead."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D28-C02",
+      "dealId": "deal-b177d0711317bfb5",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "7"
+        },
+        {
+          "suit": "hearts",
+          "rank": "4"
+        },
+        {
+          "suit": "hearts",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Ruff. All three trumps are below enemy 9/10."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Ruffs the diamond to regain the lead."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D28-C03",
+      "dealId": "deal-b177d0711317bfb5",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "A"
+        },
+        {
+          "suit": "clubs",
+          "rank": "K"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Discards a sure club winner."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Throws away a sure club winner."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D28-C04",
+      "dealId": "deal-b177d0711317bfb5",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "9"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Discarding a club offers less than taking a ruff."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Gives up an available ruff and the lead."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D28-C05",
+      "dealId": "deal-b177d0711317bfb5",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "6"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Prefer ruffing or creating a spade void."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Gives up an available ruff and the lead."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D29-C01",
+      "dealId": "deal-56174f52aa319499",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "K"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Unsupported K exposes it to the missing A."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Exposes ♠K to the outstanding ace."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D29-C02",
+      "dealId": "deal-56174f52aa319499",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "9"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Lead toward partner's spades."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: keeps the guarded king."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D29-C03",
+      "dealId": "deal-56174f52aa319499",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "7"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Lead toward partner's spades."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: keeps the guarded king."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D29-C04",
+      "dealId": "deal-56174f52aa319499",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "4"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Lead toward partner, retaining the higher spots."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: keeps the guarded king."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D29-C05",
+      "dealId": "deal-56174f52aa319499",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "A"
+        },
+        {
+          "suit": "hearts",
+          "rank": "8"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Both beat dummy 6; may force W or enable N ruff."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Leads a top heart and can force a trump."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D30-C01",
+      "dealId": "deal-a6db3f0ed42e3ea7",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "J"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Leading J sacrifices a possible trump trick."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Spends the jack before the missing queen."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D30-C02",
+      "dealId": "deal-a6db3f0ed42e3ea7",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "8"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Trump lead exposes J8 to declarer's strength."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: remove dummy's trump."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D30-C03",
+      "dealId": "deal-a6db3f0ed42e3ea7",
+      "cards": [
+        {
+          "suit": "spades",
+          "rank": "2"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Retain J82; attack a side suit instead."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: remove dummy's trump."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D30-C04",
+      "dealId": "deal-a6db3f0ed42e3ea7",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "10"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Seek partner's possible heart AJ."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Leads toward dummy's strong K-Q hearts."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D30-C05",
+      "dealId": "deal-a6db3f0ed42e3ea7",
+      "cards": [
+        {
+          "suit": "hearts",
+          "rank": "8"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Seek partner's possible heart AJ."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Leads toward dummy's strong K-Q hearts."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D30-C06",
+      "dealId": "deal-a6db3f0ed42e3ea7",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "K"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "Cash top diamond before declarer can discard."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "Cashes ♦K before dummy can become void."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D30-C07",
+      "dealId": "deal-a6db3f0ed42e3ea7",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "J"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Gives dummy Q a trick while K could win."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Lets dummy's queen beat the jack."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D30-C08",
+      "dealId": "deal-a6db3f0ed42e3ea7",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "8"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Underleads KJ into dummy Q."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Leads into dummy's queen below K-J."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D30-C09",
+      "dealId": "deal-a6db3f0ed42e3ea7",
+      "cards": [
+        {
+          "suit": "diamonds",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": false,
+        "comment": "Underleads KJ into dummy Q."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Leads into dummy's queen below K-J."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D30-C10",
+      "dealId": "deal-a6db3f0ed42e3ea7",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "10"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Seek partner's possible club KQ."
+      },
+      "B": {
+        "acceptable": false,
+        "comment": "Exposes ♣10 through dummy's A-J-8."
+      },
+      "resolution": null
+    },
+    {
+      "ref": "D30-C11",
+      "dealId": "deal-a6db3f0ed42e3ea7",
+      "cards": [
+        {
+          "suit": "clubs",
+          "rank": "3"
+        }
+      ],
+      "A": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: Seek partner's possible club KQ."
+      },
+      "B": {
+        "acceptable": true,
+        "comment": "JUDGMENT_CALL: club through dummy."
+      },
+      "resolution": null
+    }
+  ]
+}

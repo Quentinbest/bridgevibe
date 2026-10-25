@@ -726,6 +726,11 @@ are used; teacher sign-off remains US-11.3.
 
 ## F4 draft (DEP-05)
 
+`docs/domain/f4-draft/f4-labels.json` holds the F4 labels, kept apart from the regenerated
+`f4-decisions.json`. Under PRD D10 (owner, 2026-10-25) they come from two independent AI
+annotators; each grader records its source, and teachers' labels replace them when provided.
+Disagreements without a resolution are listed as unresolved and excluded from VAL-07 (US-18.5).
+
 Run `npm run f4:draft` with Node 24 to regenerate the deterministic 30-Deal
 teacher draft in `docs/domain/f4-draft/`; the command reports scan counts,
 selection categories and runtime. The scan uses real principles robots and
