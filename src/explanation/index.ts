@@ -3,6 +3,7 @@ import type { Card, ReasonCode } from '../table';
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
   'moment.heading': { text: "{count} big moments", status: 'draft' },
+  'moment.heading-one': { text: "1 big moment", status: 'draft' },
   'moment.position': { text: "Trick {n} · you played {card}", status: 'draft' },
   'moment.trick': { text: "Trick {n}, big moment", status: 'draft' },
   'moment.sound': { text: "Solid", status: 'draft' },

@@ -20,7 +20,7 @@ afterEach(cleanup);
 test('US-18: review renders labelled card, badge, hindsight and accessible trick marker', () => {
   const record = finish(f4Position(points[1]), points[1].candidates[3].cards[0]);
   const { rerender } = render(<ReviewScreen record={record} analysis={{ running: false, costs: [cost] }} onBack={() => {}} />);
-  expect(screen.getByRole('region', { name: '1 big moments' }).textContent).toContain('Better option');
+  expect(screen.getByRole('region', { name: '1 big moment' }).textContent).toContain('Better option');
   expect(screen.getByRole('heading', { name: 'Trick 2 · you played 8 of hearts' })).toBeTruthy();
   expect(document.querySelector('.key-moment')!.textContent).toContain(text('review.hindsight'));
   fireEvent.click(screen.getByRole('button', { name: 'Trick 2, big moment' }));

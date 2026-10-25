@@ -5,7 +5,7 @@ import { momentStatement } from '../coach/momentStatement';
 const icons: Record<Verdict, string> = { sound: '✓', unlucky: '⚖', lucky: '↯', mistake: '↻' };
 export function KeyMoments({ moments }: { moments: readonly DecisionAssessment[] }) {
   return <section className="key-moments" aria-labelledby="key-moments-heading">
-    <h2 id="key-moments-heading">{text('moment.heading', { count: moments.length })}</h2>
+    <h2 id="key-moments-heading">{moments.length === 1 ? text('moment.heading-one') : text('moment.heading', { count: moments.length })}</h2>
     <ol>{moments.map(moment => {
       const statement = momentStatement(moment)!;
       return <li key={moment.positionIndex} className="key-moment">
