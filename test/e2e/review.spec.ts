@@ -114,7 +114,8 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
   await expect(page.getByText('Trick 12 of 13', { exact: true })).toBeVisible();
   if (page.viewportSize()!.width >= 1000) {
     await expect(page.getByRole('navigation', { name: 'Replay steps' }).getByRole('button')).toHaveCount(16);
-    await page.getByRole('button', { name: 'Trick 1', exact: true }).click();
+    // #27: sampling may mark trick 1 as a big moment ("Trick 1, big moment"); the step target is the same.
+    await page.getByRole('button', { name: /^Trick 1(, big moment)?$/ }).click();
     await expect(page.getByText('Trick 1 of 13', { exact: true })).toBeVisible();
   }
   for (const format of ['JSON', 'PBN']) {

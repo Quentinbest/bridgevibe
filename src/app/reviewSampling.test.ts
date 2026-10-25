@@ -109,6 +109,96 @@ test('U-14: reopening the same completed Playthrough reuses its one run, includi
     expect(workers).toBe(1); expect(requests).toBe(samplingOrder(decisions).length);
   } finally { vi.unstubAllGlobals(); }
 });
+
+// §4.7: injected visibility uses the same hidden/subscribe contract as the robot host.
+function visibilityHarness(initiallyHidden = false) {
+  let hidden = initiallyHidden;
+  const listeners = new Set<() => void>();
+  const visibility = { hidden: () => hidden, subscribe(callback: () => void) {
+    listeners.add(callback); return () => { listeners.delete(callback); };
+  } };
+  const clock = { now: () => Date.now(), setTimeout: (callback: () => void, ms: number) => setTimeout(callback, ms),
+    clearTimeout: (timer: ReturnType<typeof setTimeout> | undefined) => clearTimeout(timer) };
+  const workers: HintWorker[] = [], requests: HintRequest[] = [];
+  const createWorker = () => {
+    const worker: HintWorker = { onmessage: null, onerror: null, terminate: vi.fn(),
+      postMessage(request: HintRequest) { requests.push(request); } };
+    workers.push(worker); return worker;
+  };
+  const hello = () => workers.at(-1)!.onmessage!({ data: { type: 'hello', protocolVersion: HINT_PROTOCOL_VERSION } } as MessageEvent<HintResponse>);
+  const reply = (request: HintRequest, receive = workers.at(-1)!.onmessage!, sampleCount = 50) => receive({ data: {
+    type: 'result', requestId: request.requestId, playthroughId: request.playthroughId, positionKey: request.positionKey,
+    result: { classes: [{ cards: request.candidates, tricks: 1 }], sampleCount, enumerated: false }, source,
+  } } as MessageEvent<HintResponse>);
+  return { clock, visibility, createWorker, workers, requests, listeners, hello, reply,
+    change(value: boolean, notify = true) { hidden = value; if (notify) listeners.forEach(callback => callback()); } };
+}
+test('§4.7: hidden time preserves completed decisions and the cached run; stale replies never settle resumed work', async () => {
+  vi.useFakeTimers(); vi.setSystemTime(0);
+  const h = visibilityHarness();
+  let client: ReturnType<typeof reviewSamplingClient> | undefined;
+  try {
+    const fresh = sampledPractice();
+    const selected = assessDecisions(fresh, costs).slice(0, 3);
+    const factory = (deadline: number) => client = reviewSamplingClient(deadline, h.createWorker, h);
+    const pending = reviewSampling(fresh, selected, [], undefined, factory);
+    const settled = vi.fn(); void pending.then(settled);
+    h.hello();
+    await vi.advanceTimersByTimeAsync(1000);
+    h.reply(h.requests[0]); await vi.advanceTimersByTimeAsync(0);
+    expect(h.requests).toHaveLength(2);
+    await vi.advanceTimersByTimeAsync(1000);
+    const stale = h.workers[0].onmessage!;
+    // A message can observe hidden visibility before the visibilitychange event is dispatched.
+    h.change(true, false); h.reply(h.requests[1], stale, 99);
+    expect(h.workers[0].terminate).toHaveBeenCalledOnce();
+    await vi.advanceTimersByTimeAsync(20000);
+    h.change(true); h.reply(h.requests[1], stale, 99);
+    expect(settled).not.toHaveBeenCalled(); expect(h.requests).toHaveLength(2);
+    expect(reviewSampling(fresh, selected, [], undefined, factory)).toBe(pending);
+    h.change(false); h.hello();
+    expect(h.requests[2]).toEqual({ ...h.requests[1], deadline: 28000 });
+    h.reply(h.requests[1], stale, 99);
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(h.requests).toHaveLength(3);
+    h.reply(h.requests[2]); h.reply(h.requests[2]); await vi.advanceTimersByTimeAsync(0);
+    expect(h.requests).toHaveLength(4);
+    await vi.advanceTimersByTimeAsync(1000); h.reply(h.requests[3]);
+    const assessed = await pending;
+    expect(assessed.every(d => d.quality === 'acceptable' && d.sampling?.sampleCount === 50)).toBe(true);
+    expect(h.requests.map(r => r.requestId)).toEqual([selected[0].positionIndex + 1, selected[1].positionIndex + 1,
+      selected[1].positionIndex + 1, selected[2].positionIndex + 1]);
+    expect(h.requests[3].deadline).toBe(28000);
+    expect(settled).toHaveBeenCalledOnce(); expect(h.listeners.size).toBe(0);
+    expect(reviewSampling(fresh, selected, [], undefined, factory)).toBe(pending);
+    expect(h.workers).toHaveLength(2);
+  } finally { client?.close(); vi.useRealTimers(); }
+});
+test('§4.7: initially hidden and interrupted handshake time pause; repeated hides cannot extend eight visible seconds', async () => {
+  vi.useFakeTimers(); vi.setSystemTime(0);
+  const h = visibilityHarness(true);
+  const client = reviewSamplingClient(8000, h.createWorker, h);
+  try {
+    const pending = runReviewSampling(record, decisions, [], client.estimate, client.deadline, h.clock.now);
+    const settled = vi.fn(); void pending.then(settled);
+    await vi.advanceTimersByTimeAsync(20000);
+    expect(h.workers).toHaveLength(0); expect(settled).not.toHaveBeenCalled();
+    h.change(false);
+    await vi.advanceTimersByTimeAsync(2000); h.change(true);
+    expect(h.requests).toHaveLength(0); expect(h.workers[0].terminate).toHaveBeenCalledOnce();
+    await vi.advanceTimersByTimeAsync(10000); h.change(true);
+    await vi.advanceTimersByTimeAsync(10000); h.change(false); h.hello();
+    expect(h.requests[0].deadline).toBe(48000);
+    const late = h.workers[1].onmessage!;
+    await vi.advanceTimersByTimeAsync(5999); expect(settled).not.toHaveBeenCalled();
+    await vi.advanceTimersByTimeAsync(1);
+    expect(await pending).toEqual(decisions);
+    expect(h.workers[1].terminate).toHaveBeenCalledOnce();
+    h.reply(h.requests[0], late); h.change(true); h.change(false);
+    expect(settled).toHaveBeenCalledOnce(); expect(h.workers).toHaveLength(2);
+    expect(h.requests).toHaveLength(1); expect(h.listeners.size).toBe(0);
+  } finally { client.close(); vi.useRealTimers(); }
+});
 test('US-18.3 composition: unlabelled practice, real DDS and worker handler produce sampled verdicts; audit passes', async () => {
   const log = createProvenanceLog();
   const realCosts: TrickCost[] = [];

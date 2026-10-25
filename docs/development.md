@@ -161,7 +161,10 @@ candidates to the hint worker's `review` request. Labels always win. Unlabelled 
 decisions come first (earlier tricks first), followed by zero-cost decisions whose
 double-dummy candidate values differed; that ordering metadata is ALL_HANDS, never a
 quality statement. One cached run per completed Playthrough has a shared 8-second
-deadline and 50 samples per decision: **Provisional, U-14 (Delegated to Claude 2026-10-25)**.
+visible-time budget and 50 samples per decision: **Provisional, U-14 (Delegated to Claude 2026-10-25)**.
+Hidden pages pause the budget and terminate the worker; showing the page resumes the
+first unfinished decision with the remaining budget and the same seed. Completed
+results and the cached run are retained.
 Quality is acceptable within 0.25 tricks of the best class, with 50 samples or complete
 enumeration. Both paths pass `seatViewSeed(view)` to the same estimator, which prefixes
 it with the same view digest, preserving the hint's sample prefix. Displayed tier (c)
