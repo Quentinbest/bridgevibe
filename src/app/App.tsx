@@ -172,7 +172,7 @@ function PracticeScreen({ onExit, onCompleted, firstIndex = 0, onStarted }: { on
   useEffect(() => { if (!review && view.status === 'completed') reviewButton.current?.focus(); }, [review, view.status, view.collecting]);
   const debug = DebugPanel && new URLSearchParams(window.location.search).get('debug') === '1';
   if (review) return <div className={debug ? 'debug-layout' : undefined}>
-    <ReviewScreen onTryAgain={() => { cancelAnalysis.current = analysisHost.retry(review, play.provenanceLog); }} analysis={analysis} record={review} onBack={() => setReview(null)} />
+    <ReviewScreen provenanceLog={play.provenanceLog} onTryAgain={() => { cancelAnalysis.current = analysisHost.retry(review, play.provenanceLog); }} analysis={analysis} record={review} onBack={() => setReview(null)} />
     {debug && <Suspense fallback={null}><DebugPanel play={play} /></Suspense>}
   </div>;
   return <div className={debug ? 'debug-layout' : undefined}><TableScreen onExit={onExit} key={session.key} view={view} onHint={play.showHint} onToggleHints={() => { play.toggleHints(); hintsEnabled.current = !!play.getSnapshot().hint?.enabled; }} onDismissHint={play.dismissHint} chooseContract={play.chooseContract} play={play.play} clearRejection={play.clearRejection} onShowRule={play.showRule} info={session.info} invalid={session.invalid} onNew={newDeal} />

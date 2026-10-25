@@ -2,6 +2,20 @@ import type { Card, ReasonCode } from '../table';
 
 // CI-8: every entry awaits teacher sign-off.
 export const catalogue = {
+  'moment.heading': { text: "{count} big moments", status: 'draft' },
+  'moment.heading-one': { text: "1 big moment", status: 'draft' },
+  'moment.position': { text: "Trick {n} · you played {card}", status: 'draft' },
+  'moment.trick': { text: "Trick {n}, big moment", status: 'draft' },
+  'moment.sound': { text: "Solid", status: 'draft' },
+  'moment.unlucky': { text: "Good call, bad luck", status: 'draft' },
+  'moment.lucky': { text: "Worked this time", status: 'draft' },
+  'moment.mistake': { text: "Better option", status: 'draft' },
+  'moment.sound-sentence': { text: "A reasonable choice with what you could see, and it cost no tricks in this layout.", status: 'draft' },
+  'moment.unlucky-sentence': { text: "A reasonable choice with what you could see. This layout cost tricks, but that does not make the decision a mistake.", status: 'draft' },
+  'moment.lucky-sentence': { text: "This cost no tricks in this layout, but the information you had supported a better choice.", status: 'draft' },
+  'moment.mistake-sentence': { text: "The information you had supported a better choice, and this play cost tricks in this layout.", status: 'draft' },
+  'moment.alternative': { text: "An acceptable option with what you could see: {card}.", status: 'draft' },
+  'moment.uncertain': { text: "Decision quality: uncertain. This X-ray cost alone does not judge your choice.", status: 'draft' },
   'result.title': { text: "MiniBridge result", status: 'draft' },
   'result.made': { text: "Made exactly.", status: 'draft' },
   'result.overtricks': { text: "Made, +{count}.", status: 'draft' },
