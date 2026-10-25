@@ -384,3 +384,16 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
   .review-screen:has(.review-result) > :not(.review-result) { grid-column: 1; }
   .review-screen:has(.review-result) > .review-result { grid-column: 2; grid-row: 2 / span 6; }
 }
+
+/* US-18, UX §5.4: icon, text and theme tokens carry every assessment. */
+.key-moments h2 { font-size: var(--type-23); }
+.key-moments ol { list-style: none; padding: 0; display: grid; gap: var(--space-12); }
+.key-moment { border: 1px solid var(--border); border-radius: var(--radius-12); padding: var(--space-16); background: var(--surface); color: var(--text); }
+.key-moment h3 { margin: 0; font-size: var(--type-15); color: var(--muted); }
+.moment-badge { display: flex; align-items: center; gap: var(--space-8); width: fit-content; padding: var(--space-6) var(--space-8); border-radius: var(--radius-8); font-weight: 700; }
+.moment-sound, .moment-unlucky { color: var(--accent-soft-text); background: var(--accent-soft); }
+.moment-lucky { color: var(--muted); background: var(--raised); }
+.moment-mistake { color: var(--text); background: var(--raised); border: 1px solid var(--accent-text); }
+.moment-hindsight, .moment-outcome { color: var(--muted); font-size: var(--type-13); }
+.review-quality { font-size: var(--type-11); overflow-wrap: anywhere; }
+.review-strip button[data-key-moment]::after { content: '◆'; display: block; color: var(--accent-text); }

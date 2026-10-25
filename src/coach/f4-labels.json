@@ -1,0 +1,3860 @@
+[
+  {
+    "dealId": "deal-8eeef0532d608151",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-76c7c7c4494edb3f\",\"deal-8eeef0532d608151\"],[\"announcement\",\"north\",8],[\"announcement\",\"east\",6],[\"announcement\",\"south\",16],[\"announcement\",\"west\",10],[\"declarer\",\"south\",false],[\"dummy-exposed\",\"north\"],[\"contract-choice\",\"south\",\"no-trumps\",\"game\"]],\"actions\":[[\"west\",\"hearts\",\"3\"],[\"north\",\"hearts\",\"2\"],[\"east\",\"diamonds\",\"5\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D01-C01",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "A"
+          },
+          {
+            "suit": "hearts",
+            "rank": "K"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Safe win; low also wins."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "A low heart wins; retain both honors."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "A stronger: an honor wins safely and five heart tricks remain available. B's low play is economical, not uniquely reasonable.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D01-C02",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "5"
+          },
+          {
+            "suit": "hearts",
+            "rank": "4"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Both beat the 3. Hands show cards remaining."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Wins cheaply and preserves heart honors."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-c889ac31c5e2fa86",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-48fb010e5bbc7e8e\",\"deal-c889ac31c5e2fa86\"],[\"announcement\",\"east\",9],[\"announcement\",\"south\",13],[\"announcement\",\"west\",5],[\"announcement\",\"north\",13],[\"declarer\",\"south\",true],[\"dummy-exposed\",\"north\"],[\"contract-choice\",\"south\",\"spades\",\"part-score\"]],\"actions\":[[\"west\",\"clubs\",\"7\"],[\"north\",\"clubs\",\"3\"],[\"east\",\"clubs\",\"2\"],[\"south\",\"clubs\",\"Q\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D02-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "Q"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Draw trumps, starting with the short-hand Q."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Draws trumps with the short-hand honor."
+        }
+      },
+      {
+        "ref": "D02-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "9"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Lead toward dummy AK to draw trumps."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Draws trumps toward dummy's top honors."
+        }
+      },
+      {
+        "ref": "D02-C03",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "3"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Lead toward dummy AK to draw trumps."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Draws trumps toward dummy's top honors."
+        }
+      },
+      {
+        "ref": "D02-C04",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "8"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Opens weak hearts before removing trumps."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Concedes a heart before securing trumps."
+        }
+      },
+      {
+        "ref": "D02-C05",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "3"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Opens weak hearts before removing trumps."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Concedes a heart before securing trumps."
+        }
+      },
+      {
+        "ref": "D02-C06",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "K"
+          },
+          {
+            "suit": "diamonds",
+            "rank": "Q"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Unblock diamonds toward A."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Cashes a safe diamond winner."
+        }
+      },
+      {
+        "ref": "D02-C07",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "10"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": false,
+          "comment": "Risks losing to J with AKQ available."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Develops diamonds with A-K-Q protection."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "B stronger if dummy wins A: this is a safe transfer before drawing trumps. A's J risk applies to running 10, not this continuation.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D02-C08",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "3"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": false,
+          "comment": "Uses dummy A before unblocking KQ."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Crosses safely to dummy's diamond ace."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "B stronger: low to A safely enters dummy. Nine trumps provide communication; KQ are not stranded as A's blockage argument implies.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D02-C09",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "A"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Cash A, then ruff clubs."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Cashes a winner while retaining control."
+        }
+      },
+      {
+        "ref": "D02-C10",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "6"
+          },
+          {
+            "suit": "clubs",
+            "rank": "5"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Concedes a club with A and trumps available."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Gives up a club instead of drawing trumps."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-ce58952d76591815",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-f51750336f43a154\",\"deal-ce58952d76591815\"],[\"announcement\",\"south\",10],[\"announcement\",\"west\",4],[\"announcement\",\"north\",12],[\"announcement\",\"east\",14],[\"declarer\",\"north\",false],[\"dummy-exposed\",\"south\"],[\"contract-choice\",\"north\",\"no-trumps\",\"part-score\"]],\"actions\":[[\"east\",\"spades\",\"Q\"],[\"south\",\"spades\",\"K\"],[\"west\",\"spades\",\"A\"],[\"north\",\"spades\",\"2\"],[\"west\",\"spades\",\"5\"],[\"north\",\"spades\",\"4\"],[\"east\",\"spades\",\"8\"],[\"south\",\"spades\",\"9\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D03-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "6"
+          },
+          {
+            "suit": "spades",
+            "rank": "3"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Returns the opponents' established suit."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Returns opponents' suit without a gain."
+        }
+      },
+      {
+        "ref": "D03-C02",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "J"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": true,
+          "comment": "Develop hearts toward AK10; West has 0 HCP left."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Spends the entry before unblocking ♦A."
+        },
+        "resolution": {
+          "acceptable": false,
+          "note": "B stronger: unblock singleton diamond A first. Spending heart J now sacrifices a potential entry to the long diamonds.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D03-C03",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "K"
+          },
+          {
+            "suit": "diamonds",
+            "rank": "Q"
+          },
+          {
+            "suit": "diamonds",
+            "rank": "J"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "An honor must collide with the singleton A."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Wastes an honor under the singleton ace."
+        }
+      },
+      {
+        "ref": "D03-C04",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "8"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Unblock the singleton A without wasting an honor."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Unblocks ♦A, retaining dummy's honors."
+        }
+      },
+      {
+        "ref": "D03-C05",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "5"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Unblock the singleton A without wasting an honor."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Unblocks ♦A, retaining dummy's honors."
+        }
+      },
+      {
+        "ref": "D03-C06",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "9"
+          },
+          {
+            "suit": "clubs",
+            "rank": "8"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Attacks clubs into East's known AKQ."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Delays the clear diamond-unblocking plan."
+        }
+      },
+      {
+        "ref": "D03-C07",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "6"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Attacks clubs into East's known AKQ."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Delays the clear diamond-unblocking plan."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-e7acb33f2dbf7ae0",
+    "positionKey": "{\"setup\":[[\"announcement\",\"west\",11],[\"announcement\",\"north\",8],[\"announcement\",\"east\",13],[\"announcement\",\"south\",8],[\"declarer\",\"east\",false],[\"dummy-exposed\",\"west\"],[\"contract-choice\",\"east\",\"spades\",\"game\"]],\"actions\":[[\"south\",\"hearts\",\"J\"],[\"west\",\"hearts\",\"8\"],[\"north\",\"hearts\",\"6\"],[\"east\",\"hearts\",\"Q\"],[\"east\",\"spades\",\"Q\"],[\"south\",\"spades\",\"K\"],[\"west\",\"spades\",\"A\"],[\"north\",\"spades\",\"5\"],[\"west\",\"spades\",\"J\"],[\"north\",\"spades\",\"6\"],[\"east\",\"spades\",\"10\"],[\"south\",\"spades\",\"2\"],[\"west\",\"spades\",\"8\"],[\"north\",\"spades\",\"9\"],[\"east\",\"hearts\",\"2\"],[\"south\",\"spades\",\"3\"],[\"north\",\"hearts\",\"K\"],[\"east\",\"hearts\",\"A\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D04-C01",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "10"
+          },
+          {
+            "suit": "hearts",
+            "rank": "9"
+          },
+          {
+            "suit": "hearts",
+            "rank": "7"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "All lose to A. Preserve these future winners."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Keep the established high heart sequence."
+        }
+      },
+      {
+        "ref": "D04-C02",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "3"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Lose cheaply; retain the three top hearts."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Follows low under the winning ace."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-9fef6c2de870c07f",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-e8d6cb2b65fe5f64\",\"deal-9fef6c2de870c07f\"],[\"announcement\",\"north\",6],[\"announcement\",\"east\",10],[\"announcement\",\"south\",9],[\"announcement\",\"west\",15],[\"declarer\",\"west\",false],[\"dummy-exposed\",\"east\"],[\"contract-choice\",\"west\",\"no-trumps\",\"game\"]],\"actions\":[[\"north\",\"spades\",\"Q\"],[\"east\",\"spades\",\"A\"],[\"south\",\"spades\",\"K\"],[\"west\",\"spades\",\"3\"],[\"east\",\"hearts\",\"K\"],[\"south\",\"hearts\",\"J\"],[\"west\",\"hearts\",\"2\"],[\"north\",\"hearts\",\"3\"],[\"east\",\"diamonds\",\"3\"],[\"south\",\"diamonds\",\"6\"],[\"west\",\"diamonds\",\"Q\"],[\"north\",\"diamonds\",\"8\"],[\"west\",\"diamonds\",\"A\"],[\"north\",\"diamonds\",\"9\"],[\"east\",\"diamonds\",\"4\"],[\"south\",\"diamonds\",\"J\"],[\"west\",\"clubs\",\"Q\"],[\"north\",\"clubs\",\"2\"],[\"east\",\"clubs\",\"6\"],[\"south\",\"clubs\",\"A\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D05-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "9"
+          },
+          {
+            "suit": "spades",
+            "rank": "8"
+          },
+          {
+            "suit": "spades",
+            "rank": "7"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Return partner's spades to develop long tricks."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Attacks the long suit after A-K-Q fell."
+        }
+      },
+      {
+        "ref": "D05-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "5"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: A spade return is sound."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Develops spades while retaining the 9."
+        }
+      },
+      {
+        "ref": "D05-C03",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "2"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Return partner's spades, keeping higher cards."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Develops spades while retaining the 9."
+        }
+      },
+      {
+        "ref": "D05-C04",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "5"
+          },
+          {
+            "suit": "clubs",
+            "rank": "4"
+          },
+          {
+            "suit": "clubs",
+            "rank": "3"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Gives dummy K an entry; return partner's suit."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Hands dummy its club king and the lead."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-fdbd5cf994ddd51d",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-11b7de0b3c654808\",\"deal-fdbd5cf994ddd51d\"],[\"announcement\",\"east\",0],[\"announcement\",\"south\",10],[\"announcement\",\"west\",17],[\"announcement\",\"north\",13],[\"declarer\",\"north\",false],[\"dummy-exposed\",\"south\"],[\"contract-choice\",\"north\",\"hearts\",\"part-score\"]],\"actions\":[[\"east\",\"spades\",\"5\"],[\"south\",\"spades\",\"3\"],[\"west\",\"spades\",\"6\"],[\"north\",\"spades\",\"Q\"],[\"north\",\"hearts\",\"K\"],[\"east\",\"hearts\",\"9\"],[\"south\",\"hearts\",\"3\"],[\"west\",\"hearts\",\"A\"],[\"west\",\"spades\",\"7\"],[\"north\",\"spades\",\"K\"],[\"east\",\"spades\",\"10\"],[\"south\",\"spades\",\"A\"],[\"south\",\"spades\",\"8\"],[\"west\",\"spades\",\"9\"],[\"north\",\"hearts\",\"6\"],[\"east\",\"spades\",\"2\"],[\"north\",\"hearts\",\"2\"],[\"east\",\"hearts\",\"10\"],[\"south\",\"hearts\",\"Q\"],[\"west\",\"hearts\",\"4\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D06-C01",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "J"
+          },
+          {
+            "suit": "hearts",
+            "rank": "8"
+          },
+          {
+            "suit": "hearts",
+            "rank": "7"
+          },
+          {
+            "suit": "hearts",
+            "rank": "5"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "All trumps are masters. Cash enough for seven."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "All remaining trumps win; secure the goal."
+        }
+      },
+      {
+        "ref": "D06-C02",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "K"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Establish Q; East has no honors."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Drives out ♦A and establishes ♦Q."
+        }
+      },
+      {
+        "ref": "D06-C03",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "8"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Lead toward Q behind West's A."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Leads toward ♦Q to establish diamonds."
+        }
+      },
+      {
+        "ref": "D06-C04",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "7"
+          },
+          {
+            "suit": "clubs",
+            "rank": "6"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Develop QJ10 through strong West."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Develops clubs against West's high cards."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-648babe4d8526b2e",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-fe33239eeb65ce63\",\"deal-648babe4d8526b2e\"],[\"announcement\",\"south\",13],[\"announcement\",\"west\",8],[\"announcement\",\"north\",10],[\"announcement\",\"east\",9],[\"declarer\",\"south\",false],[\"dummy-exposed\",\"north\"],[\"contract-choice\",\"south\",\"no-trumps\",\"part-score\"]],\"actions\":[[\"west\",\"clubs\",\"K\"],[\"north\",\"clubs\",\"A\"],[\"east\",\"clubs\",\"J\"],[\"south\",\"clubs\",\"9\"],[\"north\",\"hearts\",\"A\"],[\"east\",\"hearts\",\"4\"],[\"south\",\"hearts\",\"2\"],[\"west\",\"hearts\",\"5\"],[\"north\",\"diamonds\",\"3\"],[\"east\",\"diamonds\",\"10\"],[\"south\",\"diamonds\",\"K\"],[\"west\",\"diamonds\",\"2\"],[\"south\",\"diamonds\",\"J\"],[\"west\",\"diamonds\",\"Q\"],[\"north\",\"diamonds\",\"7\"],[\"east\",\"clubs\",\"4\"],[\"west\",\"hearts\",\"6\"],[\"north\",\"hearts\",\"3\"],[\"east\",\"hearts\",\"J\"],[\"south\",\"hearts\",\"Q\"],[\"south\",\"spades\",\"4\"],[\"west\",\"spades\",\"5\"],[\"north\",\"spades\",\"Q\"],[\"east\",\"spades\",\"K\"],[\"east\",\"clubs\",\"5\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D07-C01",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "K"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Discards the secure heart entry/winner."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Throws away a sure heart winner."
+        }
+      },
+      {
+        "ref": "D07-C02",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "9"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Keep four diamond tricks and the heart K."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Spares the king and all winning diamonds."
+        }
+      },
+      {
+        "ref": "D07-C03",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "7"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Keep four diamond tricks and the heart K."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Spares the king and all winning diamonds."
+        }
+      },
+      {
+        "ref": "D07-C04",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "A"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: All diamonds are masters now."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Throws away a sure diamond winner."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "A stronger: all enemy diamonds are gone. Even discarding A leaves three diamond rounds plus heart K; only three more tricks are needed.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D07-C05",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "8"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Three diamonds plus K suffice."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Shortens a fully established diamond suit."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "A stronger: three master diamond rounds plus heart K still suffice for seven. B correctly notes lost length, but that does not make the discard unsound.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D07-C06",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "5"
+          },
+          {
+            "suit": "diamonds",
+            "rank": "4"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Three diamonds plus K suffice."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Shortens a fully established diamond suit."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "A stronger: either discard leaves three master diamond rounds plus heart K. B's length concern does not defeat the seven-trick plan.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-dac48f273907be5e",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-c5772ebdfdeeb7b0\",\"deal-dac48f273907be5e\"],[\"announcement\",\"north\",15],[\"announcement\",\"east\",15],[\"announcement\",\"south\",1],[\"announcement\",\"west\",9],[\"declarer\",\"east\",false],[\"dummy-exposed\",\"west\"],[\"contract-choice\",\"east\",\"no-trumps\",\"game\"]],\"actions\":[]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D08-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "J"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Leads an unsupported J into dummy's long spades."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Opens dummy's strong spades from J-high."
+        }
+      },
+      {
+        "ref": "D08-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "9"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Attacks dummy's long suit, weakening own J."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Opens dummy's strong spades from J-high."
+        }
+      },
+      {
+        "ref": "D08-C03",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "6"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Attacks dummy's long suit, weakening own J."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Opens dummy's strong spades from J-high."
+        }
+      },
+      {
+        "ref": "D08-C04",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "3"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Attacks dummy's long suit, weakening own J."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Opens dummy's strong spades from J-high."
+        }
+      },
+      {
+        "ref": "D08-C05",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "9"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Attack dummy's void; top of a weak long suit."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Attacks hearts, where dummy is void."
+        }
+      },
+      {
+        "ref": "D08-C06",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "5"
+          },
+          {
+            "suit": "hearts",
+            "rank": "4"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": false,
+          "comment": "Middle heart spots lack a clear lead rationale."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Attacks hearts, where dummy is void."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "B stronger: both attack dummy's heart void toward a 15-HCP partner. No specified lead convention makes these low spots unacceptable.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D08-C07",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "2"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Attack dummy's void; low from four hearts."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Attacks hearts, where dummy is void."
+        }
+      },
+      {
+        "ref": "D08-C08",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "10"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Attacks dummy's five diamonds and Q."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Leads into dummy's long diamond tenace."
+        }
+      },
+      {
+        "ref": "D08-C09",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "6"
+          },
+          {
+            "suit": "diamonds",
+            "rank": "5"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Attacks dummy's five diamonds and Q."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Leads into dummy's long diamond tenace."
+        }
+      },
+      {
+        "ref": "D08-C10",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "7"
+          },
+          {
+            "suit": "clubs",
+            "rank": "6"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Seek strong partner's clubs."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: club to strong partner."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-ff9f79044a513e1b",
+    "positionKey": "{\"setup\":[[\"announcement\",\"east\",18],[\"announcement\",\"south\",11],[\"announcement\",\"west\",9],[\"announcement\",\"north\",2],[\"declarer\",\"east\",false],[\"dummy-exposed\",\"west\"],[\"contract-choice\",\"east\",\"spades\",\"part-score\"]],\"actions\":[[\"south\",\"diamonds\",\"6\"],[\"west\",\"diamonds\",\"4\"],[\"north\",\"diamonds\",\"2\"],[\"east\",\"diamonds\",\"9\"],[\"east\",\"spades\",\"K\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D09-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "A"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Take control; can attack side suits now."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Takes control before planning the return."
+        }
+      },
+      {
+        "ref": "D09-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "8"
+          },
+          {
+            "suit": "spades",
+            "rank": "7"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Hold up A to retain trump control."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: retains the trump ace."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-68b5d8266396d923",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-884f8b7e895f9885\",\"deal-68b5d8266396d923\"],[\"announcement\",\"south\",13],[\"announcement\",\"west\",8],[\"announcement\",\"north\",10],[\"announcement\",\"east\",9],[\"declarer\",\"south\",false],[\"dummy-exposed\",\"north\"],[\"contract-choice\",\"south\",\"no-trumps\",\"part-score\"]],\"actions\":[[\"west\",\"clubs\",\"Q\"],[\"north\",\"clubs\",\"2\"],[\"east\",\"clubs\",\"3\"],[\"south\",\"clubs\",\"A\"],[\"south\",\"spades\",\"A\"],[\"west\",\"spades\",\"2\"],[\"north\",\"spades\",\"3\"],[\"east\",\"spades\",\"4\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D10-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "K"
+          },
+          {
+            "suit": "spades",
+            "rank": "Q"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Cash spade winners; try to drop J."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Cashes established spade honors."
+        }
+      },
+      {
+        "ref": "D10-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "9"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Risks a spade loser before cashing KQ."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Lets the missing jack beat a spade."
+        }
+      },
+      {
+        "ref": "D10-C03",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "7"
+          },
+          {
+            "suit": "hearts",
+            "rank": "6"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Develop hearts toward K10."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: develop hearts."
+        }
+      },
+      {
+        "ref": "D10-C04",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "2"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Develop hearts toward dummy K10."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: develop hearts."
+        }
+      },
+      {
+        "ref": "D10-C05",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "10"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Lead through West for the diamond finesse."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Takes the diamond finesse toward A-Q-J."
+        }
+      },
+      {
+        "ref": "D10-C06",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "8"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Lead toward AQJ for the diamond finesse."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Leads toward the diamond tenace."
+        }
+      },
+      {
+        "ref": "D10-C07",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "3"
+          },
+          {
+            "suit": "diamonds",
+            "rank": "2"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Lead toward AQJ for the diamond finesse."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Leads toward the diamond tenace."
+        }
+      },
+      {
+        "ref": "D10-C08",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "7"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Returns clubs after the only stopper is gone."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Returns clubs and yields the initiative."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-e80b24ff88f9f1ce",
+    "positionKey": "{\"setup\":[[\"announcement\",\"west\",10],[\"announcement\",\"north\",11],[\"announcement\",\"east\",7],[\"announcement\",\"south\",12],[\"declarer\",\"south\",false],[\"dummy-exposed\",\"north\"],[\"contract-choice\",\"south\",\"spades\",\"game\"]],\"actions\":[[\"west\",\"diamonds\",\"K\"],[\"north\",\"diamonds\",\"A\"],[\"east\",\"diamonds\",\"4\"],[\"south\",\"diamonds\",\"2\"],[\"north\",\"spades\",\"J\"],[\"east\",\"spades\",\"Q\"],[\"south\",\"spades\",\"6\"],[\"west\",\"spades\",\"2\"],[\"east\",\"diamonds\",\"5\"],[\"south\",\"diamonds\",\"3\"],[\"west\",\"diamonds\",\"10\"],[\"north\",\"diamonds\",\"J\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D11-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "10"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Draw out high enemy trumps."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Develops the long trump suit."
+        }
+      },
+      {
+        "ref": "D11-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "8"
+          },
+          {
+            "suit": "spades",
+            "rank": "7"
+          },
+          {
+            "suit": "spades",
+            "rank": "5"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Draw out high enemy trumps."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Develops the long trump suit."
+        }
+      },
+      {
+        "ref": "D11-C03",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "3"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Draw out high enemy trumps."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Develops the long trump suit."
+        }
+      },
+      {
+        "ref": "D11-C04",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "A"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Cash a safe heart winner while retaining entries."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Cashes a winner while retaining entries."
+        }
+      },
+      {
+        "ref": "D11-C05",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "J"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": false,
+          "comment": "Wrong-way finesse; lead toward AJ from South."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Offers a heart finesse with king support."
+        },
+        "resolution": {
+          "acceptable": false,
+          "note": "A stronger: Q can cover J, consuming J and K together. B's claimed finesse lacks an extra honor; lead toward K, then back toward AJ.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D11-C06",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "7"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Reach K, then lead a heart toward AJ."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Crosses toward the heart king."
+        }
+      },
+      {
+        "ref": "D11-C07",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "7"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Avoidable loser: discard this on South's clubs."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Concedes a diamond with useful leads left."
+        }
+      },
+      {
+        "ref": "D11-C08",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "5"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Reach club winners and discard the diamond."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Reaches club winners for useful discards."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-064e42b5bbfa850a",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-f9d218ed559c8014\",\"deal-064e42b5bbfa850a\"],[\"announcement\",\"north\",15],[\"announcement\",\"east\",12],[\"announcement\",\"south\",8],[\"announcement\",\"west\",5],[\"declarer\",\"north\",false],[\"dummy-exposed\",\"south\"],[\"contract-choice\",\"north\",\"no-trumps\",\"game\"]],\"actions\":[[\"east\",\"diamonds\",\"6\"],[\"south\",\"diamonds\",\"2\"],[\"west\",\"diamonds\",\"3\"],[\"north\",\"diamonds\",\"A\"],[\"north\",\"hearts\",\"A\"],[\"east\",\"hearts\",\"6\"],[\"south\",\"hearts\",\"3\"],[\"west\",\"hearts\",\"J\"],[\"north\",\"clubs\",\"J\"],[\"east\",\"clubs\",\"K\"],[\"south\",\"clubs\",\"A\"],[\"west\",\"clubs\",\"2\"],[\"south\",\"clubs\",\"10\"],[\"west\",\"clubs\",\"4\"],[\"north\",\"clubs\",\"Q\"],[\"east\",\"clubs\",\"5\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D12-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "K"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": false,
+          "comment": "Exposes KJ to AQ without leading toward them."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: develop spades."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "B stronger: with no ready entry to lead toward KJ, active promotion is reasonable. K can promote J if AQ fall together; A's risk is real, not decisive.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D12-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "J"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": false,
+          "comment": "Exposes J to Q; develop safer clubs first."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: develop spades."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "B stronger: J can dislodge A while retaining K, for example against a singleton A. A identifies a risk, but promotion need not be guaranteed to be reasonable.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D12-C03",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "2"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Develop spades/possible entry."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: seeks a dummy entry."
+        }
+      },
+      {
+        "ref": "D12-C04",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "8"
+          },
+          {
+            "suit": "hearts",
+            "rank": "7"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Develop an entry via dummy 10."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: develops a heart entry."
+        }
+      },
+      {
+        "ref": "D12-C05",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "2"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Develop an entry via dummy 10."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: develops a heart entry."
+        }
+      },
+      {
+        "ref": "D12-C06",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "8"
+          },
+          {
+            "suit": "clubs",
+            "rank": "7"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Force out club 9 and establish the remaining clubs."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Develops clubs after the high honors fell."
+        }
+      },
+      {
+        "ref": "D12-C07",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "3"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "May lose cheaply to 6 while 9 remains."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Lets a lower club win unnecessarily."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-b2d6977c63fd668b",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-135154414a97663c\",\"deal-b2d6977c63fd668b\"],[\"announcement\",\"south\",9],[\"announcement\",\"west\",20],[\"announcement\",\"north\",7],[\"announcement\",\"east\",4],[\"declarer\",\"west\",false],[\"dummy-exposed\",\"east\"],[\"contract-choice\",\"west\",\"no-trumps\",\"part-score\"]],\"actions\":[[\"north\",\"diamonds\",\"Q\"],[\"east\",\"diamonds\",\"2\"],[\"south\",\"diamonds\",\"3\"],[\"west\",\"diamonds\",\"A\"],[\"west\",\"hearts\",\"A\"],[\"north\",\"hearts\",\"10\"],[\"east\",\"hearts\",\"2\"],[\"south\",\"hearts\",\"3\"],[\"west\",\"hearts\",\"K\"],[\"north\",\"clubs\",\"5\"],[\"east\",\"hearts\",\"6\"],[\"south\",\"hearts\",\"4\"],[\"west\",\"hearts\",\"Q\"],[\"north\",\"spades\",\"2\"],[\"east\",\"hearts\",\"7\"],[\"south\",\"hearts\",\"5\"],[\"west\",\"hearts\",\"9\"],[\"north\",\"clubs\",\"6\"],[\"east\",\"hearts\",\"J\"],[\"south\",\"clubs\",\"4\"],[\"east\",\"clubs\",\"Q\"],[\"south\",\"clubs\",\"10\"],[\"west\",\"clubs\",\"2\"],[\"north\",\"clubs\",\"8\"],[\"east\",\"hearts\",\"8\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D13-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "A"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Keep the sure spade winner."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Discards a certain spade winner."
+        }
+      },
+      {
+        "ref": "D13-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "Q"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Keep Q protected by A."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Breaks the strong A-Q spade holding."
+        }
+      },
+      {
+        "ref": "D13-C03",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "8"
+          },
+          {
+            "suit": "spades",
+            "rank": "7"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Keep AQ and diamond K."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Keeps spade honors and the diamond king."
+        }
+      },
+      {
+        "ref": "D13-C04",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "5"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Discard a small spade; keep both major controls."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Keeps spade honors and the diamond king."
+        }
+      },
+      {
+        "ref": "D13-C05",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "K"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "K is now the top diamond; keep it."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Discards the top remaining diamond."
+        }
+      },
+      {
+        "ref": "D13-C06",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "5"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Keep K and the long spades."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Keeps ♦K and the full spade length."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-b9dd220458e5e4f5",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-0d2c0f012e4bafa4\",\"deal-b9dd220458e5e4f5\"],[\"announcement\",\"north\",14],[\"announcement\",\"east\",5],[\"announcement\",\"south\",10],[\"announcement\",\"west\",11],[\"declarer\",\"north\",false],[\"dummy-exposed\",\"south\"],[\"contract-choice\",\"north\",\"no-trumps\",\"game\"]],\"actions\":[[\"east\",\"clubs\",\"4\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D14-C01",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "9"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Can run 9 if West plays low."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Follows cheaply, retaining hand's honors."
+        }
+      },
+      {
+        "ref": "D14-C02",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "2"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Play low toward KQJ behind West."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Follows cheaply, retaining hand's honors."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-771216e91b857fc2",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-d50d053c64d1d4a5\",\"deal-771216e91b857fc2\"],[\"announcement\",\"east\",7],[\"announcement\",\"south\",12],[\"announcement\",\"west\",8],[\"announcement\",\"north\",13],[\"declarer\",\"north\",false],[\"dummy-exposed\",\"south\"],[\"contract-choice\",\"north\",\"spades\",\"part-score\"]],\"actions\":[[\"east\",\"hearts\",\"4\"],[\"south\",\"hearts\",\"Q\"],[\"west\",\"hearts\",\"9\"],[\"north\",\"hearts\",\"A\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D15-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "10"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Lead 10 for a trump finesse toward AQ."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Offers the trump finesse toward A-Q."
+        }
+      },
+      {
+        "ref": "D15-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "8"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Lead toward AQ to draw trumps."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Leads toward the trump tenace."
+        }
+      },
+      {
+        "ref": "D15-C03",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "5"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Lead toward AQ to draw trumps."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Leads toward the trump tenace."
+        }
+      },
+      {
+        "ref": "D15-C04",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "3"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Lead toward AQ to draw trumps."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Leads toward the trump tenace."
+        }
+      },
+      {
+        "ref": "D15-C05",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "J"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Cash a master heart; A and Q have gone."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Cashes an established heart winner."
+        }
+      },
+      {
+        "ref": "D15-C06",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "6"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Reach dummy's master hearts."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Crosses to the established heart king."
+        }
+      },
+      {
+        "ref": "D15-C07",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "K"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Exposes K to A; prefer leading toward K."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Exposes ♦K with A-Q still outstanding."
+        }
+      },
+      {
+        "ref": "D15-C08",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "9"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Opens weak diamonds instead of trumps/winners."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Attacks weak diamonds before useful suits."
+        }
+      },
+      {
+        "ref": "D15-C09",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "K"
+          },
+          {
+            "suit": "clubs",
+            "rank": "Q"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Force out A to develop the club sequence."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Drives out ♣A to establish club winners."
+        }
+      },
+      {
+        "ref": "D15-C10",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "10"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "May lose to J while A still remains."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Can lose to ♣J while K-Q remain unused."
+        }
+      },
+      {
+        "ref": "D15-C11",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "7"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Underleads KQ10 and may give J a cheap trick."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Underleads K-Q toward a weak club holding."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-43829142d724efbb",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-a272f543d02780a4\",\"deal-43829142d724efbb\"],[\"announcement\",\"south\",4],[\"announcement\",\"west\",14],[\"announcement\",\"north\",8],[\"announcement\",\"east\",14],[\"declarer\",\"west\",true],[\"dummy-exposed\",\"east\"],[\"contract-choice\",\"west\",\"no-trumps\",\"part-score\"]],\"actions\":[[\"north\",\"spades\",\"Q\"],[\"east\",\"spades\",\"A\"],[\"south\",\"spades\",\"9\"],[\"west\",\"spades\",\"3\"],[\"east\",\"clubs\",\"5\"],[\"south\",\"clubs\",\"J\"],[\"west\",\"clubs\",\"Q\"],[\"north\",\"clubs\",\"A\"],[\"north\",\"spades\",\"2\"],[\"east\",\"spades\",\"5\"],[\"south\",\"spades\",\"6\"],[\"west\",\"spades\",\"10\"],[\"west\",\"hearts\",\"A\"],[\"north\",\"hearts\",\"2\"],[\"east\",\"hearts\",\"5\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D16-C01",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "9"
+          },
+          {
+            "suit": "hearts",
+            "rank": "8"
+          },
+          {
+            "suit": "hearts",
+            "rank": "7"
+          },
+          {
+            "suit": "hearts",
+            "rank": "6"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": true,
+          "comment": "All remaining small hearts outrank enemy 3."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Save the high heart sequence; follow low."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "A stronger: all five held hearts beat the only missing low heart, 3, and lose to KQJ10. B's saved sequence has no extra trick strength.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D16-C02",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "4"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Follow cheaply under A."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Follows low under declarer's ace."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-986de40ef946df5a",
+    "positionKey": "{\"setup\":[[\"announcement\",\"north\",13],[\"announcement\",\"east\",6],[\"announcement\",\"south\",14],[\"announcement\",\"west\",7],[\"declarer\",\"south\",false],[\"dummy-exposed\",\"north\"],[\"contract-choice\",\"south\",\"no-trumps\",\"game\"]],\"actions\":[[\"west\",\"hearts\",\"2\"],[\"north\",\"hearts\",\"3\"],[\"east\",\"hearts\",\"9\"],[\"south\",\"hearts\",\"K\"],[\"south\",\"diamonds\",\"8\"],[\"west\",\"diamonds\",\"3\"],[\"north\",\"diamonds\",\"A\"],[\"east\",\"diamonds\",\"5\"],[\"north\",\"spades\",\"K\"],[\"east\",\"spades\",\"2\"],[\"south\",\"spades\",\"3\"],[\"west\",\"spades\",\"4\"],[\"north\",\"hearts\",\"J\"],[\"east\",\"hearts\",\"5\"],[\"south\",\"hearts\",\"4\"],[\"west\",\"hearts\",\"Q\"],[\"west\",\"clubs\",\"2\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D17-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "Q"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Discards a spade winner."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Throws away a useful spade honor/entry."
+        }
+      },
+      {
+        "ref": "D17-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "10"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Leaves singleton Q blocked by South's A."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Breaks the useful Q-10 spade holding."
+        }
+      },
+      {
+        "ref": "D17-C03",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "10"
+          },
+          {
+            "suit": "hearts",
+            "rank": "8"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Discard from the weak hearts; both exceed 6."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Spares the spade entries and diamonds."
+        }
+      },
+      {
+        "ref": "D17-C04",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "Q"
+          },
+          {
+            "suit": "diamonds",
+            "rank": "J"
+          },
+          {
+            "suit": "diamonds",
+            "rank": "10"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Wastes diamond honors needed to force K."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Throws away a diamond promotion card."
+        }
+      },
+      {
+        "ref": "D17-C05",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "4"
+          },
+          {
+            "suit": "diamonds",
+            "rank": "2"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Retain QJ10 and both spades."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: retain four diamonds."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-3d56ccf1e02d16bd",
+    "positionKey": "{\"setup\":[[\"announcement\",\"east\",12],[\"announcement\",\"south\",15],[\"announcement\",\"west\",4],[\"announcement\",\"north\",9],[\"declarer\",\"south\",false],[\"dummy-exposed\",\"north\"],[\"contract-choice\",\"south\",\"diamonds\",\"part-score\"]],\"actions\":[[\"west\",\"clubs\",\"6\"],[\"north\",\"clubs\",\"7\"],[\"east\",\"clubs\",\"Q\"],[\"south\",\"clubs\",\"10\"],[\"east\",\"clubs\",\"3\"],[\"south\",\"clubs\",\"J\"],[\"west\",\"clubs\",\"2\"],[\"north\",\"clubs\",\"K\"],[\"north\",\"diamonds\",\"9\"],[\"east\",\"diamonds\",\"J\"],[\"south\",\"diamonds\",\"Q\"],[\"west\",\"diamonds\",\"K\"],[\"west\",\"diamonds\",\"2\"],[\"north\",\"diamonds\",\"3\"],[\"east\",\"spades\",\"5\"],[\"south\",\"diamonds\",\"4\"],[\"south\",\"diamonds\",\"A\"],[\"west\",\"diamonds\",\"5\"],[\"north\",\"diamonds\",\"6\"],[\"east\",\"spades\",\"8\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D18-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "A"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Unblock A before running dummy's spades."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Unblocks spades before crossing to dummy."
+        }
+      },
+      {
+        "ref": "D18-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "4"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Creates an avoidable spade blockage at A."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Blocks spades with the singleton ace."
+        }
+      },
+      {
+        "ref": "D18-C03",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "A"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Cash A, then develop hearts."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Cashes a winner while retaining control."
+        }
+      },
+      {
+        "ref": "D18-C04",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "10"
+          },
+          {
+            "suit": "hearts",
+            "rank": "9"
+          },
+          {
+            "suit": "hearts",
+            "rank": "8"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Drive out heart honors to establish the suit."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Develops hearts toward dummy's jack."
+        }
+      },
+      {
+        "ref": "D18-C05",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "10"
+          },
+          {
+            "suit": "diamonds",
+            "rank": "8"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": false,
+          "comment": "No enemy trumps remain; consumes own trumps."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Cashes a sure winner; no enemy trumps."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "B stronger: cashing a master leaves another trump. Two trump tricks, spade AK and heart A exceed the four still needed. A's ruff concern is not decisive.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-98cbcb601db5b4f9",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-72889b7543c17dbf\",\"deal-98cbcb601db5b4f9\"],[\"announcement\",\"south\",18],[\"announcement\",\"west\",5],[\"announcement\",\"north\",4],[\"announcement\",\"east\",13],[\"declarer\",\"south\",false],[\"dummy-exposed\",\"north\"],[\"contract-choice\",\"south\",\"no-trumps\",\"part-score\"]],\"actions\":[[\"west\",\"hearts\",\"5\"],[\"north\",\"hearts\",\"2\"],[\"east\",\"hearts\",\"4\"],[\"south\",\"hearts\",\"Q\"],[\"south\",\"clubs\",\"J\"],[\"west\",\"clubs\",\"10\"],[\"north\",\"clubs\",\"4\"],[\"east\",\"clubs\",\"A\"],[\"east\",\"hearts\",\"6\"],[\"south\",\"hearts\",\"A\"],[\"west\",\"hearts\",\"K\"],[\"north\",\"hearts\",\"J\"],[\"south\",\"spades\",\"Q\"],[\"west\",\"spades\",\"3\"],[\"north\",\"spades\",\"7\"],[\"east\",\"spades\",\"A\"],[\"east\",\"hearts\",\"8\"],[\"south\",\"spades\",\"2\"],[\"west\",\"hearts\",\"3\"],[\"north\",\"diamonds\",\"2\"],[\"east\",\"hearts\",\"10\"],[\"south\",\"spades\",\"5\"],[\"west\",\"hearts\",\"7\"],[\"north\",\"diamonds\",\"4\"],[\"east\",\"diamonds\",\"6\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D19-C01",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "A"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Take A, then four club winners make seven."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Takes the lead to cash established winners."
+        }
+      },
+      {
+        "ref": "D19-C02",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "5"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Ducking risks the contract despite five cashers."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Yields the lead with enough winners ready."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-c449c43ee07ea399",
+    "positionKey": "{\"setup\":[[\"announcement\",\"north\",8],[\"announcement\",\"east\",10],[\"announcement\",\"south\",10],[\"announcement\",\"west\",12],[\"declarer\",\"west\",false],[\"dummy-exposed\",\"east\"],[\"contract-choice\",\"west\",\"no-trumps\",\"game\"]],\"actions\":[[\"north\",\"diamonds\",\"2\"],[\"east\",\"diamonds\",\"3\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D20-C01",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "K"
+          },
+          {
+            "suit": "diamonds",
+            "rank": "Q"
+          },
+          {
+            "suit": "diamonds",
+            "rank": "J"
+          },
+          {
+            "suit": "diamonds",
+            "rank": "10"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Force A; all four touching honors work."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Plays third-hand high to develop diamonds."
+        }
+      },
+      {
+        "ref": "D20-C02",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "6"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "May give West a cheap trick without using A."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Allows a cheap win instead of an honor."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-e447109979d5accb",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-2b0b2b440cb2c817\",\"deal-e447109979d5accb\"],[\"announcement\",\"south\",10],[\"announcement\",\"west\",11],[\"announcement\",\"north\",16],[\"announcement\",\"east\",3],[\"declarer\",\"north\",false],[\"dummy-exposed\",\"south\"],[\"contract-choice\",\"north\",\"no-trumps\",\"part-score\"]],\"actions\":[[\"east\",\"diamonds\",\"9\"],[\"south\",\"diamonds\",\"Q\"],[\"west\",\"diamonds\",\"A\"],[\"north\",\"diamonds\",\"2\"],[\"west\",\"diamonds\",\"8\"],[\"north\",\"diamonds\",\"4\"],[\"east\",\"diamonds\",\"3\"],[\"south\",\"diamonds\",\"K\"],[\"south\",\"hearts\",\"2\"],[\"west\",\"hearts\",\"5\"],[\"north\",\"hearts\",\"Q\"],[\"east\",\"hearts\",\"3\"],[\"north\",\"spades\",\"J\"],[\"east\",\"spades\",\"3\"],[\"south\",\"spades\",\"2\"],[\"west\",\"spades\",\"Q\"],[\"west\",\"clubs\",\"2\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D21-C01",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "A"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Take control and avoid a blockage."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Takes control while preserving dummy's Q."
+        }
+      },
+      {
+        "ref": "D21-C02",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "4"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Duck toward dummy Q98."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: plays toward dummy's Q."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-1b42bdeef702f129",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-05b2a0be05222cbc\",\"deal-1b42bdeef702f129\"],[\"announcement\",\"south\",6],[\"announcement\",\"west\",17],[\"announcement\",\"north\",11],[\"announcement\",\"east\",6],[\"declarer\",\"west\",false],[\"dummy-exposed\",\"east\"],[\"contract-choice\",\"west\",\"no-trumps\",\"part-score\"]],\"actions\":[[\"north\",\"spades\",\"4\"],[\"east\",\"spades\",\"2\"],[\"south\",\"spades\",\"9\"],[\"west\",\"spades\",\"A\"],[\"west\",\"clubs\",\"A\"],[\"north\",\"clubs\",\"4\"],[\"east\",\"clubs\",\"2\"],[\"south\",\"clubs\",\"5\"],[\"west\",\"hearts\",\"A\"],[\"north\",\"hearts\",\"Q\"],[\"east\",\"hearts\",\"4\"],[\"south\",\"hearts\",\"2\"],[\"west\",\"diamonds\",\"Q\"],[\"north\",\"diamonds\",\"A\"],[\"east\",\"diamonds\",\"J\"],[\"south\",\"diamonds\",\"4\"],[\"north\",\"diamonds\",\"2\"],[\"east\",\"diamonds\",\"3\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D22-C01",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "K"
+          },
+          {
+            "suit": "diamonds",
+            "rank": "10"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Both are masters now that AQJ have gone."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Wins cheaply; A-Q-J have already gone."
+        }
+      },
+      {
+        "ref": "D22-C02",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "7"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "May lose to 8 or 9 despite holding two masters."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Can lose to a spot while top cards remain."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-f27ae4ec98c45988",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-4b979df3c0d11be3\",\"deal-f27ae4ec98c45988\"],[\"announcement\",\"south\",7],[\"announcement\",\"west\",8],[\"announcement\",\"north\",8],[\"announcement\",\"east\",17],[\"declarer\",\"east\",false],[\"dummy-exposed\",\"west\"],[\"contract-choice\",\"east\",\"no-trumps\",\"part-score\"]],\"actions\":[[\"south\",\"diamonds\",\"4\"],[\"west\",\"diamonds\",\"2\"],[\"north\",\"diamonds\",\"3\"],[\"east\",\"diamonds\",\"10\"],[\"east\",\"diamonds\",\"A\"],[\"south\",\"diamonds\",\"6\"],[\"west\",\"diamonds\",\"5\"],[\"north\",\"diamonds\",\"Q\"],[\"east\",\"diamonds\",\"K\"],[\"south\",\"diamonds\",\"8\"],[\"west\",\"diamonds\",\"7\"],[\"north\",\"clubs\",\"2\"],[\"east\",\"hearts\",\"8\"],[\"south\",\"hearts\",\"2\"],[\"west\",\"hearts\",\"K\"],[\"north\",\"hearts\",\"A\"],[\"north\",\"spades\",\"3\"],[\"east\",\"spades\",\"2\"],[\"south\",\"spades\",\"4\"],[\"west\",\"spades\",\"J\"],[\"west\",\"clubs\",\"K\"],[\"north\",\"clubs\",\"3\"],[\"east\",\"clubs\",\"4\"],[\"south\",\"clubs\",\"5\"],[\"west\",\"hearts\",\"J\"],[\"north\",\"hearts\",\"3\"],[\"east\",\"hearts\",\"9\"],[\"south\",\"hearts\",\"Q\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D23-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "K"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Unsupported K risks A; lead toward partner."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Exposes the king under the missing ace."
+        }
+      },
+      {
+        "ref": "D23-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "5"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Return partner's spades toward their strength."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: preserves ♠K for later."
+        }
+      },
+      {
+        "ref": "D23-C03",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "7"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Gives dummy a heart winner/entry."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Gives dummy its established long hearts."
+        }
+      },
+      {
+        "ref": "D23-C04",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "J"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Cash the top diamond; AKQ10 have gone."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Cashes the top remaining diamond."
+        }
+      },
+      {
+        "ref": "D23-C05",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "J"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Develop clubs, forcing an honor."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Risks the jack under higher club honors."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "A stronger: forcing a club honor can promote partner's cards. Partner has 2 HCP left, possibly club Q. B's unsupported-honor warning is not an absolute rule.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D23-C06",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "7"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Develop clubs toward partner."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: leads toward partner."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-e2a082153da22bec",
+    "positionKey": "{\"setup\":[[\"announcement\",\"west\",11],[\"announcement\",\"north\",9],[\"announcement\",\"east\",14],[\"announcement\",\"south\",6],[\"declarer\",\"east\",false],[\"dummy-exposed\",\"west\"],[\"contract-choice\",\"east\",\"spades\",\"game\"]],\"actions\":[[\"south\",\"spades\",\"6\"],[\"west\",\"spades\",\"7\"],[\"north\",\"spades\",\"J\"],[\"east\",\"spades\",\"Q\"],[\"east\",\"spades\",\"5\"],[\"south\",\"spades\",\"3\"],[\"west\",\"spades\",\"K\"],[\"north\",\"spades\",\"A\"],[\"north\",\"hearts\",\"3\"],[\"east\",\"hearts\",\"8\"],[\"south\",\"hearts\",\"Q\"],[\"west\",\"hearts\",\"K\"],[\"west\",\"spades\",\"10\"],[\"north\",\"hearts\",\"4\"],[\"east\",\"spades\",\"2\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D24-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "9"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Preserve 9: it is master after this trick."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Sacrifices the highest remaining trump."
+        }
+      },
+      {
+        "ref": "D24-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "4"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Lose cheaply to 10 and keep the master 9."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Saves ♠9 while following under ♠10."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-cffe2717f1591b6f",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-04b271719307a4ff\",\"deal-cffe2717f1591b6f\"],[\"announcement\",\"north\",15],[\"announcement\",\"east\",7],[\"announcement\",\"south\",10],[\"announcement\",\"west\",8],[\"declarer\",\"north\",false],[\"dummy-exposed\",\"south\"],[\"contract-choice\",\"north\",\"no-trumps\",\"game\"]],\"actions\":[[\"east\",\"spades\",\"Q\"],[\"south\",\"spades\",\"5\"],[\"west\",\"spades\",\"4\"],[\"north\",\"spades\",\"K\"],[\"north\",\"hearts\",\"A\"],[\"east\",\"hearts\",\"2\"],[\"south\",\"hearts\",\"9\"],[\"west\",\"hearts\",\"3\"],[\"north\",\"diamonds\",\"A\"],[\"east\",\"diamonds\",\"3\"],[\"south\",\"diamonds\",\"7\"],[\"west\",\"diamonds\",\"2\"],[\"north\",\"diamonds\",\"J\"],[\"east\",\"diamonds\",\"8\"],[\"south\",\"diamonds\",\"Q\"],[\"west\",\"diamonds\",\"4\"],[\"south\",\"diamonds\",\"K\"],[\"west\",\"hearts\",\"4\"],[\"north\",\"diamonds\",\"5\"],[\"east\",\"hearts\",\"6\"],[\"south\",\"clubs\",\"2\"],[\"west\",\"clubs\",\"9\"],[\"north\",\"clubs\",\"Q\"],[\"east\",\"clubs\",\"A\"],[\"east\",\"spades\",\"2\"],[\"south\",\"spades\",\"7\"],[\"west\",\"spades\",\"A\"],[\"north\",\"spades\",\"6\"],[\"west\",\"spades\",\"10\"],[\"north\",\"spades\",\"9\"],[\"east\",\"spades\",\"3\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D25-C01",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "K"
+          },
+          {
+            "suit": "hearts",
+            "rank": "Q"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Preserve the two sure heart winners."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Discards a sure heart winner."
+        }
+      },
+      {
+        "ref": "D25-C02",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "10"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Keep 10 as a potential third heart winner."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Breaks the useful K-Q-10 heart holding."
+        }
+      },
+      {
+        "ref": "D25-C03",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "8"
+          },
+          {
+            "suit": "clubs",
+            "rank": "7"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Discard a spare club; retain a club entry route."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Spares the heart winners and promotion."
+        }
+      },
+      {
+        "ref": "D25-C04",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "5"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Discard the lowest club; keep heart prospects."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Spares the heart winners and promotion."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-e5ba19237b5fc504",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-2e71234ac187b625\",\"deal-e5ba19237b5fc504\"],[\"announcement\",\"south\",5],[\"announcement\",\"west\",9],[\"announcement\",\"north\",16],[\"announcement\",\"east\",10],[\"declarer\",\"north\",false],[\"dummy-exposed\",\"south\"],[\"contract-choice\",\"north\",\"no-trumps\",\"part-score\"]],\"actions\":[[\"east\",\"spades\",\"A\"],[\"south\",\"spades\",\"2\"],[\"west\",\"spades\",\"5\"],[\"north\",\"spades\",\"10\"],[\"east\",\"spades\",\"6\"],[\"south\",\"spades\",\"3\"],[\"west\",\"spades\",\"8\"],[\"north\",\"spades\",\"Q\"],[\"north\",\"clubs\",\"K\"],[\"east\",\"clubs\",\"7\"],[\"south\",\"clubs\",\"2\"],[\"west\",\"clubs\",\"A\"],[\"west\",\"hearts\",\"2\"],[\"north\",\"hearts\",\"5\"],[\"east\",\"hearts\",\"Q\"],[\"south\",\"hearts\",\"4\"],[\"east\",\"hearts\",\"7\"],[\"south\",\"spades\",\"4\"],[\"west\",\"hearts\",\"3\"],[\"north\",\"hearts\",\"10\"],[\"north\",\"diamonds\",\"A\"],[\"east\",\"diamonds\",\"4\"],[\"south\",\"diamonds\",\"3\"],[\"west\",\"diamonds\",\"7\"],[\"north\",\"diamonds\",\"K\"],[\"east\",\"diamonds\",\"6\"],[\"south\",\"diamonds\",\"5\"],[\"west\",\"diamonds\",\"8\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D26-C01",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "K"
+          },
+          {
+            "suit": "hearts",
+            "rank": "J"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Risks losing control with seven tricks available."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Risks the lead before cashing three ♦ wins."
+        }
+      },
+      {
+        "ref": "D26-C02",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "2"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Reach QJ9; lone enemy 10 falls. Seven tricks."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Reaches Q-J-9; the sole missing ♦10 drops."
+        }
+      },
+      {
+        "ref": "D26-C03",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "10"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": true,
+          "comment": "Reach the master Q, then cash dummy diamonds."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Risks the lead before cashing three ♦ wins."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "A stronger: club AK are gone, so dummy Q wins over any remaining honor. Then diamond QJ9 supply three winners; B's loss-of-lead claim is false.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D26-C04",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "5"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": true,
+          "comment": "Reach the master Q, then cash dummy diamonds."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Risks the lead before cashing three ♦ wins."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "A stronger: club Q is a certain entry, with AK already played. Cash Q and diamond QJ9. B's claimed lead risk does not exist.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D26-C05",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "3"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": true,
+          "comment": "Reach the master Q, then cash dummy diamonds."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Risks the lead before cashing three ♦ wins."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "A stronger: club Q is a certain entry, with AK already played. Cash Q and diamond QJ9. B's claimed lead risk does not exist.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-018abef26c81a844",
+    "positionKey": "{\"setup\":[[\"announcement\",\"west\",15],[\"announcement\",\"north\",13],[\"announcement\",\"east\",3],[\"announcement\",\"south\",9],[\"declarer\",\"north\",false],[\"dummy-exposed\",\"south\"],[\"contract-choice\",\"north\",\"spades\",\"game\"]],\"actions\":[[\"east\",\"hearts\",\"J\"],[\"south\",\"hearts\",\"K\"],[\"west\",\"hearts\",\"2\"],[\"north\",\"hearts\",\"3\"],[\"south\",\"clubs\",\"3\"],[\"west\",\"clubs\",\"10\"],[\"north\",\"spades\",\"K\"],[\"east\",\"clubs\",\"2\"],[\"north\",\"diamonds\",\"A\"],[\"east\",\"diamonds\",\"5\"],[\"south\",\"diamonds\",\"2\"],[\"west\",\"diamonds\",\"4\"],[\"north\",\"hearts\",\"A\"],[\"east\",\"hearts\",\"6\"],[\"south\",\"hearts\",\"4\"],[\"west\",\"spades\",\"Q\"],[\"west\",\"clubs\",\"4\"],[\"north\",\"spades\",\"8\"],[\"east\",\"clubs\",\"5\"],[\"south\",\"clubs\",\"7\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D27-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "5"
+          },
+          {
+            "suit": "spades",
+            "rank": "4"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Draw trumps toward AJ."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Draws trumps toward dummy's A-J."
+        }
+      },
+      {
+        "ref": "D27-C02",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "Q"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "W is void; save master Q until trumps are handled."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Exposes a heart winner to West's ruff."
+        }
+      },
+      {
+        "ref": "D27-C03",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "9"
+          },
+          {
+            "suit": "hearts",
+            "rank": "8"
+          },
+          {
+            "suit": "hearts",
+            "rank": "7"
+          },
+          {
+            "suit": "hearts",
+            "rank": "5"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Ruff a low heart high in dummy."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Ruff a low heart high enough for West."
+        }
+      },
+      {
+        "ref": "D27-C04",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "3"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Create a diamond void for ruffs."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: develop diamonds."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-b177d0711317bfb5",
+    "positionKey": "{\"setup\":[[\"announcement\",\"east\",8],[\"announcement\",\"south\",13],[\"announcement\",\"west\",8],[\"announcement\",\"north\",11],[\"declarer\",\"south\",false],[\"dummy-exposed\",\"north\"],[\"contract-choice\",\"south\",\"hearts\",\"part-score\"]],\"actions\":[[\"west\",\"hearts\",\"J\"],[\"north\",\"hearts\",\"A\"],[\"east\",\"hearts\",\"K\"],[\"south\",\"hearts\",\"2\"],[\"north\",\"hearts\",\"8\"],[\"east\",\"hearts\",\"5\"],[\"south\",\"hearts\",\"Q\"],[\"west\",\"hearts\",\"6\"],[\"south\",\"diamonds\",\"J\"],[\"west\",\"diamonds\",\"K\"],[\"north\",\"diamonds\",\"9\"],[\"east\",\"diamonds\",\"10\"],[\"west\",\"diamonds\",\"2\"],[\"north\",\"diamonds\",\"7\"],[\"east\",\"diamonds\",\"Q\"],[\"south\",\"diamonds\",\"A\"],[\"south\",\"spades\",\"Q\"],[\"west\",\"spades\",\"K\"],[\"north\",\"spades\",\"10\"],[\"east\",\"spades\",\"2\"],[\"west\",\"diamonds\",\"5\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D28-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "7"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Create a spade void for later ruffs."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Gives up an available ruff and the lead."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "A stronger: this loser-on-loser discard preserves trumps and creates a spade void. B assumes a ruff secures the lead, but East may overruff.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D28-C02",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "7"
+          },
+          {
+            "suit": "hearts",
+            "rank": "4"
+          },
+          {
+            "suit": "hearts",
+            "rank": "3"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Ruff. All three trumps are below enemy 9/10."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Ruffs the diamond to regain the lead."
+        }
+      },
+      {
+        "ref": "D28-C03",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "A"
+          },
+          {
+            "suit": "clubs",
+            "rank": "K"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Discards a sure club winner."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Throws away a sure club winner."
+        }
+      },
+      {
+        "ref": "D28-C04",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "9"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Discarding a club offers less than taking a ruff."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Gives up an available ruff and the lead."
+        }
+      },
+      {
+        "ref": "D28-C05",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "6"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Prefer ruffing or creating a spade void."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Gives up an available ruff and the lead."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-56174f52aa319499",
+    "positionKey": "{\"setup\":[[\"announcement\",\"east\",8],[\"announcement\",\"south\",9],[\"announcement\",\"west\",18],[\"announcement\",\"north\",5],[\"declarer\",\"west\",false],[\"dummy-exposed\",\"east\"],[\"contract-choice\",\"west\",\"diamonds\",\"part-score\"]],\"actions\":[[\"north\",\"hearts\",\"10\"],[\"east\",\"hearts\",\"3\"],[\"south\",\"hearts\",\"5\"],[\"west\",\"hearts\",\"K\"],[\"west\",\"diamonds\",\"A\"],[\"north\",\"diamonds\",\"4\"],[\"east\",\"diamonds\",\"2\"],[\"south\",\"diamonds\",\"3\"],[\"west\",\"diamonds\",\"K\"],[\"north\",\"diamonds\",\"5\"],[\"east\",\"diamonds\",\"9\"],[\"south\",\"clubs\",\"2\"],[\"west\",\"diamonds\",\"8\"],[\"north\",\"diamonds\",\"7\"],[\"east\",\"diamonds\",\"Q\"],[\"south\",\"clubs\",\"4\"],[\"east\",\"clubs\",\"K\"],[\"south\",\"spades\",\"2\"],[\"west\",\"clubs\",\"6\"],[\"north\",\"clubs\",\"3\"],[\"east\",\"hearts\",\"J\"],[\"south\",\"hearts\",\"Q\"],[\"west\",\"hearts\",\"9\"],[\"north\",\"clubs\",\"8\"],[\"south\",\"hearts\",\"7\"],[\"west\",\"hearts\",\"2\"],[\"north\",\"clubs\",\"9\"],[\"east\",\"hearts\",\"4\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D29-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "K"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Unsupported K exposes it to the missing A."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Exposes ♠K to the outstanding ace."
+        }
+      },
+      {
+        "ref": "D29-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "9"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Lead toward partner's spades."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: keeps the guarded king."
+        }
+      },
+      {
+        "ref": "D29-C03",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "7"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Lead toward partner's spades."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: keeps the guarded king."
+        }
+      },
+      {
+        "ref": "D29-C04",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "4"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Lead toward partner, retaining the higher spots."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: keeps the guarded king."
+        }
+      },
+      {
+        "ref": "D29-C05",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "A"
+          },
+          {
+            "suit": "hearts",
+            "rank": "8"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Both beat dummy 6; may force W or enable N ruff."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Leads a top heart and can force a trump."
+        }
+      }
+    ]
+  },
+  {
+    "dealId": "deal-a6db3f0ed42e3ea7",
+    "positionKey": "{\"setup\":[[\"rotation\",\"deal-6d133e6d070cc7bb\",\"deal-a6db3f0ed42e3ea7\"],[\"announcement\",\"east\",14],[\"announcement\",\"south\",9],[\"announcement\",\"west\",12],[\"announcement\",\"north\",5],[\"declarer\",\"east\",false],[\"dummy-exposed\",\"west\"],[\"contract-choice\",\"east\",\"spades\",\"part-score\"]],\"actions\":[[\"south\",\"diamonds\",\"5\"],[\"west\",\"diamonds\",\"2\"],[\"north\",\"diamonds\",\"9\"],[\"east\",\"diamonds\",\"A\"],[\"east\",\"spades\",\"K\"],[\"south\",\"spades\",\"A\"],[\"west\",\"spades\",\"4\"],[\"north\",\"spades\",\"3\"]]}",
+    "graders": {
+      "A": {
+        "name": "AI annotator A",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-A-AI-filled.xlsx"
+      },
+      "B": {
+        "name": "AI annotator B",
+        "source": "ai",
+        "date": "2026-10-25",
+        "file": "F4-labelling-Teacher-B-AI-filled.xlsx"
+      }
+    },
+    "candidates": [
+      {
+        "ref": "D30-C01",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "J"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Leading J sacrifices a possible trump trick."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Spends the jack before the missing queen."
+        }
+      },
+      {
+        "ref": "D30-C02",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "8"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": false,
+          "comment": "Trump lead exposes J8 to declarer's strength."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: remove dummy's trump."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "B stronger: removing dummy's sole trump is a defensible passive plan. The 8 also prevents a cheap win by dummy's 7. A's trump risk makes this optional, not unsound.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D30-C03",
+        "cards": [
+          {
+            "suit": "spades",
+            "rank": "2"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": false,
+          "comment": "Retain J82; attack a side suit instead."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: remove dummy's trump."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "B stronger: a low trump removes dummy's last trump while retaining J8. A's side-suit attack is attractive, but the passive alternative is reasonable.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D30-C04",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "10"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Seek partner's possible heart AJ."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Leads toward dummy's strong K-Q hearts."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "A stronger: the lead goes through dummy KQ toward partner, whose 5 HCP could be heart AJ. B treats visible strength as prohibiting a legitimate attack.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D30-C05",
+        "cards": [
+          {
+            "suit": "hearts",
+            "rank": "8"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Seek partner's possible heart AJ."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Leads toward dummy's strong K-Q hearts."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "A stronger: a low heart through dummy can find partner's AJ, consistent with the announced points. B's objection does not rule out this development plan.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D30-C06",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "K"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "Cash top diamond before declarer can discard."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "Cashes ♦K before dummy can become void."
+        }
+      },
+      {
+        "ref": "D30-C07",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "J"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Gives dummy Q a trick while K could win."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Lets dummy's queen beat the jack."
+        }
+      },
+      {
+        "ref": "D30-C08",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "8"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Underleads KJ into dummy Q."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Leads into dummy's queen below K-J."
+        }
+      },
+      {
+        "ref": "D30-C09",
+        "cards": [
+          {
+            "suit": "diamonds",
+            "rank": "3"
+          }
+        ],
+        "acceptable": false,
+        "source": "ai",
+        "A": {
+          "acceptable": false,
+          "comment": "Underleads KJ into dummy Q."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Leads into dummy's queen below K-J."
+        }
+      },
+      {
+        "ref": "D30-C10",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "10"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai-adjudicator",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Seek partner's possible club KQ."
+        },
+        "B": {
+          "acceptable": false,
+          "comment": "Exposes ♣10 through dummy's A-J-8."
+        },
+        "resolution": {
+          "acceptable": true,
+          "note": "A stronger: 10 through dummy AJ8 can force a cover and find partner KQ, consistent with 5 HCP. B's exposure concern does not exclude this reasonable attack.",
+          "source": "ai-adjudicator",
+          "date": "2026-10-25",
+          "teacherReview": "pending"
+        }
+      },
+      {
+        "ref": "D30-C11",
+        "cards": [
+          {
+            "suit": "clubs",
+            "rank": "3"
+          }
+        ],
+        "acceptable": true,
+        "source": "ai",
+        "A": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: Seek partner's possible club KQ."
+        },
+        "B": {
+          "acceptable": true,
+          "comment": "JUDGMENT_CALL: club through dummy."
+        }
+      }
+    ]
+  }
+]

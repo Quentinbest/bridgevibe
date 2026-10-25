@@ -742,3 +742,20 @@ reproduction data and the private selection notes contain hidden cards and
 metrics. Labels come only from both teachers (T7a, CI-3); all labels, graders and
 resolution fields start blank. This draft is not an app fixture or VAL-07 result;
 #26 integrates resolved labels, excluding unresolved disagreements (US-18.5).
+
+## Key moments (#26)
+
+`npm run f4:labels` joins the immutable F4 decision/annotator inputs into
+`src/coach/f4-labels.json`; the sync test checks the committed output. Labels keep
+grader and adjudication sources (D10: AI annotators; teacher review pending, #100).
+The coach matches the Deal ID plus the complete setup/action sequence, excluding
+runtime provenance metadata. Quality comes only from resolved labels; unlabelled
+choices remain uncertain until #27. Existing trick-cost analysis supplies outcome;
+missing outcome produces no verdict. Review ranks at most three big moments by
+assessment, cost and trick; sound choices require explicit lesson teaching points.
+Each badge has an icon, text and theme colour, and every outcome sentence carries
+the hindsight label. UX §5.4 puts moments before replay; the design's practice
+Solid example and Replay trick button are omitted per US-18 and this ticket.
+VAL-07 runs all labelled candidate classes through real Table setup/replay,
+principles robots, first-legal learner continuation and bridge-dds. Its optional
+report is regenerated with `F4_REPORT=1 npx vitest run --project node test/f4.test.ts`.

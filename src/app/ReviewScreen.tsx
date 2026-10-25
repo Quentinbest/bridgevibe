@@ -1,3 +1,8 @@
+import { uncertainQualityEntry } from '../coach/uncertainQuality';
+import { momentLogEntries } from '../coach/momentStatement';
+import type { createProvenanceLog } from '../coach/provenance';
+import { assessDecisions, keyMoments } from '../coach/decisionAssessment';
+import { KeyMoments } from './KeyMoments';
 import { ResultCard } from './ResultCard';
 import { type AnalysisState } from './analysisHost';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -6,9 +11,25 @@ import { cardName, text } from '../explanation';
 import { Card } from './Card';
 import { reviewSetup } from './reviewSetup';
 
-export function ReviewScreen({ record, onBack, analysis, onTryAgain }: { onTryAgain?: () => void; analysis?: AnalysisState; record: CompletedPlaythroughRecord; onBack: () => void }) {
+export function ReviewScreen({ record, onBack, analysis, onTryAgain, provenanceLog }: { provenanceLog?: ReturnType<typeof createProvenanceLog>; onTryAgain?: () => void; analysis?: AnalysisState; record: CompletedPlaythroughRecord; onBack: () => void }) {
   // US-16.1, §4.3.5: replay also refuses incomplete records at runtime.
   const tricks = useMemo(() => replay(record), [record]);
+  const decisions = useMemo(() => assessDecisions(record, analysis?.costs ?? []), [record, analysis?.costs]);
+  const moments = useMemo(() => keyMoments(decisions), [decisions]);
+  // CI-5: log only displayed moments; stable IDs also deduplicate StrictMode and reopening review.
+  useEffect(() => {
+    if (!provenanceLog) return;
+    const logged = new Set(provenanceLog.entries().map(entry => entry.id));
+    for (const moment of moments) {
+      const entries = momentLogEntries(moment, record.playthroughId, templateId => {
+        const rendered = templateId === 'review.cost-description' ? moment.outcome!.statement.text!
+          : text(templateId, { card: moment.alternative ? cardName(moment.alternative) : '' });
+        return templateId === 'moment.alternative' || templateId === 'review.cost-description'
+          ? rendered : `${rendered} ${text('review.hindsight')}`;
+      });
+      for (const entry of entries) if (!logged.has(entry.id)) { provenanceLog.record(entry); logged.add(entry.id); }
+    }
+  }, [moments, record.playthroughId, provenanceLog]);
   const setup = useMemo(() => reviewSetup(record), [record]);
   const [index, setIndex] = useState(0);
   const [showHands, setShowHands] = useState(() => window.matchMedia?.('(min-width:1000px)').matches ?? false);
@@ -16,6 +37,15 @@ export function ReviewScreen({ record, onBack, analysis, onTryAgain }: { onTryAg
   useEffect(() => { heading.current?.focus(); }, []);
   const setupPosition = setup[index];
   const trickIndex = index - setup.length;
+  // CI-5: only the current trick's quality abstentions are actually displayed.
+  useEffect(() => {
+    if (!provenanceLog) return;
+    const logged = new Set(provenanceLog.entries().map(entry => entry.id));
+    for (const decision of decisions.filter(decision => decision.trick === trickIndex + 1)) {
+      const entry = uncertainQualityEntry(decision, record.playthroughId, text('moment.uncertain'));
+      if (entry && !logged.has(entry.id)) { provenanceLog.record(entry); logged.add(entry.id); }
+    }
+  }, [decisions, trickIndex, record.playthroughId, provenanceLog]);
   const trick = tricks[trickIndex];
   const hands = setupPosition ? record.deal.hands : trick.hands;
   // US-16.2: Previous is named by where it leads; from trick 1 it goes back a setup step.
@@ -39,6 +69,7 @@ export function ReviewScreen({ record, onBack, analysis, onTryAgain }: { onTryAg
       <p role="status">{analysis.abstention.text}</p>
       <button type="button" onClick={() => { heading.current?.focus(); onTryAgain?.(); }}>{text('review.try-again')}</button>
     </div>}
+    <KeyMoments moments={moments} />
     <section className="review-replay" aria-label={text(setup.length ? 'review.setup-replay' : 'review.replay')}>
       <div className="review-stepper">
         <button type="button" disabled={index === 0} onClick={() => setIndex(index - 1)} aria-label={previousLabel}>←</button>
@@ -56,7 +87,9 @@ export function ReviewScreen({ record, onBack, analysis, onTryAgain }: { onTryAg
               role="img" aria-label={badge.statement.text}>
               <b>{text(badge.cost ? 'review.cost-negative' : 'review.cost-zero', { cost: badge.cost })}</b>
               <small>{text('review.hindsight')}</small>
-            </span>}</li>;
+            </span>}
+            {badge && decisions.find(d => d.positionIndex === badge.positionIndex)?.quality === 'uncertain'
+              && <small className="review-quality">{text('moment.uncertain')}</small>}</li>;
         })}</ol>}
         {showHands && <section id="review-hands" className="review-hands" aria-label={handsLabel}>
           {SEATS.map(seat => <section key={seat} className={`review-hand review-${seat}`} aria-label={text(`seat.${seat}`)}>
@@ -73,7 +106,8 @@ export function ReviewScreen({ record, onBack, analysis, onTryAgain }: { onTryAg
       {setup.map((position, n) => <button key={position.title} type="button" aria-current={n === index ? 'step' : undefined}
         onClick={() => setIndex(n)}>{position.title}</button>)}
       {tricks.map((_, n) => <button key={n} type="button"
-        aria-label={text('review.trick', { n: n + 1 })} aria-current={n === trickIndex ? 'step' : undefined} onClick={() => setIndex(setup.length + n)}>{text('review.number', { n: n + 1 })}</button>)}</nav>
+        data-key-moment={moments.some(moment => moment.trick === n + 1) || undefined}
+        aria-label={text(moments.some(moment => moment.trick === n + 1) ? 'moment.trick' : 'review.trick', { n: n + 1 })} aria-current={n === trickIndex ? 'step' : undefined} onClick={() => setIndex(setup.length + n)}>{text('review.number', { n: n + 1 })}</button>)}</nav>
     <div className="review-exports"><button type="button" onClick={() => download('json')}>{text('review.json')}</button>
       <button type="button" onClick={() => download('pbn')}>{text('review.pbn')}</button></div>
   </main>;

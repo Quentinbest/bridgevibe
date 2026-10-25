@@ -2,7 +2,7 @@ import { HINT_DEADLINE_MS } from '../information/parameters';
 import { REASON_CODES, type ReasonCode, type RobotProvenance } from '../table';
 
 export type AnalysisCause = 'timeout' | 'error' | 'worker-crash' | 'protocol-mismatch';
-export type Abstention = { reason: 'not-covered'; cause: 'no-authored-hint' } | { reason: 'unavailable'; cause: AnalysisCause } | { reason: 'uncertain'; cause: 'constraints' };
+export type Abstention = { reason: 'not-covered'; cause: 'no-authored-hint' } | { reason: 'unavailable'; cause: AnalysisCause } | { reason: 'uncertain'; cause: 'constraints' | 'no-label' };
 export type InformationMode = 'VISIBLE' | 'ALL_HANDS';
 export type Provenance =
   | { sourceKind: 'authored'; contentId: string; version: string }
@@ -34,11 +34,20 @@ export function validateEntry(entry: unknown): string[] {
   if (!mode(entry.informationMode)) errors.push('informationMode');
   if (entry.abstention !== undefined) {
     const a = entry.abstention;
-    if (!object(a) || !((a.reason === 'not-covered' && a.cause === 'no-authored-hint') || (a.reason === 'uncertain' && a.cause === 'constraints') || (a.reason === 'unavailable' && ['timeout', 'error', 'worker-crash', 'protocol-mismatch'].includes(String(a.cause))))) errors.push('abstention');
+    if (!object(a) || !((a.reason === 'not-covered' && a.cause === 'no-authored-hint') || (a.reason === 'uncertain' && ['constraints', 'no-label'].includes(String(a.cause))) || (a.reason === 'unavailable' && ['timeout', 'error', 'worker-crash', 'protocol-mismatch'].includes(String(a.cause))))) errors.push('abstention');
     if (entry.kind !== 'statement') errors.push('abstention.kind');
   }
   const p = entry.provenance;
   if (!object(p)) return [...errors, 'provenance'];
+  // US-18.4, CI-5: review's no-label abstention retains the separate ALL_HANDS engine input.
+  const noLabel = p.sourceKind === 'template' && p.templateId === 'moment.uncertain'
+    && entry.summary === 'moment.uncertain' && entry.informationMode === 'VISIBLE'
+    && object(entry.abstention) && entry.abstention.reason === 'uncertain' && entry.abstention.cause === 'no-label';
+  if (entry.summary === 'moment.uncertain' || (object(entry.abstention) && entry.abstention.cause === 'no-label')) {
+    if (!noLabel || !object(p.quality) || p.quality.source !== 'no-label') errors.push('provenance.quality');
+    if (!object(p.outcome) || p.outcome.sourceKind !== 'engine' || validateEntry({ ...entry, abstention: undefined,
+      summary: 'review.cost-description', informationMode: 'ALL_HANDS', provenance: p.outcome }).length) errors.push('provenance.outcome');
+  }
   // US-14.11: forced plays and uncovered Setup use VISIBLE templates without an engine.
   const templateHint = p.sourceKind === 'template' && p.templateId === entry.summary
     && ['hint.forced-card', 'hint.forced-class', 'hint.not-covered'].includes(String(entry.summary)) && entry.informationMode === 'VISIBLE';
@@ -53,7 +62,7 @@ export function validateEntry(entry: unknown): string[] {
   if (object(entry.abstention)) {
     const notCovered = entry.abstention.reason === 'not-covered';
     const template = p.sourceKind === 'template' && entry.summary === 'hint.not-covered' && p.templateId === 'hint.not-covered';
-    if (notCovered ? !template : p.sourceKind !== 'engine') errors.push('abstention.provenance');
+    if (notCovered ? !template : !noLabel && p.sourceKind !== 'engine') errors.push('abstention.provenance');
   }
   const fields = (...keys: string[]) => { for (const key of keys) if (!nonempty(p[key])) errors.push(`provenance.${key}`); };
   switch (p.sourceKind) {
