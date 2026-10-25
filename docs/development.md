@@ -779,3 +779,11 @@ Solid example and Replay trick button are omitted per US-18 and this ticket.
 VAL-07 runs all labelled candidate classes through real Table setup/replay,
 principles robots, first-legal learner continuation and bridge-dds. Its optional
 report is regenerated with `F4_REPORT=1 npx vitest run --project node test/f4.test.ts`.
+
+## Fair-feedback study (#29)
+
+`npm run f4:fairness` replays every F4 position and writes `docs/reports/fair-feedback.md`
+(T6, VAL-12): per candidate, the double-dummy cost on the actual layout, the sampled cost
+(the review's derivation, #27) and the F4 label with its source, plus the rate at which
+double-dummy alone would blame an acceptable play. Under PRD D10 the labels are AI-sourced
+until the teachers' review (#100); the report says so. The study runs as a Node test.
