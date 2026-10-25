@@ -750,8 +750,8 @@ The teachers review the fallback policy, because its actions can show up in play
 | DEP-03 | The teacher-approved list of robot card-play principles. Approved by the owner 2026-10-24: [`docs/domain/dep-03-card-play-principles.md`](../domain/dep-03-card-play-principles.md) | Week 2 | Teaching advisor |
 | DEP-04 | Signed-off wording for reason codes, abstentions, the hindsight label and assessment verdicts (CI-2, CI-8; UX §5) | Week 3 for the slice | Teachers |
 | DEP-05 | F4 labels | Before week 2 | Both teachers (T7a), or two AI annotators (PRD D10, owner, 2026-10-25) |
-| DEP-06 | The two reference phones | Week 0 | Owner |
-| DEP-07 | D1 bidding system (or the SAYC/2-over-1 common subset) | End of week 1 (T5) | Owner |
+| DEP-06 | The two reference phones. **Decided 2026-10-25 (owner):** iPhone 16 (Safari on iOS) and Google Pixel 9 (Chrome on Android) | Week 0 | Owner |
+| DEP-07 | D1 bidding system (or the SAYC/2-over-1 common subset). **Decided 2026-10-25 (delegated to Claude by the owner):** SAYC-based; T5 uses the SAYC/2-over-1 common subset (PRD D1) | End of week 1 (T5) | Owner |
 | DEP-08 | Licence replies for candidates with unclear terms | During V (T3) | Owner |
 
 ### 7.3 Unresolved decisions requiring approval
