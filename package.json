@@ -16,6 +16,7 @@
     "f4:draft": "node scripts/f4/draft.ts",
     "f4:fairness": "F4_FAIRNESS_REPORT=1 vitest run --project node test/f4Fairness.test.ts",
     "robots:sample": "node scripts/robots/sample.ts",
+    "bidding:harness": "node tools/bidding-harness/index.ts",
     "content:check": "node scripts/content/check.ts",
     "test": "vitest run --project node",
     "test:browser": "vitest run --project browser",
