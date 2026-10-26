@@ -2,7 +2,7 @@
 
 > **Status: AI draft, awaiting both teachers.** Drafted by Claude on 2026-10-24 at the owner's request, for #4 (PRD T5, VAL-11). Not approved, and not a teacher sign-off (CI-8).
 
-**System:** the beginner subset common to SAYC and 2/1, which PRD T5 says to use while D1 (DEP-07) is undecided. The set avoids sequences the two systems treat differently: a 2-level new suit or a 1NT response over a major opening. Vulnerability is none throughout.
+**System:** the beginner subset common to SAYC and 2/1, as decided in PRD D1 (2026-10-25, delegated to Claude by the owner). The set avoids sequences the two systems treat differently: a 2-level new suit or a 1NT response over a major opening. Vulnerability is none throughout.
 
 **Data:** `auctions.json` holds what the harness needs: the hand, the auction so far (from the dealer) and the seat to call. Required cases (#4): a valid alternative bid (T5-28, and T5-21), a forcing auction (T5-17), and a case no rule covers (T5-29).
 

@@ -625,7 +625,7 @@ These targets are placeholders set by this draft, not derived from data. They ar
 
 | ID | Decision | Needed by | Planning assumption until decided |
 |---|---|---|---|
-| D1 | **Beginner bidding system:** SAYC, 2/1, Acol or custom | End of week 1 (it gates T5) | T5 uses the beginner subset common to SAYC and 2/1. Choosing Acol would require redoing T5 |
+| D1 | **Beginner bidding system:** SAYC, 2/1, Acol or custom | **Decided 2026-10-25 (delegated to Claude by the owner):** a SAYC-based beginner profile. Phase V and T5 use the beginner subset common to SAYC and 2/1 (15–17 1NT, five-card majors, Stayman, Jacoby transfers, weak twos, strong 2♣, negative doubles); the MVP convention profile (FR-B1) extends it within SAYC | All four candidate engines (rusty-bidding-bot, pons `american_instinct()`, saycbridge, Bridgit) are SAYC or 2/1, so Acol would leave T5 without a candidate; the T5 auction draft already uses this subset. Teachers confirm the profile's contents (CI-8) |
 | D2 | **Distribution model:** commercial or not; closed or open source; hosted only or binaries shipped | The gate (week 5) | PA-3: strictest model (commercial, closed source) |
 | D3 | **Backend acceptable, and hosting region** | The gate | PA-1: browser-first; add a server only if a Must requirement fails without one [A] |
 | D4 | **Launch languages** | Before MVP content production | English first, with all strings externalised; Simplified Chinese as a candidate |
