@@ -821,6 +821,18 @@ report is regenerated with `F4_REPORT=1 npx vitest run --project node test/f4.te
 double-dummy alone would blame an acceptable play. Under PRD D10 the labels are AI-sourced
 until the teachers' review (#100); the report says so. The study runs as a Node test.
 
+## F5 export (#108)
+
+`npm run f5:export` writes the teacher CSV, machine-readable JSON and grading
+instructions to `docs/reports/f5/` (VAL-08). The Node composition test replays real
+seeded Deals with principles robots, bridge-dds and production sampling counts,
+checks every statement's provenance (US-40.1), and compares two exports for
+determinism. It includes all four verdicts, advice and forced hints, abstentions,
+hindsight trick costs, sampled quality, and every step of `follow-suit-full`.
+The report identifies injected faults, normalized timing metadata and AI-sourced
+F4 labels (D10). All wording remains draft (CI-8); teachers grade independently
+and resolve disagreements before applying the VAL-08 thresholds.
+
 ## Bidding harness (#4)
 
 Run `npm run bidding:harness -- --candidates <root> [--out <dir>]` with Node 24.
