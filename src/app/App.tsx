@@ -19,6 +19,9 @@ import { lessonById } from '../curriculum/content';
 // US-40.2: the constant build guard removes the entire debug import from production.
 const DebugPanel = import.meta.env.MODE === 'internal' || import.meta.env.MODE === 'audit' || import.meta.env.MODE === 'development'
   ? lazy(() => import('./DebugPanel')) : null;
+// US-43: the device harness is absent from production and audit builds.
+const Bench = import.meta.env.MODE === 'internal' || import.meta.env.MODE === 'development'
+  ? lazy(() => import('./bench/Bench')) : null;
 
 function Opponent({ seat, count, cards, position }: { position: ScreenPosition; seat: 'west' | 'east'; count: number; cards?: readonly TableCard[] | null }) {
   return <section className={`opponent ${seat}`} data-position={position} aria-label={text(`seat.${seat}`)}>
@@ -220,6 +223,7 @@ export function App() {
     setRoute(routeFromUrl());
     if (launched) window.history.back();
   }
+  if (Bench && new URLSearchParams(window.location.search).get('bench') === '1') return <Suspense fallback={null}><Bench /></Suspense>;
   if (route.screen === 'lesson') return <LessonScreen key={route.lesson.contentId} lesson={route.lesson} onClose={leave} />;
   if (route.screen === 'practice') return <PracticeScreen onExit={leave} onCompleted={countCompleted} firstIndex={nextPracticeIndex} onStarted={practiceStarted} />;
   return <Home dealsPlayed={dealsPlayed} navigate={navigate} />;
