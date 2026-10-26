@@ -23,6 +23,14 @@ export default [
       message: 'Robots receive SeatView only (ADR-0001); import only seat-view types and card helpers from table.',
     }] }],
   } },
+  // US-47: a separate rule preserves the existing Seat View and robot guards.
+  { files: ['src/**/*.{ts,tsx}'], plugins: { harness: { rules: {
+    'offline-only': { create(context) { return { Literal(node) {
+      if (typeof node.value === 'string' && /(?:^|\/)tools\/bidding-harness(?:\/|$)/.test(node.value)) {
+        context.report({ node, message: 'US-47: bidding-harness is offline tooling, never app code.' });
+      }
+    } }; } },
+  } } }, rules: { 'harness/offline-only': 'error' } },
   js.configs.recommended, ...tseslint.configs.recommended,
   { languageOptions: { globals: { ...globals.node, ...globals.browser } } },
   // App source runs in the browser only; tests and tooling also run in Node.

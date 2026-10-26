@@ -1,0 +1,3982 @@
+{
+  "candidates": [
+    {
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed"
+    },
+    {
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)"
+    },
+    {
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null
+    },
+    {
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null
+    }
+  ],
+  "rows": [
+    {
+      "auctionId": "T5-01",
+      "tags": [
+        "opening",
+        "1NT"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KQ4",
+        "H": "A93",
+        "D": "KJ72",
+        "C": "Q85"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-01",
+      "tags": [
+        "opening",
+        "1NT"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KQ4",
+        "H": "A93",
+        "D": "KJ72",
+        "C": "Q85"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-01",
+      "tags": [
+        "opening",
+        "1NT"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KQ4",
+        "H": "A93",
+        "D": "KJ72",
+        "C": "Q85"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1NT",
+        "ruleId": "notrump-base:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/notrump/one-nt.bid:63",
+        "explanation": "15-17 HCP, balanced",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-01",
+      "tags": [
+        "opening",
+        "1NT"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KQ4",
+        "H": "A93",
+        "D": "KJ72",
+        "C": "Q85"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1NT",
+        "ruleId": "NotrumpOpening",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-02",
+      "tags": [
+        "opening",
+        "major"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AQJ74",
+        "H": "K82",
+        "D": "93",
+        "C": "K64"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-02",
+      "tags": [
+        "opening",
+        "major"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AQJ74",
+        "H": "K82",
+        "D": "93",
+        "C": "K64"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-02",
+      "tags": [
+        "opening",
+        "major"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AQJ74",
+        "H": "K82",
+        "D": "93",
+        "C": "K64"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1S",
+        "ruleId": "base:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/base.bid:49",
+        "explanation": "5+ spades",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-02",
+      "tags": [
+        "opening",
+        "major"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AQJ74",
+        "H": "K82",
+        "D": "93",
+        "C": "K64"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1S",
+        "ruleId": "OneLevelSuitOpening",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-03",
+      "tags": [
+        "opening",
+        "minor"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q83",
+        "D": "A72",
+        "C": "K95"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-03",
+      "tags": [
+        "opening",
+        "minor"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q83",
+        "D": "A72",
+        "C": "K95"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-03",
+      "tags": [
+        "opening",
+        "minor"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q83",
+        "D": "A72",
+        "C": "K95"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1C",
+        "ruleId": "base:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/base.bid:58",
+        "explanation": "3+ clubs",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-03",
+      "tags": [
+        "opening",
+        "minor"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q83",
+        "D": "A72",
+        "C": "K95"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1C",
+        "ruleId": "OneLevelSuitOpening",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-04",
+      "tags": [
+        "opening",
+        "minor"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "A4",
+        "H": "K72",
+        "D": "QJ83",
+        "C": "KJ65"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-04",
+      "tags": [
+        "opening",
+        "minor"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "A4",
+        "H": "K72",
+        "D": "QJ83",
+        "C": "KJ65"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-04",
+      "tags": [
+        "opening",
+        "minor"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "A4",
+        "H": "K72",
+        "D": "QJ83",
+        "C": "KJ65"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1D",
+        "ruleId": "base:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/base.bid:55",
+        "explanation": "3+ diamonds",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-04",
+      "tags": [
+        "opening",
+        "minor"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "A4",
+        "H": "K72",
+        "D": "QJ83",
+        "C": "KJ65"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1D",
+        "ruleId": "OneLevelSuitOpening",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-05",
+      "tags": [
+        "opening",
+        "strong"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AKQ8",
+        "H": "AKJ5",
+        "D": "AQ4",
+        "C": "K2"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-05",
+      "tags": [
+        "opening",
+        "strong"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AKQ8",
+        "H": "AKJ5",
+        "D": "AQ4",
+        "C": "K2"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-05",
+      "tags": [
+        "opening",
+        "strong"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AKQ8",
+        "H": "AKJ5",
+        "D": "AQ4",
+        "C": "K2"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "3NT",
+        "ruleId": "strong-openings:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/strong-openings.bid:50",
+        "explanation": "26-27 HCP, balanced",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-05",
+      "tags": [
+        "opening",
+        "strong"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AKQ8",
+        "H": "AKJ5",
+        "D": "AQ4",
+        "C": "K2"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2C",
+        "ruleId": "StrongTwoClubs",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-06",
+      "tags": [
+        "opening",
+        "weak-two"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KQJ952",
+        "H": "84",
+        "D": "Q73",
+        "C": "62"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-06",
+      "tags": [
+        "opening",
+        "weak-two"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KQJ952",
+        "H": "84",
+        "D": "Q73",
+        "C": "62"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-06",
+      "tags": [
+        "opening",
+        "weak-two"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KQJ952",
+        "H": "84",
+        "D": "Q73",
+        "C": "62"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2S",
+        "ruleId": "preempts:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/preempts.bid:77",
+        "explanation": "Weak two: six spades, 4-10",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-06",
+      "tags": [
+        "opening",
+        "weak-two"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "KQJ952",
+        "H": "84",
+        "D": "Q73",
+        "C": "62"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2S",
+        "ruleId": "PreemptiveOpen",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-07",
+      "tags": [
+        "opening",
+        "2NT"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AQ5",
+        "H": "KQ4",
+        "D": "AK83",
+        "C": "Q92"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-07",
+      "tags": [
+        "opening",
+        "2NT"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AQ5",
+        "H": "KQ4",
+        "D": "AK83",
+        "C": "Q92"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-07",
+      "tags": [
+        "opening",
+        "2NT"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AQ5",
+        "H": "KQ4",
+        "D": "AK83",
+        "C": "Q92"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2NT",
+        "ruleId": "strong-openings:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/strong-openings.bid:48",
+        "explanation": "20-21 HCP, balanced",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-07",
+      "tags": [
+        "opening",
+        "2NT"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "AQ5",
+        "H": "KQ4",
+        "D": "AK83",
+        "C": "Q92"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2NT",
+        "ruleId": "NotrumpOpening",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-08",
+      "tags": [
+        "opening",
+        "pass"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "Q842",
+        "H": "K73",
+        "D": "J95",
+        "C": "K62"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-08",
+      "tags": [
+        "opening",
+        "pass"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "Q842",
+        "H": "K73",
+        "D": "J95",
+        "C": "K62"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-08",
+      "tags": [
+        "opening",
+        "pass"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "Q842",
+        "H": "K73",
+        "D": "J95",
+        "C": "K62"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "Pass",
+        "ruleId": "base:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/base.bid:61",
+        "explanation": "No opening bid",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-08",
+      "tags": [
+        "opening",
+        "pass"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "Q842",
+        "H": "K73",
+        "D": "J95",
+        "C": "K62"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "Pass",
+        "ruleId": null,
+        "explanation": "DefaultPass: no rule applies (engine fallback)",
+        "provenance": "not-covered",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-09",
+      "tags": [
+        "response",
+        "raise"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "842",
+        "H": "KJ73",
+        "D": "Q95",
+        "C": "862"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-09",
+      "tags": [
+        "response",
+        "raise"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "842",
+        "H": "KJ73",
+        "D": "Q95",
+        "C": "862"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-09",
+      "tags": [
+        "response",
+        "raise"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "842",
+        "H": "KJ73",
+        "D": "Q95",
+        "C": "862"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2H",
+        "ruleId": "responses:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/responses.bid:254",
+        "explanation": "Raise: 6-10 support points, 3+ ♥ (6-12 when no limit raise is played)",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-09",
+      "tags": [
+        "response",
+        "raise"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "842",
+        "H": "KJ73",
+        "D": "Q95",
+        "C": "862"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2H",
+        "ruleId": "MinimumRaise",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-10",
+      "tags": [
+        "response",
+        "limit-raise"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "AQ5",
+        "C": "9862"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-10",
+      "tags": [
+        "response",
+        "limit-raise"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "AQ5",
+        "C": "9862"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-10",
+      "tags": [
+        "response",
+        "limit-raise"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "AQ5",
+        "C": "9862"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "3H",
+        "ruleId": "responses:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/responses.bid:180",
+        "explanation": "Limit raise: 11-12 support points, 3+ hearts",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-10",
+      "tags": [
+        "response",
+        "limit-raise"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "AQ5",
+        "C": "9862"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "3H",
+        "ruleId": "LimitRaise",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-11",
+      "tags": [
+        "response",
+        "up-the-line"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1C",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q983",
+        "D": "95",
+        "C": "862"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-11",
+      "tags": [
+        "response",
+        "up-the-line"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1C",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q983",
+        "D": "95",
+        "C": "862"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-11",
+      "tags": [
+        "response",
+        "up-the-line"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1C",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q983",
+        "D": "95",
+        "C": "862"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1H",
+        "ruleId": "responses:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/responses.bid:47",
+        "explanation": "4+ hearts, 6+ HCP",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-11",
+      "tags": [
+        "response",
+        "up-the-line"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1C",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q983",
+        "D": "95",
+        "C": "862"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1H",
+        "ruleId": "OneLevelNewSuitResponse",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-12",
+      "tags": [
+        "response",
+        "1NT"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1D",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "Q84",
+        "H": "K73",
+        "D": "952",
+        "C": "J862"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-12",
+      "tags": [
+        "response",
+        "1NT"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1D",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "Q84",
+        "H": "K73",
+        "D": "952",
+        "C": "J862"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-12",
+      "tags": [
+        "response",
+        "1NT"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1D",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "Q84",
+        "H": "K73",
+        "D": "952",
+        "C": "J862"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1NT",
+        "ruleId": "responses:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/responses.bid:75",
+        "explanation": "6-10 HCP, no 4-card major",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-12",
+      "tags": [
+        "response",
+        "1NT"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1D",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "Q84",
+        "H": "K73",
+        "D": "952",
+        "C": "J862"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1NT",
+        "ruleId": "OneNotrumpResponse",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-13",
+      "tags": [
+        "response",
+        "stayman"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q983",
+        "D": "K5",
+        "C": "862"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-13",
+      "tags": [
+        "response",
+        "stayman"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q983",
+        "D": "K5",
+        "C": "862"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-13",
+      "tags": [
+        "response",
+        "stayman"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q983",
+        "D": "K5",
+        "C": "862"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2C",
+        "ruleId": "stayman:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/notrump/stayman.bid:17",
+        "explanation": "Stayman: asks for a 4-card major",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-13",
+      "tags": [
+        "response",
+        "stayman"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KJ74",
+        "H": "Q983",
+        "D": "K5",
+        "C": "862"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2C",
+        "ruleId": "TwoLevelStayman",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-14",
+      "tags": [
+        "response",
+        "transfer"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "QJ8742",
+        "H": "83",
+        "D": "952",
+        "C": "62"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-14",
+      "tags": [
+        "response",
+        "transfer"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "QJ8742",
+        "H": "83",
+        "D": "952",
+        "C": "62"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-14",
+      "tags": [
+        "response",
+        "transfer"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "QJ8742",
+        "H": "83",
+        "D": "952",
+        "C": "62"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2H",
+        "ruleId": "jacoby-transfers:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/notrump/jacoby-transfers.bid:19",
+        "explanation": "Transfer to spades",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-14",
+      "tags": [
+        "response",
+        "transfer"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "QJ8742",
+        "H": "83",
+        "D": "952",
+        "C": "62"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2H",
+        "ruleId": "JacobyTransferToSpades",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-15",
+      "tags": [
+        "response",
+        "game"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "K84",
+        "H": "Q73",
+        "D": "KJ5",
+        "C": "Q862"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-15",
+      "tags": [
+        "response",
+        "game"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "K84",
+        "H": "Q73",
+        "D": "KJ5",
+        "C": "Q862"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-15",
+      "tags": [
+        "response",
+        "game"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "K84",
+        "H": "Q73",
+        "D": "KJ5",
+        "C": "Q862"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "3NT",
+        "ruleId": "notrump-base:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/notrump/one-nt.bid:92",
+        "explanation": "To play: 10-15 total points",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-15",
+      "tags": [
+        "response",
+        "game"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "K84",
+        "H": "Q73",
+        "D": "KJ5",
+        "C": "Q862"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "3NT",
+        "ruleId": "NotrumpGameAccept",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-16",
+      "tags": [
+        "response",
+        "new-suit"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1D",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ873",
+        "D": "95",
+        "C": "Q862"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-16",
+      "tags": [
+        "response",
+        "new-suit"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1D",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ873",
+        "D": "95",
+        "C": "Q862"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-16",
+      "tags": [
+        "response",
+        "new-suit"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1D",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ873",
+        "D": "95",
+        "C": "Q862"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1H",
+        "ruleId": "responses:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/responses.bid:69",
+        "explanation": "4+ hearts, 6+ HCP",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-16",
+      "tags": [
+        "response",
+        "new-suit"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1D",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ873",
+        "D": "95",
+        "C": "Q862"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1H",
+        "ruleId": "OneLevelNewSuitResponse",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-17",
+      "tags": [
+        "rebid",
+        "forcing"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1H",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "AQJ73",
+        "D": "K95",
+        "C": "Q62"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-17",
+      "tags": [
+        "rebid",
+        "forcing"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1H",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "AQJ73",
+        "D": "K95",
+        "C": "Q62"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-17",
+      "tags": [
+        "rebid",
+        "forcing"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1H",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "AQJ73",
+        "D": "K95",
+        "C": "Q62"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1NT",
+        "ruleId": "rebids:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/rebids.bid:87",
+        "explanation": "12-14 HCP, balanced",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-17",
+      "tags": [
+        "rebid",
+        "forcing"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1H",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "AQJ73",
+        "D": "K95",
+        "C": "Q62"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1NT",
+        "ruleId": "RebidOneNotrumpByOpener",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-18",
+      "tags": [
+        "rebid",
+        "raise"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1C",
+        "Pass",
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "A5",
+        "C": "KJ862"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-18",
+      "tags": [
+        "rebid",
+        "raise"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1C",
+        "Pass",
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "A5",
+        "C": "KJ862"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-18",
+      "tags": [
+        "rebid",
+        "raise"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1C",
+        "Pass",
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "A5",
+        "C": "KJ862"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2H",
+        "ruleId": "rebids:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/rebids.bid:55",
+        "explanation": "Raise: 4+ ♥, minimum",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-18",
+      "tags": [
+        "rebid",
+        "raise"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1C",
+        "Pass",
+        "1H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "A5",
+        "C": "KJ862"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2H",
+        "ruleId": "SupportPartnerMajorSuit",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-19",
+      "tags": [
+        "rebid",
+        "1NT"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1D",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "Q8",
+        "H": "K73",
+        "D": "AJ52",
+        "C": "K962"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-19",
+      "tags": [
+        "rebid",
+        "1NT"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1D",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "Q8",
+        "H": "K73",
+        "D": "AJ52",
+        "C": "K962"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-19",
+      "tags": [
+        "rebid",
+        "1NT"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1D",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "Q8",
+        "H": "K73",
+        "D": "AJ52",
+        "C": "K962"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1NT",
+        "ruleId": "rebids:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/rebids.bid:169",
+        "explanation": "12-14 HCP, balanced",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-19",
+      "tags": [
+        "rebid",
+        "1NT"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1D",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "Q8",
+        "H": "K73",
+        "D": "AJ52",
+        "C": "K962"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2C",
+        "ruleId": "NewSuitByOpener",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-20",
+      "tags": [
+        "rebid",
+        "reverse"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1D",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "4",
+        "H": "AKJ7",
+        "D": "AQ952",
+        "C": "K62"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-20",
+      "tags": [
+        "rebid",
+        "reverse"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1D",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "4",
+        "H": "AKJ7",
+        "D": "AQ952",
+        "C": "K62"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-20",
+      "tags": [
+        "rebid",
+        "reverse"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1D",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "4",
+        "H": "AKJ7",
+        "D": "AQ952",
+        "C": "K62"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2H",
+        "ruleId": "rebids:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/rebids.bid:175",
+        "explanation": "Reverse: 4+ hearts, longer diamonds, 17+",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-20",
+      "tags": [
+        "rebid",
+        "reverse"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1D",
+        "Pass",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "4",
+        "H": "AKJ7",
+        "D": "AQ952",
+        "C": "K62"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2H",
+        "ruleId": "ReverseByOpener",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-21",
+      "tags": [
+        "rebid",
+        "game-try"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1H",
+        "Pass",
+        "2H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "A4",
+        "H": "AKJ73",
+        "D": "KQ5",
+        "C": "962"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-21",
+      "tags": [
+        "rebid",
+        "game-try"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1H",
+        "Pass",
+        "2H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "A4",
+        "H": "AKJ73",
+        "D": "KQ5",
+        "C": "962"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-21",
+      "tags": [
+        "rebid",
+        "game-try"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1H",
+        "Pass",
+        "2H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "A4",
+        "H": "AKJ73",
+        "D": "KQ5",
+        "C": "962"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "3H",
+        "ruleId": "rebids:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/rebids.bid:340",
+        "explanation": "Invitation: 17-18 with the fit (15-18 opposite a raise to 12)",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-21",
+      "tags": [
+        "rebid",
+        "game-try"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1H",
+        "Pass",
+        "2H",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "A4",
+        "H": "AKJ73",
+        "D": "KQ5",
+        "C": "962"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2NT",
+        "ruleId": "NotrumpInvitationByOpener",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-22",
+      "tags": [
+        "competitive",
+        "overcall"
+      ],
+      "dealer": "E",
+      "auction": [
+        "1D"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KQJ84",
+        "H": "73",
+        "D": "952",
+        "C": "A62"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-22",
+      "tags": [
+        "competitive",
+        "overcall"
+      ],
+      "dealer": "E",
+      "auction": [
+        "1D"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KQJ84",
+        "H": "73",
+        "D": "952",
+        "C": "A62"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-22",
+      "tags": [
+        "competitive",
+        "overcall"
+      ],
+      "dealer": "E",
+      "auction": [
+        "1D"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KQJ84",
+        "H": "73",
+        "D": "952",
+        "C": "A62"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1S",
+        "ruleId": "overcalls:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/competitive/overcalls.bid:49",
+        "explanation": "Overcall: five spades, 8-16 total points",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-22",
+      "tags": [
+        "competitive",
+        "overcall"
+      ],
+      "dealer": "E",
+      "auction": [
+        "1D"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KQJ84",
+        "H": "73",
+        "D": "952",
+        "C": "A62"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1S",
+        "ruleId": "OneLevelStandardOvercall",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-23",
+      "tags": [
+        "competitive",
+        "takeout-double"
+      ],
+      "dealer": "E",
+      "auction": [
+        "1H"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KQ84",
+        "H": "3",
+        "D": "AJ52",
+        "C": "K962"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-23",
+      "tags": [
+        "competitive",
+        "takeout-double"
+      ],
+      "dealer": "E",
+      "auction": [
+        "1H"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KQ84",
+        "H": "3",
+        "D": "AJ52",
+        "C": "K962"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-23",
+      "tags": [
+        "competitive",
+        "takeout-double"
+      ],
+      "dealer": "E",
+      "auction": [
+        "1H"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KQ84",
+        "H": "3",
+        "D": "AJ52",
+        "C": "K962"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "X",
+        "ruleId": "takeout-double:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/competitive/takeout-double.bid:29",
+        "explanation": "Takeout: 12+ total points and the unbid suits, or 18+ with any shape",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-23",
+      "tags": [
+        "competitive",
+        "takeout-double"
+      ],
+      "dealer": "E",
+      "auction": [
+        "1H"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "KQ84",
+        "H": "3",
+        "D": "AJ52",
+        "C": "K962"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "X",
+        "ruleId": "OneLevelTakeoutDouble",
+        "explanation": "Either support for all unbid suits or a hand too strong to overcall.",
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-24",
+      "tags": [
+        "competitive",
+        "1NT-overcall"
+      ],
+      "dealer": "E",
+      "auction": [
+        "1C"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AJ4",
+        "H": "KQ3",
+        "D": "K972",
+        "C": "KJ5"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-24",
+      "tags": [
+        "competitive",
+        "1NT-overcall"
+      ],
+      "dealer": "E",
+      "auction": [
+        "1C"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AJ4",
+        "H": "KQ3",
+        "D": "K972",
+        "C": "KJ5"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-24",
+      "tags": [
+        "competitive",
+        "1NT-overcall"
+      ],
+      "dealer": "E",
+      "auction": [
+        "1C"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AJ4",
+        "H": "KQ3",
+        "D": "K972",
+        "C": "KJ5"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1NT",
+        "ruleId": "overcalls:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/competitive/overcalls.bid:99",
+        "explanation": "15-18 balanced with a stopper in ♣",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-24",
+      "tags": [
+        "competitive",
+        "1NT-overcall"
+      ],
+      "dealer": "E",
+      "auction": [
+        "1C"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AJ4",
+        "H": "KQ3",
+        "D": "K972",
+        "C": "KJ5"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1NT",
+        "ruleId": "DirectOvercall1N",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-25",
+      "tags": [
+        "competitive",
+        "negative-double"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1C",
+        "1S"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "Q952",
+        "C": "862"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-25",
+      "tags": [
+        "competitive",
+        "negative-double"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1C",
+        "1S"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "Q952",
+        "C": "862"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-25",
+      "tags": [
+        "competitive",
+        "negative-double"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1C",
+        "1S"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "Q952",
+        "C": "862"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "X",
+        "ruleId": "after-interference:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/competitive/after-interference.bid:37",
+        "explanation": "Negative double: 6+ total points, four or more in each unbid major",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-25",
+      "tags": [
+        "competitive",
+        "negative-double"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1C",
+        "1S"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "84",
+        "H": "KJ73",
+        "D": "Q952",
+        "C": "862"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "X",
+        "ruleId": "OneLevelNegativeDouble",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-26",
+      "tags": [
+        "competitive",
+        "pass"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1H",
+        "2C"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "8642",
+        "H": "3",
+        "D": "Q952",
+        "C": "K762"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-26",
+      "tags": [
+        "competitive",
+        "pass"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1H",
+        "2C"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "8642",
+        "H": "3",
+        "D": "Q952",
+        "C": "K762"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-26",
+      "tags": [
+        "competitive",
+        "pass"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1H",
+        "2C"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "8642",
+        "H": "3",
+        "D": "Q952",
+        "C": "K762"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "Pass",
+        "ruleId": "after-interference:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/competitive/after-interference.bid:293",
+        "explanation": "Nothing to say over their overcall",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-26",
+      "tags": [
+        "competitive",
+        "pass"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1H",
+        "2C"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "8642",
+        "H": "3",
+        "D": "Q952",
+        "C": "K762"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "Pass",
+        "ruleId": "PassResponseOverOvercall",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-27",
+      "tags": [
+        "competitive",
+        "advance"
+      ],
+      "dealer": "W",
+      "auction": [
+        "1C",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "K84",
+        "H": "Q73",
+        "D": "J952",
+        "C": "862"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-27",
+      "tags": [
+        "competitive",
+        "advance"
+      ],
+      "dealer": "W",
+      "auction": [
+        "1C",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "K84",
+        "H": "Q73",
+        "D": "J952",
+        "C": "862"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-27",
+      "tags": [
+        "competitive",
+        "advance"
+      ],
+      "dealer": "W",
+      "auction": [
+        "1C",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "K84",
+        "H": "Q73",
+        "D": "J952",
+        "C": "862"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "Pass",
+        "ruleId": "advances:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/competitive/advances.bid:67",
+        "explanation": "Not enough to advance",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-27",
+      "tags": [
+        "competitive",
+        "advance"
+      ],
+      "dealer": "W",
+      "auction": [
+        "1C",
+        "1S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "K84",
+        "H": "Q73",
+        "D": "J952",
+        "C": "862"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2S",
+        "ruleId": "RaiseResponseToStandardOvercall",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-28",
+      "tags": [
+        "valid-alternative"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "K4",
+        "H": "AQ973",
+        "D": "KJ5",
+        "C": "Q62"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-28",
+      "tags": [
+        "valid-alternative"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "K4",
+        "H": "AQ973",
+        "D": "KJ5",
+        "C": "Q62"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-28",
+      "tags": [
+        "valid-alternative"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "K4",
+        "H": "AQ973",
+        "D": "KJ5",
+        "C": "Q62"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1NT",
+        "ruleId": "notrump-base:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/notrump/one-nt.bid:63",
+        "explanation": "15-17 HCP, balanced",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-28",
+      "tags": [
+        "valid-alternative"
+      ],
+      "dealer": "S",
+      "auction": [],
+      "seat": "S",
+      "hand": {
+        "S": "K4",
+        "H": "AQ973",
+        "D": "KJ5",
+        "C": "Q62"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "1NT",
+        "ruleId": "NotrumpOpening",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-29",
+      "tags": [
+        "not-covered"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "2D"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AJ874",
+        "H": "KQ953",
+        "D": "4",
+        "C": "62"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-29",
+      "tags": [
+        "not-covered"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "2D"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AJ874",
+        "H": "KQ953",
+        "D": "4",
+        "C": "62"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-29",
+      "tags": [
+        "not-covered"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "2D"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AJ874",
+        "H": "KQ953",
+        "D": "4",
+        "C": "62"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "3NT",
+        "ruleId": "nt-interference:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/notrump/nt-interference.bid:122",
+        "explanation": "Game: 10+ HCP",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-29",
+      "tags": [
+        "not-covered"
+      ],
+      "dealer": "N",
+      "auction": [
+        "1NT",
+        "2D"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AJ874",
+        "H": "KQ953",
+        "D": "4",
+        "C": "62"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "2H",
+        "ruleId": "JacobyTransferToSpades",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-30",
+      "tags": [
+        "rebid",
+        "accept-invite"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1S",
+        "Pass",
+        "3S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AKJ74",
+        "H": "K82",
+        "D": "Q3",
+        "C": "K64"
+      },
+      "engine": {
+        "name": "Bridgit",
+        "version": "ee9ade9ea2eb159b3959f227d2ac0db22aa710f3"
+      },
+      "status": "not-run",
+      "reason": ".NET SDK not installed",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-30",
+      "tags": [
+        "rebid",
+        "accept-invite"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1S",
+        "Pass",
+        "3S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AKJ74",
+        "H": "K82",
+        "D": "Q3",
+        "C": "K64"
+      },
+      "engine": {
+        "name": "pons",
+        "version": "c865f4a1e7e42c29ca9e6a6f9923ee5de34eda01"
+      },
+      "status": "not-run",
+      "reason": "no BBA-free build (LR-3, T3)",
+      "result": null,
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-30",
+      "tags": [
+        "rebid",
+        "accept-invite"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1S",
+        "Pass",
+        "3S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AKJ74",
+        "H": "K82",
+        "D": "Q3",
+        "C": "K64"
+      },
+      "engine": {
+        "name": "rusty-bidding-bot",
+        "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "4S",
+        "ruleId": "rebids:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/rebids.bid:372",
+        "explanation": "Accepts the limit raise",
+        "provenance": "rule",
+        "engine": {
+          "name": "rusty-bidding-bot",
+          "version": "091175fce9d1e19f8bd3446b0f3a70f703e2bf79 (rbb 0.10.0 (rule language 1))"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    },
+    {
+      "auctionId": "T5-30",
+      "tags": [
+        "rebid",
+        "accept-invite"
+      ],
+      "dealer": "S",
+      "auction": [
+        "1S",
+        "Pass",
+        "3S",
+        "Pass"
+      ],
+      "seat": "S",
+      "hand": {
+        "S": "AKJ74",
+        "H": "K82",
+        "D": "Q3",
+        "C": "K64"
+      },
+      "engine": {
+        "name": "saycbridge",
+        "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+      },
+      "status": "run",
+      "reason": null,
+      "result": {
+        "call": "4S",
+        "ruleId": "GameAccept",
+        "explanation": null,
+        "provenance": "rule",
+        "engine": {
+          "name": "saycbridge",
+          "version": "6d5c1c0b4ae42442aa9c3fb3010746a8a7cd5462"
+        }
+      },
+      "teacherAGrade": "",
+      "teacherBGrade": "",
+      "resolutionNote": ""
+    }
+  ]
+}

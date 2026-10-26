@@ -787,3 +787,15 @@ report is regenerated with `F4_REPORT=1 npx vitest run --project node test/f4.te
 (the review's derivation, #27) and the F4 label with its source, plus the rate at which
 double-dummy alone would blame an acceptable play. Under PRD D10 the labels are AI-sourced
 until the teachers' review (#100); the report says so. The study runs as a Node test.
+
+## Bidding harness (#4)
+
+Run `npm run bidding:harness -- --candidates <root> [--out <dir>]` with Node 24.
+Claude supplies the pinned external checkouts/builds and saycbridge venv; the harness
+builds nothing. Configuration and optional CLI wrappers are documented in
+[`tools/bidding-harness/README.md`](../tools/bidding-harness/README.md).
+It uses the committed 30 T5 auctions and writes deterministic CSV, JSON and a version/status
+README to `docs/reports/t5/` by default, without drafter expectations. Both teachers'
+grades and resolution notes are blank. Results distinguish `rule`, `not-covered`,
+`no-provenance` and candidate `not-run` with a reason; pons requires a BBA-free build
+manifest (LR-3, T3). This offline tool cannot be imported from `src/` and is not shipped.

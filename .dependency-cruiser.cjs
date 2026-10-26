@@ -1,5 +1,7 @@
 module.exports = {
   forbidden: [
+    // US-47: comparison engines are offline tooling, never app dependencies.
+    { name: 'no-app-bidding-harness', severity: 'error', from: { path: '(^|/)src/' }, to: { path: '(^|/)tools/bidding-harness/' } },
     { name: 'information-only-table-types', severity: 'error', from: { path: '(^|/)src/information/', pathNot: '\\.test\\.ts$' }, to: { pathNot: '(^|/)src/(information|table)/' } },
     { name: 'information-table-types-only', severity: 'error', from: { path: '(^|/)src/information/', pathNot: '\\.test\\.ts$' }, to: { path: '(^|/)src/table/', dependencyTypesNot: ['type-only'] } },
     // §4.2: analysis uses Table and its solver package, never UI or coaching.
