@@ -15,6 +15,7 @@
     "f4:labels": "node scripts/f4/labels.ts",
     "f4:draft": "node scripts/f4/draft.ts",
     "f4:fairness": "F4_FAIRNESS_REPORT=1 vitest run --project node test/f4Fairness.test.ts",
+    "f5:export": "F5_REPORT=1 vitest run --project node test/f5Export.test.ts",
     "robots:sample": "node scripts/robots/sample.ts",
     "bidding:harness": "node tools/bidding-harness/index.ts",
     "content:check": "node scripts/content/check.ts",

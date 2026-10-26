@@ -1,0 +1,415 @@
+"Ref","Kind","Information mode","What the learner could see","Wording shown","Source","Teacher A factually correct (yes/no)","Teacher A critical error (yes/no)","Teacher A clear (yes/no)","Teacher A note","Teacher B factually correct (yes/no)","Teacher B critical error (yes/no)","Teacher B clear (yes/no)","Teacher B note","Resolution note"
+"F5-01","hint","VISIBLE","Contract: 3 no-trumps, declarer south
+Learner's seat: south; acting seat: south
+Own hand: ♠A ♠J ♠7 ♠5 ♠4 ♥A ♥K ♥5 ♥4 ♦6 ♣A ♣5 ♣4
+Dummy: ♠9 ♠2 ♥Q ♥10 ♥8 ♥7 ♦A ♦Q ♦10 ♦3 ♦2 ♣10
+Announcements: north 8 HCP, east 6 HCP, south 16 HCP, west 10 HCP
+Tricks so far: none
+Current trick: west ♥3, north ♥2, east ♦5","No peeking: your view only
+From what you can see, 4 of hearts looks like your best card here.
+Across layouts that fit what you can see, this card takes the most tricks on average. Hidden cards could change the outcome.
+You choose the card","engine bridge-dds 1.4.0 / DDS 2.9, 50 samples, sampler bv-layout 1","","","","","","","","",""
+"F5-02","abstention","VISIBLE","Contract: 3 no-trumps, declarer south
+Learner's seat: south; acting seat: south
+Own hand: ♠A ♠J ♠7 ♠5 ♠4 ♥A ♥K ♥5 ♥4 ♦6 ♣A ♣5 ♣4
+Dummy: ♠9 ♠2 ♥Q ♥10 ♥8 ♥7 ♦A ♦Q ♦10 ♦3 ♦2 ♣10
+Announcements: north 8 HCP, east 6 HCP, south 16 HCP, west 10 HCP
+Tricks so far: none
+Current trick: west ♥3, north ♥2, east ♦5","No peeking: your view only
+I can't tell from what you can see: too many hidden layouts fit, or none does.
+You choose the card","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples, sampler bv-layout 1; FAULT-INJECTED: no-layout","","","","","","","","",""
+"F5-03","abstention","VISIBLE","Contract: 3 no-trumps, declarer south
+Learner's seat: south; acting seat: south
+Own hand: ♠A ♠J ♠7 ♠5 ♠4 ♥A ♥K ♥5 ♥4 ♦6 ♣A ♣5 ♣4
+Dummy: ♠9 ♠2 ♥Q ♥10 ♥8 ♥7 ♦A ♦Q ♦10 ♦3 ♦2 ♣10
+Announcements: north 8 HCP, east 6 HCP, south 16 HCP, west 10 HCP
+Tricks so far: none
+Current trick: west ♥3, north ♥2, east ♦5","No peeking: your view only
+The hint helper couldn't finish because something went wrong. You can keep playing.
+You choose the card","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples, sampler bv-layout 1; FAULT-INJECTED: error","","","","","","","","",""
+"F5-04","hint","VISIBLE","Contract: 1 spades, declarer south
+Learner's seat: south; acting seat: south
+Own hand: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5
+Dummy: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J
+Announcements: east 9 HCP, south 13 HCP, west 5 HCP, north 13 HCP
+Tricks so far: 1: west ♣7, north ♣3, east ♣2, south ♣Q; winner south
+Current trick: none","No peeking: your view only
+From what you can see, 3 of spades looks like your best card here.
+Across layouts that fit what you can see, this card takes the most tricks on average. Hidden cards could change the outcome.
+You choose the card","engine bridge-dds 1.4.0 / DDS 2.9, 50 samples, sampler bv-layout 1","","","","","","","","",""
+"F5-05","hint","VISIBLE","Contract: 1 no-trumps, declarer north
+Learner's seat: north; acting seat: south
+Own hand: ♠7 ♥A ♥K ♥10 ♥8 ♥2 ♦A ♣J ♣7 ♣3 ♣2
+Dummy: ♠6 ♠3 ♥J ♦K ♦Q ♦J ♦8 ♦5 ♣9 ♣8 ♣6
+Announcements: south 10 HCP, west 4 HCP, north 12 HCP, east 14 HCP
+Tricks so far: 1: east ♠Q, south ♠K, west ♠A, north ♠2; winner west; 2: west ♠5, north ♠4, east ♠8, south ♠9; winner south
+Current trick: none","No peeking: your view only
+From what you can see, 5 of diamonds looks like your best card here.
+Across layouts that fit what you can see, this card takes the most tricks on average. Hidden cards could change the outcome.
+You choose the card","engine bridge-dds 1.4.0 / DDS 2.9, 50 samples, sampler bv-layout 1","","","","","","","","",""
+"F5-06","abstention","VISIBLE","Contract: not chosen (MiniBridge contract-choice)
+Learner's seat: north
+Own hand: ♠A ♠K ♠9 ♠3 ♠2 ♥10 ♥8 ♦K ♦10 ♦3 ♣Q ♣9 ♣8
+Dummy: ♠Q ♠8 ♠6 ♠4 ♥K ♥7 ♦Q ♦9 ♦8 ♦6 ♦5 ♦2 ♣A
+Announcements: north 12 HCP, east 10 HCP, south 11 HCP, west 7 HCP
+Tricks so far: none
+Current trick: none","There isn't a lesson hint for choosing this contract yet. You can choose it yourself.","template hint.not-covered","","","","","","","","",""
+"F5-07","moment verdict","ALL_HANDS","ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.
+Contract: 3 no-trumps, declarer south
+Learner's seat: south; acting seat: south
+Own hand: ♠A ♠J ♠7 ♠5 ♠4 ♥A ♥K ♥5 ♥4 ♦6 ♣A ♣5 ♣4
+Dummy: ♠9 ♠2 ♥Q ♥10 ♥8 ♥7 ♦A ♦Q ♦10 ♦3 ♦2 ♣10
+Announcements: north 8 HCP, east 6 HCP, south 16 HCP, west 10 HCP
+Tricks so far: none
+Current trick: west ♥3, north ♥2, east ♦5
+Reviewed play: south ♥A
+ALL_HANDS remaining cards (hindsight):
+north: ♠9 ♠2 ♥Q ♥10 ♥8 ♥7 ♦A ♦Q ♦10 ♦3 ♦2 ♣10
+east: ♠Q ♠6 ♠3 ♦J ♦9 ♦8 ♦7 ♣Q ♣J ♣8 ♣6 ♣2
+south: ♠A ♠J ♠7 ♠5 ♠4 ♥A ♥K ♥5 ♥4 ♦6 ♣A ♣5 ♣4
+west: ♠K ♠10 ♠8 ♥J ♥9 ♥6 ♦K ♦4 ♣K ♣9 ♣7 ♣3","A reasonable choice with what you could see, and it cost no tricks in this layout. X-ray view: with all cards visible","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples; F4 sound; AI labels (PRD D10)","","","","","","","","",""
+"F5-08","moment label","ALL_HANDS","ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.
+Contract: 3 no-trumps, declarer south
+Learner's seat: south; acting seat: south
+Own hand: ♠A ♠J ♠7 ♠5 ♠4 ♥A ♥K ♥5 ♥4 ♦6 ♣A ♣5 ♣4
+Dummy: ♠9 ♠2 ♥Q ♥10 ♥8 ♥7 ♦A ♦Q ♦10 ♦3 ♦2 ♣10
+Announcements: north 8 HCP, east 6 HCP, south 16 HCP, west 10 HCP
+Tricks so far: none
+Current trick: west ♥3, north ♥2, east ♦5
+Reviewed play: south ♥A
+ALL_HANDS remaining cards (hindsight):
+north: ♠9 ♠2 ♥Q ♥10 ♥8 ♥7 ♦A ♦Q ♦10 ♦3 ♦2 ♣10
+east: ♠Q ♠6 ♠3 ♦J ♦9 ♦8 ♦7 ♣Q ♣J ♣8 ♣6 ♣2
+south: ♠A ♠J ♠7 ♠5 ♠4 ♥A ♥K ♥5 ♥4 ♦6 ♣A ♣5 ♣4
+west: ♠K ♠10 ♠8 ♥J ♥9 ♥6 ♦K ♦4 ♣K ♣9 ♣7 ♣3","Solid X-ray view: with all cards visible","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples; F4 sound; AI labels (PRD D10)","","","","","","","","",""
+"F5-09","moment verdict","ALL_HANDS","ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.
+Contract: 1 spades, declarer south
+Learner's seat: south; acting seat: south
+Own hand: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5
+Dummy: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J
+Announcements: east 9 HCP, south 13 HCP, west 5 HCP, north 13 HCP
+Tricks so far: 1: west ♣7, north ♣3, east ♣2, south ♣Q; winner south
+Current trick: none
+Reviewed play: south ♥8
+ALL_HANDS remaining cards (hindsight):
+north: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J
+east: ♠J ♠8 ♥A ♥K ♥10 ♥7 ♥5 ♥4 ♦J ♦7 ♦5 ♣9
+south: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5
+west: ♠10 ♠6 ♥Q ♥9 ♥2 ♦8 ♦6 ♦4 ♣K ♣10 ♣8 ♣4","The information you had supported a better choice, and this play cost tricks in this layout. X-ray view: with all cards visible","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples; F4 mistake; AI labels (PRD D10)","","","","","","","","",""
+"F5-10","moment label","ALL_HANDS","ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.
+Contract: 1 spades, declarer south
+Learner's seat: south; acting seat: south
+Own hand: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5
+Dummy: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J
+Announcements: east 9 HCP, south 13 HCP, west 5 HCP, north 13 HCP
+Tricks so far: 1: west ♣7, north ♣3, east ♣2, south ♣Q; winner south
+Current trick: none
+Reviewed play: south ♥8
+ALL_HANDS remaining cards (hindsight):
+north: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J
+east: ♠J ♠8 ♥A ♥K ♥10 ♥7 ♥5 ♥4 ♦J ♦7 ♦5 ♣9
+south: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5
+west: ♠10 ♠6 ♥Q ♥9 ♥2 ♦8 ♦6 ♦4 ♣K ♣10 ♣8 ♣4","Better option X-ray view: with all cards visible","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples; F4 mistake; AI labels (PRD D10)","","","","","","","","",""
+"F5-11","moment alternative","VISIBLE","Contract: 1 spades, declarer south
+Learner's seat: south; acting seat: south
+Own hand: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5
+Dummy: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J
+Announcements: east 9 HCP, south 13 HCP, west 5 HCP, north 13 HCP
+Tricks so far: 1: west ♣7, north ♣3, east ♣2, south ♣Q; winner south
+Current trick: none","An acceptable option with what you could see: Queen of spades.","authored D02-C04, version f4-draft; F4 mistake; AI labels (PRD D10)","","","","","","","","",""
+"F5-12","moment verdict","ALL_HANDS","ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.
+Contract: 1 no-trumps, declarer north
+Learner's seat: north; acting seat: south
+Own hand: ♠7 ♥A ♥K ♥10 ♥8 ♥2 ♦A ♣J ♣7 ♣3 ♣2
+Dummy: ♠6 ♠3 ♥J ♦K ♦Q ♦J ♦8 ♦5 ♣9 ♣8 ♣6
+Announcements: south 10 HCP, west 4 HCP, north 12 HCP, east 14 HCP
+Tricks so far: 1: east ♠Q, south ♠K, west ♠A, north ♠2; winner west; 2: west ♠5, north ♠4, east ♠8, south ♠9; winner south
+Current trick: none
+Reviewed play: south ♠6
+ALL_HANDS remaining cards (hindsight):
+north: ♠7 ♥A ♥K ♥10 ♥8 ♥2 ♦A ♣J ♣7 ♣3 ♣2
+east: ♠J ♥Q ♥6 ♥4 ♦10 ♦6 ♦4 ♦3 ♣A ♣K ♣Q
+south: ♠6 ♠3 ♥J ♦K ♦Q ♦J ♦8 ♦5 ♣9 ♣8 ♣6
+west: ♠10 ♥9 ♥7 ♥5 ♥3 ♦9 ♦7 ♦2 ♣10 ♣5 ♣4","This cost no tricks in this layout, but the information you had supported a better choice. X-ray view: with all cards visible","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples; F4 lucky; AI labels (PRD D10)","","","","","","","","",""
+"F5-13","moment label","ALL_HANDS","ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.
+Contract: 1 no-trumps, declarer north
+Learner's seat: north; acting seat: south
+Own hand: ♠7 ♥A ♥K ♥10 ♥8 ♥2 ♦A ♣J ♣7 ♣3 ♣2
+Dummy: ♠6 ♠3 ♥J ♦K ♦Q ♦J ♦8 ♦5 ♣9 ♣8 ♣6
+Announcements: south 10 HCP, west 4 HCP, north 12 HCP, east 14 HCP
+Tricks so far: 1: east ♠Q, south ♠K, west ♠A, north ♠2; winner west; 2: west ♠5, north ♠4, east ♠8, south ♠9; winner south
+Current trick: none
+Reviewed play: south ♠6
+ALL_HANDS remaining cards (hindsight):
+north: ♠7 ♥A ♥K ♥10 ♥8 ♥2 ♦A ♣J ♣7 ♣3 ♣2
+east: ♠J ♥Q ♥6 ♥4 ♦10 ♦6 ♦4 ♦3 ♣A ♣K ♣Q
+south: ♠6 ♠3 ♥J ♦K ♦Q ♦J ♦8 ♦5 ♣9 ♣8 ♣6
+west: ♠10 ♥9 ♥7 ♥5 ♥3 ♦9 ♦7 ♦2 ♣10 ♣5 ♣4","Worked this time X-ray view: with all cards visible","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples; F4 lucky; AI labels (PRD D10)","","","","","","","","",""
+"F5-14","moment alternative","VISIBLE","Contract: 1 no-trumps, declarer north
+Learner's seat: north; acting seat: south
+Own hand: ♠7 ♥A ♥K ♥10 ♥8 ♥2 ♦A ♣J ♣7 ♣3 ♣2
+Dummy: ♠6 ♠3 ♥J ♦K ♦Q ♦J ♦8 ♦5 ♣9 ♣8 ♣6
+Announcements: south 10 HCP, west 4 HCP, north 12 HCP, east 14 HCP
+Tricks so far: 1: east ♠Q, south ♠K, west ♠A, north ♠2; winner west; 2: west ♠5, north ♠4, east ♠8, south ♠9; winner south
+Current trick: none","An acceptable option with what you could see: 8 of diamonds.","authored D03-C01, version f4-draft; F4 lucky; AI labels (PRD D10)","","","","","","","","",""
+"F5-15","moment verdict","ALL_HANDS","ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.
+Contract: 1 no-trumps, declarer south
+Learner's seat: south; acting seat: south
+Own hand: ♠K ♠Q ♠9 ♥7 ♥6 ♥2 ♦10 ♦8 ♦3 ♦2 ♣7
+Dummy: ♠10 ♠8 ♠7 ♠6 ♥K ♥10 ♦A ♦Q ♦J ♣10 ♣4
+Announcements: south 13 HCP, west 8 HCP, north 10 HCP, east 9 HCP
+Tricks so far: 1: west ♣Q, north ♣2, east ♣3, south ♣A; winner south; 2: south ♠A, west ♠2, north ♠3, east ♠4; winner south
+Current trick: none
+Reviewed play: south ♠K
+ALL_HANDS remaining cards (hindsight):
+north: ♠10 ♠8 ♠7 ♠6 ♥K ♥10 ♦A ♦Q ♦J ♣10 ♣4
+east: ♥A ♥Q ♥5 ♥3 ♦7 ♦6 ♦5 ♣K ♣9 ♣8 ♣5
+south: ♠K ♠Q ♠9 ♥7 ♥6 ♥2 ♦10 ♦8 ♦3 ♦2 ♣7
+west: ♠J ♠5 ♥J ♥9 ♥8 ♥4 ♦K ♦9 ♦4 ♣J ♣6","A reasonable choice with what you could see. This layout cost tricks, but that does not make the decision a mistake. X-ray view: with all cards visible","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples; F4 unlucky; AI labels (PRD D10)","","","","","","","","",""
+"F5-16","moment label","ALL_HANDS","ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.
+Contract: 1 no-trumps, declarer south
+Learner's seat: south; acting seat: south
+Own hand: ♠K ♠Q ♠9 ♥7 ♥6 ♥2 ♦10 ♦8 ♦3 ♦2 ♣7
+Dummy: ♠10 ♠8 ♠7 ♠6 ♥K ♥10 ♦A ♦Q ♦J ♣10 ♣4
+Announcements: south 13 HCP, west 8 HCP, north 10 HCP, east 9 HCP
+Tricks so far: 1: west ♣Q, north ♣2, east ♣3, south ♣A; winner south; 2: south ♠A, west ♠2, north ♠3, east ♠4; winner south
+Current trick: none
+Reviewed play: south ♠K
+ALL_HANDS remaining cards (hindsight):
+north: ♠10 ♠8 ♠7 ♠6 ♥K ♥10 ♦A ♦Q ♦J ♣10 ♣4
+east: ♥A ♥Q ♥5 ♥3 ♦7 ♦6 ♦5 ♣K ♣9 ♣8 ♣5
+south: ♠K ♠Q ♠9 ♥7 ♥6 ♥2 ♦10 ♦8 ♦3 ♦2 ♣7
+west: ♠J ♠5 ♥J ♥9 ♥8 ♥4 ♦K ♦9 ♦4 ♣J ♣6","Good call, bad luck X-ray view: with all cards visible","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples; F4 unlucky; AI labels (PRD D10)","","","","","","","","",""
+"F5-17","trick cost","ALL_HANDS","ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.
+Contract: 3 no-trumps, declarer east
+Learner's seat: south; acting seat: south
+Own hand: ♠J ♠9 ♠6 ♠3 ♥9 ♥5 ♥4 ♥2 ♦10 ♦6 ♦5 ♣7 ♣6
+Dummy: ♠A ♠10 ♠8 ♠5 ♠2 ♦Q ♦8 ♦7 ♦3 ♦2 ♣Q ♣J ♣9
+Announcements: north 15 HCP, east 15 HCP, south 1 HCP, west 9 HCP
+Tricks so far: none
+Current trick: none
+Reviewed play: south ♠J
+ALL_HANDS remaining cards (hindsight):
+north: ♠7 ♥A ♥K ♥Q ♥8 ♥6 ♦K ♦9 ♦4 ♣K ♣10 ♣8 ♣4
+east: ♠K ♠Q ♠4 ♥J ♥10 ♥7 ♥3 ♦A ♦J ♣A ♣5 ♣3 ♣2
+south: ♠J ♠9 ♠6 ♠3 ♥9 ♥5 ♥4 ♥2 ♦10 ♦6 ♦5 ♣7 ♣6
+west: ♠A ♠10 ♠8 ♠5 ♠2 ♦Q ♦8 ♦7 ♦3 ♦2 ♣Q ♣J ♣9","Trick cost: 0. X-ray view: with all cards visible. Engine: bridge-dds, version 1.4.0 / DDS 2.9.","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples","","","","","","","","",""
+"F5-18","trick cost","ALL_HANDS","ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.
+Contract: 4 spades, declarer east
+Learner's seat: south; acting seat: south
+Own hand: ♠K ♠3 ♠2 ♥J ♥10 ♥9 ♥7 ♥3 ♦K ♦J ♣8 ♣3 ♣2
+Dummy: ♠A ♠J ♠8 ♠7 ♠4 ♥8 ♦6 ♦4 ♦3 ♣A ♣Q ♣10 ♣5
+Announcements: west 11 HCP, north 8 HCP, east 13 HCP, south 8 HCP
+Tricks so far: none
+Current trick: none
+Reviewed play: south ♥J
+ALL_HANDS remaining cards (hindsight):
+north: ♠9 ♠6 ♠5 ♥K ♥6 ♦A ♦10 ♦7 ♦5 ♦2 ♣J ♣9 ♣7
+east: ♠Q ♠10 ♥A ♥Q ♥5 ♥4 ♥2 ♦Q ♦9 ♦8 ♣K ♣6 ♣4
+south: ♠K ♠3 ♠2 ♥J ♥10 ♥9 ♥7 ♥3 ♦K ♦J ♣8 ♣3 ♣2
+west: ♠A ♠J ♠8 ♠7 ♠4 ♥8 ♦6 ♦4 ♦3 ♣A ♣Q ♣10 ♣5","Trick cost: 1. X-ray view: with all cards visible. Engine: bridge-dds, version 1.4.0 / DDS 2.9.","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples","","","","","","","","",""
+"F5-19","trick cost","ALL_HANDS","ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.
+Contract: 1 spades, declarer south
+Learner's seat: south; acting seat: south
+Own hand: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5
+Dummy: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J
+Announcements: east 9 HCP, south 13 HCP, west 5 HCP, north 13 HCP
+Tricks so far: 1: west ♣7, north ♣3, east ♣2, south ♣Q; winner south
+Current trick: none
+Reviewed play: south ♣6
+ALL_HANDS remaining cards (hindsight):
+north: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J
+east: ♠J ♠8 ♥A ♥K ♥10 ♥7 ♥5 ♥4 ♦J ♦7 ♦5 ♣9
+south: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5
+west: ♠10 ♠6 ♥Q ♥9 ♥2 ♦8 ♦6 ♦4 ♣K ♣10 ♣8 ♣4","Trick cost: 2. X-ray view: with all cards visible. Engine: bridge-dds, version 1.4.0 / DDS 2.9.","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples","","","","","","","","",""
+"F5-20","trick cost","ALL_HANDS","ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.
+Contract: 3 no-trumps, declarer east
+Learner's seat: south; acting seat: south
+Own hand: ♠J ♠9 ♠6 ♠3 ♥4 ♥2 ♦6 ♦5 ♣7 ♣6
+Dummy: ♠A ♠10 ♠8 ♦Q ♦8 ♦7 ♦3 ♣Q ♣J ♣9
+Announcements: north 15 HCP, east 15 HCP, south 1 HCP, west 9 HCP
+Tricks so far: 1: south ♥5, west ♠2, north ♥6, east ♥7; winner east; 2: east ♦J, south ♦10, west ♦2, north ♦K; winner north; 3: north ♥8, east ♥3, south ♥9, west ♠5; winner south
+Current trick: none
+Reviewed play: south ♠J
+ALL_HANDS remaining cards (hindsight):
+north: ♠7 ♥A ♥K ♥Q ♦9 ♦4 ♣K ♣10 ♣8 ♣4
+east: ♠K ♠Q ♠4 ♥J ♥10 ♦A ♣A ♣5 ♣3 ♣2
+south: ♠J ♠9 ♠6 ♠3 ♥4 ♥2 ♦6 ♦5 ♣7 ♣6
+west: ♠A ♠10 ♠8 ♦Q ♦8 ♦7 ♦3 ♣Q ♣J ♣9","Trick cost: 3. X-ray view: with all cards visible. Engine: bridge-dds, version 1.4.0 / DDS 2.9.","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples","","","","","","","","",""
+"F5-21","trick cost","ALL_HANDS","ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.
+Contract: 1 no-trumps, declarer north
+Learner's seat: north; acting seat: north
+Own hand: ♠A ♠K ♠9 ♠3 ♠2 ♥10 ♥8 ♦K ♦10 ♦3 ♣Q ♣9 ♣8
+Dummy: ♠Q ♠8 ♠6 ♠4 ♥K ♥7 ♦Q ♦9 ♦8 ♦6 ♦5 ♦2
+Announcements: north 12 HCP, east 10 HCP, south 11 HCP, west 7 HCP
+Tricks so far: none
+Current trick: east ♣4, south ♣A, west ♣K
+Reviewed play: north ♣Q
+ALL_HANDS remaining cards (hindsight):
+north: ♠A ♠K ♠9 ♠3 ♠2 ♥10 ♥8 ♦K ♦10 ♦3 ♣Q ♣9 ♣8
+east: ♠J ♠7 ♥A ♥9 ♥5 ♥2 ♦A ♦7 ♣J ♣6 ♣5 ♣2
+south: ♠Q ♠8 ♠6 ♠4 ♥K ♥7 ♦Q ♦9 ♦8 ♦6 ♦5 ♦2
+west: ♠10 ♠5 ♥Q ♥J ♥6 ♥4 ♥3 ♦J ♦4 ♣10 ♣7 ♣3","Trick cost: 4. X-ray view: with all cards visible. Engine: bridge-dds, version 1.4.0 / DDS 2.9.","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples","","","","","","","","",""
+"F5-22","trick cost","ALL_HANDS","ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.
+Contract: 1 no-trumps, declarer south
+Learner's seat: south; acting seat: south
+Own hand: ♠4 ♥K ♥Q ♥9 ♥7 ♦A ♦J ♦8 ♦5 ♦4
+Dummy: ♠Q ♠9 ♠3 ♥3 ♦9 ♦7 ♦6 ♣8 ♣3 ♣2
+Announcements: south 13 HCP, west 8 HCP, north 10 HCP, east 9 HCP
+Tricks so far: 1: west ♣K, north ♣A, east ♣J, south ♣9; winner north; 2: north ♥A, east ♥4, south ♥2, west ♥5; winner north; 3: north ♦3, east ♦10, south ♦K, west ♦2; winner south
+Current trick: none
+Reviewed play: south ♦J
+ALL_HANDS remaining cards (hindsight):
+north: ♠Q ♠9 ♠3 ♥3 ♦9 ♦7 ♦6 ♣8 ♣3 ♣2
+east: ♠A ♠K ♠10 ♠8 ♠7 ♠6 ♠2 ♥J ♣5 ♣4
+south: ♠4 ♥K ♥Q ♥9 ♥7 ♦A ♦J ♦8 ♦5 ♦4
+west: ♠J ♠5 ♥10 ♥8 ♥6 ♦Q ♣Q ♣10 ♣7 ♣6","Trick cost: 7. X-ray view: with all cards visible. Engine: bridge-dds, version 1.4.0 / DDS 2.9.","engine bridge-dds 1.4.0 / DDS 2.9, 0 samples","","","","","","","","",""
+"F5-23","sampled quality","VISIBLE","Contract: 1 no-trumps, declarer north
+Learner's seat: north; acting seat: north
+Own hand: ♠A ♠K ♠9 ♠3 ♠2 ♥10 ♥8 ♦K ♦10 ♦3 ♣Q ♣9 ♣8
+Dummy: ♠Q ♠8 ♠6 ♠4 ♥K ♥7 ♦Q ♦9 ♦8 ♦6 ♦5 ♦2
+Announcements: north 12 HCP, east 10 HCP, south 11 HCP, west 7 HCP
+Tricks so far: none
+Current trick: east ♣4, south ♣A, west ♣K
+Reviewed play: north ♣Q","Decision quality: a better choice was available on the cards you could see, based on sampled layouts.","engine bridge-dds 1.4.0 / DDS 2.9, 50 samples, sampler bv-layout 1, seed b8fcbcdcc8d56faa","","","","","","","","",""
+"F5-24","hint","VISIBLE","Contract: 1 no-trumps, declarer north
+Learner's seat: north; acting seat: south
+Own hand: ♠A ♠K ♠9 ♠3 ♠2 ♥10 ♥8 ♦K ♦10 ♦3 ♣Q ♣9 ♣8
+Dummy: ♠Q ♠8 ♠6 ♠4 ♥K ♥7 ♦Q ♦9 ♦8 ♦6 ♦5 ♦2 ♣A
+Announcements: north 12 HCP, east 10 HCP, south 11 HCP, west 7 HCP
+Tricks so far: none
+Current trick: east ♣4","Only one card can be played here: Ace of clubs","template hint.forced-card","","","","","","","","",""
+"F5-25","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: north
+Own hand: ♥A ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q
+Dummy: not exposed
+Announcements: none
+Tricks so far: none
+Current trick: none","Let’s follow suit. Watch North lead a heart, then find a heart of your own.","authored follow-suit.exercise, version 1","","","","","","","","",""
+"F5-26","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: north
+Own hand: ♥A ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q
+Dummy: not exposed
+Announcements: none
+Tricks so far: none
+Current trick: none","Watch the scripted play.","authored follow-suit.exercise, version 1","","","","","","","","",""
+"F5-27","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: south
+Own hand: ♥A ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q
+Dummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4
+Announcements: none
+Tricks so far: none
+Current trick: north ♥10, east ♥9","Hearts were led, so everyone plays a heart if they can. Got one?
+Tap a card you're allowed to play
+Nice. You followed suit. Any of these works: Ace of hearts, King of hearts, Queen of hearts.
+Not quite — choose a heart to follow the suit led.
+Try again.
+These answers follow suit: Ace of hearts, King of hearts, Queen of hearts. We’ll play the first one together.
+Look for the heart symbol. You must follow the suit that was led if you have it.","authored follow-suit.prompt, version 1","","","","","","","","",""
+"F5-28","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: west
+Own hand: ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q
+Dummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4
+Announcements: none
+Tricks so far: none
+Current trick: north ♥10, east ♥9, south ♥A","Watch the scripted play.","authored follow-suit.exercise, version 1","","","","","","","","",""
+"F5-29","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: south
+Own hand: ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q
+Dummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4
+Announcements: none
+Tricks so far: 1: north ♥10, east ♥9, south ♥A, west ♥4; winner south
+Current trick: none","You followed suit: play the suit led whenever you have it.","authored follow-suit.exercise, version 1","","","","","","","","",""
+"F5-30","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: north
+Own hand: ♥A ♥K ♥Q ♠6 ♠5 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q
+Dummy: not exposed
+Announcements: none
+Tricks so far: none
+Current trick: none","Look at West's heart, then follow the suit North leads.","authored follow-suit-2.exercise, version 1","","","","","","","","",""
+"F5-31","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: north
+Own hand: ♥A ♥K ♥Q ♠6 ♠5 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q
+Dummy: not exposed
+Announcements: none
+Tricks so far: none
+Current trick: none
+Authored lesson Exposure (presentation only): west ♥4","West's heart is shown for this lesson. Robots still use their usual view.
+Shown for this lesson","authored follow-suit-2.exercise, version 1","","","","","","","","",""
+"F5-32","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: north
+Own hand: ♥A ♥K ♥Q ♠6 ♠5 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q
+Dummy: not exposed
+Announcements: none
+Tricks so far: none
+Current trick: none
+Authored lesson Exposure (presentation only): west ♥4","Watch the scripted play.","authored follow-suit-2.exercise, version 1","","","","","","","","",""
+"F5-33","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: south
+Own hand: ♥A ♥K ♥Q ♠6 ♠5 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q
+Dummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4
+Announcements: none
+Tricks so far: none
+Current trick: north ♥10, east ♥9
+Authored lesson Exposure (presentation only): west ♥4","Hearts were led, so everyone plays a heart if they can. Got one?
+Tap a card you're allowed to play
+Nice. You followed suit. Any of these works: Ace of hearts, King of hearts, Queen of hearts.
+Not quite — choose a heart to follow the suit led.
+Try again.
+These answers follow suit: Ace of hearts, King of hearts, Queen of hearts. We’ll play the first one together.
+Look for the heart symbol. You must follow the suit that was led if you have it.","authored follow-suit-2.prompt, version 1","","","","","","","","",""
+"F5-34","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: west
+Own hand: ♥K ♥Q ♠6 ♠5 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q
+Dummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4
+Announcements: none
+Tricks so far: none
+Current trick: north ♥10, east ♥9, south ♥A
+Authored lesson Exposure (presentation only): west ♥4","Watch the scripted play.","authored follow-suit-2.exercise, version 1","","","","","","","","",""
+"F5-35","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: south
+Own hand: ♥K ♥Q ♠6 ♠5 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q
+Dummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4
+Announcements: none
+Tricks so far: 1: north ♥10, east ♥9, south ♥A, west ♥4; winner south
+Current trick: none","You followed suit: play the suit led whenever you have it.","authored follow-suit-2.exercise, version 1","","","","","","","","",""
+"F5-36","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: north
+Own hand: ♥A ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦5 ♣J ♣7 ♣3 ♠Q
+Dummy: not exposed
+Announcements: none
+Tricks so far: none
+Current trick: none","Try following suit on your own. Choose a heart after North leads.","authored follow-suit-3.exercise, version 1","","","","","","","","",""
+"F5-37","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: north
+Own hand: ♥A ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦5 ♣J ♣7 ♣3 ♠Q
+Dummy: not exposed
+Announcements: none
+Tricks so far: none
+Current trick: none","Watch the scripted play.","authored follow-suit-3.exercise, version 1","","","","","","","","",""
+"F5-38","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: south
+Own hand: ♥A ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦5 ♣J ♣7 ♣3 ♠Q
+Dummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4
+Announcements: none
+Tricks so far: none
+Current trick: north ♥10, east ♥9","Hearts were led, so everyone plays a heart if they can. Got one?
+Tap a card you're allowed to play
+Nice. You followed suit. Any of these works: Ace of hearts, King of hearts, Queen of hearts.
+Not quite — choose a heart to follow the suit led.
+Try again.
+These answers follow suit: Ace of hearts, King of hearts, Queen of hearts. We’ll play the first one together.","authored follow-suit-3.prompt, version 1","","","","","","","","",""
+"F5-39","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: west
+Own hand: ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦5 ♣J ♣7 ♣3 ♠Q
+Dummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4
+Announcements: none
+Tricks so far: none
+Current trick: north ♥10, east ♥9, south ♥A","Watch the scripted play.","authored follow-suit-3.exercise, version 1","","","","","","","","",""
+"F5-40","lesson step","VISIBLE","Contract: 1 no-trumps, declarer west
+Learner's seat: south; acting seat: south
+Own hand: ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦5 ♣J ♣7 ♣3 ♠Q
+Dummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4
+Announcements: none
+Tricks so far: 1: north ♥10, east ♥9, south ♥A, west ♥4; winner south
+Current trick: none","You followed suit: play the suit led whenever you have it.","authored follow-suit-3.exercise, version 1","","","","","","","","",""

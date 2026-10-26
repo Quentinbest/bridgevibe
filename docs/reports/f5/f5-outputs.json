@@ -1,0 +1,1464 @@
+{
+  "schemaVersion": 1,
+  "format": "bridgevibe-f5",
+  "exportedAt": "2026-10-26T00:00:00.000Z",
+  "appVersion": "0.0.0",
+  "entries": [
+    {
+      "kind": "statement",
+      "summary": "hint.advice",
+      "text": "No peeking: your view only\nFrom what you can see, 4 of hearts looks like your best card here.\nAcross layouts that fit what you can see, this card takes the most tricks on average. Hidden cards could change the outcome.\nYou choose the card",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "VISIBLE",
+        "sampleCount": 50,
+        "hint": {
+          "sampler": "bv-layout",
+          "samplerVersion": "1",
+          "enumerated": false,
+          "templateId": "hint.advice",
+          "durationMs": 0,
+          "exceededTarget": false,
+          "advisedClass": [
+            {
+              "suit": "hearts",
+              "rank": "5"
+            },
+            {
+              "suit": "hearts",
+              "rank": "4"
+            }
+          ]
+        }
+      },
+      "id": "f5-hint-0",
+      "playthroughId": "f5-playthrough-1",
+      "positionIndex": 3,
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "hint",
+      "visibleContext": "Contract: 3 no-trumps, declarer south\nLearner's seat: south; acting seat: south\nOwn hand: ♠A ♠J ♠7 ♠5 ♠4 ♥A ♥K ♥5 ♥4 ♦6 ♣A ♣5 ♣4\nDummy: ♠9 ♠2 ♥Q ♥10 ♥8 ♥7 ♦A ♦Q ♦10 ♦3 ♦2 ♣10\nAnnouncements: north 8 HCP, east 6 HCP, south 16 HCP, west 10 HCP\nTricks so far: none\nCurrent trick: west ♥3, north ♥2, east ♦5",
+      "fault": null,
+      "ref": "F5-01",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 50 samples, sampler bv-layout 1"
+    },
+    {
+      "kind": "statement",
+      "summary": "hint.uncertain",
+      "text": "No peeking: your view only\nI can't tell from what you can see: too many hidden layouts fit, or none does.\nYou choose the card",
+      "abstention": {
+        "reason": "uncertain",
+        "cause": "constraints"
+      },
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "VISIBLE",
+        "sampleCount": 0,
+        "hint": {
+          "sampler": "bv-layout",
+          "samplerVersion": "1",
+          "enumerated": false,
+          "templateId": "hint.uncertain",
+          "durationMs": 0,
+          "exceededTarget": false
+        }
+      },
+      "id": "f5-hint-1",
+      "playthroughId": "f5-playthrough-1",
+      "positionIndex": 3,
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "abstention",
+      "visibleContext": "Contract: 3 no-trumps, declarer south\nLearner's seat: south; acting seat: south\nOwn hand: ♠A ♠J ♠7 ♠5 ♠4 ♥A ♥K ♥5 ♥4 ♦6 ♣A ♣5 ♣4\nDummy: ♠9 ♠2 ♥Q ♥10 ♥8 ♥7 ♦A ♦Q ♦10 ♦3 ♦2 ♣10\nAnnouncements: north 8 HCP, east 6 HCP, south 16 HCP, west 10 HCP\nTricks so far: none\nCurrent trick: west ♥3, north ♥2, east ♦5",
+      "fault": "no-layout",
+      "ref": "F5-02",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples, sampler bv-layout 1"
+    },
+    {
+      "kind": "statement",
+      "summary": "hint.unavailable-failure",
+      "text": "No peeking: your view only\nThe hint helper couldn't finish because something went wrong. You can keep playing.\nYou choose the card",
+      "abstention": {
+        "reason": "unavailable",
+        "cause": "error"
+      },
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "VISIBLE",
+        "sampleCount": 0,
+        "hint": {
+          "sampler": "bv-layout",
+          "samplerVersion": "1",
+          "enumerated": false,
+          "templateId": "hint.unavailable-failure",
+          "durationMs": 0,
+          "exceededTarget": false
+        }
+      },
+      "id": "f5-hint-2",
+      "playthroughId": "f5-playthrough-1",
+      "positionIndex": 3,
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "abstention",
+      "visibleContext": "Contract: 3 no-trumps, declarer south\nLearner's seat: south; acting seat: south\nOwn hand: ♠A ♠J ♠7 ♠5 ♠4 ♥A ♥K ♥5 ♥4 ♦6 ♣A ♣5 ♣4\nDummy: ♠9 ♠2 ♥Q ♥10 ♥8 ♥7 ♦A ♦Q ♦10 ♦3 ♦2 ♣10\nAnnouncements: north 8 HCP, east 6 HCP, south 16 HCP, west 10 HCP\nTricks so far: none\nCurrent trick: west ♥3, north ♥2, east ♦5",
+      "fault": "error",
+      "ref": "F5-03",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples, sampler bv-layout 1"
+    },
+    {
+      "kind": "statement",
+      "summary": "hint.advice",
+      "text": "No peeking: your view only\nFrom what you can see, 3 of spades looks like your best card here.\nAcross layouts that fit what you can see, this card takes the most tricks on average. Hidden cards could change the outcome.\nYou choose the card",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "VISIBLE",
+        "sampleCount": 50,
+        "hint": {
+          "sampler": "bv-layout",
+          "samplerVersion": "1",
+          "enumerated": false,
+          "templateId": "hint.advice",
+          "durationMs": 0,
+          "exceededTarget": false,
+          "advisedClass": [
+            {
+              "suit": "spades",
+              "rank": "3"
+            }
+          ]
+        }
+      },
+      "id": "f5-hint-3",
+      "playthroughId": "f5-playthrough-2",
+      "positionIndex": 4,
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "hint",
+      "visibleContext": "Contract: 1 spades, declarer south\nLearner's seat: south; acting seat: south\nOwn hand: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5\nDummy: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J\nAnnouncements: east 9 HCP, south 13 HCP, west 5 HCP, north 13 HCP\nTricks so far: 1: west ♣7, north ♣3, east ♣2, south ♣Q; winner south\nCurrent trick: none",
+      "fault": null,
+      "ref": "F5-04",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 50 samples, sampler bv-layout 1"
+    },
+    {
+      "kind": "statement",
+      "summary": "hint.advice",
+      "text": "No peeking: your view only\nFrom what you can see, 5 of diamonds looks like your best card here.\nAcross layouts that fit what you can see, this card takes the most tricks on average. Hidden cards could change the outcome.\nYou choose the card",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "VISIBLE",
+        "sampleCount": 50,
+        "hint": {
+          "sampler": "bv-layout",
+          "samplerVersion": "1",
+          "enumerated": false,
+          "templateId": "hint.advice",
+          "durationMs": 0,
+          "exceededTarget": false,
+          "advisedClass": [
+            {
+              "suit": "diamonds",
+              "rank": "5"
+            }
+          ]
+        }
+      },
+      "id": "f5-hint-4",
+      "playthroughId": "f5-playthrough-3",
+      "positionIndex": 8,
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "hint",
+      "visibleContext": "Contract: 1 no-trumps, declarer north\nLearner's seat: north; acting seat: south\nOwn hand: ♠7 ♥A ♥K ♥10 ♥8 ♥2 ♦A ♣J ♣7 ♣3 ♣2\nDummy: ♠6 ♠3 ♥J ♦K ♦Q ♦J ♦8 ♦5 ♣9 ♣8 ♣6\nAnnouncements: south 10 HCP, west 4 HCP, north 12 HCP, east 14 HCP\nTricks so far: 1: east ♠Q, south ♠K, west ♠A, north ♠2; winner west; 2: west ♠5, north ♠4, east ♠8, south ♠9; winner south\nCurrent trick: none",
+      "fault": null,
+      "ref": "F5-05",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 50 samples, sampler bv-layout 1"
+    },
+    {
+      "kind": "statement",
+      "summary": "hint.not-covered",
+      "text": "There isn't a lesson hint for choosing this contract yet. You can choose it yourself.",
+      "abstention": {
+        "reason": "not-covered",
+        "cause": "no-authored-hint"
+      },
+      "provenance": {
+        "sourceKind": "template",
+        "templateId": "hint.not-covered"
+      },
+      "id": "f5-playthrough-4",
+      "playthroughId": "f5-playthrough-4",
+      "positionIndex": 0,
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "abstention",
+      "fault": null,
+      "visibleContext": "Contract: not chosen (MiniBridge contract-choice)\nLearner's seat: north\nOwn hand: ♠A ♠K ♠9 ♠3 ♠2 ♥10 ♥8 ♦K ♦10 ♦3 ♣Q ♣9 ♣8\nDummy: ♠Q ♠8 ♠6 ♠4 ♥K ♥7 ♦Q ♦9 ♦8 ♦6 ♦5 ♦2 ♣A\nAnnouncements: north 12 HCP, east 10 HCP, south 11 HCP, west 7 HCP\nTricks so far: none\nCurrent trick: none",
+      "ref": "F5-06",
+      "source": "template hint.not-covered"
+    },
+    {
+      "id": "[\"key-moment\",\"f5-playthrough-5\",3,\"moment.sound-sentence\",{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0,\"templateId\":\"moment.sound-sentence\",\"quality\":{\"sourceKind\":\"authored\",\"contentId\":\"D01-C01\",\"version\":\"f4-draft\",\"source\":\"ai-adjudicator\"},\"outcome\":{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0}},0]",
+      "playthroughId": "f5-playthrough-5",
+      "positionIndex": 3,
+      "kind": "statement",
+      "summary": "moment.sound-sentence",
+      "text": "A reasonable choice with what you could see, and it cost no tricks in this layout. X-ray view: with all cards visible",
+      "informationMode": "ALL_HANDS",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "ALL_HANDS",
+        "sampleCount": 0,
+        "templateId": "moment.sound-sentence",
+        "quality": {
+          "sourceKind": "authored",
+          "contentId": "D01-C01",
+          "version": "f4-draft",
+          "source": "ai-adjudicator"
+        },
+        "outcome": {
+          "sourceKind": "engine",
+          "name": "bridge-dds",
+          "version": "1.4.0 / DDS 2.9",
+          "mode": "ALL_HANDS",
+          "sampleCount": 0
+        }
+      },
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "moment verdict",
+      "visibleContext": "ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.\nContract: 3 no-trumps, declarer south\nLearner's seat: south; acting seat: south\nOwn hand: ♠A ♠J ♠7 ♠5 ♠4 ♥A ♥K ♥5 ♥4 ♦6 ♣A ♣5 ♣4\nDummy: ♠9 ♠2 ♥Q ♥10 ♥8 ♥7 ♦A ♦Q ♦10 ♦3 ♦2 ♣10\nAnnouncements: north 8 HCP, east 6 HCP, south 16 HCP, west 10 HCP\nTricks so far: none\nCurrent trick: west ♥3, north ♥2, east ♦5\nReviewed play: south ♥A\nALL_HANDS remaining cards (hindsight):\nnorth: ♠9 ♠2 ♥Q ♥10 ♥8 ♥7 ♦A ♦Q ♦10 ♦3 ♦2 ♣10\neast: ♠Q ♠6 ♠3 ♦J ♦9 ♦8 ♦7 ♣Q ♣J ♣8 ♣6 ♣2\nsouth: ♠A ♠J ♠7 ♠5 ♠4 ♥A ♥K ♥5 ♥4 ♦6 ♣A ♣5 ♣4\nwest: ♠K ♠10 ♠8 ♥J ♥9 ♥6 ♦K ♦4 ♣K ♣9 ♣7 ♣3",
+      "fault": null,
+      "verdict": "sound",
+      "ref": "F5-07",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples"
+    },
+    {
+      "id": "[\"key-moment\",\"f5-playthrough-5\",3,\"moment.sound\",{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0,\"templateId\":\"moment.sound\",\"quality\":{\"sourceKind\":\"authored\",\"contentId\":\"D01-C01\",\"version\":\"f4-draft\",\"source\":\"ai-adjudicator\"},\"outcome\":{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0}},0]",
+      "playthroughId": "f5-playthrough-5",
+      "positionIndex": 3,
+      "kind": "statement",
+      "summary": "moment.sound",
+      "text": "Solid X-ray view: with all cards visible",
+      "informationMode": "ALL_HANDS",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "ALL_HANDS",
+        "sampleCount": 0,
+        "templateId": "moment.sound",
+        "quality": {
+          "sourceKind": "authored",
+          "contentId": "D01-C01",
+          "version": "f4-draft",
+          "source": "ai-adjudicator"
+        },
+        "outcome": {
+          "sourceKind": "engine",
+          "name": "bridge-dds",
+          "version": "1.4.0 / DDS 2.9",
+          "mode": "ALL_HANDS",
+          "sampleCount": 0
+        }
+      },
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "moment label",
+      "visibleContext": "ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.\nContract: 3 no-trumps, declarer south\nLearner's seat: south; acting seat: south\nOwn hand: ♠A ♠J ♠7 ♠5 ♠4 ♥A ♥K ♥5 ♥4 ♦6 ♣A ♣5 ♣4\nDummy: ♠9 ♠2 ♥Q ♥10 ♥8 ♥7 ♦A ♦Q ♦10 ♦3 ♦2 ♣10\nAnnouncements: north 8 HCP, east 6 HCP, south 16 HCP, west 10 HCP\nTricks so far: none\nCurrent trick: west ♥3, north ♥2, east ♦5\nReviewed play: south ♥A\nALL_HANDS remaining cards (hindsight):\nnorth: ♠9 ♠2 ♥Q ♥10 ♥8 ♥7 ♦A ♦Q ♦10 ♦3 ♦2 ♣10\neast: ♠Q ♠6 ♠3 ♦J ♦9 ♦8 ♦7 ♣Q ♣J ♣8 ♣6 ♣2\nsouth: ♠A ♠J ♠7 ♠5 ♠4 ♥A ♥K ♥5 ♥4 ♦6 ♣A ♣5 ♣4\nwest: ♠K ♠10 ♠8 ♥J ♥9 ♥6 ♦K ♦4 ♣K ♣9 ♣7 ♣3",
+      "fault": null,
+      "verdict": "sound",
+      "ref": "F5-08",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples"
+    },
+    {
+      "id": "[\"key-moment\",\"f5-playthrough-6\",4,\"moment.mistake-sentence\",{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0,\"templateId\":\"moment.mistake-sentence\",\"quality\":{\"sourceKind\":\"authored\",\"contentId\":\"D02-C04\",\"version\":\"f4-draft\",\"source\":\"ai\"},\"outcome\":{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0}},1]",
+      "playthroughId": "f5-playthrough-6",
+      "positionIndex": 4,
+      "kind": "statement",
+      "summary": "moment.mistake-sentence",
+      "text": "The information you had supported a better choice, and this play cost tricks in this layout. X-ray view: with all cards visible",
+      "informationMode": "ALL_HANDS",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "ALL_HANDS",
+        "sampleCount": 0,
+        "templateId": "moment.mistake-sentence",
+        "quality": {
+          "sourceKind": "authored",
+          "contentId": "D02-C04",
+          "version": "f4-draft",
+          "source": "ai"
+        },
+        "outcome": {
+          "sourceKind": "engine",
+          "name": "bridge-dds",
+          "version": "1.4.0 / DDS 2.9",
+          "mode": "ALL_HANDS",
+          "sampleCount": 0
+        }
+      },
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "moment verdict",
+      "visibleContext": "ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.\nContract: 1 spades, declarer south\nLearner's seat: south; acting seat: south\nOwn hand: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5\nDummy: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J\nAnnouncements: east 9 HCP, south 13 HCP, west 5 HCP, north 13 HCP\nTricks so far: 1: west ♣7, north ♣3, east ♣2, south ♣Q; winner south\nCurrent trick: none\nReviewed play: south ♥8\nALL_HANDS remaining cards (hindsight):\nnorth: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J\neast: ♠J ♠8 ♥A ♥K ♥10 ♥7 ♥5 ♥4 ♦J ♦7 ♦5 ♣9\nsouth: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5\nwest: ♠10 ♠6 ♥Q ♥9 ♥2 ♦8 ♦6 ♦4 ♣K ♣10 ♣8 ♣4",
+      "fault": null,
+      "verdict": "mistake",
+      "ref": "F5-09",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples"
+    },
+    {
+      "id": "[\"key-moment\",\"f5-playthrough-6\",4,\"moment.mistake\",{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0,\"templateId\":\"moment.mistake\",\"quality\":{\"sourceKind\":\"authored\",\"contentId\":\"D02-C04\",\"version\":\"f4-draft\",\"source\":\"ai\"},\"outcome\":{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0}},1]",
+      "playthroughId": "f5-playthrough-6",
+      "positionIndex": 4,
+      "kind": "statement",
+      "summary": "moment.mistake",
+      "text": "Better option X-ray view: with all cards visible",
+      "informationMode": "ALL_HANDS",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "ALL_HANDS",
+        "sampleCount": 0,
+        "templateId": "moment.mistake",
+        "quality": {
+          "sourceKind": "authored",
+          "contentId": "D02-C04",
+          "version": "f4-draft",
+          "source": "ai"
+        },
+        "outcome": {
+          "sourceKind": "engine",
+          "name": "bridge-dds",
+          "version": "1.4.0 / DDS 2.9",
+          "mode": "ALL_HANDS",
+          "sampleCount": 0
+        }
+      },
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "moment label",
+      "visibleContext": "ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.\nContract: 1 spades, declarer south\nLearner's seat: south; acting seat: south\nOwn hand: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5\nDummy: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J\nAnnouncements: east 9 HCP, south 13 HCP, west 5 HCP, north 13 HCP\nTricks so far: 1: west ♣7, north ♣3, east ♣2, south ♣Q; winner south\nCurrent trick: none\nReviewed play: south ♥8\nALL_HANDS remaining cards (hindsight):\nnorth: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J\neast: ♠J ♠8 ♥A ♥K ♥10 ♥7 ♥5 ♥4 ♦J ♦7 ♦5 ♣9\nsouth: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5\nwest: ♠10 ♠6 ♥Q ♥9 ♥2 ♦8 ♦6 ♦4 ♣K ♣10 ♣8 ♣4",
+      "fault": null,
+      "verdict": "mistake",
+      "ref": "F5-10",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples"
+    },
+    {
+      "id": "[\"key-moment\",\"f5-playthrough-6\",4,\"moment.alternative\",{\"sourceKind\":\"authored\",\"contentId\":\"D02-C04\",\"version\":\"f4-draft\",\"source\":\"ai\",\"templateId\":\"moment.alternative\",\"quality\":{\"sourceKind\":\"authored\",\"contentId\":\"D02-C04\",\"version\":\"f4-draft\",\"source\":\"ai\"},\"outcome\":{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0}},1]",
+      "playthroughId": "f5-playthrough-6",
+      "positionIndex": 4,
+      "kind": "statement",
+      "summary": "moment.alternative",
+      "text": "An acceptable option with what you could see: Queen of spades.",
+      "informationMode": "VISIBLE",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "D02-C04",
+        "version": "f4-draft",
+        "source": "ai",
+        "templateId": "moment.alternative",
+        "quality": {
+          "sourceKind": "authored",
+          "contentId": "D02-C04",
+          "version": "f4-draft",
+          "source": "ai"
+        },
+        "outcome": {
+          "sourceKind": "engine",
+          "name": "bridge-dds",
+          "version": "1.4.0 / DDS 2.9",
+          "mode": "ALL_HANDS",
+          "sampleCount": 0
+        }
+      },
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "moment alternative",
+      "visibleContext": "Contract: 1 spades, declarer south\nLearner's seat: south; acting seat: south\nOwn hand: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5\nDummy: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J\nAnnouncements: east 9 HCP, south 13 HCP, west 5 HCP, north 13 HCP\nTricks so far: 1: west ♣7, north ♣3, east ♣2, south ♣Q; winner south\nCurrent trick: none",
+      "fault": null,
+      "verdict": "mistake",
+      "ref": "F5-11",
+      "source": "authored D02-C04, version f4-draft"
+    },
+    {
+      "id": "[\"key-moment\",\"f5-playthrough-7\",8,\"moment.lucky-sentence\",{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0,\"templateId\":\"moment.lucky-sentence\",\"quality\":{\"sourceKind\":\"authored\",\"contentId\":\"D03-C01\",\"version\":\"f4-draft\",\"source\":\"ai\"},\"outcome\":{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0}},0]",
+      "playthroughId": "f5-playthrough-7",
+      "positionIndex": 8,
+      "kind": "statement",
+      "summary": "moment.lucky-sentence",
+      "text": "This cost no tricks in this layout, but the information you had supported a better choice. X-ray view: with all cards visible",
+      "informationMode": "ALL_HANDS",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "ALL_HANDS",
+        "sampleCount": 0,
+        "templateId": "moment.lucky-sentence",
+        "quality": {
+          "sourceKind": "authored",
+          "contentId": "D03-C01",
+          "version": "f4-draft",
+          "source": "ai"
+        },
+        "outcome": {
+          "sourceKind": "engine",
+          "name": "bridge-dds",
+          "version": "1.4.0 / DDS 2.9",
+          "mode": "ALL_HANDS",
+          "sampleCount": 0
+        }
+      },
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "moment verdict",
+      "visibleContext": "ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.\nContract: 1 no-trumps, declarer north\nLearner's seat: north; acting seat: south\nOwn hand: ♠7 ♥A ♥K ♥10 ♥8 ♥2 ♦A ♣J ♣7 ♣3 ♣2\nDummy: ♠6 ♠3 ♥J ♦K ♦Q ♦J ♦8 ♦5 ♣9 ♣8 ♣6\nAnnouncements: south 10 HCP, west 4 HCP, north 12 HCP, east 14 HCP\nTricks so far: 1: east ♠Q, south ♠K, west ♠A, north ♠2; winner west; 2: west ♠5, north ♠4, east ♠8, south ♠9; winner south\nCurrent trick: none\nReviewed play: south ♠6\nALL_HANDS remaining cards (hindsight):\nnorth: ♠7 ♥A ♥K ♥10 ♥8 ♥2 ♦A ♣J ♣7 ♣3 ♣2\neast: ♠J ♥Q ♥6 ♥4 ♦10 ♦6 ♦4 ♦3 ♣A ♣K ♣Q\nsouth: ♠6 ♠3 ♥J ♦K ♦Q ♦J ♦8 ♦5 ♣9 ♣8 ♣6\nwest: ♠10 ♥9 ♥7 ♥5 ♥3 ♦9 ♦7 ♦2 ♣10 ♣5 ♣4",
+      "fault": null,
+      "verdict": "lucky",
+      "ref": "F5-12",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples"
+    },
+    {
+      "id": "[\"key-moment\",\"f5-playthrough-7\",8,\"moment.lucky\",{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0,\"templateId\":\"moment.lucky\",\"quality\":{\"sourceKind\":\"authored\",\"contentId\":\"D03-C01\",\"version\":\"f4-draft\",\"source\":\"ai\"},\"outcome\":{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0}},0]",
+      "playthroughId": "f5-playthrough-7",
+      "positionIndex": 8,
+      "kind": "statement",
+      "summary": "moment.lucky",
+      "text": "Worked this time X-ray view: with all cards visible",
+      "informationMode": "ALL_HANDS",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "ALL_HANDS",
+        "sampleCount": 0,
+        "templateId": "moment.lucky",
+        "quality": {
+          "sourceKind": "authored",
+          "contentId": "D03-C01",
+          "version": "f4-draft",
+          "source": "ai"
+        },
+        "outcome": {
+          "sourceKind": "engine",
+          "name": "bridge-dds",
+          "version": "1.4.0 / DDS 2.9",
+          "mode": "ALL_HANDS",
+          "sampleCount": 0
+        }
+      },
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "moment label",
+      "visibleContext": "ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.\nContract: 1 no-trumps, declarer north\nLearner's seat: north; acting seat: south\nOwn hand: ♠7 ♥A ♥K ♥10 ♥8 ♥2 ♦A ♣J ♣7 ♣3 ♣2\nDummy: ♠6 ♠3 ♥J ♦K ♦Q ♦J ♦8 ♦5 ♣9 ♣8 ♣6\nAnnouncements: south 10 HCP, west 4 HCP, north 12 HCP, east 14 HCP\nTricks so far: 1: east ♠Q, south ♠K, west ♠A, north ♠2; winner west; 2: west ♠5, north ♠4, east ♠8, south ♠9; winner south\nCurrent trick: none\nReviewed play: south ♠6\nALL_HANDS remaining cards (hindsight):\nnorth: ♠7 ♥A ♥K ♥10 ♥8 ♥2 ♦A ♣J ♣7 ♣3 ♣2\neast: ♠J ♥Q ♥6 ♥4 ♦10 ♦6 ♦4 ♦3 ♣A ♣K ♣Q\nsouth: ♠6 ♠3 ♥J ♦K ♦Q ♦J ♦8 ♦5 ♣9 ♣8 ♣6\nwest: ♠10 ♥9 ♥7 ♥5 ♥3 ♦9 ♦7 ♦2 ♣10 ♣5 ♣4",
+      "fault": null,
+      "verdict": "lucky",
+      "ref": "F5-13",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples"
+    },
+    {
+      "id": "[\"key-moment\",\"f5-playthrough-7\",8,\"moment.alternative\",{\"sourceKind\":\"authored\",\"contentId\":\"D03-C01\",\"version\":\"f4-draft\",\"source\":\"ai\",\"templateId\":\"moment.alternative\",\"quality\":{\"sourceKind\":\"authored\",\"contentId\":\"D03-C01\",\"version\":\"f4-draft\",\"source\":\"ai\"},\"outcome\":{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0}},0]",
+      "playthroughId": "f5-playthrough-7",
+      "positionIndex": 8,
+      "kind": "statement",
+      "summary": "moment.alternative",
+      "text": "An acceptable option with what you could see: 8 of diamonds.",
+      "informationMode": "VISIBLE",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "D03-C01",
+        "version": "f4-draft",
+        "source": "ai",
+        "templateId": "moment.alternative",
+        "quality": {
+          "sourceKind": "authored",
+          "contentId": "D03-C01",
+          "version": "f4-draft",
+          "source": "ai"
+        },
+        "outcome": {
+          "sourceKind": "engine",
+          "name": "bridge-dds",
+          "version": "1.4.0 / DDS 2.9",
+          "mode": "ALL_HANDS",
+          "sampleCount": 0
+        }
+      },
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "moment alternative",
+      "visibleContext": "Contract: 1 no-trumps, declarer north\nLearner's seat: north; acting seat: south\nOwn hand: ♠7 ♥A ♥K ♥10 ♥8 ♥2 ♦A ♣J ♣7 ♣3 ♣2\nDummy: ♠6 ♠3 ♥J ♦K ♦Q ♦J ♦8 ♦5 ♣9 ♣8 ♣6\nAnnouncements: south 10 HCP, west 4 HCP, north 12 HCP, east 14 HCP\nTricks so far: 1: east ♠Q, south ♠K, west ♠A, north ♠2; winner west; 2: west ♠5, north ♠4, east ♠8, south ♠9; winner south\nCurrent trick: none",
+      "fault": null,
+      "verdict": "lucky",
+      "ref": "F5-14",
+      "source": "authored D03-C01, version f4-draft"
+    },
+    {
+      "id": "[\"key-moment\",\"f5-playthrough-8\",8,\"moment.unlucky-sentence\",{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0,\"templateId\":\"moment.unlucky-sentence\",\"quality\":{\"sourceKind\":\"authored\",\"contentId\":\"D10-C01\",\"version\":\"f4-draft\",\"source\":\"ai\"},\"outcome\":{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0}},1]",
+      "playthroughId": "f5-playthrough-8",
+      "positionIndex": 8,
+      "kind": "statement",
+      "summary": "moment.unlucky-sentence",
+      "text": "A reasonable choice with what you could see. This layout cost tricks, but that does not make the decision a mistake. X-ray view: with all cards visible",
+      "informationMode": "ALL_HANDS",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "ALL_HANDS",
+        "sampleCount": 0,
+        "templateId": "moment.unlucky-sentence",
+        "quality": {
+          "sourceKind": "authored",
+          "contentId": "D10-C01",
+          "version": "f4-draft",
+          "source": "ai"
+        },
+        "outcome": {
+          "sourceKind": "engine",
+          "name": "bridge-dds",
+          "version": "1.4.0 / DDS 2.9",
+          "mode": "ALL_HANDS",
+          "sampleCount": 0
+        }
+      },
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "moment verdict",
+      "visibleContext": "ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.\nContract: 1 no-trumps, declarer south\nLearner's seat: south; acting seat: south\nOwn hand: ♠K ♠Q ♠9 ♥7 ♥6 ♥2 ♦10 ♦8 ♦3 ♦2 ♣7\nDummy: ♠10 ♠8 ♠7 ♠6 ♥K ♥10 ♦A ♦Q ♦J ♣10 ♣4\nAnnouncements: south 13 HCP, west 8 HCP, north 10 HCP, east 9 HCP\nTricks so far: 1: west ♣Q, north ♣2, east ♣3, south ♣A; winner south; 2: south ♠A, west ♠2, north ♠3, east ♠4; winner south\nCurrent trick: none\nReviewed play: south ♠K\nALL_HANDS remaining cards (hindsight):\nnorth: ♠10 ♠8 ♠7 ♠6 ♥K ♥10 ♦A ♦Q ♦J ♣10 ♣4\neast: ♥A ♥Q ♥5 ♥3 ♦7 ♦6 ♦5 ♣K ♣9 ♣8 ♣5\nsouth: ♠K ♠Q ♠9 ♥7 ♥6 ♥2 ♦10 ♦8 ♦3 ♦2 ♣7\nwest: ♠J ♠5 ♥J ♥9 ♥8 ♥4 ♦K ♦9 ♦4 ♣J ♣6",
+      "fault": null,
+      "verdict": "unlucky",
+      "ref": "F5-15",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples"
+    },
+    {
+      "id": "[\"key-moment\",\"f5-playthrough-8\",8,\"moment.unlucky\",{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0,\"templateId\":\"moment.unlucky\",\"quality\":{\"sourceKind\":\"authored\",\"contentId\":\"D10-C01\",\"version\":\"f4-draft\",\"source\":\"ai\"},\"outcome\":{\"sourceKind\":\"engine\",\"name\":\"bridge-dds\",\"version\":\"1.4.0 / DDS 2.9\",\"mode\":\"ALL_HANDS\",\"sampleCount\":0}},1]",
+      "playthroughId": "f5-playthrough-8",
+      "positionIndex": 8,
+      "kind": "statement",
+      "summary": "moment.unlucky",
+      "text": "Good call, bad luck X-ray view: with all cards visible",
+      "informationMode": "ALL_HANDS",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "ALL_HANDS",
+        "sampleCount": 0,
+        "templateId": "moment.unlucky",
+        "quality": {
+          "sourceKind": "authored",
+          "contentId": "D10-C01",
+          "version": "f4-draft",
+          "source": "ai"
+        },
+        "outcome": {
+          "sourceKind": "engine",
+          "name": "bridge-dds",
+          "version": "1.4.0 / DDS 2.9",
+          "mode": "ALL_HANDS",
+          "sampleCount": 0
+        }
+      },
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "moment label",
+      "visibleContext": "ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.\nContract: 1 no-trumps, declarer south\nLearner's seat: south; acting seat: south\nOwn hand: ♠K ♠Q ♠9 ♥7 ♥6 ♥2 ♦10 ♦8 ♦3 ♦2 ♣7\nDummy: ♠10 ♠8 ♠7 ♠6 ♥K ♥10 ♦A ♦Q ♦J ♣10 ♣4\nAnnouncements: south 13 HCP, west 8 HCP, north 10 HCP, east 9 HCP\nTricks so far: 1: west ♣Q, north ♣2, east ♣3, south ♣A; winner south; 2: south ♠A, west ♠2, north ♠3, east ♠4; winner south\nCurrent trick: none\nReviewed play: south ♠K\nALL_HANDS remaining cards (hindsight):\nnorth: ♠10 ♠8 ♠7 ♠6 ♥K ♥10 ♦A ♦Q ♦J ♣10 ♣4\neast: ♥A ♥Q ♥5 ♥3 ♦7 ♦6 ♦5 ♣K ♣9 ♣8 ♣5\nsouth: ♠K ♠Q ♠9 ♥7 ♥6 ♥2 ♦10 ♦8 ♦3 ♦2 ♣7\nwest: ♠J ♠5 ♥J ♥9 ♥8 ♥4 ♦K ♦9 ♦4 ♣J ♣6",
+      "fault": null,
+      "verdict": "unlucky",
+      "ref": "F5-16",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples"
+    },
+    {
+      "id": "trick-cost-f5-playthrough-9-0-bridge-dds-1.4.0 / DDS 2.9-f5",
+      "playthroughId": "f5-playthrough-9",
+      "positionIndex": 0,
+      "kind": "statement",
+      "summary": "{\"cost\":0}",
+      "text": "Trick cost: 0. X-ray view: with all cards visible. Engine: bridge-dds, version 1.4.0 / DDS 2.9.",
+      "informationMode": "ALL_HANDS",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "ALL_HANDS",
+        "sampleCount": 0
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "trick cost",
+      "visibleContext": "ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.\nContract: 3 no-trumps, declarer east\nLearner's seat: south; acting seat: south\nOwn hand: ♠J ♠9 ♠6 ♠3 ♥9 ♥5 ♥4 ♥2 ♦10 ♦6 ♦5 ♣7 ♣6\nDummy: ♠A ♠10 ♠8 ♠5 ♠2 ♦Q ♦8 ♦7 ♦3 ♦2 ♣Q ♣J ♣9\nAnnouncements: north 15 HCP, east 15 HCP, south 1 HCP, west 9 HCP\nTricks so far: none\nCurrent trick: none\nReviewed play: south ♠J\nALL_HANDS remaining cards (hindsight):\nnorth: ♠7 ♥A ♥K ♥Q ♥8 ♥6 ♦K ♦9 ♦4 ♣K ♣10 ♣8 ♣4\neast: ♠K ♠Q ♠4 ♥J ♥10 ♥7 ♥3 ♦A ♦J ♣A ♣5 ♣3 ♣2\nsouth: ♠J ♠9 ♠6 ♠3 ♥9 ♥5 ♥4 ♥2 ♦10 ♦6 ♦5 ♣7 ♣6\nwest: ♠A ♠10 ♠8 ♠5 ♠2 ♦Q ♦8 ♦7 ♦3 ♦2 ♣Q ♣J ♣9",
+      "fault": null,
+      "ref": "F5-17",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples"
+    },
+    {
+      "id": "trick-cost-f5-playthrough-10-0-bridge-dds-1.4.0 / DDS 2.9-f5",
+      "playthroughId": "f5-playthrough-10",
+      "positionIndex": 0,
+      "kind": "statement",
+      "summary": "{\"cost\":1}",
+      "text": "Trick cost: 1. X-ray view: with all cards visible. Engine: bridge-dds, version 1.4.0 / DDS 2.9.",
+      "informationMode": "ALL_HANDS",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "ALL_HANDS",
+        "sampleCount": 0
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "trick cost",
+      "visibleContext": "ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.\nContract: 4 spades, declarer east\nLearner's seat: south; acting seat: south\nOwn hand: ♠K ♠3 ♠2 ♥J ♥10 ♥9 ♥7 ♥3 ♦K ♦J ♣8 ♣3 ♣2\nDummy: ♠A ♠J ♠8 ♠7 ♠4 ♥8 ♦6 ♦4 ♦3 ♣A ♣Q ♣10 ♣5\nAnnouncements: west 11 HCP, north 8 HCP, east 13 HCP, south 8 HCP\nTricks so far: none\nCurrent trick: none\nReviewed play: south ♥J\nALL_HANDS remaining cards (hindsight):\nnorth: ♠9 ♠6 ♠5 ♥K ♥6 ♦A ♦10 ♦7 ♦5 ♦2 ♣J ♣9 ♣7\neast: ♠Q ♠10 ♥A ♥Q ♥5 ♥4 ♥2 ♦Q ♦9 ♦8 ♣K ♣6 ♣4\nsouth: ♠K ♠3 ♠2 ♥J ♥10 ♥9 ♥7 ♥3 ♦K ♦J ♣8 ♣3 ♣2\nwest: ♠A ♠J ♠8 ♠7 ♠4 ♥8 ♦6 ♦4 ♦3 ♣A ♣Q ♣10 ♣5",
+      "fault": null,
+      "ref": "F5-18",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples"
+    },
+    {
+      "id": "trick-cost-f5-playthrough-11-4-bridge-dds-1.4.0 / DDS 2.9-f5",
+      "playthroughId": "f5-playthrough-11",
+      "positionIndex": 4,
+      "kind": "statement",
+      "summary": "{\"cost\":2}",
+      "text": "Trick cost: 2. X-ray view: with all cards visible. Engine: bridge-dds, version 1.4.0 / DDS 2.9.",
+      "informationMode": "ALL_HANDS",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "ALL_HANDS",
+        "sampleCount": 0
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "trick cost",
+      "visibleContext": "ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.\nContract: 1 spades, declarer south\nLearner's seat: south; acting seat: south\nOwn hand: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5\nDummy: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J\nAnnouncements: east 9 HCP, south 13 HCP, west 5 HCP, north 13 HCP\nTricks so far: 1: west ♣7, north ♣3, east ♣2, south ♣Q; winner south\nCurrent trick: none\nReviewed play: south ♣6\nALL_HANDS remaining cards (hindsight):\nnorth: ♠A ♠K ♠7 ♠5 ♠4 ♠2 ♥J ♥6 ♦A ♦9 ♦2 ♣J\neast: ♠J ♠8 ♥A ♥K ♥10 ♥7 ♥5 ♥4 ♦J ♦7 ♦5 ♣9\nsouth: ♠Q ♠9 ♠3 ♥8 ♥3 ♦K ♦Q ♦10 ♦3 ♣A ♣6 ♣5\nwest: ♠10 ♠6 ♥Q ♥9 ♥2 ♦8 ♦6 ♦4 ♣K ♣10 ♣8 ♣4",
+      "fault": null,
+      "ref": "F5-19",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples"
+    },
+    {
+      "id": "trick-cost-f5-playthrough-12-12-bridge-dds-1.4.0 / DDS 2.9-f5",
+      "playthroughId": "f5-playthrough-12",
+      "positionIndex": 12,
+      "kind": "statement",
+      "summary": "{\"cost\":3}",
+      "text": "Trick cost: 3. X-ray view: with all cards visible. Engine: bridge-dds, version 1.4.0 / DDS 2.9.",
+      "informationMode": "ALL_HANDS",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "ALL_HANDS",
+        "sampleCount": 0
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "trick cost",
+      "visibleContext": "ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.\nContract: 3 no-trumps, declarer east\nLearner's seat: south; acting seat: south\nOwn hand: ♠J ♠9 ♠6 ♠3 ♥4 ♥2 ♦6 ♦5 ♣7 ♣6\nDummy: ♠A ♠10 ♠8 ♦Q ♦8 ♦7 ♦3 ♣Q ♣J ♣9\nAnnouncements: north 15 HCP, east 15 HCP, south 1 HCP, west 9 HCP\nTricks so far: 1: south ♥5, west ♠2, north ♥6, east ♥7; winner east; 2: east ♦J, south ♦10, west ♦2, north ♦K; winner north; 3: north ♥8, east ♥3, south ♥9, west ♠5; winner south\nCurrent trick: none\nReviewed play: south ♠J\nALL_HANDS remaining cards (hindsight):\nnorth: ♠7 ♥A ♥K ♥Q ♦9 ♦4 ♣K ♣10 ♣8 ♣4\neast: ♠K ♠Q ♠4 ♥J ♥10 ♦A ♣A ♣5 ♣3 ♣2\nsouth: ♠J ♠9 ♠6 ♠3 ♥4 ♥2 ♦6 ♦5 ♣7 ♣6\nwest: ♠A ♠10 ♠8 ♦Q ♦8 ♦7 ♦3 ♣Q ♣J ♣9",
+      "fault": null,
+      "ref": "F5-20",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples"
+    },
+    {
+      "id": "trick-cost-f5-playthrough-13-3-bridge-dds-1.4.0 / DDS 2.9-f5-sampled",
+      "playthroughId": "f5-playthrough-13",
+      "positionIndex": 3,
+      "kind": "statement",
+      "summary": "{\"cost\":4}",
+      "text": "Trick cost: 4. X-ray view: with all cards visible. Engine: bridge-dds, version 1.4.0 / DDS 2.9.",
+      "informationMode": "ALL_HANDS",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "ALL_HANDS",
+        "sampleCount": 0
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "trick cost",
+      "visibleContext": "ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.\nContract: 1 no-trumps, declarer north\nLearner's seat: north; acting seat: north\nOwn hand: ♠A ♠K ♠9 ♠3 ♠2 ♥10 ♥8 ♦K ♦10 ♦3 ♣Q ♣9 ♣8\nDummy: ♠Q ♠8 ♠6 ♠4 ♥K ♥7 ♦Q ♦9 ♦8 ♦6 ♦5 ♦2\nAnnouncements: north 12 HCP, east 10 HCP, south 11 HCP, west 7 HCP\nTricks so far: none\nCurrent trick: east ♣4, south ♣A, west ♣K\nReviewed play: north ♣Q\nALL_HANDS remaining cards (hindsight):\nnorth: ♠A ♠K ♠9 ♠3 ♠2 ♥10 ♥8 ♦K ♦10 ♦3 ♣Q ♣9 ♣8\neast: ♠J ♠7 ♥A ♥9 ♥5 ♥2 ♦A ♦7 ♣J ♣6 ♣5 ♣2\nsouth: ♠Q ♠8 ♠6 ♠4 ♥K ♥7 ♦Q ♦9 ♦8 ♦6 ♦5 ♦2\nwest: ♠10 ♠5 ♥Q ♥J ♥6 ♥4 ♥3 ♦J ♦4 ♣10 ♣7 ♣3",
+      "fault": null,
+      "ref": "F5-21",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples"
+    },
+    {
+      "id": "trick-cost-f5-playthrough-14-12-bridge-dds-1.4.0 / DDS 2.9-f5",
+      "playthroughId": "f5-playthrough-14",
+      "positionIndex": 12,
+      "kind": "statement",
+      "summary": "{\"cost\":7}",
+      "text": "Trick cost: 7. X-ray view: with all cards visible. Engine: bridge-dds, version 1.4.0 / DDS 2.9.",
+      "informationMode": "ALL_HANDS",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "ALL_HANDS",
+        "sampleCount": 0
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "trick cost",
+      "visibleContext": "ALL_HANDS review: hindsight using all four hands. Historical learner Seat View follows.\nContract: 1 no-trumps, declarer south\nLearner's seat: south; acting seat: south\nOwn hand: ♠4 ♥K ♥Q ♥9 ♥7 ♦A ♦J ♦8 ♦5 ♦4\nDummy: ♠Q ♠9 ♠3 ♥3 ♦9 ♦7 ♦6 ♣8 ♣3 ♣2\nAnnouncements: south 13 HCP, west 8 HCP, north 10 HCP, east 9 HCP\nTricks so far: 1: west ♣K, north ♣A, east ♣J, south ♣9; winner north; 2: north ♥A, east ♥4, south ♥2, west ♥5; winner north; 3: north ♦3, east ♦10, south ♦K, west ♦2; winner south\nCurrent trick: none\nReviewed play: south ♦J\nALL_HANDS remaining cards (hindsight):\nnorth: ♠Q ♠9 ♠3 ♥3 ♦9 ♦7 ♦6 ♣8 ♣3 ♣2\neast: ♠A ♠K ♠10 ♠8 ♠7 ♠6 ♠2 ♥J ♣5 ♣4\nsouth: ♠4 ♥K ♥Q ♥9 ♥7 ♦A ♦J ♦8 ♦5 ♦4\nwest: ♠J ♠5 ♥10 ♥8 ♥6 ♦Q ♣Q ♣10 ♣7 ♣6",
+      "fault": null,
+      "ref": "F5-22",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 0 samples"
+    },
+    {
+      "id": "sampled-quality-f5-playthrough-13-3",
+      "playthroughId": "f5-playthrough-13",
+      "positionIndex": 3,
+      "kind": "statement",
+      "summary": "moment.sampled-not-acceptable",
+      "text": "Decision quality: a better choice was available on the cards you could see, based on sampled layouts.",
+      "informationMode": "VISIBLE",
+      "provenance": {
+        "sourceKind": "engine",
+        "name": "bridge-dds",
+        "version": "1.4.0 / DDS 2.9",
+        "mode": "VISIBLE",
+        "sampleCount": 50,
+        "sampled": {
+          "qualitySource": "sampled",
+          "seed": "b8fcbcdcc8d56faa",
+          "seedDerivation": "seatViewSeed",
+          "sampler": "bv-layout",
+          "samplerVersion": "1",
+          "enumerated": false
+        }
+      },
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "sampled quality",
+      "visibleContext": "Contract: 1 no-trumps, declarer north\nLearner's seat: north; acting seat: north\nOwn hand: ♠A ♠K ♠9 ♠3 ♠2 ♥10 ♥8 ♦K ♦10 ♦3 ♣Q ♣9 ♣8\nDummy: ♠Q ♠8 ♠6 ♠4 ♥K ♥7 ♦Q ♦9 ♦8 ♦6 ♦5 ♦2\nAnnouncements: north 12 HCP, east 10 HCP, south 11 HCP, west 7 HCP\nTricks so far: none\nCurrent trick: east ♣4, south ♣A, west ♣K\nReviewed play: north ♣Q",
+      "fault": null,
+      "ref": "F5-23",
+      "source": "engine bridge-dds 1.4.0 / DDS 2.9, 50 samples, sampler bv-layout 1, seed b8fcbcdcc8d56faa"
+    },
+    {
+      "kind": "statement",
+      "summary": "hint.forced-card",
+      "text": "Only one card can be played here: Ace of clubs",
+      "provenance": {
+        "sourceKind": "template",
+        "templateId": "hint.forced-card"
+      },
+      "id": "f5-hint-23",
+      "playthroughId": "f5-playthrough-13",
+      "positionIndex": 1,
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "hint",
+      "visibleContext": "Contract: 1 no-trumps, declarer north\nLearner's seat: north; acting seat: south\nOwn hand: ♠A ♠K ♠9 ♠3 ♠2 ♥10 ♥8 ♦K ♦10 ♦3 ♣Q ♣9 ♣8\nDummy: ♠Q ♠8 ♠6 ♠4 ♥K ♥7 ♦Q ♦9 ♦8 ♦6 ♦5 ♦2 ♣A\nAnnouncements: north 12 HCP, east 10 HCP, south 11 HCP, west 7 HCP\nTricks so far: none\nCurrent trick: east ♣4",
+      "fault": null,
+      "ref": "F5-24",
+      "source": "template hint.forced-card"
+    },
+    {
+      "id": "f5-lesson-0",
+      "playthroughId": "f5-playthrough-15",
+      "positionIndex": 0,
+      "kind": "statement",
+      "summary": "lesson-step-commentary",
+      "text": "Let’s follow suit. Watch North lead a heart, then find a heart of your own.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit.exercise",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "commentary",
+      "stepIndex": 0,
+      "exerciseId": "follow-suit.exercise",
+      "contentId": "follow-suit.exercise",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "commentary",
+          "wording": "Let’s follow suit. Watch North lead a heart, then find a heart of your own."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: north\nOwn hand: ♥A ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q\nDummy: not exposed\nAnnouncements: none\nTricks so far: none\nCurrent trick: none",
+      "ref": "F5-25",
+      "source": "authored follow-suit.exercise, version 1"
+    },
+    {
+      "id": "f5-lesson-1",
+      "playthroughId": "f5-playthrough-15",
+      "positionIndex": 0,
+      "kind": "statement",
+      "summary": "lesson-step-scripted-action",
+      "text": "Watch the scripted play.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit.exercise",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "scripted-action",
+      "stepIndex": 1,
+      "exerciseId": "follow-suit.exercise",
+      "contentId": "follow-suit.exercise",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "scripted-action",
+          "wording": "Watch the scripted play."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: north\nOwn hand: ♥A ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q\nDummy: not exposed\nAnnouncements: none\nTricks so far: none\nCurrent trick: none",
+      "ref": "F5-26",
+      "source": "authored follow-suit.exercise, version 1"
+    },
+    {
+      "id": "f5-lesson-2",
+      "playthroughId": "f5-playthrough-15",
+      "positionIndex": 2,
+      "kind": "statement",
+      "summary": "lesson-step-prompt",
+      "text": "Hearts were led, so everyone plays a heart if they can. Got one?\nTap a card you're allowed to play\nNice. You followed suit. Any of these works: Ace of hearts, King of hearts, Queen of hearts.\nNot quite — choose a heart to follow the suit led.\nTry again.\nThese answers follow suit: Ace of hearts, King of hearts, Queen of hearts. We’ll play the first one together.\nLook for the heart symbol. You must follow the suit that was led if you have it.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit.prompt",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "prompt",
+      "stepIndex": 2,
+      "exerciseId": "follow-suit.exercise",
+      "contentId": "follow-suit.prompt",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "commentary",
+          "wording": "Hearts were led, so everyone plays a heart if they can. Got one?"
+        },
+        {
+          "when": "prompt",
+          "wording": "Tap a card you're allowed to play"
+        },
+        {
+          "when": "correct or corrected",
+          "wording": "Nice. You followed suit. Any of these works: Ace of hearts, King of hearts, Queen of hearts."
+        },
+        {
+          "when": "wrong",
+          "wording": "Not quite — choose a heart to follow the suit led."
+        },
+        {
+          "when": "first wrong answer",
+          "wording": "Try again."
+        },
+        {
+          "when": "show answer",
+          "wording": "These answers follow suit: Ace of hearts, King of hearts, Queen of hearts. We’ll play the first one together."
+        },
+        {
+          "when": "hint requested",
+          "wording": "Look for the heart symbol. You must follow the suit that was led if you have it."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: south\nOwn hand: ♥A ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q\nDummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4\nAnnouncements: none\nTricks so far: none\nCurrent trick: north ♥10, east ♥9",
+      "ref": "F5-27",
+      "source": "authored follow-suit.prompt, version 1"
+    },
+    {
+      "id": "f5-lesson-3",
+      "playthroughId": "f5-playthrough-15",
+      "positionIndex": 3,
+      "kind": "statement",
+      "summary": "lesson-step-scripted-action",
+      "text": "Watch the scripted play.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit.exercise",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "scripted-action",
+      "stepIndex": 3,
+      "exerciseId": "follow-suit.exercise",
+      "contentId": "follow-suit.exercise",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "scripted-action",
+          "wording": "Watch the scripted play."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: west\nOwn hand: ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q\nDummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4\nAnnouncements: none\nTricks so far: none\nCurrent trick: north ♥10, east ♥9, south ♥A",
+      "ref": "F5-28",
+      "source": "authored follow-suit.exercise, version 1"
+    },
+    {
+      "id": "f5-lesson-4",
+      "playthroughId": "f5-playthrough-15",
+      "positionIndex": 4,
+      "kind": "statement",
+      "summary": "lesson-step-commentary",
+      "text": "You followed suit: play the suit led whenever you have it.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit.exercise",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "commentary",
+      "stepIndex": 4,
+      "exerciseId": "follow-suit.exercise",
+      "contentId": "follow-suit.exercise",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "commentary",
+          "wording": "You followed suit: play the suit led whenever you have it."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: south\nOwn hand: ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q\nDummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4\nAnnouncements: none\nTricks so far: 1: north ♥10, east ♥9, south ♥A, west ♥4; winner south\nCurrent trick: none",
+      "ref": "F5-29",
+      "source": "authored follow-suit.exercise, version 1"
+    },
+    {
+      "id": "f5-lesson-5",
+      "playthroughId": "f5-playthrough-16",
+      "positionIndex": 0,
+      "kind": "statement",
+      "summary": "lesson-step-commentary",
+      "text": "Look at West's heart, then follow the suit North leads.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit-2.exercise",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "commentary",
+      "stepIndex": 5,
+      "exerciseId": "follow-suit-2.exercise",
+      "contentId": "follow-suit-2.exercise",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "commentary",
+          "wording": "Look at West's heart, then follow the suit North leads."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: north\nOwn hand: ♥A ♥K ♥Q ♠6 ♠5 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q\nDummy: not exposed\nAnnouncements: none\nTricks so far: none\nCurrent trick: none",
+      "ref": "F5-30",
+      "source": "authored follow-suit-2.exercise, version 1"
+    },
+    {
+      "id": "f5-lesson-6",
+      "playthroughId": "f5-playthrough-16",
+      "positionIndex": 0,
+      "kind": "statement",
+      "summary": "lesson-step-exposure",
+      "text": "West's heart is shown for this lesson. Robots still use their usual view.\nShown for this lesson",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit-2.exercise",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "exposure",
+      "stepIndex": 6,
+      "exerciseId": "follow-suit-2.exercise",
+      "contentId": "follow-suit-2.exercise",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "exposure",
+          "wording": "West's heart is shown for this lesson. Robots still use their usual view."
+        },
+        {
+          "when": "exposed card caption",
+          "wording": "Shown for this lesson"
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: north\nOwn hand: ♥A ♥K ♥Q ♠6 ♠5 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q\nDummy: not exposed\nAnnouncements: none\nTricks so far: none\nCurrent trick: none\nAuthored lesson Exposure (presentation only): west ♥4",
+      "ref": "F5-31",
+      "source": "authored follow-suit-2.exercise, version 1"
+    },
+    {
+      "id": "f5-lesson-7",
+      "playthroughId": "f5-playthrough-16",
+      "positionIndex": 0,
+      "kind": "statement",
+      "summary": "lesson-step-scripted-action",
+      "text": "Watch the scripted play.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit-2.exercise",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "scripted-action",
+      "stepIndex": 7,
+      "exerciseId": "follow-suit-2.exercise",
+      "contentId": "follow-suit-2.exercise",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "scripted-action",
+          "wording": "Watch the scripted play."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: north\nOwn hand: ♥A ♥K ♥Q ♠6 ♠5 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q\nDummy: not exposed\nAnnouncements: none\nTricks so far: none\nCurrent trick: none\nAuthored lesson Exposure (presentation only): west ♥4",
+      "ref": "F5-32",
+      "source": "authored follow-suit-2.exercise, version 1"
+    },
+    {
+      "id": "f5-lesson-8",
+      "playthroughId": "f5-playthrough-16",
+      "positionIndex": 2,
+      "kind": "statement",
+      "summary": "lesson-step-prompt",
+      "text": "Hearts were led, so everyone plays a heart if they can. Got one?\nTap a card you're allowed to play\nNice. You followed suit. Any of these works: Ace of hearts, King of hearts, Queen of hearts.\nNot quite — choose a heart to follow the suit led.\nTry again.\nThese answers follow suit: Ace of hearts, King of hearts, Queen of hearts. We’ll play the first one together.\nLook for the heart symbol. You must follow the suit that was led if you have it.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit-2.prompt",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "prompt",
+      "stepIndex": 8,
+      "exerciseId": "follow-suit-2.exercise",
+      "contentId": "follow-suit-2.prompt",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "commentary",
+          "wording": "Hearts were led, so everyone plays a heart if they can. Got one?"
+        },
+        {
+          "when": "prompt",
+          "wording": "Tap a card you're allowed to play"
+        },
+        {
+          "when": "correct or corrected",
+          "wording": "Nice. You followed suit. Any of these works: Ace of hearts, King of hearts, Queen of hearts."
+        },
+        {
+          "when": "wrong",
+          "wording": "Not quite — choose a heart to follow the suit led."
+        },
+        {
+          "when": "first wrong answer",
+          "wording": "Try again."
+        },
+        {
+          "when": "show answer",
+          "wording": "These answers follow suit: Ace of hearts, King of hearts, Queen of hearts. We’ll play the first one together."
+        },
+        {
+          "when": "hint requested",
+          "wording": "Look for the heart symbol. You must follow the suit that was led if you have it."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: south\nOwn hand: ♥A ♥K ♥Q ♠6 ♠5 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q\nDummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4\nAnnouncements: none\nTricks so far: none\nCurrent trick: north ♥10, east ♥9\nAuthored lesson Exposure (presentation only): west ♥4",
+      "ref": "F5-33",
+      "source": "authored follow-suit-2.prompt, version 1"
+    },
+    {
+      "id": "f5-lesson-9",
+      "playthroughId": "f5-playthrough-16",
+      "positionIndex": 3,
+      "kind": "statement",
+      "summary": "lesson-step-scripted-action",
+      "text": "Watch the scripted play.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit-2.exercise",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "scripted-action",
+      "stepIndex": 9,
+      "exerciseId": "follow-suit-2.exercise",
+      "contentId": "follow-suit-2.exercise",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "scripted-action",
+          "wording": "Watch the scripted play."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: west\nOwn hand: ♥K ♥Q ♠6 ♠5 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q\nDummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4\nAnnouncements: none\nTricks so far: none\nCurrent trick: north ♥10, east ♥9, south ♥A\nAuthored lesson Exposure (presentation only): west ♥4",
+      "ref": "F5-34",
+      "source": "authored follow-suit-2.exercise, version 1"
+    },
+    {
+      "id": "f5-lesson-10",
+      "playthroughId": "f5-playthrough-16",
+      "positionIndex": 4,
+      "kind": "statement",
+      "summary": "lesson-step-commentary",
+      "text": "You followed suit: play the suit led whenever you have it.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit-2.exercise",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "commentary",
+      "stepIndex": 10,
+      "exerciseId": "follow-suit-2.exercise",
+      "contentId": "follow-suit-2.exercise",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "commentary",
+          "wording": "You followed suit: play the suit led whenever you have it."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: south\nOwn hand: ♥K ♥Q ♠6 ♠5 ♦A ♦10 ♦6 ♦2 ♣J ♣7 ♣3 ♠Q\nDummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4\nAnnouncements: none\nTricks so far: 1: north ♥10, east ♥9, south ♥A, west ♥4; winner south\nCurrent trick: none",
+      "ref": "F5-35",
+      "source": "authored follow-suit-2.exercise, version 1"
+    },
+    {
+      "id": "f5-lesson-11",
+      "playthroughId": "f5-playthrough-17",
+      "positionIndex": 0,
+      "kind": "statement",
+      "summary": "lesson-step-commentary",
+      "text": "Try following suit on your own. Choose a heart after North leads.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit-3.exercise",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "commentary",
+      "stepIndex": 11,
+      "exerciseId": "follow-suit-3.exercise",
+      "contentId": "follow-suit-3.exercise",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "commentary",
+          "wording": "Try following suit on your own. Choose a heart after North leads."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: north\nOwn hand: ♥A ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦5 ♣J ♣7 ♣3 ♠Q\nDummy: not exposed\nAnnouncements: none\nTricks so far: none\nCurrent trick: none",
+      "ref": "F5-36",
+      "source": "authored follow-suit-3.exercise, version 1"
+    },
+    {
+      "id": "f5-lesson-12",
+      "playthroughId": "f5-playthrough-17",
+      "positionIndex": 0,
+      "kind": "statement",
+      "summary": "lesson-step-scripted-action",
+      "text": "Watch the scripted play.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit-3.exercise",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "scripted-action",
+      "stepIndex": 12,
+      "exerciseId": "follow-suit-3.exercise",
+      "contentId": "follow-suit-3.exercise",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "scripted-action",
+          "wording": "Watch the scripted play."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: north\nOwn hand: ♥A ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦5 ♣J ♣7 ♣3 ♠Q\nDummy: not exposed\nAnnouncements: none\nTricks so far: none\nCurrent trick: none",
+      "ref": "F5-37",
+      "source": "authored follow-suit-3.exercise, version 1"
+    },
+    {
+      "id": "f5-lesson-13",
+      "playthroughId": "f5-playthrough-17",
+      "positionIndex": 2,
+      "kind": "statement",
+      "summary": "lesson-step-prompt",
+      "text": "Hearts were led, so everyone plays a heart if they can. Got one?\nTap a card you're allowed to play\nNice. You followed suit. Any of these works: Ace of hearts, King of hearts, Queen of hearts.\nNot quite — choose a heart to follow the suit led.\nTry again.\nThese answers follow suit: Ace of hearts, King of hearts, Queen of hearts. We’ll play the first one together.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit-3.prompt",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "prompt",
+      "stepIndex": 13,
+      "exerciseId": "follow-suit-3.exercise",
+      "contentId": "follow-suit-3.prompt",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "commentary",
+          "wording": "Hearts were led, so everyone plays a heart if they can. Got one?"
+        },
+        {
+          "when": "prompt",
+          "wording": "Tap a card you're allowed to play"
+        },
+        {
+          "when": "correct or corrected",
+          "wording": "Nice. You followed suit. Any of these works: Ace of hearts, King of hearts, Queen of hearts."
+        },
+        {
+          "when": "wrong",
+          "wording": "Not quite — choose a heart to follow the suit led."
+        },
+        {
+          "when": "first wrong answer",
+          "wording": "Try again."
+        },
+        {
+          "when": "show answer",
+          "wording": "These answers follow suit: Ace of hearts, King of hearts, Queen of hearts. We’ll play the first one together."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: south\nOwn hand: ♥A ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦5 ♣J ♣7 ♣3 ♠Q\nDummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4\nAnnouncements: none\nTricks so far: none\nCurrent trick: north ♥10, east ♥9",
+      "ref": "F5-38",
+      "source": "authored follow-suit-3.prompt, version 1"
+    },
+    {
+      "id": "f5-lesson-14",
+      "playthroughId": "f5-playthrough-17",
+      "positionIndex": 3,
+      "kind": "statement",
+      "summary": "lesson-step-scripted-action",
+      "text": "Watch the scripted play.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit-3.exercise",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "scripted-action",
+      "stepIndex": 14,
+      "exerciseId": "follow-suit-3.exercise",
+      "contentId": "follow-suit-3.exercise",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "scripted-action",
+          "wording": "Watch the scripted play."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: west\nOwn hand: ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦5 ♣J ♣7 ♣3 ♠Q\nDummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4\nAnnouncements: none\nTricks so far: none\nCurrent trick: north ♥10, east ♥9, south ♥A",
+      "ref": "F5-39",
+      "source": "authored follow-suit-3.exercise, version 1"
+    },
+    {
+      "id": "f5-lesson-15",
+      "playthroughId": "f5-playthrough-17",
+      "positionIndex": 4,
+      "kind": "statement",
+      "summary": "lesson-step-commentary",
+      "text": "You followed suit: play the suit led whenever you have it.",
+      "informationMode": "VISIBLE",
+      "at": "2026-10-26T00:00:00.000Z",
+      "provenance": {
+        "sourceKind": "authored",
+        "contentId": "follow-suit-3.exercise",
+        "version": "1"
+      },
+      "grade": null,
+      "graderNote": null,
+      "outputKind": "lesson step",
+      "stepKind": "commentary",
+      "stepIndex": 15,
+      "exerciseId": "follow-suit-3.exercise",
+      "contentId": "follow-suit-3.exercise",
+      "version": 1,
+      "signOff": {
+        "status": "unsigned-draft"
+      },
+      "wordingVariants": [
+        {
+          "when": "commentary",
+          "wording": "You followed suit: play the suit led whenever you have it."
+        }
+      ],
+      "fault": null,
+      "visibleContext": "Contract: 1 no-trumps, declarer west\nLearner's seat: south; acting seat: south\nOwn hand: ♥K ♥Q ♠6 ♠2 ♦A ♦10 ♦6 ♦5 ♣J ♣7 ♣3 ♠Q\nDummy: ♠K ♠10 ♠7 ♠3 ♥6 ♥2 ♦J ♦7 ♦3 ♣Q ♣8 ♣4\nAnnouncements: none\nTricks so far: 1: north ♥10, east ♥9, south ♥A, west ♥4; winner south\nCurrent trick: none",
+      "ref": "F5-40",
+      "source": "authored follow-suit-3.exercise, version 1"
+    }
+  ],
+  "lesson": {
+    "contentId": "follow-suit-full",
+    "version": 2,
+    "signOff": {
+      "status": "unsigned-draft"
+    },
+    "title": "Follow suit"
+  }
+}
