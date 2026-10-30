@@ -1,4 +1,4 @@
-import { openPractice, choosePractice, installPausedClock, robotTurn } from './miniBridge';
+import { openPractice, choosePractice, installPausedClock, robotTurn, samplingSettled } from './miniBridge';
 import { readFile } from 'node:fs/promises';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
@@ -76,8 +76,10 @@ test('US-04, US-16: review, keyboard stepper, four hands and record downloads', 
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.keyboard.press('Enter');
   await expect(page.getByText('Trick 1 of 13', { exact: true })).toBeVisible();
-  await expect(page.locator('[aria-current="step"]')).toHaveAttribute('aria-label', 'Trick 1');
   await expect(page.locator('.review-cost')).toHaveCount(2);
+  await samplingSettled(page);
+  // #27, #110: sampling may mark trick 1 as a big moment; this spec checks the step, key-moments.spec the mark.
+  await expect(page.locator('[aria-current="step"]')).toHaveAttribute('aria-label', /^Trick 1(, big moment)?$/);
   for (const badge of await page.locator('.review-cost').all()) {
     await expect(badge).toContainText('X-ray view: with all cards visible');
     await expect(badge).toHaveAccessibleName(/Engine: bridge-dds, version 1.4.0 \/ DDS 2.9/);
