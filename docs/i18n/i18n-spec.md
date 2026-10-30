@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | **Draft v0.1, for owner, engineering lead and teacher review** |
-| Date | 2026-10-30 |
+| Date | 2026-10-30 (v0.2 picks the fonts per locale, §6.5) |
 | Requested by | The owner, 2026-10-30: add Simplified Chinese, Traditional Chinese, Japanese and Spanish |
 | Derived from | `docs/PRD.md` §10.4 (NFR-I), §18 D4 · `docs/engineering/engineering-spec.md` §4.2, §4.4, §4.9, §7.3 · `docs/ux/ux-spec.md` §9–§11 · `GLOSSARY.md` §10 · ADR-0001, ADR-0004 · `src/explanation/index.ts` |
 | Scope | Phase **M**. Phase V stays English-only (PRD §13.3) |
@@ -142,7 +142,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 
 | ID | Requirement | Acceptance |
 |---|---|---|
-| I18N-16 | **CJK text uses the system's CJK fonts** (Proposed, U-26). <br>• Per-`lang` font stacks: `zh-Hans`: PingFang SC, Noto Sans CJK SC, Microsoft YaHei; `zh-Hant`: PingFang TC, Noto Sans CJK TC, Microsoft JhengHei; `ja`: Hiragino Sans, Noto Sans CJK JP, Yu Gothic, Meiryo; each then `sans-serif`. <br>• The brand fonts stay first for Latin glyphs. <br>• Nothing loads from a CDN. <br>• Correct `lang` makes unified Han characters take their regional shapes | I18N-16.1 Screenshot tests show no missing-glyph boxes in each CJK locale. I18N-16.2 The licence check is unchanged, because no font is added |
+| I18N-16 | **CJK text uses the CJK members of the IBM Plex family** (§6.5; U-26, Delegated to Claude): <br>• IBM Plex Sans SC for `zh-Hans`; <br>• IBM Plex Sans TC for `zh-Hant`; <br>• IBM Plex Sans JP for `ja`. <br>They are self-hosted, sliced by `unicode-range`, and fall back to the system's CJK fonts. Bricolage Grotesque stays the display face for Latin letters and digits. Suit symbols keep a stack that doesn't change with locale. Spanish uses the existing Latin fonts. Nothing loads from a CDN. Correct `lang` makes unified Han characters take their regional shapes | I18N-16.1 **Coverage test:** every character in each shipped locale's `learner` catalogue lies in a declared slice, or for `es` in the Latin subset, so nothing depends on fallback. I18N-16.2 Screenshot tests show no missing-glyph boxes. I18N-16.3 The licence check lists each added font with its OFL-1.1 notice (LR-1) |
 | I18N-17 | **Layouts hold at 320 and 390 px** for every shipped locale and for the pseudo-locale (I18N-23): <br>• no clipped or truncated text; <br>• touch targets of at least 44 px; <br>• the two-row hand rule unchanged. <br>CJK lines break by character, and `ja` uses `word-break: auto-phrase` where the browser supports it | I18N-17.1 Playwright projects for `es` and `ja` at 390 (the longest and the tallest), and the pseudo-locale at 320. I18N-17.2 axe passes in every locale |
 | I18N-18 | **Length rules per locale.** UX §11 says "at most about 15 words". That rule doesn't apply to CJK, so each Locale Glossary states its own limit in characters, set by the teacher | I18N-18.1 A content lint warns above the limit |
 | I18N-19 | **Accessible text is localised too:** accessible names, live announcements ("East plays the 9 of hearts") and rejection messages | I18N-19.1 The existing a11y tests run in `zh-Hans` and `es` as well as `en` |
@@ -152,7 +152,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 | ID | Requirement | Acceptance |
 |---|---|---|
 | I18N-20 | **Provenance records the locale.** <br>• A template statement's provenance has `locale` and the catalogue version, as well as `templateId` (CI-5, `Statement.locale`). <br>• Logged statements keep the locale they were rendered in, even after a switch. <br>• The F5 export carries the locale, so teachers grade in their own language | I18N-20.1 US-40 provenance completeness includes `locale`. I18N-20.2 An F5 export in `zh-Hans` is deterministic |
-| I18N-21 | **Locales load only when needed.** Each non-English catalogue is its own lazily loaded chunk. The English first load stays within NFR-P1, with no extra bytes on the critical path. Offline use (NFR-C3) caches the selected locale | I18N-21.1 A bundle check: the English entry chunk has no other catalogue. I18N-21.2 Switching locale offline after first use works |
+| I18N-21 | **Locales load only when needed.** <br>• Each non-English catalogue is its own lazily loaded chunk, and so is its CJK font CSS. <br>• The English first load stays within NFR-P1, with no extra bytes on the critical path. <br>• Offline use (NFR-C3) caches the selected locale. <br>• Font slices are cached as they are used; one missing offline falls back to the system CJK font | I18N-21.1 A bundle check: the English entry chunk has no other catalogue and no CJK `@font-face`. I18N-21.2 Switching locale offline after first use works |
 | I18N-22 | **The US-38 guard also catches non-Latin text.** A literal with any Han, Kana or Hangul character counts as phrase-like without needing a space | I18N-22.1 A guard test with `const label = '继续'` fails |
 | I18N-23 | **A pseudo-locale for development only** (`en-XA`): accented letters, +40% length, and brackets around each entry. It catches hard-coded text and layout overflow before translation starts. It is never shipped | I18N-23.1 Production build has no `en-XA`. I18N-23.2 The 320-px pseudo-locale project passes |
 
@@ -223,6 +223,68 @@ The fields below extend engineering spec §4.4.
 | `ProgressExport.settings` | Add `locale`. `schemaVersion` bumps, with a migration that defaults to device matching |
 | `Lesson`, `Exercise`, `Step`, `Prompt` | Unchanged. They hold `textRef`s, not text |
 
+### 6.5 Typography per locale (U-26, Delegated to Claude)
+
+**The style today** (`src/app/tokens.css`, `src/app/styles.css`):
+
+- **Body:** IBM Plex Sans 400, 500 and 600.
+- **Display:** Bricolage Grotesque 600 and 800. Used for `h1`, home headings, the lesson counts and the rejection reason, with `letter-spacing: -.03em` and a tight line height.
+- **Mono:** IBM Plex Mono 500, for seat labels, the led badge and deal info.
+- **Loading:** all three are self-hosted through @fontsource, and only their `latin` subset loads.
+
+**The choice: stay in the Plex family.** IBM drew Plex Sans SC, TC and JP to match Plex Sans. So body text keeps the same voice in every language, and its Latin letters and digits are Plex's own. Bricolage stays the brand display face: in a CJK heading, its letters and numerals carry the personality, and the CJK characters come from Plex.
+
+| Locale | Body | Display | Mono | CJK weights shipped | Source (pinned) |
+|---|---|---|---|---|---|
+| `en`, `es` | IBM Plex Sans | Bricolage Grotesque | IBM Plex Mono | none | Unchanged. The `latin` subsets cover ñ, á–ú, ü, ¿ and ¡ |
+| `zh-Hans` | IBM Plex Sans SC | Bricolage Grotesque, then IBM Plex Sans SC | IBM Plex Mono, then IBM Plex Sans SC | 400, 600 | IBM `plex-sans-sc` 1.1.0, vendored (below) |
+| `zh-Hant` | IBM Plex Sans TC | Bricolage Grotesque, then IBM Plex Sans TC | IBM Plex Mono, then IBM Plex Sans TC | 400, 600 | IBM `plex-sans-tc` 1.1.1, vendored (below) |
+| `ja` | IBM Plex Sans JP | Bricolage Grotesque, then IBM Plex Sans JP | IBM Plex Mono, then IBM Plex Sans JP | 400, 600 | `@fontsource/ibm-plex-sans-jp` 5.3.1 |
+
+All three families are OFL-1.1.
+
+**Rules**
+
+1. **In CJK locales the CJK face leads the body stack,** ahead of IBM Plex Sans:
+   - Its own Latin glyphs are Plex, so English words and digits look the same.
+   - It keeps “ ” and … at CJK proportions inside Chinese and Japanese sentences.
+   - Each stack ends with the system's fonts for that script, then `sans-serif`:
+     - `zh-Hans`: PingFang SC, Noto Sans CJK SC, Microsoft YaHei;
+     - `zh-Hant`: PingFang TC, Noto Sans CJK TC, Microsoft JhengHei;
+     - `ja`: Hiragino Sans, Noto Sans CJK JP, Yu Gothic, Meiryo.
+2. **Two CJK weights only: 400 and 600.**
+   - The CSS weight-matching rules map body 500 to 400, and display 800 to 600.
+   - CJK at 600 already reads as heavy as Latin at 800.
+   - `font-synthesis-weight: none` prevents smeared fake bold.
+   - Two weights halve the font bytes of a full set.
+3. **Spacing is reset for CJK:**
+   - `letter-spacing: 0` on display text, because −0.03em crowds CJK characters.
+   - Line height at least 1.3 for headings, and 1.7 for body text.
+4. **Suit symbols and card faces keep one stack in every locale,** a `--font-suit` token that today equals the English body stack. The CJK faces and some CJK system fonts lack ♠♥♦♣ or draw them full-width, and cards must look the same everywhere (I18N-10).
+5. **The tokens are overridden per `lang`,** so no component changes:
+
+```css
+/* I18N-16: per-locale type; the Plex CJK faces carry body text, Bricolage keeps Latin display glyphs. */
+:root:lang(zh-Hans) {
+  --font-body: 'IBM Plex Sans SC', 'IBM Plex Sans', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  --font-display: 'Bricolage Grotesque', 'IBM Plex Sans SC', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'IBM Plex Sans SC', 'PingFang SC', 'Noto Sans CJK SC', monospace;
+}
+/* zh-Hant and ja: the same shape with Plex Sans TC / JP and the system fonts listed in rule 1. */
+```
+
+**How each font gets into the repository**
+
+- **Japanese** comes from @fontsource, like the existing fonts. Its CSS is imported lazily with the `ja` catalogue.
+- **Simplified and Traditional Chinese** are not on @fontsource. IBM's npm packages exist, but they depend on `@ibm/telemetry-js` and run `ibmtelemetry` on `postinstall`, which would send data to IBM from every `npm ci` and every CI run. So they are not added as dependencies. Instead:
+  - a script fetches the pinned tarball with `--ignore-scripts` and checks its integrity hash;
+  - it copies the sliced `woff2` files and the per-weight CSS for 400 and 600 into `src/app/fonts/`;
+  - the licences go into `public/licences/fonts/`, declared in `licences/assets.json`.
+- **What that costs:**
+  - **Repository:** about 20 MB of binary, at roughly 4–5.5 MB per weight per script.
+  - **Learners:** a screen downloads only the slices for the characters it shows, about 24 KB each.
+  - **If the repository size is too much:** vendor the complete fonts instead (SC Regular 3.7 MB, TC 2.4 MB). A build step then cuts each one down to the characters in its signed-off catalogue. This works because US-38 keeps every learner-facing character in the catalogue. It costs one build tool.
+
 ## 7. Seed terminology (drafts for the teachers)
 
 These are Claude's starting points, so the teachers' glossary work begins from a list rather than a blank page. **Nothing here is approved.** † marks terms known to vary by region or club.
@@ -290,7 +352,7 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
 |---|---|---|---|
 | L0a | `en.ts` split, entry `scope`, formatter with plural and select, `-one` keys merged, concatenation removed (I18N-05 to I18N-08) | Gate (U-08 framework) | Engineering |
 | L0b | Locale state, `lang`, matching, Settings row, lazy chunks, provenance locale (I18N-01 to I18N-04, I18N-20, I18N-21) | L0a | Engineering |
-| L0c | Guard extension, pseudo-locale, CJK font stacks, locale Playwright projects (I18N-16, I18N-17, I18N-22, I18N-23) | L0b | Engineering |
+| L0c | Guard extension, pseudo-locale, the §6.5 fonts (vendor script, tokens, coverage test), locale Playwright projects (I18N-16, I18N-17, I18N-22, I18N-23) | L0b | Engineering |
 | L1 | Locale Glossary per language, with avoid terms and register (I18N-09, I18N-18) | U-20 to U-23, a teacher per language | Teachers |
 | L2 | `zh-Hans` catalogue and lesson text, signed off; locale shipped | L0, L1 for `zh-Hans` | Translator + teacher |
 | L3 | `zh-Hant`, `ja`, `es`: each as L2, independently | L0, its own L1 | Translator + teacher |
@@ -320,7 +382,7 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
 | U-23 | Card-face letters and strain abbreviations per locale (for example Spanish R/D/V, ST or SA) | Keep A K Q J faces in the CJK locales. Spanish follows the teacher's region | Teachers |
 | U-24 | **May an AI draft translations?** (This relates to D7 and D10) | Yes, as drafts only. Each entry records `source: ai-draft`, and a bridge teacher in that language reviews and signs off every entry. Nothing AI-drafted ships unsigned | Owner |
 | U-25 | Message format: an in-house ICU subset or a library | In-house subset (§6.2) | Engineering lead |
-| U-26 | CJK fonts: system stacks or self-hosted Noto subsets | System stacks. Self-hosting would add megabytes per script against NFR-P1. Revisit only if screenshots show unacceptable fallbacks on a reference phone | Engineering lead + owner |
+| U-26 | CJK fonts | **Delegated to Claude (owner, 2026-10-30): IBM Plex Sans SC, TC and JP,** at 400 and 600, sliced and self-hosted, with system fallback; details in §6.5. Still open for the owner: whether to vendor about 20 MB of font slices into the repository or subset at build time | Owner (repository size) + engineering lead |
 | U-27 | Rules reference text (for example the EBU MiniBridge laws summary in `result.rules`) | Translate our own paraphrase, which needs no rights record. Quoting an official translation by a national federation needs a Rights Record (LR-5) | Owner |
 
 **Proposed ADR-0006: locales never change correctness.**
@@ -339,7 +401,9 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
 | R-4 | Spanish text overflows phone layouts | High | Medium | Pseudo-locale and `es-390` screenshots from L0c, before translation |
 | R-5 | Hard-coded CJK slips past the guard | Medium | Medium | I18N-22 |
 | R-6 | Learners in China and Japan expect a different bidding system | Medium | Medium | Out of scope (D1). Lesson copy names the system once; collect evidence in the pilot |
-| R-7 | Bundle growth slows first load | Low | Medium | Lazy chunks per locale (I18N-21) |
+| R-7 | Bundle growth slows first load | Low | Medium | Lazy chunks per locale (I18N-21). CJK fonts load by slice, only in their locale |
+| R-8 | Font tooling sends data to a third party: IBM's packages run telemetry on install | High, if the packages were added | Medium | Vendor from a hash-checked tarball fetched with `--ignore-scripts` (§6.5). Never add the `@ibm/plex-sans-*` packages as dependencies |
+| R-9 | A character from a late copy change has no slice, so it renders in a system font | Low | Low | I18N-16.1 coverage test runs on every catalogue change |
 
 ## 13. Proposed edits to other documents (after approval)
 
@@ -353,4 +417,6 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
   - §9: the Language row's behaviour (§8);
   - §11: per-locale length and register.
 - **GLOSSARY §10:** *Locale* (a language and region the product is offered in); *Shipped locale* (one that is complete and signed off).
-- **`docs/development.md`:** a "Locales" section once L0 lands, covering how to add a key, run the pseudo-locale and check parity.
+- **`docs/development.md`:**
+  - a "Locales" section once L0 lands, covering how to add a key, run the pseudo-locale and check parity;
+  - in "Theme and fonts", the per-locale stacks and how the vendored Plex CJK slices are refreshed.
