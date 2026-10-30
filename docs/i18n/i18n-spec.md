@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Status | **Draft v0.1, for owner, engineering lead and teacher review** |
-| Date | 2026-10-30 (v0.2 picks the fonts per locale, §6.5) |
+| Date | 2026-10-30 (v0.2 picks the fonts per locale, §6.5; v0.3 trims them at build time, §6.6) |
 | Requested by | The owner, 2026-10-30: add Simplified Chinese, Traditional Chinese, Japanese and Spanish |
 | Derived from | `docs/PRD.md` §10.4 (NFR-I), §18 D4 · `docs/engineering/engineering-spec.md` §4.2, §4.4, §4.9, §7.3 · `docs/ux/ux-spec.md` §9–§11 · `GLOSSARY.md` §10 · ADR-0001, ADR-0004 · `src/explanation/index.ts` |
 | Scope | Phase **M**. Phase V stays English-only (PRD §13.3) |
@@ -142,7 +142,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 
 | ID | Requirement | Acceptance |
 |---|---|---|
-| I18N-16 | **CJK text uses the CJK members of the IBM Plex family** (§6.5; U-26, Delegated to Claude): <br>• IBM Plex Sans SC for `zh-Hans`; <br>• IBM Plex Sans TC for `zh-Hant`; <br>• IBM Plex Sans JP for `ja`. <br>They are self-hosted, sliced by `unicode-range`, and fall back to the system's CJK fonts. Bricolage Grotesque stays the display face for Latin letters and digits. Suit symbols keep a stack that doesn't change with locale. Spanish uses the existing Latin fonts. Nothing loads from a CDN. Correct `lang` makes unified Han characters take their regional shapes | I18N-16.1 **Coverage test:** every character in each shipped locale's `learner` catalogue lies in a declared slice, or for `es` in the Latin subset, so nothing depends on fallback. I18N-16.2 Screenshot tests show no missing-glyph boxes. I18N-16.3 The licence check lists each added font with its OFL-1.1 notice (LR-1) |
+| I18N-16 | **CJK text uses the CJK members of the IBM Plex family** (§6.5, §6.6; U-26): <br>• IBM Plex Sans SC for `zh-Hans`; <br>• IBM Plex Sans TC for `zh-Hant`; <br>• IBM Plex Sans JP for `ja`. <br>Each is **trimmed at build time** to the characters its locale uses, and **renamed** `BridgeVibe Sans SC`, `TC` or `JP`, as the OFL requires (§6.6). Each falls back to the system's CJK fonts. Bricolage Grotesque stays the display face for Latin letters and digits. Suit symbols keep a stack that doesn't change with locale. Spanish uses the existing Latin fonts. Nothing loads from a CDN. Correct `lang` makes unified Han characters take their regional shapes | I18N-16.1 **The build fails** if any character in a shipped locale's `learner` catalogue has no glyph in its trimmed font, or for `es` in the Latin subset. The error names the catalogue key. I18N-16.2 Screenshot tests show no missing-glyph boxes. I18N-16.3 The licence check lists each trimmed font as a Modified Version of its IBM source, with the OFL-1.1 notice (LR-1). I18N-16.4 A test reads each trimmed font's `name` table: no renamed record contains "Plex", and the copyright, trademark and licence records are unchanged |
 | I18N-17 | **Layouts hold at 320 and 390 px** for every shipped locale and for the pseudo-locale (I18N-23): <br>• no clipped or truncated text; <br>• touch targets of at least 44 px; <br>• the two-row hand rule unchanged. <br>CJK lines break by character, and `ja` uses `word-break: auto-phrase` where the browser supports it | I18N-17.1 Playwright projects for `es` and `ja` at 390 (the longest and the tallest), and the pseudo-locale at 320. I18N-17.2 axe passes in every locale |
 | I18N-18 | **Length rules per locale.** UX §11 says "at most about 15 words". That rule doesn't apply to CJK, so each Locale Glossary states its own limit in characters, set by the teacher | I18N-18.1 A content lint warns above the limit |
 | I18N-19 | **Accessible text is localised too:** accessible names, live announcements ("East plays the 9 of hearts") and rejection messages | I18N-19.1 The existing a11y tests run in `zh-Hans` and `es` as well as `en` |
@@ -152,7 +152,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 | ID | Requirement | Acceptance |
 |---|---|---|
 | I18N-20 | **Provenance records the locale.** <br>• A template statement's provenance has `locale` and the catalogue version, as well as `templateId` (CI-5, `Statement.locale`). <br>• Logged statements keep the locale they were rendered in, even after a switch. <br>• The F5 export carries the locale, so teachers grade in their own language | I18N-20.1 US-40 provenance completeness includes `locale`. I18N-20.2 An F5 export in `zh-Hans` is deterministic |
-| I18N-21 | **Locales load only when needed.** <br>• Each non-English catalogue is its own lazily loaded chunk, and so is its CJK font CSS. <br>• The English first load stays within NFR-P1, with no extra bytes on the critical path. <br>• Offline use (NFR-C3) caches the selected locale. <br>• Font slices are cached as they are used; one missing offline falls back to the system CJK font | I18N-21.1 A bundle check: the English entry chunk has no other catalogue and no CJK `@font-face`. I18N-21.2 Switching locale offline after first use works |
+| I18N-21 | **Locales load only when needed.** <br>• Each non-English catalogue is its own lazily loaded chunk, and so is its CJK font CSS. <br>• The English first load stays within NFR-P1, with no extra bytes on the critical path. <br>• Offline use (NFR-C3) caches the selected locale, including its two trimmed font files in full. | I18N-21.1 A bundle check: the English entry chunk has no other catalogue and no CJK `@font-face`. I18N-21.2 Switching locale offline after first use works. I18N-21.3 Each trimmed font file stays within 500 KB, or the build fails |
 | I18N-22 | **The US-38 guard also catches non-Latin text.** A literal with any Han, Kana or Hangul character counts as phrase-like without needing a space | I18N-22.1 A guard test with `const label = '继续'` fails |
 | I18N-23 | **A pseudo-locale for development only** (`en-XA`): accented letters, +40% length, and brackets around each entry. It catches hard-coded text and layout overflow before translation starts. It is never shipped | I18N-23.1 Production build has no `en-XA`. I18N-23.2 The 320-px pseudo-locale project passes |
 
@@ -223,7 +223,7 @@ The fields below extend engineering spec §4.4.
 | `ProgressExport.settings` | Add `locale`. `schemaVersion` bumps, with a migration that defaults to device matching |
 | `Lesson`, `Exercise`, `Step`, `Prompt` | Unchanged. They hold `textRef`s, not text |
 
-### 6.5 Typography per locale (U-26, Delegated to Claude)
+### 6.5 Typography per locale (U-26: fonts Delegated to Claude; trimming decided by the owner)
 
 **The style today** (`src/app/tokens.css`, `src/app/styles.css`):
 
@@ -237,11 +237,11 @@ The fields below extend engineering spec §4.4.
 | Locale | Body | Display | Mono | CJK weights shipped | Source (pinned) |
 |---|---|---|---|---|---|
 | `en`, `es` | IBM Plex Sans | Bricolage Grotesque | IBM Plex Mono | none | Unchanged. The `latin` subsets cover ñ, á–ú, ü, ¿ and ¡ |
-| `zh-Hans` | IBM Plex Sans SC | Bricolage Grotesque, then IBM Plex Sans SC | IBM Plex Mono, then IBM Plex Sans SC | 400, 600 | IBM `plex-sans-sc` 1.1.0, vendored (below) |
-| `zh-Hant` | IBM Plex Sans TC | Bricolage Grotesque, then IBM Plex Sans TC | IBM Plex Mono, then IBM Plex Sans TC | 400, 600 | IBM `plex-sans-tc` 1.1.1, vendored (below) |
-| `ja` | IBM Plex Sans JP | Bricolage Grotesque, then IBM Plex Sans JP | IBM Plex Mono, then IBM Plex Sans JP | 400, 600 | `@fontsource/ibm-plex-sans-jp` 5.3.1 |
+| `zh-Hans` | BridgeVibe Sans SC (trimmed IBM Plex Sans SC) | Bricolage Grotesque, then BridgeVibe Sans SC | IBM Plex Mono, then BridgeVibe Sans SC | 400, 600 | IBM `plex-sans-sc` 1.1.0, trimmed at build (§6.6) |
+| `zh-Hant` | BridgeVibe Sans TC (trimmed IBM Plex Sans TC) | Bricolage Grotesque, then BridgeVibe Sans TC | IBM Plex Mono, then BridgeVibe Sans TC | 400, 600 | IBM `plex-sans-tc` 1.1.1, trimmed at build |
+| `ja` | BridgeVibe Sans JP (trimmed IBM Plex Sans JP) | Bricolage Grotesque, then BridgeVibe Sans JP | IBM Plex Mono, then BridgeVibe Sans JP | 400, 600 | IBM `plex-sans-jp` 3.0.0, trimmed at build |
 
-All three families are OFL-1.1.
+All three sources are OFL-1.1, with the Reserved Font Name "Plex". The trimmed fonts are the same design under a new name.
 
 **Rules**
 
@@ -256,7 +256,7 @@ All three families are OFL-1.1.
    - The CSS weight-matching rules map body 500 to 400, and display 800 to 600.
    - CJK at 600 already reads as heavy as Latin at 800.
    - `font-synthesis-weight: none` prevents smeared fake bold.
-   - Two weights halve the font bytes of a full set.
+   - Two weights halve the font bytes, compared with three.
 3. **Spacing is reset for CJK:**
    - `letter-spacing: 0` on display text, because −0.03em crowds CJK characters.
    - Line height at least 1.3 for headings, and 1.7 for body text.
@@ -266,24 +266,66 @@ All three families are OFL-1.1.
 ```css
 /* I18N-16: per-locale type; the Plex CJK faces carry body text, Bricolage keeps Latin display glyphs. */
 :root:lang(zh-Hans) {
-  --font-body: 'IBM Plex Sans SC', 'IBM Plex Sans', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
-  --font-display: 'Bricolage Grotesque', 'IBM Plex Sans SC', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
-  --font-mono: 'IBM Plex Mono', 'IBM Plex Sans SC', 'PingFang SC', 'Noto Sans CJK SC', monospace;
+  --font-body: 'BridgeVibe Sans SC', 'IBM Plex Sans', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  --font-display: 'Bricolage Grotesque', 'BridgeVibe Sans SC', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'BridgeVibe Sans SC', 'PingFang SC', 'Noto Sans CJK SC', monospace;
 }
-/* zh-Hant and ja: the same shape with Plex Sans TC / JP and the system fonts listed in rule 1. */
+/* zh-Hant and ja: the same shape with BridgeVibe Sans TC / JP and the system fonts listed in rule 1. */
 ```
 
-**How each font gets into the repository**
+### 6.6 Trimming the CJK fonts at build time (U-26, owner, 2026-10-30)
 
-- **Japanese** comes from @fontsource, like the existing fonts. Its CSS is imported lazily with the `ja` catalogue.
-- **Simplified and Traditional Chinese** are not on @fontsource. IBM's npm packages exist, but they depend on `@ibm/telemetry-js` and run `ibmtelemetry` on `postinstall`, which would send data to IBM from every `npm ci` and every CI run. So they are not added as dependencies. Instead:
-  - a script fetches the pinned tarball with `--ignore-scripts` and checks its integrity hash;
-  - it copies the sliced `woff2` files and the per-weight CSS for 400 and 600 into `src/app/fonts/`;
-  - the licences go into `public/licences/fonts/`, declared in `licences/assets.json`.
-- **What that costs:**
-  - **Repository:** about 20 MB of binary, at roughly 4–5.5 MB per weight per script.
-  - **Learners:** a screen downloads only the slices for the characters it shows, about 24 KB each.
-  - **If the repository size is too much:** vendor the complete fonts instead (SC Regular 3.7 MB, TC 2.4 MB). A build step then cuts each one down to the characters in its signed-off catalogue. This works because US-38 keeps every learner-facing character in the catalogue. It costs one build tool.
+**The owner chose this over committing about 20 MB of font slices.** US-38 keeps every learner-facing character in the catalogue, so each locale's character set is known at build time. Each locale ships one small file per weight.
+
+**The licence requires a new name.** IBM's CJK releases are OFL-1.1, with the Reserved Font Name "Plex". The OFL FAQ (version 1.1-update7, November 2023) says:
+
+- Removing glyphs for a web font makes a Modified Version (2.5, 2.6, 2.8).
+- A Modified Version can't use a Reserved Font Name, or any word of one (3.1, 5.4).
+- Trademark notices must stay (3.7).
+- Only a separate written agreement with the copyright holder lifts this (5.8). We don't need one.
+
+So the trimmed fonts are named **BridgeVibe Sans SC**, **BridgeVibe Sans TC** and **BridgeVibe Sans JP**, both in the font file and as the CSS family. The Latin Plex fonts already shipped are Google Fonts builds whose licences reserve no name, so they are unaffected.
+
+**The pipeline** (Proposed; built in L0c):
+
+1. **Fetch the sources.** `scripts/fonts/fetch.ts` downloads the pinned IBM tarballs (`@ibm/plex-sans-sc` 1.1.0, `-tc` 1.1.1, `-jp` 3.0.0) from the npm registry.
+   - It checks each against its `sha512` integrity, recorded in `scripts/fonts/sources.json`.
+   - It never runs package scripts, which avoids IBM's install-time telemetry.
+   - It extracts only `fonts/complete/woff2/hinted/*-{Regular,SemiBold}.woff2` and `LICENSE.txt`, into the git-ignored `.font-sources/` (about 17 MB).
+   - CI caches that folder, keyed by the hashes. Nothing from the tarballs is committed.
+2. **Collect the characters per locale:**
+   - every `learner` entry, including every plural and select branch;
+   - printable ASCII;
+   - a fixed set of CJK punctuation;
+   - whatever the Intl formatters the app uses produce for that locale, such as 、 and 和 from `Intl.ListFormat('zh-Hans')`.
+3. **Trim** each weight with `subset-font` 2.9.0 (BSD-3-Clause; built on `harfbuzzjs`, MIT; no install scripts), a development dependency. It keeps the default OpenType layout features, including vertical and proportional forms, and writes WOFF2.
+4. **Rename** in the `name` table:
+   - Rewrite records 1, 3, 4, 6, 16 and 17 (and 21, 22 and 25 if present) to the BridgeVibe name.
+   - Keep records 0 (copyright), 7 (trademark) and 13–14 (licence) unchanged.
+   - Recompute the table checksums.
+5. **Emit** hashed assets and the `@font-face` CSS into the locale's lazy chunk (I18N-21). The same Vite plugin runs in `dev`, and trims again when a catalogue changes.
+
+**What the build checks:**
+
+| Check | Fails when |
+|---|---|
+| I18N-16.1 coverage | A catalogue character has no glyph in the IBM source. The error names the key, so the teacher or translator can choose another word |
+| I18N-16.4 names | A renamed record still contains "Plex", or a kept record changed |
+| I18N-21.3 size | A trimmed file exceeds 500 KB per weight |
+| Determinism | The same catalogue and sources produce different bytes, which would break caching |
+| Licence (LR-1) | `NOTICE.txt` lacks "BridgeVibe Sans SC/TC/JP: Modified Version of IBM Plex Sans SC/TC/JP (version), © IBM Corp., OFL-1.1" with the full licence text |
+
+**What it costs:**
+
+- **Learners:** about 150–400 KB per weight per script, depending on how many distinct characters the copy uses. That estimate comes from IBM's own slices, at about 190 bytes per code point. One locale downloads two such files, and caches them whole for offline use.
+- **Repository:** nothing committed except the pipeline.
+- **Build:** a few seconds per locale.
+- **Network:** the first build on a machine needs to reach the npm registry, as `npm ci` already does.
+
+**Trade-offs:**
+
+- **Text outside the catalogue renders in the system CJK font:** a learner's file name, for example, or a translator's last-minute character outside the build. I18N-16.1 keeps catalogue text covered.
+- **Every copy change re-trims the fonts and changes their hash,** so returning learners download the font again after a content release.
 
 ## 7. Seed terminology (drafts for the teachers)
 
@@ -352,7 +394,8 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
 |---|---|---|---|
 | L0a | `en.ts` split, entry `scope`, formatter with plural and select, `-one` keys merged, concatenation removed (I18N-05 to I18N-08) | Gate (U-08 framework) | Engineering |
 | L0b | Locale state, `lang`, matching, Settings row, lazy chunks, provenance locale (I18N-01 to I18N-04, I18N-20, I18N-21) | L0a | Engineering |
-| L0c | Guard extension, pseudo-locale, the §6.5 fonts (vendor script, tokens, coverage test), locale Playwright projects (I18N-16, I18N-17, I18N-22, I18N-23) | L0b | Engineering |
+| L0c | Guard extension, pseudo-locale, locale Playwright projects (I18N-17, I18N-22, I18N-23) | L0b | Engineering |
+| L0d | The §6.5 tokens and the §6.6 font pipeline: fetch script, trim-and-rename plugin, build checks, `NOTICE` entries (I18N-16, I18N-21.3) | L0b | Engineering |
 | L1 | Locale Glossary per language, with avoid terms and register (I18N-09, I18N-18) | U-20 to U-23, a teacher per language | Teachers |
 | L2 | `zh-Hans` catalogue and lesson text, signed off; locale shipped | L0, L1 for `zh-Hans` | Translator + teacher |
 | L3 | `zh-Hant`, `ja`, `es`: each as L2, independently | L0, its own L1 | Translator + teacher |
@@ -382,7 +425,7 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
 | U-23 | Card-face letters and strain abbreviations per locale (for example Spanish R/D/V, ST or SA) | Keep A K Q J faces in the CJK locales. Spanish follows the teacher's region | Teachers |
 | U-24 | **May an AI draft translations?** (This relates to D7 and D10) | Yes, as drafts only. Each entry records `source: ai-draft`, and a bridge teacher in that language reviews and signs off every entry. Nothing AI-drafted ships unsigned | Owner |
 | U-25 | Message format: an in-house ICU subset or a library | In-house subset (§6.2) | Engineering lead |
-| U-26 | CJK fonts | **Delegated to Claude (owner, 2026-10-30): IBM Plex Sans SC, TC and JP,** at 400 and 600, sliced and self-hosted, with system fallback; details in §6.5. Still open for the owner: whether to vendor about 20 MB of font slices into the repository or subset at build time | Owner (repository size) + engineering lead |
+| U-26 | CJK fonts | **Decided.** <br>• Font choice, Delegated to Claude (owner, 2026-10-30): IBM Plex Sans SC, TC and JP at 400 and 600, with system fallback (§6.5). <br>• Delivery, decided by the owner (2026-10-30): trimmed at build time from IBM's pinned releases, and renamed BridgeVibe Sans SC/TC/JP as the OFL requires (§6.6). <br>The engineering lead approves the §6.6 pipeline before L0d | Owner + engineering lead |
 | U-27 | Rules reference text (for example the EBU MiniBridge laws summary in `result.rules`) | Translate our own paraphrase, which needs no rights record. Quoting an official translation by a national federation needs a Rights Record (LR-5) | Owner |
 
 **Proposed ADR-0006: locales never change correctness.**
@@ -401,9 +444,10 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
 | R-4 | Spanish text overflows phone layouts | High | Medium | Pseudo-locale and `es-390` screenshots from L0c, before translation |
 | R-5 | Hard-coded CJK slips past the guard | Medium | Medium | I18N-22 |
 | R-6 | Learners in China and Japan expect a different bidding system | Medium | Medium | Out of scope (D1). Lesson copy names the system once; collect evidence in the pilot |
-| R-7 | Bundle growth slows first load | Low | Medium | Lazy chunks per locale (I18N-21). CJK fonts load by slice, only in their locale |
-| R-8 | Font tooling sends data to a third party: IBM's packages run telemetry on install | High, if the packages were added | Medium | Vendor from a hash-checked tarball fetched with `--ignore-scripts` (§6.5). Never add the `@ibm/plex-sans-*` packages as dependencies |
-| R-9 | A character from a late copy change has no slice, so it renders in a system font | Low | Low | I18N-16.1 coverage test runs on every catalogue change |
+| R-7 | Bundle growth slows first load | Low | Medium | Lazy chunks per locale (I18N-21). Trimmed CJK fonts load only in their locale, with a size limit per file (I18N-21.3) |
+| R-8 | Font tooling sends data to a third party: IBM's packages run telemetry on install | High, if the packages were added | Medium | Fetch hash-checked tarballs and never run their scripts (§6.6). Never add the `@ibm/plex-sans-*` packages as dependencies |
+| R-9 | **A trimmed font ships under the reserved name "Plex"**, breaching OFL-1.1 (LR-2) | Low | High | The rename is part of the pipeline, and I18N-16.4 fails the build on any leftover "Plex" in a renamed record |
+| R-10 | A signed-off string uses a character IBM Plex lacks | Low | Low | I18N-16.1 fails the build and names the key. The teacher picks another word, or the character renders in the system font |
 
 ## 13. Proposed edits to other documents (after approval)
 
@@ -419,4 +463,4 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
 - **GLOSSARY §10:** *Locale* (a language and region the product is offered in); *Shipped locale* (one that is complete and signed off).
 - **`docs/development.md`:**
   - a "Locales" section once L0 lands, covering how to add a key, run the pseudo-locale and check parity;
-  - in "Theme and fonts", the per-locale stacks and how the vendored Plex CJK slices are refreshed.
+  - in "Theme and fonts", the per-locale stacks, how to bump a pinned IBM source (version plus `sha512`), and why the trimmed fonts are renamed.
