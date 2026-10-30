@@ -84,7 +84,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 
 | Tag | Endonym in picker | Target audience | Matches these device languages | Plural categories | Notes |
 |---|---|---|---|---|---|
-| `en` | English | Source locale | `en-*`, and anything unmatched | one, other | Source of every key |
+| `en` | English | Source locale | `en-*` (and the fallback in step 2 below) | one, other | Source of every key |
 | `zh-Hans` | 简体中文 | Mainland China | `zh-CN`, `zh-SG`, `zh-Hans-*`, bare `zh` | other | Already the D4 candidate |
 | `zh-Hant` | 繁體中文 | Taiwan (U-21) | `zh-TW`, `zh-HK`, `zh-MO`, `zh-Hant-*` | other | Its own glossary; **not** a script conversion of `zh-Hans` |
 | `ja` | 日本語 | Japan | `ja-*` | other | Register: U-22 |
@@ -92,8 +92,8 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 
 **Matching (Proposed):**
 
-1. Walk `navigator.languages` in order. Take the first entry that maps, by the table above, to a locale that has **shipped**.
-2. If none maps, use `en`.
+1. Walk `navigator.languages` in order. Take the first entry that maps, by the table above, to a locale that has **shipped**. Skip unmatched entries: `['fr-FR', 'ja-JP']` gives `ja` when `ja` has shipped.
+2. Only when the whole list has nothing that maps, use `en`.
 3. A learner's explicit choice in Settings always overrides the device language.
 
 ## 5. Requirements
@@ -102,7 +102,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 
 | ID | Requirement | Acceptance |
 |---|---|---|
-| I18N-01 | On first launch, the locale comes from the device language by the §4 matching rules. Only shipped locales are eligible | I18N-01.1 A unit table test covers every row of §4, plus an unmatched language and a matched but unshipped one. I18N-01.2 An end-to-end test with Playwright `locale: 'ja-JP'` lands in Japanese |
+| I18N-01 | On first launch, the locale comes from the device language by the §4 matching rules. Only shipped locales are eligible | I18N-01.1 A unit table test covers every row of §4, plus an unmatched language, a matched but unshipped one, and a list whose first entry is unmatched and whose second is shipped (`['fr-FR', 'ja-JP']` gives `ja`). I18N-01.2 An end-to-end test with Playwright `locale: 'ja-JP'` lands in Japanese |
 | I18N-02 | **Settings → Language:** <br>• lists the shipped locales by endonym, with no flags; <br>• applies a change at once, without a reload, including mid-Playthrough; <br>• keeps the current Playthrough's state, focus and position | I18N-02.1 An end-to-end test switches language mid-trick. The Seat View, the trick and the legal cards are unchanged, and the visible copy is in the new locale |
 | I18N-03 | The choice is stored with the other settings: for the session in V, and persisted in M. It is part of `ProgressExport.settings` (FR-P4) | I18N-03.1 Export and import keep the locale. I18N-03.2 Importing an unshipped locale falls back to the §4 matching rules |
 | I18N-04 | `<html lang>` and the document title follow the locale. Text in another language, such as English in the internal provenance panel, carries its own `lang` | I18N-04.1 An end-to-end check of `document.documentElement.lang` per locale |
@@ -120,7 +120,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 
 | ID | Requirement | Acceptance |
 |---|---|---|
-| I18N-09 | **A locale's Locale Glossary comes first.** It is drafted and signed off before any other string in that locale is translated (FR-E5, GLOSSARY §10). It maps every glossary term and every teenage-register word, and lists *avoid* terms. One example: in Japanese, トランプ means playing cards, so it can't stand alone for "trump" | I18N-09.1 The lint (US-34.2) runs per locale. I18N-09.2 For `zh-Hans`, `zh-Hant` and `ja`, it matches by substring, because there are no word boundaries |
+| I18N-09 | **A locale's Locale Glossary comes first.** It is drafted and signed off before any other string in that locale is translated (FR-E5, GLOSSARY §10). It maps every glossary term and every teenage-register word, and lists *avoid* terms. One example: in Japanese, トランプ means playing cards, so it can't stand alone for "trump" | I18N-09.1 The lint (US-34.2) runs per locale. I18N-09.2 For `zh-Hans`, `zh-Hant` and `ja`, it matches by substring, because there are no word boundaries. Each *avoid* term lists the approved glossary terms that contain it, such as ノートランプ for トランプ. Those approved terms are removed before the search. I18N-09.3 A lint test accepts ノートランプ and rejects トランプ on its own |
 | I18N-10 | **Bridge notation is copy.** Strain abbreviations (NT), seat letters (in Spanish, W is O for *Oeste*), card-face letters and level-and-strain call labels all come from the catalogue. Suit symbols ♠♥♦♣ are the same in every locale, and always have a localised accessible name | I18N-10.1 Golden render tests for a card, a contract and a call label in every locale. I18N-10.2 No suit-symbol-only element lacks an accessible name (axe, plus the existing card tests) |
 
 ### 5.4 Content and sign-off
@@ -142,7 +142,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 
 | ID | Requirement | Acceptance |
 |---|---|---|
-| I18N-16 | **CJK text uses the CJK members of the IBM Plex family** (§6.5, §6.6; U-26): <br>• IBM Plex Sans SC for `zh-Hans`; <br>• IBM Plex Sans TC for `zh-Hant`; <br>• IBM Plex Sans JP for `ja`. <br>Each is **trimmed at build time** to the characters its locale uses, and **renamed** `BridgeVibe Sans SC`, `TC` or `JP`, as the OFL requires (§6.6). Each falls back to the system's CJK fonts. Bricolage Grotesque stays the display face for Latin letters and digits. Suit symbols keep a stack that doesn't change with locale. Spanish uses the existing Latin fonts. Nothing loads from a CDN. Correct `lang` makes unified Han characters take their regional shapes | I18N-16.1 **The build fails** if any character in a shipped locale's `learner` catalogue has no glyph in its trimmed font, or for `es` in the Latin subset. The error names the catalogue key. I18N-16.2 Screenshot tests show no missing-glyph boxes. I18N-16.3 The licence check lists each trimmed font as a Modified Version of its IBM source, with the OFL-1.1 notice (LR-1). I18N-16.4 A test reads each trimmed font's `name` table: no renamed record contains "Plex", and the copyright, trademark and licence records are unchanged |
+| I18N-16 | **CJK text uses the CJK members of the IBM Plex family** (§6.5, §6.6; U-26): <br>• IBM Plex Sans SC for `zh-Hans`; <br>• IBM Plex Sans TC for `zh-Hant`; <br>• IBM Plex Sans JP for `ja`. <br>Each is **trimmed at build time** to the characters its locale uses, and **renamed** `BridgeVibe Sans SC`, `TC` or `JP`, as the OFL requires (§6.6). Each falls back to the system's CJK fonts. Bricolage Grotesque stays the display face for Latin letters and digits. Suit symbols keep a stack that doesn't change with locale. Spanish uses the existing Latin fonts. Nothing loads from a CDN. Correct `lang` makes unified Han characters take their regional shapes | I18N-16.1 **The build fails** if any character in a shipped locale's `learner` catalogue has no glyph in the font its entry renders with. That is the trimmed CJK font, or for `es` the Latin subset, except for entries rendered with `--font-suit` (`symbol.*` and `face.*`, §6.5 rule 4). Those are checked instead to contain only ♠♥♦♣ or the locale's approved card-face letters. The error names the catalogue key. I18N-16.2 Screenshot tests show no missing-glyph boxes. I18N-16.3 The licence check lists each trimmed font as a Modified Version of its IBM source, with the OFL-1.1 notice (LR-1). I18N-16.4 A test reads each trimmed font's `name` table: no renamed record contains "Plex", and the copyright, trademark and licence records are unchanged |
 | I18N-17 | **Layouts hold at 320 and 390 px** for every shipped locale and for the pseudo-locale (I18N-23): <br>• no clipped or truncated text; <br>• touch targets of at least 44 px; <br>• the two-row hand rule unchanged. <br>CJK lines break by character, and `ja` uses `word-break: auto-phrase` where the browser supports it | I18N-17.1 Playwright projects for `es` and `ja` at 390 (the longest and the tallest), and the pseudo-locale at 320. I18N-17.2 axe passes in every locale |
 | I18N-18 | **Length rules per locale.** UX §11 says "at most about 15 words". That rule doesn't apply to CJK, so each Locale Glossary states its own limit in characters, set by the teacher | I18N-18.1 A content lint warns above the limit |
 | I18N-19 | **Accessible text is localised too:** accessible names, live announcements ("East plays the 9 of hearts") and rejection messages | I18N-19.1 The existing a11y tests run in `zh-Hans` and `es` as well as `en` |
@@ -309,7 +309,7 @@ So the trimmed fonts are named **BridgeVibe Sans SC**, **BridgeVibe Sans TC** an
 
 | Check | Fails when |
 |---|---|
-| I18N-16.1 coverage | A catalogue character has no glyph in the IBM source. The error names the key, so the teacher or translator can choose another word |
+| I18N-16.1 coverage | A catalogue character has no glyph in the IBM source. Entries rendered with `--font-suit` are checked against the suit set instead. The error names the key, so the teacher or translator can choose another word |
 | I18N-16.4 names | A renamed record still contains "Plex", or a kept record changed |
 | I18N-21.3 size | A trimmed file exceeds 500 KB per weight |
 | Determinism | The same catalogue and sources produce different bytes, which would break caching |
@@ -426,7 +426,7 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
 | U-24 | **May an AI draft translations?** (This relates to D7 and D10) | Yes, as drafts only. Each entry records `source: ai-draft`, and a bridge teacher in that language reviews and signs off every entry. Nothing AI-drafted ships unsigned | Owner |
 | U-25 | Message format: an in-house ICU subset or a library | In-house subset (§6.2) | Engineering lead |
 | U-26 | CJK fonts | **Decided.** <br>• Font choice, Delegated to Claude (owner, 2026-10-30): IBM Plex Sans SC, TC and JP at 400 and 600, with system fallback (§6.5). <br>• Delivery, decided by the owner (2026-10-30): trimmed at build time from IBM's pinned releases, and renamed BridgeVibe Sans SC/TC/JP as the OFL requires (§6.6). <br>The engineering lead approves the §6.6 pipeline before L0d | Owner + engineering lead |
-| U-27 | Rules reference text (for example the EBU MiniBridge laws summary in `result.rules`) | Translate our own paraphrase, which needs no rights record. Quoting an official translation by a national federation needs a Rights Record (LR-5) | Owner |
+| U-27 | Rules reference text (for example the EBU MiniBridge laws summary in `result.rules`) | Translate our own paraphrase. It still gets a Rights Record like every Content Item (US-26.1, GLOSSARY §9), recorded as original BridgeVibe content under the project's own licence, so no third-party grant is needed. Quoting an official translation by a national federation would also need that federation's written grant (LR-5) | Owner |
 
 **Proposed ADR-0006: locales never change correctness.**
 
