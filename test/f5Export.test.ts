@@ -6,6 +6,7 @@ import { text } from '../src/explanation';
 import { columns, csv, generateReport } from './f5/report';
 
 // VAL-08, US-40.1: validate coverage and reproducibility before publishing teacher inputs.
+// #119: two generations take ~21 s alone and ~100 s on a busy machine; headroom, not retries (#87).
 test('VAL-08: F5 real composition export is complete and reproducible', async () => {
   const first = await generateReport(), second = await generateReport();
   expect(second).toEqual(first);
@@ -59,4 +60,4 @@ test('VAL-08: F5 real composition export is complete and reproducible', async ()
     writeFileSync(new URL('f5-sheet.csv', dir), first.sheet);
     writeFileSync(new URL('README.md', dir), first.readme);
   }
-}, 60_000);
+}, 180_000);
