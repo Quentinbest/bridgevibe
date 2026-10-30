@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { resolve, dirname } from 'node:path';
+import { resolve, dirname, isAbsolute, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
 import register from '../../licences/candidates.json' with { type: 'json' };
@@ -61,7 +61,7 @@ function object(value: unknown): Record<string, unknown> {
 function nullableText(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
-export function parseResult(name: string, output: string, engine: Engine): Result {
+export function parseResult(name: string, output: string, engine: Engine, checkout?: string): Result {
   const response = object(JSON.parse(output));
   let ruleId: string | null = null;
   let provenance: Result['provenance'] = 'no-provenance';
@@ -72,7 +72,9 @@ export function parseResult(name: string, output: string, engine: Engine): Resul
       if (!nullableText(rule.module) || !nullableText(rule.file) || !Number.isInteger(rule.line) || Number(rule.line) < 1) {
         throw new Error('Invalid rbb rule location');
       }
-      ruleId = `${rule.module}:${rule.file}:${rule.line}`;
+      // US-47: rule IDs name the file inside the pinned checkout, never a machine-local absolute path.
+      const file = checkout && isAbsolute(String(rule.file)) ? relative(checkout, String(rule.file)) : String(rule.file);
+      ruleId = `${rule.module}:${file}:${rule.line}`;
       provenance = 'rule';
     }
   } else if (response.provenance === 'not-covered') provenance = 'not-covered';
@@ -150,7 +152,7 @@ export function prepareCandidate(candidate: typeof candidates[number], root: str
     run(auction: Auction): Result {
       if (!invoke || status.status !== 'run') throw new Error(status.reason ?? 'candidate unavailable');
       if (auction.vulnerability !== 'none') throw new Error('Only the T5 non-vulnerable auctions are supported');
-      return parseResult(candidate.name, invoke(auction), engine);
+      return parseResult(candidate.name, invoke(auction), engine, checkout);
     },
   };
 }

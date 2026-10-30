@@ -64,6 +64,12 @@ test('Bridgit default passes and missing provenance never become rule-backed', (
   expect(parseResult('Bridgit', '{"call":"P"}', adapter.status.engine).provenance).toBe('no-provenance');
   expect(parseResult('saycbridge', '{"call":"P","provenance":"rule"}', adapter.status.engine).provenance).toBe('no-provenance');
 });
+test('rusty-bidding-bot rule IDs name the file inside the checkout, not an absolute local path', () => {
+  const engine = { name: 'rusty-bidding-bot', version: candidates.find(c => c.name === 'rusty-bidding-bot')!.commit };
+  const output = '{"call":"1N","rule":{"module":"notrump-base","file":"/home/someone/rbb/conventions/notrump/one-nt.bid","line":63}}';
+  expect(parseResult('rusty-bidding-bot', output, engine, '/home/someone/rbb').ruleId).toBe('notrump-base:conventions/notrump/one-nt.bid:63');
+  expect(parseResult('rusty-bidding-bot', output.replace('/home/someone/rbb/', ''), engine, '/home/someone/rbb').ruleId).toBe('notrump-base:conventions/notrump/one-nt.bid:63');
+});
 test('Bridgit reports missing SDK or missing CLI', () => {
   const missing: Runner = (exe, args, cwd) => { if (exe === 'dotnet') throw new Error('missing'); return fake(exe, args, cwd); };
   expect(prepareCandidate(candidates[0], root, {}, missing).status.reason).toBe('.NET SDK not installed');
