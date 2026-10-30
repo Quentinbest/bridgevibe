@@ -1,4 +1,4 @@
-import { openPractice, choosePractice, installPausedClock, robotTurn } from './miniBridge';
+import { openPractice, choosePractice, installPausedClock, robotTurn, samplingSettled } from './miniBridge';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import { completeFixedDeal } from '../strategy';
@@ -43,6 +43,7 @@ for (const fault of ['timeout', 'error', 'crash', 'protocol-mismatch', 'success'
       await page.getByRole('button', { name: 'Previous trick' }).click();
     }
     await expect(page.locator('.review-cost')).toHaveCount(2);
+    await samplingSettled(page);
     await expect(page.getByRole('status')).toHaveCount(0);
     await expect(counter).toHaveText('0');
     expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);

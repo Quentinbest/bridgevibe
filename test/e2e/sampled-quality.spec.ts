@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { sampledPractice } from '../sampledPractice';
 import { cardName } from '../../src/explanation';
-import { installPausedClock, robotTurn } from './miniBridge';
+import { installPausedClock, robotTurn, samplingSettled } from './miniBridge';
 
 test('US-18: unlabelled seeded practice reviews sampled quality or explicitly uncertain quality', async ({ page }) => {
   // Composition test proves this exact seed/line contains at least one costly decision.
@@ -22,7 +22,7 @@ test('US-18: unlabelled seeded practice reviews sampled quality or explicitly un
   await page.getByRole('button', { name: 'Review this deal', exact: true }).click();
   await page.clock.resume();
   await expect(page.getByText('Working out the X-ray view…', { exact: true })).toHaveCount(0);
-  await expect(page.getByText('Checking your choices against the cards you could see…', { exact: true })).toHaveCount(0);
+  await samplingSettled(page);
   if (await page.locator('.key-moment').count()) {
     await expect(page.locator('.key-moment .moment-quality').first()).toContainText('based on sampled layouts');
   } else {
