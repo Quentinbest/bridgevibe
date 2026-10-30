@@ -6,7 +6,7 @@ BridgeVibe is a browser-first web game that teaches teenage beginners to play co
 
 - **The specs** are the source of truth: `docs/PRD.md`, `docs/engineering/engineering-spec.md`, `docs/ux/ux-spec.md` and the ADRs in `docs/adr/`. Their IDs (US-38, ADR-0001, CI-8, FR-…, NFR-…) are cited in code comments and tests.
 - **The words** are `GLOSSARY.md`'s. Use them in identifiers and copy; a *Playthrough* is one playing of a Deal, never a "hand" or "game".
-- **Decisions:** the owner's decisions are in the PRD §18 (D1–D9) and `docs/domain/open-questions.md`. Engineering decisions waiting for approval are in the engineering spec §7.3 (U-nn).
+- **Decisions:** the owner's decisions are in the PRD §18 (D1–D11) and `docs/domain/open-questions.md`. Engineering decisions waiting for approval are in the engineering spec §7.3 (U-nn).
 - **Work:** [GitHub Issues](https://github.com/Quentinbest/bridgevibe/issues) are the one backlog. Phase V tickets carry `phase:V` and a `lane:` label; #30 tracks them. Each ticket lists what to read, its acceptance criteria and a Definition of done.
 - **The design** is `docs/design/BridgeVibe UI.html`, a packed gallery: open it in a browser (see `docs/development.md` to read a screen's markup). Where the design and the spec disagree, follow the spec. All learner-facing text is in `src/explanation/`.
 

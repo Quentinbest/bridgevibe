@@ -18,7 +18,7 @@ Where each validation item (PRD §13.7) stands at `main` bd798dd, for the techno
 | VAL-08 Teacher grading (F5) | Yes | **Waiting: teachers** | [`f5/`](f5/): 24 coach outputs and the 16 lesson steps, each with its visible context and provenance (#108) | Both teachers' grades (`f5/f5-sheet.csv`) |
 | VAL-09 Learner observation | No | Not planned | — | Optional (T7b) |
 | VAL-10 Licence bill of materials (T3) | Yes | **Open** | [`licence-candidates.md`](licence-candidates.md); the build's licence check (#3, #37, #38) | The solver candidates all pass. Every bidding candidate has an open or failed row; see below |
-| VAL-11 Bidding comparison (T5) | Yes, for bidding | **Waiting: teachers** | [`t5/`](t5/): 30 auctions, rusty-bidding-bot and saycbridge run | Both teachers' grades (`t5/t5-sheet.csv`). Bridgit not run (no .NET); pons not run |
+| VAL-11 Bidding comparison (T5) | Yes, for bidding | **Waiting: teachers** | [`t5/`](t5/): 30 auctions, rusty-bidding-bot and saycbridge run | Both teachers' grades (`t5/t5-sheet.csv`). Bridgit not run (no .NET); pons dropped (D11) |
 | VAL-12 Fair feedback (T6) | No | Measured | [`fair-feedback.md`](fair-feedback.md): double-dummy alone would blame 27 of 100 acceptable plays | On AI labels, like VAL-07 |
 
 ## Risks for the decision
@@ -27,12 +27,10 @@ Where each validation item (PRD §13.7) stands at `main` bd798dd, for the techno
   - rusty-bidding-bot fails LR-3 on test fixtures and notes that mention BBA or EPBot, and its stock convention cards need their origin checked (LR-5, LR-6, DEP-08);
   - saycbridge has unscanned files (LR-3 and LR-7 open);
   - Bridgit passes but hasn't been run;
-  - pons, see below.
+  - pons was dropped by the owner (D11, 2026-10-30).
 
   If the two teachers rate rusty-bidding-bot best, its shipped artefact (the WebAssembly bidder and the cards it loads) needs its own assessment, separate from the checkout's fixtures.
-- **pons.** The T3 plan assumed a build of `american_instinct()` without the `american_bba_*` weights would make pons eligible. Removing the weights is easy: `american_instinct()` doesn't call the neural floors, and the weights are only `include_bytes!` statics in `src/bidding/neural.rs`.
-
-  The upstream code, though, records that the deterministic floor was "inspired by" a reverse-engineering of EPBot (`docs/ai-bidder/bba-floor.md` §5). It also records that many of its defaults were tuned by A/B matches against BBA (`src/bidding/instinct.rs`). Whether that makes the book "derived from EPBot or BBA" under VAL-10 is a judgement for the owner; a build flag can't settle it. Recommendation: drop pons as a bidding candidate for this gate, and close #34 or keep it only if pons is reconsidered.
+- **pons (decided).** Removing its `american_bba_*` weights would not have settled LR-3: upstream records that the deterministic floor was modelled on a reverse-engineering of EPBot (`docs/ai-bidder/bba-floor.md` §5) and that many defaults were tuned against BBA (`src/bidding/instinct.rs`). The owner dropped pons as a bidding candidate (PRD D11, 2026-10-30) and #34 is closed.
 - **Labels are AI's.** VAL-07 and VAL-12 measure against AI annotators with AI adjudication (D10). The adjudicator called 21 of the 23 disputed options acceptable, which makes the yardstick lenient until the teachers have reviewed them (#100).
 - **Robots.** In the 20-deal F7 sample, 157 of 1,040 robot plays (15%) used the `fallback-lowest` rule, meaning no principle applied. The teachers' review (#96, US-11.3) will show how many of those are wrong.
 - **Wording.** All 289 learner-facing strings are drafts (CI-8). DEP-04 (reason codes, abstentions, the hindsight label and the verdicts) was due in week 3.
@@ -43,4 +41,4 @@ Where each validation item (PRD §13.7) stands at `main` bd798dd, for the techno
 | --- | --- | --- |
 | Owner | Phone runs for #28 | VAL-04, the solver choice, and whether #82 is needed |
 | Teachers | The five-task pack: T5 grading, #100, F7 review (#96), wording, F5 grading | VAL-11, VAL-07 on teacher labels, DEP-02/DEP-03, DEP-04, VAL-08 |
-| Owner | DEP-08 licence questions (convention cards, pons) | VAL-10 for the bidding choice |
+| Owner | DEP-08 licence questions (convention cards) | VAL-10 for the bidding choice |
