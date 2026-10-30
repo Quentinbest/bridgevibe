@@ -109,7 +109,7 @@
       "reason": null,
       "result": {
         "call": "1NT",
-        "ruleId": "notrump-base:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/notrump/one-nt.bid:63",
+        "ruleId": "notrump-base:conventions/notrump/one-nt.bid:63",
         "explanation": "15-17 HCP, balanced",
         "provenance": "rule",
         "engine": {
@@ -231,7 +231,7 @@
       "reason": null,
       "result": {
         "call": "1S",
-        "ruleId": "base:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/base.bid:49",
+        "ruleId": "base:conventions/base/base.bid:49",
         "explanation": "5+ spades",
         "provenance": "rule",
         "engine": {
@@ -353,7 +353,7 @@
       "reason": null,
       "result": {
         "call": "1C",
-        "ruleId": "base:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/base.bid:58",
+        "ruleId": "base:conventions/base/base.bid:58",
         "explanation": "3+ clubs",
         "provenance": "rule",
         "engine": {
@@ -475,7 +475,7 @@
       "reason": null,
       "result": {
         "call": "1D",
-        "ruleId": "base:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/base.bid:55",
+        "ruleId": "base:conventions/base/base.bid:55",
         "explanation": "3+ diamonds",
         "provenance": "rule",
         "engine": {
@@ -597,7 +597,7 @@
       "reason": null,
       "result": {
         "call": "3NT",
-        "ruleId": "strong-openings:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/strong-openings.bid:50",
+        "ruleId": "strong-openings:conventions/base/strong-openings.bid:50",
         "explanation": "26-27 HCP, balanced",
         "provenance": "rule",
         "engine": {
@@ -719,7 +719,7 @@
       "reason": null,
       "result": {
         "call": "2S",
-        "ruleId": "preempts:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/preempts.bid:77",
+        "ruleId": "preempts:conventions/base/preempts.bid:77",
         "explanation": "Weak two: six spades, 4-10",
         "provenance": "rule",
         "engine": {
@@ -841,7 +841,7 @@
       "reason": null,
       "result": {
         "call": "2NT",
-        "ruleId": "strong-openings:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/strong-openings.bid:48",
+        "ruleId": "strong-openings:conventions/base/strong-openings.bid:48",
         "explanation": "20-21 HCP, balanced",
         "provenance": "rule",
         "engine": {
@@ -963,7 +963,7 @@
       "reason": null,
       "result": {
         "call": "Pass",
-        "ruleId": "base:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/base.bid:61",
+        "ruleId": "base:conventions/base/base.bid:61",
         "explanation": "No opening bid",
         "provenance": "rule",
         "engine": {
@@ -1094,7 +1094,7 @@
       "reason": null,
       "result": {
         "call": "2H",
-        "ruleId": "responses:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/responses.bid:254",
+        "ruleId": "responses:conventions/base/responses.bid:254",
         "explanation": "Raise: 6-10 support points, 3+ ♥ (6-12 when no limit raise is played)",
         "provenance": "rule",
         "engine": {
@@ -1228,7 +1228,7 @@
       "reason": null,
       "result": {
         "call": "3H",
-        "ruleId": "responses:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/responses.bid:180",
+        "ruleId": "responses:conventions/base/responses.bid:180",
         "explanation": "Limit raise: 11-12 support points, 3+ hearts",
         "provenance": "rule",
         "engine": {
@@ -1362,7 +1362,7 @@
       "reason": null,
       "result": {
         "call": "1H",
-        "ruleId": "responses:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/responses.bid:47",
+        "ruleId": "responses:conventions/base/responses.bid:47",
         "explanation": "4+ hearts, 6+ HCP",
         "provenance": "rule",
         "engine": {
@@ -1496,7 +1496,7 @@
       "reason": null,
       "result": {
         "call": "1NT",
-        "ruleId": "responses:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/responses.bid:75",
+        "ruleId": "responses:conventions/base/responses.bid:75",
         "explanation": "6-10 HCP, no 4-card major",
         "provenance": "rule",
         "engine": {
@@ -1630,7 +1630,7 @@
       "reason": null,
       "result": {
         "call": "2C",
-        "ruleId": "stayman:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/notrump/stayman.bid:17",
+        "ruleId": "stayman:conventions/notrump/stayman.bid:17",
         "explanation": "Stayman: asks for a 4-card major",
         "provenance": "rule",
         "engine": {
@@ -1764,7 +1764,7 @@
       "reason": null,
       "result": {
         "call": "2H",
-        "ruleId": "jacoby-transfers:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/notrump/jacoby-transfers.bid:19",
+        "ruleId": "jacoby-transfers:conventions/notrump/jacoby-transfers.bid:19",
         "explanation": "Transfer to spades",
         "provenance": "rule",
         "engine": {
@@ -1898,7 +1898,7 @@
       "reason": null,
       "result": {
         "call": "3NT",
-        "ruleId": "notrump-base:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/notrump/one-nt.bid:92",
+        "ruleId": "notrump-base:conventions/notrump/one-nt.bid:92",
         "explanation": "To play: 10-15 total points",
         "provenance": "rule",
         "engine": {
@@ -2032,7 +2032,7 @@
       "reason": null,
       "result": {
         "call": "1H",
-        "ruleId": "responses:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/responses.bid:69",
+        "ruleId": "responses:conventions/base/responses.bid:69",
         "explanation": "4+ hearts, 6+ HCP",
         "provenance": "rule",
         "engine": {
@@ -2172,7 +2172,7 @@
       "reason": null,
       "result": {
         "call": "1NT",
-        "ruleId": "rebids:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/rebids.bid:87",
+        "ruleId": "rebids:conventions/base/rebids.bid:87",
         "explanation": "12-14 HCP, balanced",
         "provenance": "rule",
         "engine": {
@@ -2314,7 +2314,7 @@
       "reason": null,
       "result": {
         "call": "2H",
-        "ruleId": "rebids:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/rebids.bid:55",
+        "ruleId": "rebids:conventions/base/rebids.bid:55",
         "explanation": "Raise: 4+ ♥, minimum",
         "provenance": "rule",
         "engine": {
@@ -2456,7 +2456,7 @@
       "reason": null,
       "result": {
         "call": "1NT",
-        "ruleId": "rebids:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/rebids.bid:169",
+        "ruleId": "rebids:conventions/base/rebids.bid:169",
         "explanation": "12-14 HCP, balanced",
         "provenance": "rule",
         "engine": {
@@ -2598,7 +2598,7 @@
       "reason": null,
       "result": {
         "call": "2H",
-        "ruleId": "rebids:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/rebids.bid:175",
+        "ruleId": "rebids:conventions/base/rebids.bid:175",
         "explanation": "Reverse: 4+ hearts, longer diamonds, 17+",
         "provenance": "rule",
         "engine": {
@@ -2740,7 +2740,7 @@
       "reason": null,
       "result": {
         "call": "3H",
-        "ruleId": "rebids:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/rebids.bid:340",
+        "ruleId": "rebids:conventions/base/rebids.bid:340",
         "explanation": "Invitation: 17-18 with the fit (15-18 opposite a raise to 12)",
         "provenance": "rule",
         "engine": {
@@ -2873,7 +2873,7 @@
       "reason": null,
       "result": {
         "call": "1S",
-        "ruleId": "overcalls:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/competitive/overcalls.bid:49",
+        "ruleId": "overcalls:conventions/competitive/overcalls.bid:49",
         "explanation": "Overcall: five spades, 8-16 total points",
         "provenance": "rule",
         "engine": {
@@ -3003,7 +3003,7 @@
       "reason": null,
       "result": {
         "call": "X",
-        "ruleId": "takeout-double:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/competitive/takeout-double.bid:29",
+        "ruleId": "takeout-double:conventions/competitive/takeout-double.bid:29",
         "explanation": "Takeout: 12+ total points and the unbid suits, or 18+ with any shape",
         "provenance": "rule",
         "engine": {
@@ -3133,7 +3133,7 @@
       "reason": null,
       "result": {
         "call": "1NT",
-        "ruleId": "overcalls:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/competitive/overcalls.bid:99",
+        "ruleId": "overcalls:conventions/competitive/overcalls.bid:99",
         "explanation": "15-18 balanced with a stopper in ♣",
         "provenance": "rule",
         "engine": {
@@ -3266,7 +3266,7 @@
       "reason": null,
       "result": {
         "call": "X",
-        "ruleId": "after-interference:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/competitive/after-interference.bid:37",
+        "ruleId": "after-interference:conventions/competitive/after-interference.bid:37",
         "explanation": "Negative double: 6+ total points, four or more in each unbid major",
         "provenance": "rule",
         "engine": {
@@ -3400,7 +3400,7 @@
       "reason": null,
       "result": {
         "call": "Pass",
-        "ruleId": "after-interference:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/competitive/after-interference.bid:293",
+        "ruleId": "after-interference:conventions/competitive/after-interference.bid:293",
         "explanation": "Nothing to say over their overcall",
         "provenance": "rule",
         "engine": {
@@ -3537,7 +3537,7 @@
       "reason": null,
       "result": {
         "call": "Pass",
-        "ruleId": "advances:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/competitive/advances.bid:67",
+        "ruleId": "advances:conventions/competitive/advances.bid:67",
         "explanation": "Not enough to advance",
         "provenance": "rule",
         "engine": {
@@ -3660,7 +3660,7 @@
       "reason": null,
       "result": {
         "call": "1NT",
-        "ruleId": "notrump-base:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/notrump/one-nt.bid:63",
+        "ruleId": "notrump-base:conventions/notrump/one-nt.bid:63",
         "explanation": "15-17 HCP, balanced",
         "provenance": "rule",
         "engine": {
@@ -3787,7 +3787,7 @@
       "reason": null,
       "result": {
         "call": "3NT",
-        "ruleId": "nt-interference:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/notrump/nt-interference.bid:122",
+        "ruleId": "nt-interference:conventions/notrump/nt-interference.bid:122",
         "explanation": "Game: 10+ HCP",
         "provenance": "rule",
         "engine": {
@@ -3926,7 +3926,7 @@
       "reason": null,
       "result": {
         "call": "4S",
-        "ruleId": "rebids:/Users/quentin/workspace/bridgevibe/.reference-solvers/candidates/rusty-bidding-bot/conventions/base/rebids.bid:372",
+        "ruleId": "rebids:conventions/base/rebids.bid:372",
         "explanation": "Accepts the limit raise",
         "provenance": "rule",
         "engine": {

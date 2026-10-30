@@ -1,8 +1,8 @@
-# Phase V gate readiness (2026-10-26)
+# Phase V gate readiness (2026-10-26, updated 2026-10-30)
 
-Where each validation item (PRD §13.7) stands at `main` fd15f19, for the technology selection gate (PRD §14). The owner decides the gate; this report only collects the evidence and names what is missing.
+Where each validation item (PRD §13.7) stands at `main` bd798dd, for the technology selection gate (PRD §14). The owner decides the gate; this report only collects the evidence and names what is missing.
 
-**Summary.** Of the 10 items that block the gate, 5 are met by automated suites that run in CI, 1 is met on AI labels, and 4 are waiting: on the owner's phone runs (VAL-04), on the teachers (VAL-08, VAL-11), and on the licence questions (VAL-10). VAL-08 also needs a deliverable nobody has built yet: the F5 export (#108).
+**Summary.** Of the 10 items that block the gate, 5 are met by automated suites that run in CI, 1 is met on AI labels, and 4 are waiting: on the owner's phone runs (VAL-04), on the teachers (VAL-08, VAL-11), and on the licence questions (VAL-10). VAL-08's input, the F5 export, is merged (#108); only the teachers' grading is missing.
 
 ## Items
 
@@ -15,7 +15,7 @@ Where each validation item (PRD §13.7) stands at `main` fd15f19, for the techno
 | VAL-05 Information boundary (F3) | Yes | Met | `test/f3Permutation.test.ts`, the Seat View type boundary (ADR-0001), ESLint and dependency-cruiser rules (#25) | — |
 | VAL-06 Abstention | Yes | Met | `src/app/analysisFaults.test.tsx`, `test/e2e/analysis-faults.spec.ts` (#21, #24) | — |
 | VAL-07 Review labelling (F4) | Yes | **Met on AI labels** | [`val-07.md`](val-07.md): 0 acceptable plays called mistakes, every hindsight output labelled | Teachers' review of the 23 adjudicated options (#100). Under D10 the result measures the coach against AI annotators, not teachers |
-| VAL-08 Teacher grading (F5) | Yes | **Not started** | — | The F5 export (#108); then the teachers' grading |
+| VAL-08 Teacher grading (F5) | Yes | **Waiting: teachers** | [`f5/`](f5/): 24 coach outputs and the 16 lesson steps, each with its visible context and provenance (#108) | Both teachers' grades (`f5/f5-sheet.csv`) |
 | VAL-09 Learner observation | No | Not planned | — | Optional (T7b) |
 | VAL-10 Licence bill of materials (T3) | Yes | **Open** | [`licence-candidates.md`](licence-candidates.md); the build's licence check (#3, #37, #38) | The solver candidates all pass. Every bidding candidate has an open or failed row; see below |
 | VAL-11 Bidding comparison (T5) | Yes, for bidding | **Waiting: teachers** | [`t5/`](t5/): 30 auctions, rusty-bidding-bot and saycbridge run | Both teachers' grades (`t5/t5-sheet.csv`). Bridgit not run (no .NET); pons not run |
@@ -42,6 +42,5 @@ Where each validation item (PRD §13.7) stands at `main` fd15f19, for the techno
 | Waiting on | What | Unblocks |
 | --- | --- | --- |
 | Owner | Phone runs for #28 | VAL-04, the solver choice, and whether #82 is needed |
-| Teachers | The four-task pack: T5 grading, #100, F7 review (#96), wording | VAL-11, VAL-07 on teacher labels, DEP-02/DEP-03, DEP-04 |
-| Owner, then teachers | The F5 export (#108), then teacher grading | VAL-08 |
+| Teachers | The five-task pack: T5 grading, #100, F7 review (#96), wording, F5 grading | VAL-11, VAL-07 on teacher labels, DEP-02/DEP-03, DEP-04, VAL-08 |
 | Owner | DEP-08 licence questions (convention cards, pons) | VAL-10 for the bidding choice |
