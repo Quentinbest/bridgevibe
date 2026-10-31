@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | **Draft v0.2, for owner and engineering lead review** |
-| Date | 2026-10-31 (v0.2 adds the edge-case review, §8) |
+| Status | **Draft v0.3, for owner and engineering lead review** |
+| Date | 2026-10-31 (v0.2 adds the edge-case review, §8; v0.3 records the owner's answers to Q1 and Q2, §9) |
 | Derived from | `docs/i18n/i18n-spec.md` v0.4 (requirements I18N-01 to I18N-23, delivery steps L0a to L4, decisions U-19 to U-27) · the code at `main` 0379dcd |
 | Scope | Phase **M**. The MVP ships `en` and `zh-Hans` (D4). `zh-Hant`, `ja` and `es` follow (U-19) |
 
@@ -157,7 +157,7 @@
   - **No remount:** an open hint sheet stays open, and focus stays on the control that started the switch.
   - **Races and failure:** two quick switches end on the second locale, even when the first chunk loads last. A rejected `import()` leaves the current locale and shows `locale.load-failed`.
   - **Boot:** with a stub locale matched, the first render is already in that locale.
-  - **Matching table:** also covers `zh-cn`, `zh-Hans-HK` (gives `zh-Hans`), `zh-HK` (gives `zh-Hant`), a missing `navigator.languages`, and an invalid tag.
+  - **Matching table:** also covers `zh-cn`, `zh-Hans-HK` (gives `zh-Hans`), `zh-HK` (gives `zh-Hant`), a missing `navigator.languages`, and an invalid tag. While `zh-Hant` is unshipped, `zh-TW` and `zh-HK` give `en`, not `zh-Hans` (Q1).
   - **F1 and the determinism suites:** identical Records under `en` and a stub second locale (I18N-15.2).
   - **Provenance:** US-40 completeness includes `locale`.
   - **F5:** `npm run f5:export` is byte-identical apart from the new `locale` and `catalogueVersion` fields in the JSON. The PR regenerates the committed `docs/reports/f5/f5-outputs.json` and says so. The CSV sheet is unchanged.
@@ -278,7 +278,7 @@
   - **Keys:** sign-off records are keyed by content ID, version and locale (`SignOff.locale`, spec §6.4), in the US-26 pipeline store.
   - **Lesson text:** a lesson's text is the set of catalogue keys it references, the same set `validate.ts` collects. So a lesson's sign-off in a locale covers exactly those entries at the lesson's version (§8, E-11).
   - **Staleness:** each translated entry's sign-off records a hash of the English entry it was translated from. When the English changes, the translation becomes **stale** and counts as unsigned (§8, E-01).
-  - **When a shipped locale has unsigned or stale entries** (owner question Q2; recommended):
+  - **When a shipped locale has unsigned or stale entries** (Q2, decided by the owner):
     - a feature PR may merge to `main` with `ai-draft` entries in every present locale (I-02's type check forces the entries);
     - a **production** build then **fails**, naming the entries. It never silently drops the locale, which would switch every Chinese learner to English;
     - non-production builds only warn.
@@ -391,7 +391,7 @@ A review of v0.1 looked for cases the tickets didn't handle. Each was checked ag
 
 | ID | Priority | Case | Where handled |
 |---|---|---|---|
-| E-01 | High | **An English copy edit or a new key after `zh-Hans` ships** makes a signed translation stale or missing. If the shipped list just dropped the locale, every Chinese learner would silently switch to English | I-12: staleness hashes. Production builds fail rather than unship; a locale leaves only by an owner change; Q2. §5: new copy adds `ai-draft` entries |
+| E-01 | High | **An English copy edit or a new key after `zh-Hans` ships** makes a signed translation stale or missing. If the shipped list just dropped the locale, every Chinese learner would silently switch to English | I-12: staleness hashes. Production builds fail rather than unship (Q2, decided by the owner); a locale leaves only by an owner change. §5: new copy adds `ai-draft` entries |
 | E-02 | High | **Copy kept as rendered text** stays in the old language after a switch. Codex found hints and rejections. The search also found review trick costs (`analysisHost.ts:60`, `:72`) and the review setup memo (`ReviewScreen.tsx:48`) | I-04: four places, a review rule and a review-screen switch test |
 | E-03 | High | **Async loading:** an English flash on a `zh-CN` boot (`main.tsx:13` sets the title from `en`); two quick switches finishing in the wrong order; a failed chunk after a redeploy, or offline | I-04: resolve before the first render, the last request wins, fonts ready before commit, no half-switch, `locale.load-failed` |
 | E-04 | High | **`catalogueVersion` was undefined** but required by I18N-20 | I-04: a SHA-256 of the canonical catalogue, computed at build |
@@ -399,7 +399,7 @@ A review of v0.1 looked for cases the tickets didn't handle. Each was checked ag
 | E-06 | Medium | **The module-level active locale leaks between tests** in the same file | I-04: a reset in a setup file, plus `withLocale` |
 | E-07 | Medium | **Device tags:** lower-case `zh-cn`, `zh-Hans-HK`, a missing `navigator.languages`, invalid tags. A region table maps `zh-Hans-HK` to Traditional by mistake | I-04: canonicalise and `maximize()`, then match by script |
 | E-08 | Medium | **A stored implicit choice** would pin the locale even after the learner changes their device language | I-05: store explicit picks only; "Device language" option |
-| E-09 | Medium | **Taiwan and Hong Kong devices during the MVP:** `zh-Hant` isn't shipped, so matching gives them English, not 简体中文 | Q1 for the owner. The rules as written give English |
+| E-09 | Medium | **Taiwan and Hong Kong devices during the MVP:** `zh-Hant` isn't shipped, so matching gives them English, not 简体中文 | Q1, decided by the owner: English. I-04's matching test asserts it |
 | E-10 | Medium | **Fonts for preview and stub locales:** "shipped only" would leave I-07's CJK screenshots on fallback fonts | I-09: non-production builds also trim for preview and stub locales |
 | E-11 | Medium | **Lesson text has no single sign-off unit:** the text lives in catalogue entries, not in the lesson file | I-12: a lesson's text is its referenced keys, signed per locale at its version |
 | E-12 | Low | **The pseudo-locale could break message syntax** by accenting placeholder names or `plural` keywords | I-07: transform literal text only, and pass parity |
@@ -414,7 +414,7 @@ A review of v0.1 looked for cases the tickets didn't handle. Each was checked ag
 
 ## 9. Questions for the owner
 
-| ID | Question | Recommendation |
+| ID | Question | Decision |
 |---|---|---|
-| Q1 | **During the MVP, what should a Traditional Chinese device (`zh-TW`, `zh-HK`, `zh-MO`) see:** English, or 简体中文? | **English**, as the rules give today. Simplified script with mainland terms (无将 for 無王) is the mismatch U-21 avoids. Learners can still pick 简体中文 in Settings once I-05 lands |
-| Q2 | **After `zh-Hans` ships, what happens to a release when English copy changes** and the Chinese translation isn't re-signed yet? | **The release build fails and names the entries.** The owner then gets sign-off or holds the release. The locale is never silently removed (E-01) |
+| Q1 | **During the MVP, what should a Traditional Chinese device (`zh-TW`, `zh-HK`, `zh-MO`) see:** English, or 简体中文? | **Decided 2026-10-31 (owner, as recommended): English,** as the matching rules give. Simplified script with mainland terms (无将 for 無王) is the mismatch U-21 avoids. Learners can still pick 简体中文 in Settings once I-05 lands. I-04's matching table asserts `zh-TW` → `en` while `zh-Hant` is unshipped |
+| Q2 | **After `zh-Hans` ships, what happens to a release when English copy changes** and the Chinese translation isn't re-signed yet? | **Decided 2026-10-31 (owner, as recommended): the production build fails and names the stale or unsigned entries.** The owner then gets sign-off or holds the release. A shipped locale is never silently removed (E-01). I-12 implements this |
