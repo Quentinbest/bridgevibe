@@ -643,6 +643,7 @@ The teachers review the fallback policy, because its actions can show up in play
 
 ### 4.9 Localisation and copy
 
+- Locales, message format, fonts and per-locale sign-off are specified in `docs/i18n/i18n-spec.md` (I18N-nn); its decisions are U-19 to U-27 below.
 - All learner-facing text comes from templates (facts, abstentions, reason codes) or string catalogues, keyed by ID (NFR-I). V ships English only.
 - The locale glossary lint (FR-E5) and the teacher sign-off of every template (CI-8) are part of the pipeline in M.
 
@@ -782,6 +783,15 @@ The teachers review the fallback policy, because its actions can show up in play
 | U-16 | Maximum acceptable robot fallback rate on the reference phones (the PRD only asks for it to be reported) | **Recommended:** measure per deal, not per decision; a robot makes up to 39 plays per deal, so 2% per decision would put a fallback in about 55% of deals. VAL-04 fails for a solver or policy with more than 5% of deals containing a timeout fallback on the reference Android (about 0.13% per decision), or with any engine-failure fallback in the F7 soak. Throttling and *not covered* call fallbacks are excluded. Mainly decides whether a sampled robot policy is viable for the MVP (US-12.3) | Owner + engineering lead |
 | U-17 | Whether a teacher may sign off content they authored | **Recommended:** a teacher other than the author signs off every new content ID and every change to learner-facing text. The author may sign alone only for versions the pipeline shows touch no learner-facing text and nothing that decides correctness. Non-English text needs a teacher who knows bridge in that language. Batch reviews per module, and include reviewer time in the MVP estimate at the gate (RK-12, RK-13; US-26.4) | Owner + teachers |
 | U-18 | Several learners sharing one device (siblings, school computers) | **Recommended:** accept one learner per device for the MVP. Profiles wouldn't help on school computers that wipe storage, where the progress file is the carrier. Store progress under a local learner ID now so profiles need no migration later, add **Start fresh**, and ask about shared devices in the beta pilot to decide on profiles (US-36.4) | Owner |
+| U-19 | Which locales launch with the MVP (D4) | **Decided 2026-10-31 (owner):** `en` and `zh-Hans`. `zh-Hant`, `ja` and `es` follow, each when complete and signed off (`docs/i18n/i18n-spec.md` §11) | Owner |
+| U-20 | Which Spanish | **Decided 2026-10-31 (Delegated to Claude):** neutral Latin American Spanish (`es-419`) with *tú*, served to every `es-*` (i18n spec §11) | Owner + teachers |
+| U-21 | Which Traditional Chinese | **Decided 2026-10-31 (owner):** Taiwan terminology, served to `zh-HK` and `zh-MO` too (i18n spec §11) | Owner + teachers |
+| U-22 | Japanese register for teenagers | Open: i18n spec §11 | Teachers |
+| U-23 | Card-face letters and strain abbreviations per locale | Open: i18n spec §11 | Teachers |
+| U-24 | May an AI draft translations? | **Decided 2026-10-31 (owner):** yes, as drafts only, recorded `source: ai-draft`; a bridge teacher in that language signs off every entry (CI-8; i18n spec §11) | Owner |
+| U-25 | Message format: in-house ICU subset or a library | Open: i18n spec §6.2, §11 | Engineering lead |
+| U-26 | CJK fonts and their delivery | **Decided 2026-10-30:** IBM Plex Sans SC/TC/JP (Delegated to Claude), trimmed at build time and renamed BridgeVibe Sans (owner); the engineering lead approves the pipeline (i18n spec §6.5, §6.6) | Owner + engineering lead |
+| U-27 | Rules reference text in other languages | **Decided 2026-10-31 (Delegated to Claude):** translate our own paraphrase, with a Rights Record as original BridgeVibe content; quote no federation translation (i18n spec §11) | Owner |
 
 ### 7.4 Edge cases and failure modes added in v0.2
 
