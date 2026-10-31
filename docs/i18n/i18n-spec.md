@@ -388,7 +388,7 @@ The engineering spec's seams apply (§5.2), with no mocked rules core.
 
 ## 10. Delivery plan
 
-Each step is its own ticket (one PR each, under about 1,000 lines). Translation PRs are mostly catalogue lines, so they say why when they run larger.
+Each step is its own ticket (one PR each, under about 1,000 lines). Translation PRs are mostly catalogue lines, so they say why when they run larger. [`implementation-plan.md`](implementation-plan.md) breaks these steps into tickets I-01 to I-14, with files, tests and dependencies.
 
 | Step | Deliverable | Depends on | Owner of the work |
 |---|---|---|---|
