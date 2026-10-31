@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | **Draft v0.3, for owner and engineering lead review** |
-| Date | 2026-10-31 (v0.2 adds the edge-case review, §8; v0.3 records the owner's answers to Q1 and Q2, §9) |
+| Status | **Draft v0.4, for owner and engineering lead review** |
+| Date | 2026-10-31 (v0.2 adds the edge-case review, §8; v0.3 records the owner's answers to Q1 and Q2, §9; v0.4 answers the Codex review, E-16 to E-18) |
 | Derived from | `docs/i18n/i18n-spec.md` v0.4 (requirements I18N-01 to I18N-23, delivery steps L0a to L4, decisions U-19 to U-27) · the code at `main` 0379dcd |
 | Scope | Phase **M**. The MVP ships `en` and `zh-Hans` (D4). `zh-Hant`, `ja` and `es` follow (U-19) |
 
@@ -40,7 +40,7 @@
 | I-01 | Write ADR-0006: locales never change correctness | §11 | proposed ADR-0006 | — | ~60 | Yes |
 | I-02 | Split the catalogue and add entry `scope` | L0a | I18N-05, I18N-08 | — | ~750 (mostly moved lines) | Yes |
 | I-03 | Message formatter: plural, select, lists, numbers | L0a | I18N-06, I18N-07 | I-02, U-25 | ~450 | Yes |
-| I-04 | Locale runtime: state, matching, `lang`, lazy chunks, provenance locale | L0b | I18N-01, I18N-04, I18N-15, I18N-20, I18N-21.1 | I-03, the gate | ~950 | — |
+| I-04 | Locale runtime: state, matching, `lang`, lazy chunks, provenance locale | L0b | I18N-01, I18N-04, I18N-15, I18N-20, I18N-21.1 | I-03, the gate | ~1,050, filed as two PRs: I-04a and I-04b | — |
 | I-05 | Settings → Language, and the stored choice | L0b | I18N-02, I18N-03 | I-04, US-35, US-36 | ~300 | — |
 | I-06 | Guard: catch non-Latin literals | L0c | I18N-22 | — | ~60 | Yes |
 | I-07 | Pseudo-locale `en-XA` and locale end-to-end projects | L0c | I18N-17, I18N-19, I18N-23 | I-04 | ~400 | — |
@@ -74,10 +74,26 @@
   - Move the entries to `src/explanation/locales/en.ts`. `index.ts` keeps the API and derives `StringId` from `en`.
   - The entry type becomes `{ text, status: 'draft' | 'signed', scope: 'learner' | 'internal', source?: 'human' | 'ai-draft', integrity?: true }`.
   - Mark the 23 internal entries `scope: 'internal'`: 11 `bench.*` and 12 `debug.*`. About 290 learner entries remain.
-  - Tag as `integrity` the abstention, *uncertain*, sampled-quality and hindsight entries. These are `moment.*-sentence`, `moment.sampled-*`, `moment.uncertain`, `moment.hint-close`, `review.hindsight`, `hint.uncertain`, `hint.unavailable-timeout`, `hint.unavailable-failure` and `hint.not-covered`. The tags are listed in the PR for teacher review.
+  - **Tag as `integrity` by a rule, not a hand list** (§8, E-18). An entry is `integrity` if it does any of these (CI-1 to CI-3, INV-5 to INV-7):
+    - judges a decision;
+    - states or qualifies certainty, abstentions included;
+    - names an information mode.
+
+    A sweep of the catalogue at 0379dcd gives these entries, listed in the PR for teacher review:
+    - **Verdicts and judgements:** `moment.sound`, `moment.unlucky`, `moment.lucky`, `moment.mistake`, the four `moment.*-sentence` entries, `moment.alternative`, `moment.sampled-*`, `moment.uncertain` and `moment.hint-close`.
+    - **Certainty and abstentions:** `hint.advice` ("looks like"), `hint.reason` ("Hidden cards could change the outcome"), `hint.uncertain`, `hint.unavailable-timeout`, `hint.unavailable-failure`, `hint.not-covered` and `review.unavailable`.
+    - **Information-mode labels:** `hint.label`, `hint.thinking`, `review.sampling`, `review.working`, `review.hindsight`, `review.xray` and `review.cost-description`. The last carries the X-ray qualification in its accessible description.
+    - **Not tagged:** `hint.forced-card` and `hint.forced-class` state rule facts with certainty, so they need ordinary sign-off.
   - Add `type Catalogue = Record<LearnerStringId, Entry>`, so each later locale is `satisfies Catalogue` (I18N-05.1).
 - **Tests:**
-  - `src/explanation/catalogue.test.ts`: every entry has a scope.
+  - `src/explanation/catalogue.test.ts`: every entry has a scope, and the `integrity` set equals the list above.
+  - **A composition check that keeps the list honest:** a template used for a logged statement must be tagged `integrity` if the statement has any of these:
+    - an `abstention`;
+    - `informationMode: 'ALL_HANDS'`;
+    - `sourceKind: 'engine'`;
+    - a decision verdict.
+
+    It runs over the F5 export's statements, which cover all four verdicts, every abstention kind, hints and hindsight costs (#108), so a new certainty-sensitive template can't skip the tag.
   - `completeness.test.ts` and `reasons.test.ts` stay green unchanged.
   - A new test: no `internal` key is used in `src/app/**` outside `bench/` and `DebugPanel.tsx` (I18N-08.2).
 - **Size:** most of the diff is the 313 moved lines; the PR says so.
@@ -112,6 +128,10 @@
 
 ### I-04 Locale runtime
 
+**Filed as two PRs** to stay under about 1,000 lines:
+- **I-04a, runtime:** matching, the active locale, `catalogueVersion`, boot and switching, the provider, `lang`, test isolation and IME.
+- **I-04b, statements and provenance:** cached rendered text, `LogEntry` locale stamping, and their tests. I-04b waits for I-04a.
+
 - **Change:**
   - **`src/explanation/match.ts`:** the §4 matching rules (§8, E-07).
     - **Input:** `navigator.languages`, or `[navigator.language]` when the list is missing or empty.
@@ -143,10 +163,19 @@
     - **Review rule for later PRs:** no rendered copy is kept in `useMemo`, `useState` or a ref unless `currentLocale()` is in its dependencies.
   - **Test isolation:** the active locale is module state, so `vitest.config.ts` gains a setup file that resets it to `en` after each test. Tests switch with a `withLocale(tag, fn)` helper (§8, E-06).
   - **IME:** the lesson's <kbd>H</kbd> hint shortcut (`LessonScreen.tsx:64`) ignores key events while an input method is composing (`event.isComposing`), so Chinese and Japanese input-method users don't trigger it while typing (§8, E-15).
-  - **Provenance:**
-    - The `template` kind of `Provenance` in `src/coach/provenance.ts` gains `locale` and `catalogueVersion`.
-    - `validateEntry` requires both (I18N-20).
-    - **Who fills them in:** template provenance is created in `src/app/play.ts:153` and `:195`, `src/app/hints.ts:66` and `:80`, and `src/coach/uncertainQuality.ts:5`. `coach` may not import `explanation`, so `coach` leaves the fields out. The app's provenance-log wrapper stamps them from `currentLocale()` when an entry is recorded. `test/f5/report.ts` does the same.
+  - **Provenance: the locale goes on the statement, not on one provenance kind** (§7, deviation 6; §8, E-16):
+    - **Every source logs catalogue text,** not only templates:
+      - templates (`play.ts:153`, `:195`; `hints.ts:66`, `:80`; `coach/uncertainQuality.ts:5`);
+      - sampled hints and sampled quality (`coach/hint.ts:8`–`:10`, `sourceKind: 'engine'`);
+      - authored lesson statements (`LessonScreen.tsx:56`);
+      - the analysis host (`analysisHost.ts:60`, `:72`).
+    - **So `LogEntry`** (`src/coach/provenance.ts`) gains `locale` and `catalogueVersion`, required on every entry that has `text`. `Provenance` itself is unchanged. Robot actions, which carry no text, have neither.
+    - `validateEntry` requires both on every statement with text (I18N-20).
+    - **Who fills them in:** `coach` may not import `explanation`, so it leaves the fields out. The app's provenance-log wrapper stamps them when an entry is recorded. `test/f5/report.ts` does the same.
+    - **Render and stamp together** (§8, E-17):
+      - the wrapper takes a `{ id, params }` descriptor, renders it with the active catalogue, and stamps that same locale, in one step;
+      - a statement that is computed but logged later is kept as a descriptor until then;
+      - so the forced hint `hints.ts` holds in `statement` until `show()` calls `record()` (`:51`, `:80`, `:97`) can't be logged as old-language text under a new-language label.
     - The debug export's `schemaVersion` stays 1. The fields are additive, as in #108.
   - **`.dependency-cruiser.cjs`:** the current allow-lists already keep `table`, `information`, `analysis`, `robots` and `coach` from importing `explanation`. A test in `test/dependencies.test.ts` pins this, so a later rule change can't open the boundary (I18N-15.1).
 - **Tests:**
@@ -159,7 +188,8 @@
   - **Boot:** with a stub locale matched, the first render is already in that locale.
   - **Matching table:** also covers `zh-cn`, `zh-Hans-HK` (gives `zh-Hans`), `zh-HK` (gives `zh-Hant`), a missing `navigator.languages`, and an invalid tag. While `zh-Hant` is unshipped, `zh-TW` and `zh-HK` give `en`, not `zh-Hans` (Q1).
   - **F1 and the determinism suites:** identical Records under `en` and a stub second locale (I18N-15.2).
-  - **Provenance:** US-40 completeness includes `locale`.
+  - **Provenance:** US-40 completeness includes `locale` and `catalogueVersion` on statements from every source: template, engine, authored and table.
+  - **Deferred hint:** compute a forced hint with the sheet closed, switch locale, then open the sheet. The logged text and its `locale` are both the new locale's.
   - **F5:** `npm run f5:export` is byte-identical apart from the new `locale` and `catalogueVersion` fields in the JSON. The PR regenerates the committed `docs/reports/f5/f5-outputs.json` and says so. The CSV sheet is unchanged.
   - **Bundle check:** the entry chunk contains no catalogue other than `en` (I18N-21.1).
 - **Note:** this ticket ships no second locale to learners. A test-only stub catalogue proves the mechanism.
@@ -346,7 +376,7 @@ early ─ I-01 ADR ─┐
                        I-15 (after US-37 and I-09)
 ```
 
-- **Engineering, I-01 to I-10, I-12 and I-15:** about 5,350 changed lines across 12 PRs.
+- **Engineering, I-01 to I-10, I-12 and I-15:** about 5,450 changed lines across 13 PRs (I-04 counts as two).
 - **Teacher work:** I-11 and I-13 for the MVP. Then three more glossaries and catalogues after it.
 
 ## 5. Checks every ticket keeps
@@ -377,7 +407,7 @@ early ─ I-01 ADR ─┐
 3. **I18N-15.1 needs no new dependency rule.** The current allow-lists already block those imports, so I-04 adds a test that pins them instead.
 4. **`cardName` needs no change** (spec §2 listed it with the fragment builders). `card.name` is already one template, `{rank} of {suit}`, and a locale can reorder it.
 5. **The Language row depends on US-35,** and its persistence on US-36. Neither exists yet. Device matching (I-04) works without them.
-6. **The locale is stamped where provenance is logged, not where it's created** (spec §6.4 and I18N-20 don't say where). `coach` creates template provenance (`uncertainQuality.ts`) but may not depend on `explanation`, so the app's log wrapper adds `locale` and `catalogueVersion`.
+6. **The locale is a field of every logged statement, stamped at logging** (spec §6.4 puts `locale` and `catalogueVersion` on the template kind of `Provenance`). Statements from the engine, from authored lessons and from the table also carry catalogue text, so they need the fields too. `coach` creates statements but may not depend on `explanation`, so the app's log wrapper renders and stamps them in one step.
 
 7. **I18N-12.1 needs a check the validator can run.** Its example, a `ja` commentary naming an unexposed card, needs prose parsing, which US-15.1–2 rules out. Proposed wording: "A lesson whose `ja` catalogue lacks a lesson key, or whose `ja` entry changes the placeholders, fails validation in `ja` only. The sign-off checklist confirms that each translation names the same cards as the English."
 
@@ -387,7 +417,10 @@ Once approved, these go into the i18n spec as v0.5.
 
 ## 8. Edge cases added by the self-review (v0.2)
 
-A review of v0.1 looked for cases the tickets didn't handle. Each was checked against the code at 0379dcd, and each changed a ticket. They are listed by priority.
+A review of v0.1 looked for cases the tickets didn't handle. Each was checked against the code at 0379dcd, and each changed a ticket.
+
+- **E-01 to E-15** came from that review and are listed by priority.
+- **E-16 to E-18** came from the Codex reviews of v0.2 and v0.3, and were checked against the same code.
 
 | ID | Priority | Case | Where handled |
 |---|---|---|---|
@@ -406,6 +439,9 @@ A review of v0.1 looked for cases the tickets didn't handle. Each was checked ag
 | E-13 | Low | **Lint misses:** full-width letters (`ＮＴ`), and lengths counted in UTF-16 units | I-10: NFKC, and graphemes via `Intl.Segmenter` |
 | E-14 | Low | **The `.join(` grep flags non-copy joins** (`deals.ts:21`, the seed) | I-03: an allow-list with reasons |
 | E-15 | Low | **The <kbd>H</kbd> hint shortcut fires while a Chinese or Japanese input method is composing** | I-04: ignore `isComposing` |
+| E-16 | High | *(Codex, v0.2)* **Engine, authored and table statements had no locale:** only template provenance got the field | I-04: `locale` and `catalogueVersion` on every `LogEntry` with text; deviation 6 |
+| E-17 | Medium | *(Codex, v0.2)* **A deferred hint is logged under the wrong locale:** a forced hint computed with the sheet closed, then a switch, then open would log old text with the new locale | I-04: render and stamp in one step; descriptors until logged; a compute, switch, open test |
+| E-18 | Medium | *(Codex, v0.3)* **The `integrity` list missed entries** (`review.unavailable`, `review.cost-description`, and on a full sweep `hint.reason`, `review.xray`, the verdict labels and the mode labels) | I-02: tag by rule. A catalogue sweep gives the list, and a composition check over the F5 statements catches new ones |
 
 **Checked and found safe:**
 - **Web Workers:** `hintWorker`, `robotWorker` and `analysisWorker` render no copy, so a main-thread active locale is enough.
