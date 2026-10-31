@@ -40,7 +40,7 @@
 | I-01 | Write ADR-0006: locales never change correctness | §11 | proposed ADR-0006 | — | ~60 | Yes |
 | I-02 | Split the catalogue and add entry `scope` | L0a | I18N-05, I18N-08 | — | ~750 (mostly moved lines) | Yes |
 | I-03 | Message formatter: plural, select, lists, numbers | L0a | I18N-06, I18N-07 | I-02, U-25 | ~450 | Yes |
-| I-04 | Locale runtime: state, matching, `lang`, lazy chunks, provenance locale | L0b | I18N-01, I18N-04, I18N-15, I18N-20, I18N-21.1–21.2 | I-03, the gate | ~600 | — |
+| I-04 | Locale runtime: state, matching, `lang`, lazy chunks, provenance locale | L0b | I18N-01, I18N-04, I18N-15, I18N-20, I18N-21.1 | I-03, the gate | ~700 | — |
 | I-05 | Settings → Language, and the stored choice | L0b | I18N-02, I18N-03 | I-04, US-35, US-36 | ~300 | — |
 | I-06 | Guard: catch non-Latin literals | L0c | I18N-22 | — | ~60 | Yes |
 | I-07 | Pseudo-locale `en-XA` and locale end-to-end projects | L0c | I18N-17, I18N-19, I18N-23 | I-04 | ~400 | — |
@@ -51,6 +51,7 @@
 | I-12 | Per-locale sign-off, integrity tags, shipped-locale list, validity per locale | L4 | I18N-11 to I18N-14 | I-02, pipeline sign-off (US-26) | ~700 | — |
 | I-13 | `zh-Hans` catalogue and lesson text: draft, review, sign off, ship | L2 | D4 for MVP | I-03 to I-12 | catalogue lines | — |
 | I-14 | `zh-Hant`, `ja`, `es`: one ticket each, as I-11 plus I-13 | L3 | U-19 after the MVP | I-13 pattern, a teacher each | catalogue lines | — |
+| I-15 | Offline caching of the selected locale and its fonts | L0b | I18N-21.2 | I-09, US-37 (offline) | ~200 | — |
 
 **Critical path to the MVP:** I-02 → I-03 → I-04 → I-09 → I-13, with I-10 → I-11 and I-12 running alongside. Teacher review in I-11 and I-13 is the longest step (spec R-1).
 
@@ -117,6 +118,11 @@
     - on change, it sets `document.documentElement.lang` and the document title (I18N-04);
     - live regions are not re-announced (spec §6.3);
     - `index.html` keeps `lang="en"` as the pre-script default.
+  - **Cached rendered text** (spec §6.3: on-screen statements re-render from template ID and parameters):
+    - **Hints:** `HintSnapshot` in `src/app/hints.ts` stores rendered `advice` and `reason` strings (`:23`–`:25`, `:63`), and skips recomputation for the same position key. Store a `{ id, params }` descriptor instead, and render it in `HintSheet.tsx`.
+    - **Rejections:** `src/app/play.ts:152` stores the rendered rejection `reason`, which `App.tsx` displays. Store `{ id, params }` instead, and render it at display time.
+    - **Card parameters** stay structured (`Card`, not `cardName(card)`), so the card name follows the locale too.
+    - **What keeps its original text:** logged provenance entries (I18N-20), and `announcements`, which were already spoken.
   - **Provenance:**
     - The `template` kind of `Provenance` in `src/coach/provenance.ts` gains `locale` and `catalogueVersion`.
     - `validateEntry` requires both (I18N-20).
@@ -126,6 +132,7 @@
 - **Tests:**
   - **Matching:** a unit table, including `['fr-FR', 'ja-JP']` → `ja` (I18N-01.1).
   - **Composition:** switching locale mid-Playthrough re-renders the copy, and the Seat View, the trick and the legal cards are unchanged (I18N-02.1, at the seam).
+  - **Composition, cached text:** switching locale while a resolved hint and a rejection are on screen re-renders both in the new locale, without a new hint request. The provenance log keeps the original text, and no announcement repeats.
   - **F1 and the determinism suites:** identical Records under `en` and a stub second locale (I18N-15.2).
   - **Provenance:** US-40 completeness includes `locale`.
   - **F5:** `npm run f5:export` is byte-identical apart from the new `locale` field. The PR says so.
@@ -242,9 +249,16 @@
   - The build derives it from the sign-off records. A locale with any unsigned `learner` entry, lesson text or glossary is not listed (I18N-11.1).
   - Non-production builds show unshipped locales with a "preview" marker and English fallback (I18N-11.2).
   - `match.ts` (I-04) reads this list.
-- **Validity per locale:** `scripts/content/check.ts` runs `validateLesson` once per shipped locale, with that locale's key set and text. `src/pipeline/validate.ts` already takes the key set from its caller, so the dependency rules don't change (I18N-12.1).
+- **Validity per locale:**
+  - **What the validator can check:** `validateLesson` (`src/pipeline/validate.ts:234`) checks catalogue membership and the structured card references on the Prompt (`prompt.hint.referencedCards`). It deliberately parses no prose (`:60`, US-15.1–2).
+  - **Why prose can't be checked:** those references live on the Prompt, not in a locale's text, so every locale shares them, and a translation can't change which cards the lesson declares.
+  - **The per-locale checks are therefore:**
+    1. `scripts/content/check.ts` runs `validateLesson` once per shipped locale, with that locale's key set. A missing lesson key fails in that locale only.
+    2. I18N-06 placeholder parity: a translated lesson entry can't drop or add `{answers}` or `{card}`.
+    3. The teacher's sign-off checklist for lesson text asks whether the translation names exactly the cards the English names (I18N-14's checklist mechanism).
+  - **I18N-12.1's example** (a `ja` commentary naming an unexposed card fails in `ja` only) would need prose parsing, which US-15 rules out. §7 lists the revised check for approval (deviation 7).
 - **Tests:**
-  - a pipeline test where a `ja` commentary refers to a card the Script doesn't expose fails in `ja` only;
+  - a pipeline test where the `ja` catalogue lacks one lesson key, or drops `{answers}`, fails in `ja` only, while `en` passes;
   - a schema check for `source`;
   - checklist enforcement.
 
@@ -258,6 +272,13 @@
 4. **Sign-off:** recorded per entry. When complete, `zh-Hans` appears in the shipped-locale list (I-12), and matching serves it to `zh-CN` devices.
 
 The PR lists the changes made at teacher review and states that the copy is signed off for `zh-Hans` only.
+
+### I-15 Offline caching of the selected locale and its fonts
+
+- **Why a separate ticket:** I18N-21.2 requires a locale switch to work offline after first use. Nothing in the code caches for offline use today: there is no service worker and no Cache Storage use. US-37 (offline after first load, NFR-C3, Should) owns that infrastructure.
+- **Change:** when US-37's offline cache exists, its precache list includes the selected locale's chunk, its `@font-face` CSS and both of its trimmed font files (I-09's emitted names, read from the Vite manifest). A locale switch caches the new locale on first use.
+- **Tests:** end-to-end, load once, switch to the stub locale, go offline (`context.setOffline(true)`), reload, and switch back and forth. The copy and fonts render with no network request.
+- **If US-37 is not built for the MVP:** I18N-21.2 stays open, and the PR that closes I-09 says so.
 
 ### I-14 After the MVP: `zh-Hant`, `ja`, `es`
 
@@ -281,9 +302,10 @@ early ─ I-01 ADR ─┐
                    └─ I-10 ─ I-11 (teacher) ──┤
                        I-12 (after US-26) ────┘
                        I-05 (after US-35/36), any time before the MVP
+                       I-15 (after US-37 and I-09)
 ```
 
-- **Engineering, I-01 to I-10 and I-12:** about 4,800 changed lines across 11 PRs.
+- **Engineering, I-01 to I-10, I-12 and I-15:** about 5,100 changed lines across 12 PRs.
 - **Teacher work:** I-11 and I-13 for the MVP. Then three more glossaries and catalogues after it.
 
 ## 5. Checks every ticket keeps
@@ -314,5 +336,7 @@ early ─ I-01 ADR ─┐
 4. **`cardName` needs no change** (spec §2 listed it with the fragment builders). `card.name` is already one template, `{rank} of {suit}`, and a locale can reorder it.
 5. **The Language row depends on US-35,** and its persistence on US-36. Neither exists yet. Device matching (I-04) works without them.
 6. **The locale is stamped where provenance is logged, not where it's created** (spec §6.4 and I18N-20 don't say where). `coach` creates template provenance (`uncertainQuality.ts`) but may not depend on `explanation`, so the app's log wrapper adds `locale` and `catalogueVersion`.
+
+7. **I18N-12.1 needs a check the validator can run.** Its example, a `ja` commentary naming an unexposed card, needs prose parsing, which US-15.1–2 rules out. Proposed wording: "A lesson whose `ja` catalogue lacks a lesson key, or whose `ja` entry changes the placeholders, fails validation in `ja` only. The sign-off checklist confirms that each translation names the same cards as the English."
 
 Once approved, these go into the i18n spec as v0.5.
