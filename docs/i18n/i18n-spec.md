@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | **Draft v0.1, for owner, engineering lead and teacher review** |
-| Date | 2026-10-30 (v0.2 picks the fonts per locale, §6.5; v0.3 trims them at build time, §6.6) |
+| Status | **Draft v0.4.** The owner's decisions are recorded (U-19, U-21, U-24, U-26), and so are the calls Delegated to Claude (U-20, U-27). Open: U-22 and U-23 (teachers), and U-25 (engineering lead) |
+| Date | 2026-10-31 (v0.2 picks the fonts per locale, §6.5; v0.3 trims them at build time, §6.6; v0.4 records the decisions, §11) |
 | Requested by | The owner, 2026-10-30: add Simplified Chinese, Traditional Chinese, Japanese and Spanish |
 | Derived from | `docs/PRD.md` §10.4 (NFR-I), §18 D4 · `docs/engineering/engineering-spec.md` §4.2, §4.4, §4.9, §7.3 · `docs/ux/ux-spec.md` §9–§11 · `GLOSSARY.md` §10 · ADR-0001, ADR-0004 · `src/explanation/index.ts` |
 | Scope | Phase **M**. Phase V stays English-only (PRD §13.3) |
@@ -77,7 +77,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 - Right-to-left languages. None is requested; §10 lists what keeps them possible.
 - **A bidding system per locale.** D1 (a SAYC-based profile) applies in every language, even where Precision or other systems are common locally (§12, R-6).
 - Translating internal tools: the device benchmark (`bench.*`) and the developer provenance panel.
-- Language-model phrasing at run time (D7). Translation drafting by AI is a separate question (U-24).
+- Language-model phrasing at run time (D7). AI may draft translations, which teachers then sign off (U-24).
 - Server-side localisation, content delivery networks, or downloading locales after release.
 
 ## 4. Locales
@@ -85,10 +85,10 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 | Tag | Endonym in picker | Target audience | Matches these device languages | Plural categories | Notes |
 |---|---|---|---|---|---|
 | `en` | English | Source locale | `en-*` (and the fallback in step 2 below) | one, other | Source of every key |
-| `zh-Hans` | 简体中文 | Mainland China | `zh-CN`, `zh-SG`, `zh-Hans-*`, bare `zh` | other | Already the D4 candidate |
-| `zh-Hant` | 繁體中文 | Taiwan (U-21) | `zh-TW`, `zh-HK`, `zh-MO`, `zh-Hant-*` | other | Its own glossary; **not** a script conversion of `zh-Hans` |
+| `zh-Hans` | 简体中文 | Mainland China | `zh-CN`, `zh-SG`, `zh-Hans-*`, bare `zh` | other | Ships with the MVP (D4, U-19) |
+| `zh-Hant` | 繁體中文 | Taiwan (U-21) | `zh-TW`, `zh-HK`, `zh-MO`, `zh-Hant-*` | other | After the MVP. Its own glossary; **not** a script conversion of `zh-Hans`. `<html lang="zh-Hant-TW">` |
 | `ja` | 日本語 | Japan | `ja-*` | other | Register: U-22 |
-| `es` | Español | One region, to be chosen (U-20) | `es-*` | one, many, other | Terms differ between Spain and Latin America |
+| `es` | Español | Latin America, in neutral `es-419` with *tú* (U-20) | `es-*` | one, many, other | After the MVP. Where Spain's bridge terms differ, the glossary notes them. `<html lang="es-419">` |
 
 **Matching (Proposed):**
 
@@ -129,7 +129,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 |---|---|---|
 | I18N-11 | **A locale ships only when it is fully signed off.** Every `learner` entry, every lesson text and its Locale Glossary are signed off by a teacher who knows bridge in that language (CI-8, US-26.4). <br>• A shipped locale never falls back to English for learners. <br>• Development and test builds may show an unshipped locale, with English fallback and a visible "preview" marker | I18N-11.1 The build's shipped-locale list is derived from the sign-off records. A locale with an unsigned `learner` entry can't be listed. I18N-11.2 The preview marker exists only in non-production builds |
 | I18N-12 | **Translation never changes correctness.** This extends ADR-0004 to locales (proposed ADR-0006). <br>• A translation keeps the content ID, expected answers, Deal and Script. <br>• Each locale's text has its own sign-off, keyed by content ID, version and locale. <br>• The validity check "expected answers consistent with the prose" (US-27.4) runs for every locale | I18N-12.1 Pipeline test: a lesson whose `ja` commentary refers to a card the Script doesn't expose fails validation in `ja` only |
-| I18N-13 | **Every translated entry records its source:** `human`, or `ai-draft` if U-24 allows it. An `ai-draft` entry can't be signed off unchanged without the reviewer confirming it | I18N-13.1 Schema check on the source field. Sign-off records carry it |
+| I18N-13 | **Every translated entry records its source:** `human`, or `ai-draft` (allowed by U-24). An `ai-draft` entry can't be signed off unchanged without the reviewer confirming it | I18N-13.1 Schema check on the source field. Sign-off records carry it |
 
 ### 5.5 Coaching integrity across languages
 
@@ -331,7 +331,7 @@ So the trimmed fonts are named **BridgeVibe Sans SC**, **BridgeVibe Sans TC** an
 
 These are Claude's starting points, so the teachers' glossary work begins from a list rather than a blank page. **Nothing here is approved.** † marks terms known to vary by region or club.
 
-| English | zh-Hans | zh-Hant (Taiwan) | ja | es |
+| English | zh-Hans | zh-Hant (Taiwan) | ja | es (Latin America) |
 |---|---|---|---|---|
 | Bridge | 桥牌 | 橋牌 | ブリッジ | bridge |
 | ♠ ♥ ♦ ♣ | 黑桃 红心 方块 梅花 | 黑桃 紅心 方塊 梅花 | スペード ハート ダイヤ クラブ | picas, corazones, diamantes, tréboles |
@@ -396,9 +396,9 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
 | L0b | Locale state, `lang`, matching, Settings row, lazy chunks, provenance locale (I18N-01 to I18N-04, I18N-20, I18N-21) | L0a | Engineering |
 | L0c | Guard extension, pseudo-locale, locale Playwright projects (I18N-17, I18N-22, I18N-23) | L0b | Engineering |
 | L0d | The §6.5 tokens and the §6.6 font pipeline: fetch script, trim-and-rename plugin, build checks, `NOTICE` entries (I18N-16, I18N-21.3) | L0b | Engineering |
-| L1 | Locale Glossary per language, with avoid terms and register (I18N-09, I18N-18) | U-20 to U-23, a teacher per language | Teachers |
-| L2 | `zh-Hans` catalogue and lesson text, signed off; locale shipped | L0, L1 for `zh-Hans` | Translator + teacher |
-| L3 | `zh-Hant`, `ja`, `es`: each as L2, independently | L0, its own L1 | Translator + teacher |
+| L1 | Locale Glossary per language, with avoid terms and register (I18N-09, I18N-18). `zh-Hans` first | U-22, U-23, a teacher per language | Teachers |
+| L2 | `zh-Hans` catalogue and lesson text, signed off; locale shipped **with the MVP** (U-19) | L0, L1 for `zh-Hans` | Translator (AI drafts allowed, U-24) + teacher |
+| L3 | `zh-Hant`, `ja`, `es`: each as L2, independently, **after the MVP** (U-19) | L0, its own L1 | Translator (AI drafts allowed, U-24) + teacher |
 | L4 | Sign-off records per locale in the pipeline (I18N-11 to I18N-14) | Pipeline sign-off (M) | Engineering |
 
 **Ordering:**
@@ -416,17 +416,17 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
 
 ## 11. Decisions needed
 
-| ID | Decision | Recommendation | Approver |
+| ID | Decision | Decision or recommendation | Approver |
 |---|---|---|---|
-| U-19 | **Update D4: which locales launch with the MVP** | Build L0 for the MVP. Ship `en` and `zh-Hans` at MVP (`zh-Hans` is already the D4 candidate). Ship `zh-Hant`, `ja` and `es` each when complete and signed off. Holding the MVP for all five ties its date to four teachers' availability | Owner |
-| U-20 | Which Spanish: Spain (`es-ES`) or Latin American (`es-419`) | One Spanish catalogue, written for the region of the first Spanish-speaking bridge teacher recruited, and served to every `es-*`. Add a second only on learner evidence | Owner + teachers |
-| U-21 | Which Traditional Chinese: Taiwan or Hong Kong | Taiwan terminology, served to `zh-HK` and `zh-MO` too. Note any Hong Kong differences in the glossary | Owner + teachers |
-| U-22 | Japanese register for teenagers | です/ます, friendly rather than formal. The teacher decides | Teachers |
-| U-23 | Card-face letters and strain abbreviations per locale (for example Spanish R/D/V, ST or SA) | Keep A K Q J faces in the CJK locales. Spanish follows the teacher's region | Teachers |
-| U-24 | **May an AI draft translations?** (This relates to D7 and D10) | Yes, as drafts only. Each entry records `source: ai-draft`, and a bridge teacher in that language reviews and signs off every entry. Nothing AI-drafted ships unsigned | Owner |
-| U-25 | Message format: an in-house ICU subset or a library | In-house subset (§6.2) | Engineering lead |
+| U-19 | **Update D4: which locales launch with the MVP** | **Decided 2026-10-31 (owner): `en` and `zh-Hans`.** Recorded in PRD §18 D4. <br>• L0 is built for the MVP. <br>• `zh-Hant`, `ja` and `es` follow after the MVP, each when complete and signed off (I18N-11) | Owner |
+| U-20 | Which Spanish: Spain (`es-ES`) or Latin American (`es-419`) | **Decided 2026-10-31 (Delegated to Claude): neutral Latin American Spanish (`es-419`), with *tú*,** served to every `es-*`. <br>• **Why:** most Spanish-speaking teenagers live in Latin America, and neutral *tú* reads naturally in Spain too, so one catalogue serves both. <br>• Where Spain's bridge terms differ (*doblo* or *contra*, ST or SA), the glossary records the `es-419` choice and notes the Spanish one. <br>• Recruit a Latin American bridge teacher for L1. Add an `es-ES` catalogue only on learner evidence | Owner + teachers |
+| U-21 | Which Traditional Chinese: Taiwan or Hong Kong | **Decided 2026-10-31 (owner): Taiwan terminology,** served to `zh-HK` and `zh-MO` too. The glossary notes any Hong Kong differences | Owner + teachers |
+| U-22 | Japanese register for teenagers | Recommended: です/ます, friendly rather than formal. The teacher decides | Teachers |
+| U-23 | Card-face letters and strain abbreviations per locale (for example Spanish R/D/V, ST or SA) | Recommended: keep A K Q J faces in the CJK locales. Spanish follows `es-419` usage (U-20). The teachers decide | Teachers |
+| U-24 | **May an AI draft translations?** (This relates to D7 and D10) | **Decided 2026-10-31 (owner): yes, as drafts only.** <br>• Each entry records `source: ai-draft` (I18N-13). <br>• A bridge teacher in that language reviews and signs off every entry (CI-8, US-26.4). <br>• Nothing AI-drafted ships unsigned. <br>• This is translation drafting, not run-time phrasing, so D7 is unchanged | Owner |
+| U-25 | Message format: an in-house ICU subset or a library | Recommended: in-house subset (§6.2) | Engineering lead |
 | U-26 | CJK fonts | **Decided.** <br>• Font choice, Delegated to Claude (owner, 2026-10-30): IBM Plex Sans SC, TC and JP at 400 and 600, with system fallback (§6.5). <br>• Delivery, decided by the owner (2026-10-30): trimmed at build time from IBM's pinned releases, and renamed BridgeVibe Sans SC/TC/JP as the OFL requires (§6.6). <br>The engineering lead approves the §6.6 pipeline before L0d | Owner + engineering lead |
-| U-27 | Rules reference text (for example the EBU MiniBridge laws summary in `result.rules`) | Translate our own paraphrase. It still gets a Rights Record like every Content Item (US-26.1, GLOSSARY §9), recorded as original BridgeVibe content under the project's own licence, so no third-party grant is needed. Quoting an official translation by a national federation would also need that federation's written grant (LR-5) | Owner |
+| U-27 | Rules reference text (for example the EBU MiniBridge laws summary in `result.rules`) | **Decided 2026-10-31 (Delegated to Claude): translate our own paraphrase, and quote no federation translation.** <br>• The paraphrase gets a Rights Record like every Content Item (US-26.1, GLOSSARY §9), as original BridgeVibe content under the project's own licence, so no third-party grant is needed. <br>• Its wording in each locale is signed off like any other entry (CI-8). <br>• Quoting an official translation would need that federation's written grant (LR-5), so it would come back to the owner | Owner |
 
 **Proposed ADR-0006: locales never change correctness.**
 
@@ -438,7 +438,7 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
 
 | ID | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|---|
-| R-1 | No bridge teacher available for a language | High | High | Locales ship independently (U-19). Recruit teachers before L1. Count review time in the MVP estimate (RK-13) |
+| R-1 | No bridge teacher available for a language | High | High | Only `zh-Hans` is in the MVP besides English, and the other locales ship independently (U-19). Recruit teachers before L1. AI drafts cut translation time, not review time (U-24). Count review time in the MVP estimate (RK-13) |
 | R-2 | **A translation upgrades certainty** ("probably" becomes "is") or drops the hindsight label | Medium | High (P0/P1 in review) | I18N-14 integrity tags, checklist, back-translation, composition test |
 | R-3 | Regional term mismatch (無王 vs 无将; *doblo* vs *contra*) alienates learners | Medium | Medium | Separate glossaries, no script conversion, region recorded per locale (U-20, U-21) |
 | R-4 | Spanish text overflows phone layouts | High | Medium | Pseudo-locale and `es-390` screenshots from L0c, before translation |
@@ -451,12 +451,12 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
 
 ## 13. Proposed edits to other documents (after approval)
 
-- **PRD §18 D4:** the decision from U-19. **PRD §10.4:** the five locales and the "ship when complete and signed off" rule.
+- **PRD §18 D4 and §10.4:** done in v0.4. D4 records U-19, and NFR-I names the MVP locales and the "ship when complete and signed off" rule.
 - **Engineering spec:**
   - §4.4: the §6.4 field changes;
   - §4.9: link to this document;
   - US-01.9: generalised by I18N-05;
-  - §7.3: U-19 to U-27 once accepted.
+  - §7.3: U-19 to U-27, done in v0.4: one row each, with its status and a pointer here. §4.9 links to this document.
 - **UX spec:**
   - §9: the Language row's behaviour (§8);
   - §11: per-locale length and register.

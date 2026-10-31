@@ -304,7 +304,7 @@ The validation exercise measures these on two **reference devices**: a low-end A
 
 - All strings are externalised from day one.
 - There is one bridge glossary per language, reviewed by a teacher.
-- Launch languages are decision D4; English and Simplified Chinese are the candidates. Bridge terminology in each language needs teacher review.
+- Launch languages are decision D4: the MVP ships English and Simplified Chinese; Traditional Chinese, Japanese and Spanish follow, each when complete and signed off. Bridge terminology in each language needs teacher review. The multi-language specification is `docs/i18n/i18n-spec.md`.
 
 ### 10.5 Privacy and security (NFR-S)
 
@@ -628,7 +628,7 @@ These targets are placeholders set by this draft, not derived from data. They ar
 | D1 | **Beginner bidding system:** SAYC, 2/1, Acol or custom | **Decided 2026-10-25 (delegated to Claude by the owner):** a SAYC-based beginner profile. Phase V and T5 use the beginner subset common to SAYC and 2/1 (15–17 1NT, five-card majors, Stayman, Jacoby transfers, weak twos, strong 2♣, negative doubles); the MVP convention profile (FR-B1) extends it within SAYC | All four candidate engines (rusty-bidding-bot, pons `american_instinct()`, saycbridge, Bridgit) are SAYC or 2/1, so Acol would leave T5 without a candidate; the T5 auction draft already uses this subset. Teachers confirm the profile's contents (CI-8) |
 | D2 | **Distribution model:** commercial or not; closed or open source; hosted only or binaries shipped | The gate (week 5) | PA-3: strictest model (commercial, closed source) |
 | D3 | **Backend acceptable, and hosting region** | The gate | PA-1: browser-first; add a server only if a Must requirement fails without one [A] |
-| D4 | **Launch languages** | Before MVP content production | English first, with all strings externalised; Simplified Chinese as a candidate |
+| D4 | **Launch languages** | **Decided 2026-10-31 (owner):** the MVP ships English (`en`) and Simplified Chinese (`zh-Hans`) | Traditional Chinese (Taiwan terminology), Japanese and Spanish follow after the MVP. Each ships only when its catalogue, lesson text and Locale Glossary are complete and signed off by a teacher who knows bridge in that language (`docs/i18n/i18n-spec.md`, U-19). Phase V stays English-only |
 | D5 | **Does MiniBridge ship as a curriculum module** (for example, module 6, "points and choosing a contract")? | After the exercise | No commitment; FR-R4 is Could for the MVP |
 | D6 | **Product name** | **Decided 2026-10-18:** BridgeVibe | Replaces the working name "PlayBridge", which collided with `maxgiraldo/playbridge` (RK-11). A trademark check is still needed before public launch |
 | D7 | **Language-model phrasing in the MVP** | The gate | No; templates only |
