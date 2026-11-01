@@ -1,5 +1,7 @@
 # Open-source bridge reuse assessment
 
+> **Current candidate status is in [the candidate register](candidate-register.md)** (T8, 2026-11-01). This report is kept as written.
+
 **Research snapshot: 17 October 2026 · Decision report before development**
 
 ## 1. Recommendation for review

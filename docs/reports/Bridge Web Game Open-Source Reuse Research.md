@@ -1,5 +1,7 @@
 # Bridge Web Game: Open-Source Reuse Research
 
+> **Current candidate status is in [the candidate register](candidate-register.md)** (T8, 2026-11-01). This report is kept as written.
+
 Oct 17, 2026 · @Kun Donald
 
 ## Summary

@@ -1,5 +1,7 @@
 # Open source assessment for a Web MiniBridge learning game
 
+> **Current candidate status is in [the candidate register](candidate-register.md)** (T8, 2026-11-01). This report is kept as written.
+
 Research date: 2026-10-16, Asia/Shanghai. English first; Simplified Chinese follows.
 
 ## English

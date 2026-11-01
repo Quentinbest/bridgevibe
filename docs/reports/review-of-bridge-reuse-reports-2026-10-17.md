@@ -1,5 +1,7 @@
 # Review of the three bridge open-source reuse reports
 
+> **Current candidate status is in [the candidate register](candidate-register.md)** (T8, 2026-11-01). This report is kept as written.
+
 **Review date:** 2026-10-17 · **Reviewer:** Claude (Opus 5.5), at the repository owner's request
 
 | ID | File | Dated | Length |
