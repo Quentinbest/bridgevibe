@@ -16,14 +16,14 @@ Status words:
 
 | Responsibility (PRD §12) | Candidate | Pin | Licence | Status | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| Double-dummy analysis | bridge-dds (DDS 2.9, WebAssembly) | npm 1.4.0 | Apache-2.0 | **candidate**: passes F2; phones pending | VAL-03 (`src/analysis/f2.test.ts`, #22); #28 |
+| Double-dummy analysis | bridge-dds: bookchris/bridge-dds-js (DDS 2.9, WebAssembly) | npm 1.4.0 | Apache-2.0 | **candidate**: passes F2; phones pending | VAL-03 (`src/analysis/f2.test.ts`, #22); #28 |
 | Double-dummy analysis | macroxue/bridge-solver | 630705d | Apache-2.0, MIT | **candidate**: passes F2; phones pending | VAL-03 (#22); #28 |
 | Double-dummy analysis | DDS 3.1, single-threaded WebAssembly | fe6a658 | Apache-2.0 | **candidate**: passes F2; phones pending | VAL-03 (#63); #28 |
 | Double-dummy analysis | DDS 3.1, threaded (cross-origin isolation) | fe6a658 | Apache-2.0 | **candidate, on hold** | #82, waits on #28 |
 | Double-dummy analysis | pons-dds | 12689f0 | Apache-2.0 | **candidate (optional)**: not integrated | US-43.1 |
 | Double-dummy analysis | @bridge-tools/dd | npm 0.2.2 | MIT | **excluded**: wrong results (up to 20 cards in a 13-card hand; wrong tricks in 5 of 10 deals) | Report A, notable rejections |
 | Rules and state core | Our own TypeScript core | in repo | — | **adopted for V**: passes F1 and F6 | VAL-01, VAL-02 |
-| Rules and state core | RalphLipe/ts-contractbridge | 8a788cf | MIT | **not adopted**: §14 keeps our core unless extraction is cheaper; ours already passes | licence report |
+| Rules and state core | RalphLipe/ts-contractbridge | 8a788cf | MIT (for `packages/ts-contractbridge` only; no root licence, per the review §6.2) | **not adopted**: §14 keeps our core unless extraction is cheaper; ours already passes | licence report |
 | Lesson foundation | Bridge-Classroom | f4ec8c0 | Unlicense | **run: fails T4** at the cited commit (offline, BBA at run time, false verdict) | [`bridge-classroom-fit.md`](bridge-classroom-fit.md), #123 |
 | Lesson content | Baker-Bridge | 6009854 | Unlicense | **candidate (MVP content)**: LR-3 fails in the checkout; LR-5/6 open (deals filtered with EPBot) | licence report; PRD §12 |
 | Bidding and explanations | rusty-bidding-bot | 091175f | Apache-2.0, MIT | **run (T5)**: LR-3 fails on fixtures; LR-5/6 open (stock convention cards) | [`t5/`](t5/), licence report |
@@ -35,7 +35,8 @@ Status words:
 | Robot policy | Our own principles policy (DEP-03) | in repo | — | **adopted for V** | #13, F7 |
 | Robot policy | BEN | ad8608a | GPL family | **excluded for now**: LR-3 and LR-4 fail (bundled BBA/BGA/SuitC binaries) | licence report; PRD §12 |
 | Tooling (not shipped) | endplay | 260af10 | MIT | **used**: F2 references | licence report |
-| Tooling (not shipped) | redeal | — | unclear | **reference** | report A |
+| Tooling (not shipped) | anntzer/redeal | — | GPL-3.0 (`LICENSE.txt`; report A's "unclear" was refuted by the review, §8 item 10) | **reference** | report A; review §6.2 |
+| Authoring tooling (not shipped) | bridge-craftwork/bridge-lesson-packaging | a2fc0db | Unlicense | **reference**: optional tool for splitting and rotating PBNs and making handouts; documentation screened only | report C §8 |
 
 **Screened in the reports and not taken further.** Each is either reference-only or excluded for the reason given. They are kept here so the three tables have one home.
 
@@ -43,6 +44,10 @@ Status words:
 | --- | --- |
 | frankwallis/redouble, richardschneider/bridge, kduffie/bridge-engine, pslusarz/gnubridge, erik-knudsen/BridgeZ, jarekczek/pbntools, Kungsgeten/bml, pfdubois/BridgeBidding, google-deepmind/open_spiel, sotetsuk/pgx, harukaki/brl, BSalita/SH_Bidding | **Reference only**: old stacks, desktop or research code. GNUBridge's robots see all hands, so it is no teaching model |
 | macroxue/bridge-bidding-practice, bridge-tools/core, jfklorenz/Bridge-Package, jfklorenz/Bridge-Scoring-Package, richardschneider/bridge-scorer, hdkz-dev/multi-game-engines, GuCasper/btf-minibridge-dds | **Reference or narrow reuse**: helpers our own core already covers |
+| facebookresearch/jps | **Reference only**: archived research code, CC-BY-NC 4.0 (no commercial permission) (report C) |
+| hanyuu11/bridge_learning | **Excluded**: research environment with no root licence (LR-1) (report C) |
+| cowbell/bridge, syfun/contract-bridge | **Excluded**: no licence grant found (LR-1) (report C) |
+| kdblocher/bridge | **Excluded**: custom Shared Source licence, up to two users per entity, commercial licence required; not open source (report C) |
 | bridge-craftwork/Bridge-Offline-Practice, juef17/LibreBridge | **Excluded**: GPL desktop or app code, not a web foundation |
 | brannondorsey/nickel-bridge, jinsoowhang/bridge-game-coach, maxgiraldo/playbridge, PGreen90/Learn-Bridge, ebridge/bridge-web, rajnesh/bridge-bidding-system-js, tomron/bridge-kids, jazzychad/bridge-trainer, igiel/BridgeLesson | **Excluded**: no licence (LR-1), or student and demo code |
 | PyBridge, FreeBridge (SourceForge) | **Excluded**: inactive GPL desktop clients |
