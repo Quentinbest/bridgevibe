@@ -1,6 +1,6 @@
-# Phase V gate readiness (2026-10-26, updated 2026-10-30)
+# Phase V gate readiness (2026-10-26, updated 2026-11-02)
 
-Where each validation item (PRD §13.7) stands at `main` bd798dd, for the technology selection gate (PRD §14). The owner decides the gate; this report only collects the evidence and names what is missing.
+Where each validation item (PRD §13.7) and each deliverable (§13.9) stands at `main` 1933830, for the technology selection gate (PRD §14). The owner decides the gate; this report only collects the evidence and names what is missing.
 
 **Summary.** Of the 10 items that block the gate, 5 are met by automated suites that run in CI, 1 is met on AI labels, and 4 are waiting: on the owner's phone runs (VAL-04), on the teachers (VAL-08, VAL-11), and on the licence questions (VAL-10). VAL-08's input, the F5 export, is merged (#108); only the teachers' grading is missing.
 
@@ -20,6 +20,23 @@ Where each validation item (PRD §13.7) stands at `main` bd798dd, for the techno
 | VAL-10 Licence bill of materials (T3) | Yes | **Open** | [`licence-candidates.md`](licence-candidates.md); the build's licence check (#3, #37, #38) | The solver candidates all pass. Every bidding candidate has an open or failed row; see below |
 | VAL-11 Bidding comparison (T5) | Yes, for bidding | **Waiting: teachers** | [`t5/`](t5/): 30 auctions, rusty-bidding-bot and saycbridge run | Both teachers' grades (`t5/t5-sheet.csv`). Bridgit not run (no .NET); pons dropped (D11) |
 | VAL-12 Fair feedback (T6) | No | Measured | [`fair-feedback.md`](fair-feedback.md): double-dummy alone would blame 27 of 100 acceptable plays | On AI labels, like VAL-07 |
+
+## Deliverables (PRD §13.9)
+
+| # | Deliverable | Status | Where |
+| --- | --- | --- | --- |
+| 1 | The slice build and its source | Done | `main`; internal build `vite build --mode internal` |
+| 2 | The F1–F7 fixture suites as automated tests | Done | F1/F6 `src/table/`, F2 `src/analysis/f2.test.ts`, F3 `test/f3Permutation.test.ts`, F4 `test/f4.test.ts`, F5 `test/f5Export.test.ts`, F7 `test/principles.test.ts` |
+| 3 | A device benchmark report | **Waiting: owner** | Harness merged (#106); phone runs pending (#28) |
+| 4 | The licence bill of materials | Done, with open items | Build BOM via the licence check (#3); [`licence-candidates.md`](licence-candidates.md) |
+| 5 | The Bridge-Classroom fit report | Done on desktop; phones deferred | [`bridge-classroom-fit.md`](bridge-classroom-fit.md) (#123) |
+| 6 | The bidding comparison report | **Waiting: teachers** | [`t5/`](t5/); the two new TypeScript bidding apps found by T8 are left out (owner, 2026-11-02) |
+| 7 | The fair-feedback study | Done (on AI labels) | [`fair-feedback.md`](fair-feedback.md) |
+| 8 | The teachers' review notes and F4 labels | **Waiting: teachers** | F4 labels are AI-sourced (D10); the teacher pack's five tasks |
+| 9 | The learner observation notes | Not run (optional, T7b) | — |
+| 10 | One updated candidate register | Done | [`candidate-register.md`](candidate-register.md) (#124) |
+| 11 | The Technology Selection Decision Record | Draft | [ADR-0005](../adr/0005-technology-selection.md) (#125), status Proposed |
+| 12 | An MVP estimate | Draft | [`mvp-estimate.md`](mvp-estimate.md) (#125) |
 
 ## Risks for the decision
 
