@@ -2,14 +2,14 @@
 
 Gate deliverable 12 (PRD §13.9): an estimate for the recommended path (assemble components, [ADR-0005](../adr/0005-technology-selection.md)) and a rough one for the rejected alternative (adapt Bridge-Classroom). Draft, 2026-11-02; every figure is an *estimate* in engineer-days (ed), and content and teacher time are counted separately (RK-13).
 
-**Headline.** The recommended path is about **86–133 engineer-days** of software work, or **101–158** if we have to author our own bidding rule tables. Content production adds:
-- **35–55 author days**;
-- **40–60 teacher days** (two teachers);
+**Headline.** The recommended path is about **107–163 engineer-days** of software work, or **122–188** if we have to author our own bidding rule tables. That includes the English and Simplified Chinese launch (D4). Content production adds:
+- **47–73 author days**, of which 12–18 are Simplified Chinese;
+- **52–78 teacher days**: two teachers, plus a Chinese-speaking bridge teacher for the `zh-Hans` sign-off;
 - the release work in PRD §16: an accessibility audit and a pilot.
 
-With two engineers that is roughly **9–16 weeks** of engineering, if content runs in parallel.
+With two engineers that is roughly **11–19 weeks** of engineering, if content runs in parallel.
 
-The Bridge-Classroom path is roughly **125–214 engineer-days** before the same content work. It is not lower, let alone 25% lower, so the Foundation rule (adapt only if at least 25% cheaper) points to assembling components.
+The Bridge-Classroom path is roughly **125–214 engineer-days** before the same content work. Adding the same bilingual work (18–26) gives 143–240. That is not lower, let alone 25% lower, so the Foundation rule (adapt only if at least 25% cheaper) points to assembling components.
 
 ## What the slice already provides
 
@@ -45,10 +45,11 @@ The estimate below counts only what the MVP adds.
 | Review offline (FR-RV5) and performance (NFR-P1–P6) | Depends on the #28 results; tuning to the budgets | 4–8 |
 | Accessibility to WCAG 2.2 AA (§16.6) | Fixes from an audit of the core journeys (the slice already runs axe in e2e) | 5–8 |
 | Hardening and release | Error handling, packaging, CI, and the licence bill of materials for the release | 6–10 |
-| Contingency on the above | About 15% for integration surprises | 12–18 |
-| **Total** | Without own rule tables, and with them | **86–133, or 101–158** |
+| English and Simplified Chinese (NFR-I, D4) | Tickets I-01 to I-10, I-12 and I-15 of [`docs/i18n/implementation-plan.md`](../i18n/implementation-plan.md): catalogue split, message formatter, locale runtime, language setting, guards and pseudo-locale, CJK fonts, Locale Glossary format, per-locale sign-off, offline locale caching. The plan sizes them at about 6,000 changed lines | 18–26 |
+| Contingency on the above | About 15% for integration surprises | 15–22 |
+| **Total** | Without own rule tables, and with them | **107–163, or 122–188** |
 
-If the solver has to move to a server (VAL-04 fails on the phones), add **8–12 ed** for a small analysis service and degraded offline review.
+If the solver has to move to a server (VAL-04 fails on the phones), add **8–12 ed** for a small analysis service and degraded offline review. If saycbridge wins T5, add **10–15 ed** for a bidding service, or a browser port of Z3 of uncertain size. Either way, NFR-C3 is re-decided for that part.
 
 ### Content and teacher time
 
@@ -60,6 +61,8 @@ The curriculum (FR-L2) has 10 modules. Assume about 3 lessons a module, each wit
 | Teacher review and sign-off of each lesson, template and explanation (CI-8, FR-C3) | Two teachers | About 0.5 day a lesson each: **30–40 teacher days** |
 | Bidding profile and regression set (FR-B1, FR-B4, VAL-11 at MVP scale) | Teachers | **5–10 teacher days** |
 | Pilot with 10–20 beginners (§16.7) and acting on its findings | Teachers and owner | **5–10 days**, plus fixes inside the hardening line above |
+| Simplified Chinese: Locale Glossary (I-11), catalogue and lesson text (I-13) | Translator-author with bridge knowledge | **12–18 author days** |
+| `zh-Hans` review and sign-off by a teacher who knows bridge in Chinese (D4, U-19) | A third teacher | **12–18 teacher days**: the longest step on the i18n plan's critical path (spec R-1) |
 
 These figures assume the Phase V teacher work (the five-task pack) is done first, since it settles DEP-02/03/04, the F4 labels and the bidding choice.
 
@@ -80,7 +83,7 @@ Content and teacher time are about the same on both paths. Its Baker-Bridge less
 
 ## Assumptions and what would change the numbers
 
-- The bidding engine passes VAL-11. If none does, the "own tables" line applies (+15–25 ed).
+- The bidding engine passes VAL-11 and runs in the browser. If none passes, the "own tables" line applies (+15–25 ed). If saycbridge wins, the bidding-service line applies.
 - A browser solver passes VAL-04 on both phones. If not, add the server option (+8–12 ed) and re-decide NFR-C3.
 - The teachers sign off within the slice's draft structures. Large rewrites of the coach wording (F5, DEP-04) would add rework.
 - These are planning ranges, not commitments. The slice's own estimate was about 34 engineer-days for the required tracks (PRD §13). It is the only calibration point.
