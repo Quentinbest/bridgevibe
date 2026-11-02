@@ -1,6 +1,6 @@
 # ADR-0006: Locales never change what counts as correct
 
-- **Status:** Proposed (Claude, 2026-11-02; awaiting the owner)
+- **Status:** Accepted (Delegated to Claude by the owner, 2026-11-02)
 - **Date:** 2026-11-02
 - **Related:** ADR-0001, ADR-0002, ADR-0004; i18n spec I18N-12, I18N-15, I18N-20, §11; PRD §18 D4; engineering spec §4.2; CI-8; INV-1
 
