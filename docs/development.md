@@ -230,7 +230,7 @@ All copy, including aria labels, comes from `text()`. `test/catalogue.test.ts` p
 
 - JSX text, or a literal or template child, containing a letter or digit;
 - a literal or template value of `aria-label`, `aria-description`, `title`, `alt`, `placeholder` or `label`;
-- any phrase-like literal or template (a letter and a space in its fixed text) anywhere in the file, except class names and import paths;
+- any phrase-like literal or template (a letter and a space in its fixed text, or any Han, Kana or Hangul, since those scripts don't space words: I18N-22) anywhere in the file, except class names and import paths;
 - a JSX child or protected attribute whose type is a string literal, which catches a word kept in a constant (`const label = 'Continue'`) or imported from a helper module.
 
 A word in a widened `string` (`let label = 'Continue'`, or a value typed `string`) still passes; review catches those.
