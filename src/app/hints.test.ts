@@ -7,7 +7,7 @@ import { createPlay } from './play';
 import { fixedDeal } from './fixture';
 import { choosePractice } from '../../test/miniBridge';
 import { createHints, hintSeat, renderHint } from './hints';
-import { cardName, catalogue, text } from '../explanation';
+import { cardName, catalogue, list, text } from '../explanation';
 import { hintStatement } from '../coach/hint';
 import { faultHintRunner, type HintFault } from './hintFaults';
 import { completeFixedDeal } from '../../test/strategy';
@@ -174,7 +174,7 @@ test('US-14.11: forced cards bypass the runner throughout a Playthrough and log 
         expect(calls).not.toContain(view.positionIndex);
         play.showHint();
         expect(play.getSnapshot().hint).toMatchObject({ thinking: false, abstained: false,
-          advice: text(templateId, { card: cardName(snapshot.legalCards[0]), cards: snapshot.legalCards.map(cardName).join(', ') }) });
+          advice: text(templateId, { card: cardName(snapshot.legalCards[0]), cards: list(snapshot.legalCards.map(cardName)) }) });
         const logged = play.provenanceLog.entries().at(-1)!;
         expect(logged).toMatchObject({ informationMode: 'VISIBLE', provenance: { sourceKind: 'template', templateId } });
         expect(validateEntry(logged)).toEqual([]);
@@ -248,7 +248,8 @@ test('US-14.11: a real Table with an entire legal suit in one visible class star
   hints.sync(view, cards, { playthroughId: table.record().playthroughId, positionKey: table.positionKey() }); hints.show();
   expect(cards).toHaveLength(13); expect(runner).not.toHaveBeenCalled();
   expect(hints.snapshot()).toMatchObject({ open: true, thinking: false, abstained: false,
-    advice: text('hint.forced-class', { cards: cards.map(cardName).join(', ') }) });
+    advice: text('hint.forced-class', { cards: list(cards.map(cardName)) }) });
+  expect(hints.snapshot().advice).toBe('These cards are all the same here: King of diamonds, Queen of diamonds, 9 of diamonds, 7 of diamonds, 10 of diamonds, 6 of diamonds, 4 of diamonds, Ace of diamonds, Jack of diamonds, 5 of diamonds, 2 of diamonds, 8 of diamonds, and 3 of diamonds');
   expect(log).toHaveBeenCalledWith(expect.objectContaining({ summary: 'hint.forced-class', provenance: { sourceKind: 'template', templateId: 'hint.forced-class' } }), 0);
   const entry = { ...log.mock.calls[0][0], id: 'equivalent', playthroughId: table.record().playthroughId, positionIndex: 0, informationMode: 'VISIBLE', at: new Date().toISOString() };
   expect(validateEntry(entry)).toEqual([]);

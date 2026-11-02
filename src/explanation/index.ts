@@ -1,5 +1,8 @@
 import type { Card, ReasonCode } from '../table';
 
+import { formatMessage } from './format';
+export { list, number } from './format';
+
 import { en } from './locales/en';
 import type { Entry } from './types';
 export type { Entry } from './types';
@@ -12,7 +15,7 @@ export type LearnerStringId = {
 // I18N-05.1: later locales must cover every learner key.
 export type Catalogue = Record<LearnerStringId, Entry>;
 export function text(id: StringId, params: Readonly<Record<string, string | number>> = {}): string {
-  return catalogue[id].text.replace(/\{(\w+)\}/g, (match, key: string) => String(params[key] ?? match));
+  return formatMessage(catalogue[id].text, params, 'en');
 }
 
 // US-01.9: adding a Reason Code requires a corresponding copy template.

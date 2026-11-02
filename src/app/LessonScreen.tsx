@@ -6,7 +6,7 @@ import { sessionAttempts } from '../progress/attemptStore';
 import { createProvenanceLog } from '../coach/provenance';
 import { APP_VERSION } from './appVersion';
 type ProvenanceLog = ReturnType<typeof createProvenanceLog>;
-import { cardName, text, type StringId } from '../explanation';
+import { cardName, list, text, type StringId } from '../explanation';
 import { SEATS, type Card as TableCard } from '../table';
 import { Card } from './Card';
 import { Hand, RotationNotice } from './Hand';
@@ -45,7 +45,7 @@ export function LessonScreen({ onClose, provenanceLog, lesson = followSuit }: { 
   const dummySeat = SEATS[(SEATS.indexOf(state.view.contract.declarer) + 2) % 4];
   const positions = tablePositions(state.view.contract.declarer);
   const declaring = state.view.contract.declarer === 'north' || state.view.contract.declarer === 'south';
-  const answers = state.prompt?.expectedAnswers.map(cardName).join(', ') ?? '';
+  const answers = list(state.prompt?.expectedAnswers.map(cardName) ?? []);
   function answer(card: TableCard) { setSelected(null); setRuleOpen(false); setState(player.answer(card, Date.now())); }
   function hint() {
     const next = player.showHint();

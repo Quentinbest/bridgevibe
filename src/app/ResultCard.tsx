@@ -12,7 +12,7 @@ export function ResultCard({ record, onReview, onNext, reviewRef, reference = fa
   const [rulesExpanded, setRulesExpanded] = useState(false);
   const score = result.score.score * (record.learnerSide === result.declaringSide ? 1 : -1);
   return <section className="result-card" aria-label={text('result.title')}>
-    <h2>{text(!result.made ? result.short === 1 ? 'result.down-one' : 'result.down'
+    <h2>{text(!result.made ? 'result.down'
       : result.overtricks ? 'result.overtricks' : 'result.made', { count: result.short || result.overtricks })}</h2>
     <p className="result-contract">{text('result.contract', { objective: text(`objective.${result.objective}`),
       strain: text(result.contract.strain === 'no-trumps' ? 'result.no-trumps' : `suit.${result.contract.strain}`),

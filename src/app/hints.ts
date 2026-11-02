@@ -2,7 +2,7 @@ import { HINT_DEADLINE_MS } from '../information/parameters';
 import { configuredEngine } from '../analysis/solverSelection';
 import { visibleClasses, type HintResult } from '../analysis/sampledEstimate';
 import { hintStatement } from '../coach/hint';
-import { cardName, text } from '../explanation';
+import { cardName, list, text } from '../explanation';
 import { RANKS, sideOf, seatViewSeed, type Card, type SeatView } from '../table';
 import type { HintIdentity } from './hintProtocol';
 import { runHint, type HintRunner } from './hintClient';
@@ -75,7 +75,7 @@ export function createHints(changed: () => void, log: (entry: Statement, positio
       // US-14.11: visible equivalence proves a forced play without sampling.
       if (visibleClasses(view, candidates).length === 1) {
         const templateId = candidates.length === 1 ? 'hint.forced-card' : 'hint.forced-class';
-        const advice = text(templateId, { card: cardName(candidates[0]), cards: candidates.map(cardName).join(', ') });
+        const advice = text(templateId, { card: cardName(candidates[0]), cards: list(candidates.map(cardName)) });
         state = { ...state, thinking: false, advice };
         statement = { kind: 'statement', summary: templateId, text: advice, provenance: { sourceKind: 'template', templateId } };
         return;

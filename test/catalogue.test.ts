@@ -163,3 +163,35 @@ test('I18N-08.2: learner app source never references internal keys', () => {
   const files = appFiles('src/app').filter(file => !file.startsWith('src/app/bench/') && file !== 'src/app/DebugPanel.tsx');
   expect(files.flatMap(file => internalKeyViolations(readFileSync(file, 'utf8'), file))).toEqual([]);
 });
+
+const joinAllowList = [
+  { file: 'src/app/deals.ts', snippet: "byte => alphabet[byte & 63]).join('')", reason: 'Joins random seed characters, not copy.' },
+  { file: 'src/app/hints.ts', snippet: "[text('hint.label'), advice, reason, text('hint.choose')].filter(Boolean).join('\\n')", reason: 'Logs whole rendered sentences on separate lines.' },
+];
+// I18N-07.2: inspect calls, so whitespace cannot bypass the rendered-list guard.
+function joinViolations(source: string, file: string): string[] {
+  const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, scriptKind(file));
+  const found: string[] = [];
+  function visit(node: ts.Node) {
+    if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) && node.expression.name.text === 'join') {
+      if (!joinAllowList.some(allowed => allowed.file === file && allowed.reason && node.getText(ast).includes(allowed.snippet))) {
+        found.push(`${file}:${line(node)}: ${node.getText(ast)}`);
+      }
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(ast);
+  return found;
+}
+test('I18N-07.2: join guard catches copy joins and permits only documented calls', () => {
+  expect(joinViolations("cards.map(cardName).join(', '); cards.join (', ');", 'bad.ts')).toHaveLength(2);
+  expect(joinViolations("// cards.join(', ')\nconst x = 'join(';", 'good.ts')).toEqual([]);
+  for (const allowed of joinAllowList) {
+    expect(joinViolations(readFileSync(allowed.file, 'utf8'), allowed.file)).toEqual([]);
+    expect(joinViolations("cards.join(', ')", allowed.file)).toHaveLength(1);
+  }
+});
+test('I18N-07.2: app joins are limited to seeds and logged whole sentences', () => {
+  const files = appFiles('src/app').filter(file => !file.startsWith('src/app/bench/'));
+  expect(files.flatMap(file => joinViolations(readFileSync(file, 'utf8'), file))).toEqual([]);
+});
