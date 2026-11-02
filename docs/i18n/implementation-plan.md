@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | **Draft v0.4, for owner and engineering lead review** |
-| Date | 2026-10-31 (v0.2 adds the edge-case review, §8; v0.3 records the owner's answers to Q1 and Q2, §9; v0.4 answers the Codex review, E-16 to E-18) |
+| Status | **v0.5.** §7 is accepted and U-25 and the U-26 pipeline are decided, all Delegated to Claude by the owner (2026-11-02, #136) |
+| Date | 2026-11-02 (v0.2 adds the edge-case review, §8; v0.3 records the owner's answers to Q1 and Q2, §9; v0.4 answers the Codex review, E-16 to E-18; v0.5 records the delegated decisions and corrects two facts against the code) |
 | Derived from | `docs/i18n/i18n-spec.md` v0.4 (requirements I18N-01 to I18N-23, delivery steps L0a to L4, decisions U-19 to U-27) · the code at `main` 0379dcd |
 | Scope | Phase **M**. The MVP ships `en` and `zh-Hans` (D4). `zh-Hant`, `ja` and `es` follow (U-19) |
 
@@ -22,14 +22,14 @@
 | Condition | Blocks | Status at 0379dcd |
 |---|---|---|
 | **The technology selection gate,** which fixes the MVP framework (U-08) | Everything except §2's "can start early" tickets | Open. 4 of the 10 gate items are waiting (`docs/reports/phase-v-gate-readiness.md`) |
-| **U-25, the message format** | I-03 | Open (engineering lead). The plan assumes the recommended in-house subset |
-| **U-26 pipeline approval** (spec §6.6) | I-08, I-09 | Open (engineering lead) |
+| **U-25, the message format** | I-03 | Decided 2026-11-02: the in-house subset (Delegated to Claude) |
+| **U-26 pipeline approval** (spec §6.6) | I-08, I-09 | Approved 2026-11-02 as specified (Delegated to Claude) |
 | **US-35, the Settings screen** (phase M) | I-05 | Not started. No Settings screen or settings store exists yet |
 | **US-36, progress persistence** (phase M) | Persisting the choice in I-05 | Not started. Today the app keeps state for the session only |
 | **Pipeline sign-off records** (US-26) | I-12 | Not started. Every entry is `status: 'draft'` |
 | **A `zh-Hans` bridge teacher** | I-11, I-13 | Not recruited |
 
-**Can start before the gate** (Recommended; the owner decides): I-01, I-02, I-03 and I-06. None of them touches the UI framework, the build output or learner-visible behaviour.
+**Can start before the gate** (started 2026-11-02, Delegated to Claude by the owner): I-01, I-02, I-03 and I-06. None of them touches the UI framework, the build output or learner-visible behaviour.
 
 ---
 
@@ -69,11 +69,11 @@
 
 ### I-02 Split the catalogue and add entry `scope`
 
-- **Today:** `src/explanation/index.ts` holds 313 English entries typed `{ text; status: 'draft' }`, plus `text()`, `reasonStrings` and `cardName`.
+- **Today:** `src/explanation/index.ts` holds 312 English entries typed `{ text; status: 'draft' }`, plus `text()`, `reasonStrings` and `cardName`.
 - **Change:**
   - Move the entries to `src/explanation/locales/en.ts`. `index.ts` keeps the API and derives `StringId` from `en`.
   - The entry type becomes `{ text, status: 'draft' | 'signed', scope: 'learner' | 'internal', source?: 'human' | 'ai-draft', integrity?: true }`.
-  - Mark the 23 internal entries `scope: 'internal'`: 11 `bench.*` and 12 `debug.*`. About 290 learner entries remain.
+  - Mark the 23 internal entries `scope: 'internal'`: 11 `bench.*` and 12 `debug.*`. 289 learner entries remain.
   - **Tag as `integrity` by a rule, not a hand list** (§8, E-18). An entry is `integrity` if it does any of these (CI-1 to CI-3, INV-5 to INV-7):
     - judges a decision;
     - states or qualifies certainty, abstentions included;
@@ -96,7 +96,7 @@
     It runs over the F5 export's statements, which cover all four verdicts, every abstention kind, hints and hindsight costs (#108), so a new certainty-sensitive template can't skip the tag.
   - `completeness.test.ts` and `reasons.test.ts` stay green unchanged.
   - A new test: no `internal` key is used in `src/app/**` outside `bench/` and `DebugPanel.tsx` (I18N-08.2).
-- **Size:** most of the diff is the 313 moved lines; the PR says so.
+- **Size:** most of the diff is the 312 moved lines; the PR says so.
 
 ### I-03 Message formatter: plural, select, lists, numbers
 
@@ -124,7 +124,7 @@
   - **Placeholder parity:** each entry's placeholders and plural branches are parsed and compared across locales (I18N-06.1). A malformed message fails the test (I18N-06.2).
   - **Lists:** `list` renders `A, B, and C` (`en`), `A、B和C` (`zh-Hans`) and `A, B y C` (`es`).
   - **Composition:** the forced-class hint and the lesson's "show answer" render through `list`.
-- **Grep check (I18N-07.2):** a test fails on any `.join(` in `src/app`, outside `bench/`, unless it is on a short allow-list of non-copy joins with a reason each. Today that list holds one: `deals.ts:21` joins seed characters.
+- **Grep check (I18N-07.2):** a test fails on any `.join(` in `src/app`, outside `bench/`, unless it is on a short allow-list of non-copy joins with a reason each. Today that list holds two: `deals.ts:21` joins seed characters, and `hints.ts:25` joins whole rendered sentences for the logged hint text.
 
 ### I-04 Locale runtime
 
@@ -413,7 +413,7 @@ early ─ I-01 ADR ─┐
 
 8. **Plural branches: `other` plus the categories whole numbers can reach** (I18N-06 says "every CLDR category"). For `es`, whole numbers from 0 to 100,000 only produce `one` and `other`. Requiring `many` would make translators write a branch the app can never show.
 
-Once approved, these go into the i18n spec as v0.5.
+**Accepted 2026-11-02 (Delegated to Claude by the owner, not the engineering lead's approval)** and folded into the i18n spec as v0.5 (#136).
 
 ## 8. Edge cases added by the self-review (v0.2)
 

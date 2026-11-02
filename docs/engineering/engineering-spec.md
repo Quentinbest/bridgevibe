@@ -789,8 +789,8 @@ The teachers review the fallback policy, because its actions can show up in play
 | U-22 | Japanese register for teenagers | Open: i18n spec §11 | Teachers |
 | U-23 | Card-face letters and strain abbreviations per locale | Open: i18n spec §11 | Teachers |
 | U-24 | May an AI draft translations? | **Decided 2026-10-31 (owner):** yes, as drafts only, recorded `source: ai-draft`; a bridge teacher in that language signs off every entry (CI-8; i18n spec §11) | Owner |
-| U-25 | Message format: in-house ICU subset or a library | Open: i18n spec §6.2, §11 | Engineering lead |
-| U-26 | CJK fonts and their delivery | **Decided 2026-10-30:** IBM Plex Sans SC/TC/JP (Delegated to Claude), trimmed at build time and renamed BridgeVibe Sans (owner); the engineering lead approves the pipeline (i18n spec §6.5, §6.6) | Owner + engineering lead |
+| U-25 | Message format: in-house ICU subset or a library | **Decided 2026-11-02 (Delegated to Claude by the owner):** the in-house subset (i18n spec §6.2, §11) | Engineering lead |
+| U-26 | CJK fonts and their delivery | **Decided 2026-10-30:** IBM Plex Sans SC/TC/JP (Delegated to Claude), trimmed at build time and renamed BridgeVibe Sans (owner); the pipeline approved 2026-11-02 (Delegated to Claude by the owner) (i18n spec §6.5, §6.6) | Owner + engineering lead |
 | U-27 | Rules reference text in other languages | **Decided 2026-10-31 (Delegated to Claude):** translate our own paraphrase, with a Rights Record as original BridgeVibe content; quote no federation translation (i18n spec §11) | Owner |
 
 ### 7.4 Edge cases and failure modes added in v0.2
