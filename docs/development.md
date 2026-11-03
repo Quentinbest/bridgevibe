@@ -235,6 +235,15 @@ All copy, including aria labels, comes from `text()`. `test/catalogue.test.ts` p
 
 A word in a widened `string` (`let label = 'Continue'`, or a value typed `string`) still passes; review catches those.
 
+**Locale Glossary:** `src/explanation/glossary/<tag>.ts` records approved domain terms,
+teenage-register UI words, avoided terms, register and a grapheme length limit;
+register each glossary in `glossary/index.ts`. English has no Locale Glossary.
+`src/explanation/glossary.test.ts` checks registered catalogues for avoided words
+in learner-facing message literals (including every branch), exempts approved
+compounds, checks coverage of `GLOSSARY.md` and logs length warnings (I18N-09,
+I18N-18). AI drafts carry `source: 'ai-draft'` and stay `status: 'draft'` until a
+bridge teacher reviews and signs them off (CI-8, U-24).
+
 ## Theme and fonts
 
 - **Tokens:** design tokens are defined once, as CSS custom properties in `src/app/tokens.css`.
