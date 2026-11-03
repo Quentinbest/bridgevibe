@@ -96,8 +96,19 @@ test('I18N-09: missing terms require term entries, not register entries', () => 
   expect(missingTerms(stub, terms)).toEqual(absent);
 });
 
-test('I-10: no real locale glossary is registered before teacher drafting in I-11', () => {
-  expect(glossaries).toEqual({});
+for (const [tag, registered] of Object.entries(glossaries)) {
+  test(`I18N-09: the ${tag} glossary covers every domain term once and passes its own avoid list`, () => {
+    expect(registered?.locale).toBe(tag);
+    expect(missingTerms(registered!, terms)).toEqual([]);
+    const names = registered!.entries.map(entry => `${entry.kind}:${entry.term}`);
+    expect(new Set(names).size).toBe(names.length);
+    const approved = Object.fromEntries(registered!.entries.map((entry, index) => [`approved.${index}`, { text: entry.approved, scope: 'learner' as const, status: 'draft' as const }]));
+    expect(avoidViolations(approved, registered!)).toEqual([]);
+  });
+}
+
+test('U-24, CI-8: the zh-Hans glossary is an AI draft until its teacher signs it off (I-11)', () => {
+  expect(glossaries['zh-Hans']!.entries.every(entry => entry.source === 'ai-draft' && entry.status === 'draft')).toBe(true);
 });
 
 const locales = import.meta.glob<Record<string, Catalogue>>('./locales/*.ts');
