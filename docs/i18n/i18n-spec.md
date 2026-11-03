@@ -2,8 +2,8 @@
 
 | Field | Value |
 |---|---|
-| Status | **Draft v0.4.** The owner's decisions are recorded (U-19, U-21, U-24, U-26), and so are the calls Delegated to Claude (U-20, U-27). Open: U-22 and U-23 (teachers), and U-25 (engineering lead) |
-| Date | 2026-10-31 (v0.2 picks the fonts per locale, §6.5; v0.3 trims them at build time, §6.6; v0.4 records the decisions, §11) |
+| Status | **Draft v0.5.** The owner's decisions are recorded (U-19, U-21, U-24, U-26), and so are the calls Delegated to Claude (U-20, U-25, U-26's pipeline, U-27, and the implementation plan's §7 changes). Open: U-22 and U-23 (teachers) |
+| Date | 2026-11-02 (v0.2 picks the fonts per locale, §6.5; v0.3 trims them at build time, §6.6; v0.4 records the decisions, §11; v0.5 folds in the implementation plan's eight §7 changes, marked "v0.5", and decides U-25 and the U-26 pipeline under the owner's delegation) |
 | Requested by | The owner, 2026-10-30: add Simplified Chinese, Traditional Chinese, Japanese and Spanish |
 | Derived from | `docs/PRD.md` §10.4 (NFR-I), §18 D4 · `docs/engineering/engineering-spec.md` §4.2, §4.4, §4.9, §7.3 · `docs/ux/ux-spec.md` §9–§11 · `GLOSSARY.md` §10 · ADR-0001, ADR-0004 · `src/explanation/index.ts` |
 | Scope | Phase **M**. Phase V stays English-only (PRD §13.3) |
@@ -50,7 +50,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
     - This works for English only.
     - Spanish has three CLDR categories (`one`, `many`, `other`), while Chinese and Japanese have one (`other`).
   - **Sentences are glued together from fragments:**
-    - `cardName()` builds "{rank} of {suit}" from separate words.
+    - `cardName()` fills one template, `card.name` ("{rank} of {suit}"), with rank and suit words. A locale can reorder it (红心A), so it needs golden tests, not a change (v0.5).
     - `src/app/hints.ts:78` joins card names with `', '`.
     - Chinese wants 红心A, with no "of", and lists with 、.
   - **Latin-only page and fonts:**
@@ -103,7 +103,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 | ID | Requirement | Acceptance |
 |---|---|---|
 | I18N-01 | On first launch, the locale comes from the device language by the §4 matching rules. Only shipped locales are eligible | I18N-01.1 A unit table test covers every row of §4, plus an unmatched language, a matched but unshipped one, and a list whose first entry is unmatched and whose second is shipped (`['fr-FR', 'ja-JP']` gives `ja`). I18N-01.2 An end-to-end test with Playwright `locale: 'ja-JP'` lands in Japanese |
-| I18N-02 | **Settings → Language:** <br>• lists the shipped locales by endonym, with no flags; <br>• applies a change at once, without a reload, including mid-Playthrough; <br>• keeps the current Playthrough's state, focus and position | I18N-02.1 An end-to-end test switches language mid-trick. The Seat View, the trick and the legal cards are unchanged, and the visible copy is in the new locale |
+| I18N-02 | **Settings → Language:** <br>• lists the shipped locales by endonym, with no flags; <br>• applies a change at once, without a reload, including mid-Playthrough; <br>• keeps the current Playthrough's state, focus and position. <br>The row is built inside the US-35 Settings screen, and its stored choice waits for US-36. Until then, device matching (I18N-01) still applies (v0.5) | I18N-02.1 An end-to-end test switches language mid-trick. The Seat View, the trick and the legal cards are unchanged, and the visible copy is in the new locale |
 | I18N-03 | The choice is stored with the other settings: for the session in V, and persisted in M. It is part of `ProgressExport.settings` (FR-P4) | I18N-03.1 Export and import keep the locale. I18N-03.2 Importing an unshipped locale falls back to the §4 matching rules |
 | I18N-04 | `<html lang>` and the document title follow the locale. Text in another language, such as English in the internal provenance panel, carries its own `lang` | I18N-04.1 An end-to-end check of `document.documentElement.lang` per locale |
 
@@ -112,8 +112,8 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 | ID | Requirement | Acceptance |
 |---|---|---|
 | I18N-05 | **One catalogue per locale, all keyed by the same `StringId`s.** English is the source. A shipped locale missing any learner-facing key fails the build. This extends US-01.9 from reason codes to every key | I18N-05.1 The type check fails on a missing key in a shipped locale. I18N-05.2 The existing reason-code completeness tests run for every shipped locale |
-| I18N-06 | **The same placeholders in every locale.** Each entry uses exactly the placeholder names of its English source. A plural entry covers every CLDR category of its locale (`Intl.PluralRules(locale).resolvedOptions().pluralCategories`) | I18N-06.1 A test parses every entry in every locale and compares placeholder sets and plural branches. I18N-06.2 A malformed message fails the test, not the runtime |
-| I18N-07 | **No sentence is built from translated fragments.** <br>• Card names, seat phrases and results are whole templates with placeholders. <br>• Lists use `Intl.ListFormat`. <br>• Numbers and signed scores use `Intl.NumberFormat`. <br>• The paired `-one` keys become one plural message | I18N-07.1 `cardName`, the forced-class hint list, `result.*`, `moment.heading` and `home.session` render correctly in all five locales. I18N-07.2 A grep check finds no `.join(` on rendered copy in `src/app` |
+| I18N-06 | **The same placeholders in every locale.** Each entry uses exactly the placeholder names of its English source. A plural entry covers `other` plus every CLDR category its locale assigns to a whole number from 0 to 100,000, the numbers the app can show. For `es` that is `one` and `other`; `many` (1,000,000 and up) can't occur (v0.5) | I18N-06.1 A test parses every entry in every locale and compares placeholder sets and plural branches. I18N-06.2 A malformed message fails the test, not the runtime |
+| I18N-07 | **No sentence is built from translated fragments.** <br>• Card names, seat phrases and results are whole templates with placeholders. <br>• Lists use `Intl.ListFormat`. <br>• Numbers and signed scores use `Intl.NumberFormat`. <br>• The paired `-one` keys become one plural message | I18N-07.1 `cardName`, the forced-class hint list, `result.*`, `moment.heading` and `home.session` render correctly in all five locales. I18N-07.2 A check finds no `.join(` call in `src/app` outside an allow-list that gives a reason for each entry (today: the deal seed, and the logged hint text, which joins whole sentences) |
 | I18N-08 | **Every entry has a scope:** `learner` or `internal`. Only `learner` entries are translated, signed off and checked for completeness. `bench.*` and the debug panel's entries are `internal` and stay English | I18N-08.1 The completeness test skips `internal`. I18N-08.2 No `internal` key renders on a learner screen (a composition test) |
 
 ### 5.3 Bridge terminology
@@ -128,7 +128,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 | ID | Requirement | Acceptance |
 |---|---|---|
 | I18N-11 | **A locale ships only when it is fully signed off.** Every `learner` entry, every lesson text and its Locale Glossary are signed off by a teacher who knows bridge in that language (CI-8, US-26.4). <br>• A shipped locale never falls back to English for learners. <br>• Development and test builds may show an unshipped locale, with English fallback and a visible "preview" marker | I18N-11.1 The build's shipped-locale list is derived from the sign-off records. A locale with an unsigned `learner` entry can't be listed. I18N-11.2 The preview marker exists only in non-production builds |
-| I18N-12 | **Translation never changes correctness.** This extends ADR-0004 to locales ([ADR-0006](../adr/0006-locales-never-change-correctness.md)). <br>• A translation keeps the content ID, expected answers, Deal and Script. <br>• Each locale's text has its own sign-off, keyed by content ID, version and locale. <br>• The validity check "expected answers consistent with the prose" (US-27.4) runs for every locale | I18N-12.1 Pipeline test: a lesson whose `ja` commentary refers to a card the Script doesn't expose fails validation in `ja` only |
+| I18N-12 | **Translation never changes correctness.** This extends ADR-0004 to locales ([ADR-0006](../adr/0006-locales-never-change-correctness.md)). <br>• A translation keeps the content ID, expected answers, Deal and Script. <br>• Each locale's text has its own sign-off, keyed by content ID, version and locale. <br>• The validity check "expected answers consistent with the prose" (US-27.4) runs for every locale | I18N-12.1 Pipeline test: a lesson whose `ja` catalogue lacks a lesson key, or whose `ja` entry changes the placeholders, fails validation in `ja` only. The sign-off checklist confirms that each translation names the same cards as the English. (v0.5: checking the prose itself would need prose parsing, which US-15.1–2 rules out) |
 | I18N-13 | **Every translated entry records its source:** `human`, or `ai-draft` (allowed by U-24). An `ai-draft` entry can't be signed off unchanged without the reviewer confirming it | I18N-13.1 Schema check on the source field. Sign-off records carry it |
 
 ### 5.5 Coaching integrity across languages
@@ -136,14 +136,14 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 | ID | Requirement | Acceptance |
 |---|---|---|
 | I18N-14 | **Translations keep the same certainty.** <br>• Templates for abstentions, *uncertain*, sampled quality and hindsight (CI-1 to CI-3, INV-5 to INV-7) are tagged `integrity`. <br>• Their sign-off checklist asks whether the translation claims no more certainty than the English, and keeps the hindsight label. <br>• Teachers get an English back-translation of each `integrity` entry with the review | I18N-14.1 Every hindsight statement renders `review.hindsight` (or its key) in every locale (a composition test). I18N-14.2 Sign-off of an `integrity` entry without the checklist answered is rejected |
-| I18N-15 | **Localisation never decides.** It sees only rendered facts, abstentions and reason codes (engineering spec §4.2, rule 4). The locale never reaches the Table, robots or analysis | I18N-15.1 A dependency-cruiser rule: `table`, `information`, `analysis` and `robots` can't import the locale module. I18N-15.2 F1 and determinism suites give identical Records under every locale |
+| I18N-15 | **Localisation never decides.** It sees only rendered facts, abstentions and reason codes (engineering spec §4.2, rule 4). The locale never reaches the Table, robots or analysis | I18N-15.1 A test pins the dependency-cruiser allow-lists, which already keep `table`, `information`, `analysis`, `robots` and `coach` from importing `explanation` (v0.5: no new rule is needed). I18N-15.2 F1 and determinism suites give identical Records under every locale |
 
 ### 5.6 Typography, layout and accessibility
 
 | ID | Requirement | Acceptance |
 |---|---|---|
 | I18N-16 | **CJK text uses the CJK members of the IBM Plex family** (§6.5, §6.6; U-26): <br>• IBM Plex Sans SC for `zh-Hans`; <br>• IBM Plex Sans TC for `zh-Hant`; <br>• IBM Plex Sans JP for `ja`. <br>Each is **trimmed at build time** to the characters its locale uses, and **renamed** `BridgeVibe Sans SC`, `TC` or `JP`, as the OFL requires (§6.6). Each falls back to the system's CJK fonts. Bricolage Grotesque stays the display face for Latin letters and digits. Suit symbols keep a stack that doesn't change with locale. Spanish uses the existing Latin fonts. Nothing loads from a CDN. Correct `lang` makes unified Han characters take their regional shapes | I18N-16.1 **The build fails** if any character in a shipped locale's `learner` catalogue has no glyph in the font its entry renders with. That is the trimmed CJK font, or for `es` the Latin subset, except for entries rendered with `--font-suit` (`symbol.*` and `face.*`, §6.5 rule 4). Those are checked instead to contain only ♠♥♦♣ or the locale's approved card-face letters. The error names the catalogue key. I18N-16.2 Screenshot tests show no missing-glyph boxes. I18N-16.3 The licence check lists each trimmed font as a Modified Version of its IBM source, with the OFL-1.1 notice (LR-1). I18N-16.4 A test reads each trimmed font's `name` table: no renamed record contains "Plex", and the copyright, trademark and licence records are unchanged |
-| I18N-17 | **Layouts hold at 320 and 390 px** for every shipped locale and for the pseudo-locale (I18N-23): <br>• no clipped or truncated text; <br>• touch targets of at least 44 px; <br>• the two-row hand rule unchanged. <br>CJK lines break by character, and `ja` uses `word-break: auto-phrase` where the browser supports it | I18N-17.1 Playwright projects for `es` and `ja` at 390 (the longest and the tallest), and the pseudo-locale at 320. I18N-17.2 axe passes in every locale |
+| I18N-17 | **Layouts hold at 320 and 390 px** for every shipped locale and for the pseudo-locale (I18N-23): <br>• no clipped or truncated text; <br>• touch targets of at least 44 px; <br>• the two-row hand rule unchanged. <br>CJK lines break by character, and `ja` uses `word-break: auto-phrase` where the browser supports it | I18N-17.1 Playwright projects for `es` and `ja` at 390 (the longest and the tallest), and the pseudo-locale at 320. They run their own specs (`test/e2e/locale/`); the existing specs match English text and stay `en`-only (v0.5). I18N-17.2 axe passes in every locale |
 | I18N-18 | **Length rules per locale.** UX §11 says "at most about 15 words". That rule doesn't apply to CJK, so each Locale Glossary states its own limit in characters, set by the teacher | I18N-18.1 A content lint warns above the limit |
 | I18N-19 | **Accessible text is localised too:** accessible names, live announcements ("East plays the 9 of hearts") and rejection messages | I18N-19.1 The existing a11y tests run in `zh-Hans` and `es` as well as `en` |
 
@@ -151,7 +151,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 
 | ID | Requirement | Acceptance |
 |---|---|---|
-| I18N-20 | **Provenance records the locale.** <br>• A template statement's provenance has `locale` and the catalogue version, as well as `templateId` (CI-5, `Statement.locale`). <br>• Logged statements keep the locale they were rendered in, even after a switch. <br>• The F5 export carries the locale, so teachers grade in their own language | I18N-20.1 US-40 provenance completeness includes `locale`. I18N-20.2 An F5 export in `zh-Hans` is deterministic |
+| I18N-20 | **Provenance records the locale.** <br>• Every logged statement that has text records `locale` and `catalogueVersion`, whatever its source: template, engine, authored or table (CI-5, `Statement.locale`). The app's log wrapper renders and stamps them in one step, because `coach` may not import `explanation` (v0.5). <br>• Logged statements keep the locale they were rendered in, even after a switch. <br>• The F5 export carries the locale, so teachers grade in their own language | I18N-20.1 US-40 provenance completeness includes `locale`. I18N-20.2 An F5 export in `zh-Hans` is deterministic |
 | I18N-21 | **Locales load only when needed.** <br>• Each non-English catalogue is its own lazily loaded chunk, and so is its CJK font CSS. <br>• The English first load stays within NFR-P1, with no extra bytes on the critical path. <br>• Offline use (NFR-C3) caches the selected locale, including its two trimmed font files in full. | I18N-21.1 A bundle check: the English entry chunk has no other catalogue and no CJK `@font-face`. I18N-21.2 Switching locale offline after first use works. I18N-21.3 Each trimmed font file stays within 500 KB, or the build fails |
 | I18N-22 | **The US-38 guard also catches non-Latin text.** A literal with any Han, Kana or Hangul character counts as phrase-like without needing a space | I18N-22.1 A guard test with `const label = '继续'` fails |
 | I18N-23 | **A pseudo-locale for development only** (`en-XA`): accented letters, +40% length, and brackets around each entry. It catches hard-coded text and layout overflow before translation starts. It is never shipped | I18N-23.1 Production build has no `en-XA`. I18N-23.2 The 320-px pseudo-locale project passes |
@@ -179,7 +179,7 @@ No other module gains a dependency.
 src/explanation/
   index.ts            text(), types, StringId (from en)
   locales/en.ts       source catalogue (today's entries move here)
-  locales/zh-Hans.ts  satisfies Catalogue<StringId>
+  locales/zh-Hans.ts  satisfies Catalogue
   locales/zh-Hant.ts
   locales/ja.ts
   locales/es.ts
@@ -190,9 +190,9 @@ src/explanation/
 
 - **Key parity is checked by the compiler.** Each translation is typed `satisfies Record<LearnerStringId, Entry>`, the same pattern the reason-code entries use today.
 - **The entry shape grows:** `{ text, status: 'draft' | 'signed', scope: 'learner' | 'internal', source, integrity? }`.
-- **`text()` takes a locale.** Components read it from context, not as an argument at every call.
+- **`text()` keeps its signature** (v0.5). `explanation` holds the active locale, set only by the app's `LocaleProvider`, and `text()` reads it. An optional explicit `locale` argument serves tests and exports. About 295 calls in 21 files, some outside React (`play.ts`, `hints.ts`), would otherwise change for no behavioural gain.
 
-### 6.2 Message format (U-25)
+### 6.2 Message format (U-25, decided 2026-11-02, Delegated to Claude)
 
 **Use a small ICU MessageFormat subset, in-house:**
 
@@ -217,7 +217,7 @@ The fields below extend engineering spec §4.4.
 
 | Entity | Change |
 |---|---|
-| `Provenance` (template kind) | Add `locale` and `catalogueVersion` |
+| `LogEntry` (the provenance log) | Add `locale` and `catalogueVersion`, required on every entry with `text`; robot actions have neither. `Provenance` is unchanged (v0.5) |
 | `Statement` | Already has `locale`; now enforced |
 | `SignOff` | Add `locale`. Scope can be a single catalogue entry or a lesson's text |
 | `ProgressExport.settings` | Add `locale`. `schemaVersion` bumps, with a migration that defaults to device matching |
@@ -424,8 +424,8 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
 | U-22 | Japanese register for teenagers | Recommended: です/ます, friendly rather than formal. The teacher decides | Teachers |
 | U-23 | Card-face letters and strain abbreviations per locale (for example Spanish R/D/V, ST or SA) | Recommended: keep A K Q J faces in the CJK locales. Spanish follows `es-419` usage (U-20). The teachers decide | Teachers |
 | U-24 | **May an AI draft translations?** (This relates to D7 and D10) | **Decided 2026-10-31 (owner): yes, as drafts only.** <br>• Each entry records `source: ai-draft` (I18N-13). <br>• A bridge teacher in that language reviews and signs off every entry (CI-8, US-26.4). <br>• Nothing AI-drafted ships unsigned. <br>• This is translation drafting, not run-time phrasing, so D7 is unchanged | Owner |
-| U-25 | Message format: an in-house ICU subset or a library | Recommended: in-house subset (§6.2) | Engineering lead |
-| U-26 | CJK fonts | **Decided.** <br>• Font choice, Delegated to Claude (owner, 2026-10-30): IBM Plex Sans SC, TC and JP at 400 and 600, with system fallback (§6.5). <br>• Delivery, decided by the owner (2026-10-30): trimmed at build time from IBM's pinned releases, and renamed BridgeVibe Sans SC/TC/JP as the OFL requires (§6.6). <br>The engineering lead approves the §6.6 pipeline before L0d | Owner + engineering lead |
+| U-25 | Message format: an in-house ICU subset or a library | **Decided 2026-11-02 (Delegated to Claude by the owner): the in-house subset** (§6.2): `{name}`, `plural` with `=n` branches, and `select`, with no apostrophe quoting. <br>• **Why:** the copy needs nothing more, and `Intl` supplies the locale data, so a library would add bytes and a licence entry for unused features. <br>• This is not the engineering lead's approval; the lead may still replace it before L1 | Engineering lead |
+| U-26 | CJK fonts | **Decided.** <br>• Font choice, Delegated to Claude (owner, 2026-10-30): IBM Plex Sans SC, TC and JP at 400 and 600, with system fallback (§6.5). <br>• Delivery, decided by the owner (2026-10-30): trimmed at build time from IBM's pinned releases, and renamed BridgeVibe Sans SC/TC/JP as the OFL requires (§6.6). <br>• Pipeline (§6.6), approved 2026-11-02 (Delegated to Claude by the owner, not the engineering lead's approval): as specified, which unblocks L0d | Owner + engineering lead |
 | U-27 | Rules reference text (for example the EBU MiniBridge laws summary in `result.rules`) | **Decided 2026-10-31 (Delegated to Claude): translate our own paraphrase, and quote no federation translation.** <br>• The paraphrase gets a Rights Record like every Content Item (US-26.1, GLOSSARY §9), as original BridgeVibe content under the project's own licence, so no third-party grant is needed. <br>• Its wording in each locale is signed off like any other entry (CI-8). <br>• Quoting an official translation would need that federation's written grant (LR-5), so it would come back to the owner | Owner |
 
 **[ADR-0006](../adr/0006-locales-never-change-correctness.md): locales never change correctness** (accepted 2026-11-02, Delegated to Claude by the owner).
