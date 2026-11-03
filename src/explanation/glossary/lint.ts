@@ -8,22 +8,21 @@ export function normalise(text: string, locale: string): string {
   return text.normalize('NFKC').toLocaleLowerCase(locale);
 }
 
-function* literals(nodes: readonly MessageNode[]): Generator<string> {
-  for (const node of nodes) {
-    if (node.type === 'literal') yield node.value;
-    if ('branches' in node) for (const branch of node.branches.values()) yield* literals(branch);
-  }
-}
+// U+FFFC is neither word-like nor a letter, so an interpolated value separates the text around it.
+const opaque = '￼';
 
 export function avoidViolations(catalogue: Readonly<Record<string, Entry>>, glossary: LocaleGlossary): string[] {
   const violations: string[] = [];
   const { locale } = glossary;
   const substring = /^(zh|ja)(-|$)/i.test(locale);
   const segmenter = new Intl.Segmenter(locale, { granularity: 'word' });
-  const words = (text: string) => [...segmenter.segment(text)].filter(part => part.isWordLike).map(part => part.segment);
+  // An interpolated value stays in the word list as a barrier, so words around it aren't adjacent.
+  const words = (text: string) => [...segmenter.segment(text)]
+    .filter(part => part.isWordLike || part.segment.includes(opaque)).map(part => part.isWordLike ? part.segment : opaque);
   for (const [key, entry] of Object.entries(catalogue)) {
     if (entry.scope !== 'learner') continue;
-    const texts = [...literals(parseMessage(entry.text))].map(text => normalise(text, locale));
+    // US-34.2: a term can span the text around a branch, so check each complete branch path.
+    const texts = renderings(parseMessage(entry.text), opaque).map(text => normalise(text, locale));
     for (const term of glossary.entries) for (const avoided of term.avoid ?? []) {
       const needle = normalise(avoided.text, locale);
       if (!needle) continue;
@@ -35,20 +34,23 @@ export function avoidViolations(catalogue: Readonly<Record<string, Entry>>, glos
         const literalWords = words(literal);
         const found = substring ? literal.includes(needle) : needleWords.length > 0 && literalWords.some((_, start) =>
           needleWords.every((word, offset) => literalWords[start + offset] === word));
-        if (found) violations.push(`${key}: uses avoided "${avoided.text}" (${term.term})`);
+        if (found) {
+          violations.push(`${key}: uses avoided "${avoided.text}" (${term.term})`);
+          break;
+        }
       }
     }
   }
   return violations;
 }
 
-function renderings(nodes: readonly MessageNode[]): string[] {
+function renderings(nodes: readonly MessageNode[], hole?: string): string[] {
   let results = [''];
   for (const node of nodes) {
     const parts = node.type === 'literal' ? [node.value]
-      : node.type === 'argument' ? [`{${node.name}}`]
-        : node.type === 'pound' ? ['#']
-          : [...node.branches.values()].flatMap(renderings);
+      : node.type === 'argument' ? [hole ?? `{${node.name}}`]
+        : node.type === 'pound' ? [hole ?? '#']
+          : [...node.branches.values()].flatMap(branch => renderings(branch, hole));
     results = results.flatMap(prefix => parts.map(part => prefix + part));
   }
   return results;

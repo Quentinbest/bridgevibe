@@ -50,6 +50,19 @@ test('I18N-08, I18N-09: skips internal entries and syntax, visits nested plural/
     .toEqual(['stub: uses avoided "trump" (Trump suit)']);
 });
 
+test('US-34.2: avoided terms spanning surrounding text and a branch are caught; arguments stay opaque', () => {
+  const spanish = glossary('es', [term('No-trumps', [{ text: 'sin palo' }])]);
+  expect(avoidViolations({ stub: entry('sin {strain, select, nt {triunfo} other {palo}}') }, spanish))
+    .toEqual(['stub: uses avoided "sin palo" (No-trumps)']);
+  expect(avoidViolations({ stub: entry('sin {strain, select, a {palo} b {palo} other {palo}}') }, spanish))
+    .toEqual(['stub: uses avoided "sin palo" (No-trumps)']);
+  expect(avoidViolations({ stub: entry('sin {x} palo'), count: entry('{n, plural, other {sin # palo}}') }, spanish)).toEqual([]);
+  const japanese = glossary('ja', [term('Trump suit', [{ text: 'トランプ', containedIn: ['ノートランプ'] }])]);
+  expect(avoidViolations({ stub: entry('トラ{x, select, a {ンプ} other {ック}}') }, japanese))
+    .toEqual(['stub: uses avoided "トランプ" (Trump suit)']);
+  expect(avoidViolations({ stub: entry('トラ{x}ンプ') }, japanese)).toEqual([]);
+});
+
 test('I18N-18, E-13: warns on 11 graphemes, accepts 10 and counts skin-tone emoji as one', () => {
   const stub = glossary('ja');
   expect(lengthWarnings({ stub: entry('1234567890'), emoji: entry('123456789👍🏽'),
