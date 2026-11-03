@@ -1,0 +1,38 @@
+[
+  {
+    "family": "SC",
+    "package": "@ibm/plex-sans-sc",
+    "version": "1.1.0",
+    "tarball": "https://registry.npmjs.org/@ibm/plex-sans-sc/-/plex-sans-sc-1.1.0.tgz",
+    "integrity": "sha512-IkhORwgw/CrsUss7uW9Rj6KKSsGQoIyIaNWjjju/7sV7SYS3yk0c/DgZN/leIG3Co5lN/X4Or/sQaL+SdvmSIg==",
+    "files": [
+      "package/fonts/complete/woff2/hinted/IBMPlexSansSC-Regular.woff2",
+      "package/fonts/complete/woff2/hinted/IBMPlexSansSC-SemiBold.woff2"
+    ],
+    "licence": "package/LICENSE.txt"
+  },
+  {
+    "family": "TC",
+    "package": "@ibm/plex-sans-tc",
+    "version": "1.1.1",
+    "tarball": "https://registry.npmjs.org/@ibm/plex-sans-tc/-/plex-sans-tc-1.1.1.tgz",
+    "integrity": "sha512-pM4DfRkKL4Vqrew/GDrqfXe1sqAcLuYR49Xks0yCAVQHhoMna0yJ5sV3KfC542h455oAK3XrH9CtSd0sfq+u9Q==",
+    "files": [
+      "package/fonts/complete/woff2/hinted/IBMPlexSansTC-Regular.woff2",
+      "package/fonts/complete/woff2/hinted/IBMPlexSansTC-SemiBold.woff2"
+    ],
+    "licence": "package/LICENSE.txt"
+  },
+  {
+    "family": "JP",
+    "package": "@ibm/plex-sans-jp",
+    "version": "3.0.0",
+    "tarball": "https://registry.npmjs.org/@ibm/plex-sans-jp/-/plex-sans-jp-3.0.0.tgz",
+    "integrity": "sha512-/v46f2qWBwOg0U/At3R9yVIWrHZKYHM0ByCz2lnNk60VqTHATcCHUT9djTmYBlRwaepybLzDsvx2DtxpHpIPvA==",
+    "files": [
+      "package/fonts/complete/woff2/hinted/IBMPlexSansJP-Regular.woff2",
+      "package/fonts/complete/woff2/hinted/IBMPlexSansJP-SemiBold.woff2"
+    ],
+    "licence": "package/LICENSE.txt"
+  }
+]

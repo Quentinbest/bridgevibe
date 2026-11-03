@@ -16,7 +16,7 @@
 - **IDs:**
   - Requirements are `I18N-nn`, and acceptance checks are `I18N-nn.k`.
   - Decisions that need approval continue the engineering specification's list from **U-19** (§11). Once accepted, they move to its §7.3.
-  - The proposed ADR is **ADR-0006**, because ADR-0005 is already reserved for rotation (UX P-2).
+  - The ADR is **[ADR-0006](../adr/0006-locales-never-change-correctness.md)**, accepted 2026-11-02 (Delegated to Claude by the owner). ADR-0005 is the technology selection.
 - **Locale tags** are BCP 47: `en`, `zh-Hans`, `zh-Hant`, `ja`, `es`.
 - **Words** are the glossary's. A *Playthrough* is still never a "hand" or "game", in any language.
 - **Bridge terms in other languages** (§7) are drafts by Claude. None is approved, and every term needs sign-off from a teacher who plays bridge in that language (CI-8, US-26.4).
@@ -128,7 +128,7 @@ Bridge words differ by language and region. For example, Taiwan says 無王 for 
 | ID | Requirement | Acceptance |
 |---|---|---|
 | I18N-11 | **A locale ships only when it is fully signed off.** Every `learner` entry, every lesson text and its Locale Glossary are signed off by a teacher who knows bridge in that language (CI-8, US-26.4). <br>• A shipped locale never falls back to English for learners. <br>• Development and test builds may show an unshipped locale, with English fallback and a visible "preview" marker | I18N-11.1 The build's shipped-locale list is derived from the sign-off records. A locale with an unsigned `learner` entry can't be listed. I18N-11.2 The preview marker exists only in non-production builds |
-| I18N-12 | **Translation never changes correctness.** This extends ADR-0004 to locales (proposed ADR-0006). <br>• A translation keeps the content ID, expected answers, Deal and Script. <br>• Each locale's text has its own sign-off, keyed by content ID, version and locale. <br>• The validity check "expected answers consistent with the prose" (US-27.4) runs for every locale | I18N-12.1 Pipeline test: a lesson whose `ja` commentary refers to a card the Script doesn't expose fails validation in `ja` only |
+| I18N-12 | **Translation never changes correctness.** This extends ADR-0004 to locales ([ADR-0006](../adr/0006-locales-never-change-correctness.md)). <br>• A translation keeps the content ID, expected answers, Deal and Script. <br>• Each locale's text has its own sign-off, keyed by content ID, version and locale. <br>• The validity check "expected answers consistent with the prose" (US-27.4) runs for every locale | I18N-12.1 Pipeline test: a lesson whose `ja` commentary refers to a card the Script doesn't expose fails validation in `ja` only |
 | I18N-13 | **Every translated entry records its source:** `human`, or `ai-draft` (allowed by U-24). An `ai-draft` entry can't be signed off unchanged without the reviewer confirming it | I18N-13.1 Schema check on the source field. Sign-off records carry it |
 
 ### 5.5 Coaching integrity across languages
@@ -428,7 +428,7 @@ Each step is its own ticket (one PR each, under about 1,000 lines). Translation 
 | U-26 | CJK fonts | **Decided.** <br>• Font choice, Delegated to Claude (owner, 2026-10-30): IBM Plex Sans SC, TC and JP at 400 and 600, with system fallback (§6.5). <br>• Delivery, decided by the owner (2026-10-30): trimmed at build time from IBM's pinned releases, and renamed BridgeVibe Sans SC/TC/JP as the OFL requires (§6.6). <br>The engineering lead approves the §6.6 pipeline before L0d | Owner + engineering lead |
 | U-27 | Rules reference text (for example the EBU MiniBridge laws summary in `result.rules`) | **Decided 2026-10-31 (Delegated to Claude): translate our own paraphrase, and quote no federation translation.** <br>• The paraphrase gets a Rights Record like every Content Item (US-26.1, GLOSSARY §9), as original BridgeVibe content under the project's own licence, so no third-party grant is needed. <br>• Its wording in each locale is signed off like any other entry (CI-8). <br>• Quoting an official translation would need that federation's written grant (LR-5), so it would come back to the owner | Owner |
 
-**Proposed ADR-0006: locales never change correctness.**
+**[ADR-0006](../adr/0006-locales-never-change-correctness.md): locales never change correctness** (accepted 2026-11-02, Delegated to Claude by the owner).
 
 - A locale changes words only. It never changes legality, scores, verdicts, expected answers or what counts as correct.
 - A translation is signed off per locale and doesn't create a new Content ID.
