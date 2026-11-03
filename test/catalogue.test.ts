@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import ts from 'typescript';
 import { expect, test } from 'vitest';
+import { catalogue } from '../src/explanation';
 
 const attributes = new Set(['aria-label', 'aria-description', 'title', 'alt', 'placeholder', 'label']);
 const scriptKind = (file: string) => (file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
@@ -134,4 +135,31 @@ test('every app source file sources learner-facing copy from the catalogue', () 
   const files = appFiles('src/app');
   expect(files.flatMap(file => violations(readFileSync(file, 'utf8'), file))).toEqual([]);
   expect(typedViolations(ts.createProgram(files, compilerOptions), files)).toEqual([]);
+});
+
+// I18N-08.2: internal catalogue keys cannot reach learner app modules.
+function internalKeyViolations(source: string, file: string): string[] {
+  const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, scriptKind(file));
+  const found: string[] = [];
+  function visit(node: ts.Node) {
+    const value = ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) ? node.text
+      : ts.isTemplateExpression(node) ? node.head.text : undefined;
+    if (value !== undefined && (internalKeys.has(value) || value.startsWith('bench.') || value.startsWith('debug.'))) {
+      found.push(`${file}:${line(node)}: ${value}`);
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(ast);
+  return found;
+}
+const internalKeys = new Set(Object.entries(catalogue).filter(([, entry]) => entry.scope === 'internal').map(([key]) => key));
+test('I18N-08.2: internal key guard catches strings and static and interpolated templates', () => {
+  expect(internalKeyViolations("text('bench.title'); text(`debug.title`); text(`debug.${x}`); text('bench.future');", 'bad.tsx')).toEqual([
+    'bad.tsx:1: bench.title', 'bad.tsx:1: debug.title', 'bad.tsx:1: debug.', 'bad.tsx:1: bench.future',
+  ]);
+  expect(internalKeyViolations("text('product'); text(`seat.${seat}`);", 'good.tsx')).toEqual([]);
+});
+test('I18N-08.2: learner app source never references internal keys', () => {
+  const files = appFiles('src/app').filter(file => !file.startsWith('src/app/bench/') && file !== 'src/app/DebugPanel.tsx');
+  expect(files.flatMap(file => internalKeyViolations(readFileSync(file, 'utf8'), file))).toEqual([]);
 });
