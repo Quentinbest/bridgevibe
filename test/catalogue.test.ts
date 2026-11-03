@@ -2,9 +2,11 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import ts from 'typescript';
 import { expect, test } from 'vitest';
+import { catalogue } from '../src/explanation';
 
 const attributes = new Set(['aria-label', 'aria-description', 'title', 'alt', 'placeholder', 'label']);
 const scriptKind = (file: string) => (file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
+const cjk = /[\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\p{Script=Hangul}]/u;
 const line = (node: ts.Node) => node.getSourceFile().getLineAndCharacterOfPosition(node.getStart()).line + 1;
 
 function violations(source: string, file: string): string[] {
@@ -19,9 +21,10 @@ function violations(source: string, file: string): string[] {
   }
   // Copy kept in a variable (`const message = 'Try again'`) reaches JSX indirectly, so any literal
   // that looks like a phrase (a letter and a space) is copy too. Class names and module paths aren't.
+  // I18N-22: Chinese and Japanese put no spaces between words, so any Han, Kana or Hangul is copy.
   function phraseText(node: ts.Node): string | undefined {
     const value = literalValue(node);
-    if (!value || !/\p{L}/u.test(value) || !/\s/.test(value)) return undefined;
+    if (!value || !/\p{L}/u.test(value) || !(/\s/.test(value) || cjk.test(value))) return undefined;
     if (ts.isImportDeclaration(node.parent) || ts.isExportDeclaration(node.parent)) return undefined;
     const attribute = ts.findAncestor(node, ts.isJsxAttribute);
     return attribute && attribute.name.getText(ast) === 'className' ? undefined : value;
@@ -117,6 +120,13 @@ test('catalogue guard catches phrases kept outside JSX, but not class names or m
   expect(violations('text(`rank.${rank}`);\n<div className={`opponent ${seat}`} />', 'good.tsx')).toEqual([]);
   expect(violations(`import x from './some module';\n<div className="card back" />;\n<div className={'card back'} />`, 'good.tsx')).toEqual([]);
 });
+test('I18N-22.1: catalogue guard catches Han, Kana and Hangul words that have no space', () => {
+  expect(violations("const label = '继续';", 'bad.ts')).toEqual(['bad.ts:1: 继续']);
+  expect(violations("const label = 'つづける';\nconst more = 'ヒント';", 'bad.ts')).toEqual(['bad.ts:1: つづける', 'bad.ts:2: ヒント']);
+  expect(violations("const label = '계속';", 'bad.ts')).toEqual(['bad.ts:1: 계속']);
+  expect(violations('const message = `第${n}墩`;', 'bad.ts')).toEqual(['bad.ts:1: 第墩']);
+  expect(violations("const id = 'continue';\n<div className=\"卡\" />", 'good.tsx')).toEqual([]);
+});
 test('catalogue guard catches words kept in constants, in the component or imported', () => {
   expect(typedViolations(programFor({
     '/v/a.tsx': "const label = 'Continue';\nexport const A = () => <button>{label}</button>;",
@@ -134,4 +144,31 @@ test('every app source file sources learner-facing copy from the catalogue', () 
   const files = appFiles('src/app');
   expect(files.flatMap(file => violations(readFileSync(file, 'utf8'), file))).toEqual([]);
   expect(typedViolations(ts.createProgram(files, compilerOptions), files)).toEqual([]);
+});
+
+// I18N-08.2: internal catalogue keys cannot reach learner app modules.
+function internalKeyViolations(source: string, file: string): string[] {
+  const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, scriptKind(file));
+  const found: string[] = [];
+  function visit(node: ts.Node) {
+    const value = ts.isStringLiteral(node) || ts.isNoSubstitutionTemplateLiteral(node) ? node.text
+      : ts.isTemplateExpression(node) ? node.head.text : undefined;
+    if (value !== undefined && (internalKeys.has(value) || value.startsWith('bench.') || value.startsWith('debug.'))) {
+      found.push(`${file}:${line(node)}: ${value}`);
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(ast);
+  return found;
+}
+const internalKeys = new Set(Object.entries(catalogue).filter(([, entry]) => entry.scope === 'internal').map(([key]) => key));
+test('I18N-08.2: internal key guard catches strings and static and interpolated templates', () => {
+  expect(internalKeyViolations("text('bench.title'); text(`debug.title`); text(`debug.${x}`); text('bench.future');", 'bad.tsx')).toEqual([
+    'bad.tsx:1: bench.title', 'bad.tsx:1: debug.title', 'bad.tsx:1: debug.', 'bad.tsx:1: bench.future',
+  ]);
+  expect(internalKeyViolations("text('product'); text(`seat.${seat}`);", 'good.tsx')).toEqual([]);
+});
+test('I18N-08.2: learner app source never references internal keys', () => {
+  const files = appFiles('src/app').filter(file => !file.startsWith('src/app/bench/') && file !== 'src/app/DebugPanel.tsx');
+  expect(files.flatMap(file => internalKeyViolations(readFileSync(file, 'utf8'), file))).toEqual([]);
 });

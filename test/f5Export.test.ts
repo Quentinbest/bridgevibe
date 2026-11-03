@@ -2,7 +2,8 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { expect, test } from 'vitest';
 import { validateEntry } from '../src/coach/provenance';
 import { fullFollowSuit } from '../src/curriculum/content';
-import { text } from '../src/explanation';
+import { catalogue, text } from '../src/explanation';
+import { integrityViolations } from './f5/integrity';
 import { columns, csv, generateReport } from './f5/report';
 
 // VAL-08, US-40.1: validate coverage and reproducibility before publishing teacher inputs.
@@ -10,6 +11,7 @@ import { columns, csv, generateReport } from './f5/report';
 test('VAL-08: F5 real composition export is complete and reproducible', async () => {
   const first = await generateReport(), second = await generateReport();
   expect(second).toEqual(first);
+  expect(integrityViolations(first.json.entries, catalogue)).toEqual([]);
   const { entries } = first.json;
   const coach = entries.filter(e => e.outputKind !== 'lesson step');
   expect(coach.length).toBeGreaterThanOrEqual(20);
