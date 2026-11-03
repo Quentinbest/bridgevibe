@@ -26,7 +26,7 @@ test('US-21: keyboard selects, cancels, asks for a hint, accepts an alternative 
   expect(screen.getByText('Authored hint · follow-suit.prompt · version 1')).toBeTruthy();
   fireEvent.keyDown(card, { key: 'Enter' });
   fireEvent.keyDown(card, { key: 'Enter' });
-  expect(screen.getByText('Nice. You followed suit. Any of these works: Ace of hearts, King of hearts, Queen of hearts.')).toBeTruthy();
+  expect(screen.getByText('Nice. You followed suit. Any of these works: Ace of hearts, King of hearts, and Queen of hearts.')).toBeTruthy();
   expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Next step' }));
   expect(sessionAttempts.snapshot().at(-1)).toMatchObject({ outcome: 'correct', hintTier: 'a', hintTiming: 'before-first-answer' });
   fireEvent.click(screen.getByRole('button', { name: 'Next step' }));
@@ -49,7 +49,7 @@ test('US-21: wrong twice exposes Show me, records failure and offers script cont
   expect(screen.getByRole('alert').textContent).toBe('Not that one. You still have hearts.');
   expect(screen.getByText('Not that one. You still have hearts.').closest('[role="status"]')).toBeNull();
   fireEvent.click(screen.getByRole('button', { name: 'Show me' }));
-  expect(screen.getByText(/These answers follow suit: Ace of hearts, King of hearts, Queen of hearts/)).toBeTruthy();
+  expect(screen.getByText(/These answers follow suit: Ace of hearts, King of hearts, and Queen of hearts/)).toBeTruthy();
   expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Next step' }));
   expect(sessionAttempts.snapshot().at(-1)?.outcome).toBe('failed');
   fireEvent.click(screen.getByRole('button', { name: 'Next step' }));

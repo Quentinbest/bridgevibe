@@ -46,7 +46,7 @@ export function Home({ dealsPlayed, navigate }: { dealsPlayed: number; navigate:
       <a className="home-practice" href={hrefFor('?practice=1')} onClick={event => follow(event, '?practice=1')}>
         <h3>{text('home.quick')}</h3><p>{text('home.practice-description')}</p>
       </a>
-      <p className="home-session">{text(dealsPlayed === 1 ? 'home.session-one' : 'home.session', { count: dealsPlayed })} {text('home.unsaved')}</p>
+      <p className="home-session">{text('home.session', { count: dealsPlayed })} {text('home.unsaved')}</p>
     </main>
     {/* UX §2.1: only destinations with phase V content are offered. */}
     <nav className="home-nav" aria-label={text('home.navigation')}>

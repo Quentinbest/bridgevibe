@@ -16,7 +16,7 @@ test('lesson accepts alternatives, keeps progress synchronized, and closes to Ho
   const card = page.getByRole('button', { name: 'King of hearts', exact: true });
   await card.click();
   await page.getByRole('button', { name: 'Play it, King of hearts', exact: true }).click();
-  await expect(page.getByText('Nice. You followed suit. Any of these works: Ace of hearts, King of hearts, Queen of hearts.')).toBeVisible();
+  await expect(page.getByText('Nice. You followed suit. Any of these works: Ace of hearts, King of hearts, and Queen of hearts.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Next step' })).toBeFocused();
   await page.getByRole('button', { name: 'Next step' }).click();
   await expect(page.getByText('4/5', { exact: true })).toBeVisible();
@@ -40,7 +40,7 @@ test('wrong twice, rules feedback, hint provenance, Show me and script continuat
   await expect(page.getByText('Authored hint · follow-suit.prompt · version 1')).toBeVisible();
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.getByRole('button', { name: 'Show me' }).click();
-  await expect(page.getByText(/These answers follow suit: Ace of hearts, King of hearts, Queen of hearts/)).toBeVisible();
+  await expect(page.getByText(/These answers follow suit: Ace of hearts, King of hearts, and Queen of hearts/)).toBeVisible();
   await expect(page.getByRole('button', { name: 'Next step' })).toBeFocused();
   await page.getByRole('button', { name: 'Next step' }).click();
   await page.clock.runFor(500);
