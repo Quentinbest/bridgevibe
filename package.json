@@ -18,6 +18,7 @@
     "f5:export": "F5_REPORT=1 vitest run --project node test/f5Export.test.ts",
     "robots:sample": "node scripts/robots/sample.ts",
     "bidding:harness": "node tools/bidding-harness/index.ts",
+    "fonts:fetch": "node scripts/fonts/fetch.ts",
     "content:check": "node scripts/content/check.ts",
     "test": "vitest run --project node",
     "test:browser": "vitest run --project browser",
