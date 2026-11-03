@@ -372,7 +372,7 @@ The lesson player uses the table component from §3 with a commentary panel.
 | ID | Proposal | Reason |
 |---|---|---|
 | P-1 | Add **Highlight playable cards** to FR-S1 (Practice only; off in modules 1–2) | Dimming illegal cards speeds up practice, but it would give away the answer in the following-suit lessons |
-| P-2 | Record the table rotation (§3.2) as **ADR-0005**, or as an amendment to ADR-0003 | ADR-0003 leaves the display to design; the choice affects lessons, review and testing, so it should be explicit |
+| P-2 | Record the table rotation (§3.2) as **ADR-0007** (ADR-0005 is now the technology selection, ADR-0006 the locale rule), or as an amendment to ADR-0003 | ADR-0003 leaves the display to design; the choice affects lessons, review and testing, so it should be explicit |
 | P-3 | Add **tap-to-raise, confirm-to-play** as the default card interaction to NFR-A or FR-R | Prevents accidental plays on small screens; it also matters for fairness, since an accidental play becomes a recorded Decision |
 | P-4 | Add a UX question set to T7b (learner observation) | §13: rotation, hint wording, assessment badges, retry strip |
 | P-5 | Define the abandoned-playthrough timeout (§7: 7 days) in FR-R10 | The glossary lists *abandoned* as a status, but nothing triggers it |

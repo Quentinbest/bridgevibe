@@ -774,7 +774,7 @@ The teachers review the fallback policy, because its actions can show up in play
 | U-07 | Whether the V provenance log persists beyond the session | Session plus export (A-05) | Owner |
 | U-08 | UI framework for the slice | Engineering lead's choice; MVP framework at the gate | Engineering lead |
 | U-09 | Trigger for an *abandoned* playthrough (UX P-5) | 7 days without an action | Owner |
-| U-10 | UX proposals P-1 (highlight playable cards), P-2 (rotation ADR-0005), P-3 (tap to raise, then confirm) | Accept into the PRD before M build; each affects table and lesson behaviour | Owner |
+| U-10 | UX proposals P-1 (highlight playable cards), P-2 (rotation ADR-0007), P-3 (tap to raise, then confirm) | Accept into the PRD before M build; each affects table and lesson behaviour | Owner |
 | U-11 | How "expected answer consistent with the prose" is checked (FR-L5) | Structured answer references in commentary (US-27.4) | Teachers + engineering lead |
 | U-12 | How a lesson hint declares the cards it mentions (Q12) | Structured card references, checked against exposures (US-15) | Teachers + engineering lead |
 | U-13 | Review analysis only after completion (ADR-0001 §4), versus sealed precomputation during play | Start at completion and show progressively; revisit with T2 data, which would need an ADR-0001 amendment | Owner |
