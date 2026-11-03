@@ -195,13 +195,13 @@ function tarball(entries: [string, string][]): Buffer {
 }
 const temporary: string[] = [];
 afterEach(async () => { await Promise.all(temporary.splice(0).map(dir => rm(dir, { recursive: true, force: true }))); });
-async function setup(entries: [string, string][] = [['package/regular', 'regular'], ['package/semibold', 'semibold'], ['../evil', 'evil'], ['package/postinstall.js', 'throw new Error("executed")']]) {
+async function setup(entries: [string, string][] = [['package/regular', 'regular'], ['package/semibold', 'semibold'], ['package/LICENSE.txt', 'OFL'], ['../evil', 'evil'], ['package/postinstall.js', 'throw new Error("executed")']]) {
   const root = await mkdtemp(path.join(tmpdir(), 'bridgevibe-fonts-'));
   temporary.push(root);
   const bytes = tarball(entries);
   await writeFile(path.join(root, 'test.tgz'), bytes);
   const source: Source = { family: 'SC', package: '@ibm/plex-sans-sc', version: '1.1.0', tarball: 'https://registry.npmjs.org/test.tgz',
-    integrity: 'sha512-' + createHash('sha512').update(bytes).digest('base64'), files: ['package/regular', 'package/semibold'] };
+    integrity: 'sha512-' + createHash('sha512').update(bytes).digest('base64'), files: ['package/regular', 'package/semibold'], licence: 'package/LICENSE.txt' };
   return { root, bytes, source, options: { root, from: root, sources: [source] } };
 }
 
@@ -218,7 +218,8 @@ describe('font tarball fetching (R-8)', () => {
     const output = path.join(root, '.font-sources');
     const directory = path.join(output, 'plex-sans-sc-1.1.0');
     expect((await readdir(output)).sort()).toEqual(['manifest.json', 'plex-sans-sc-1.1.0']);
-    expect((await readdir(directory)).sort()).toEqual(['IBMPlexSansSC-Regular.woff2', 'IBMPlexSansSC-SemiBold.woff2']);
+    expect((await readdir(directory)).sort()).toEqual(['IBMPlexSansSC-Regular.woff2', 'IBMPlexSansSC-SemiBold.woff2', 'LICENSE.txt']);
+    expect(await readFile(path.join(directory, 'LICENSE.txt'), 'utf8')).toBe('OFL');
     const regular = path.join(directory, 'IBMPlexSansSC-Regular.woff2');
     expect(await readFile(regular, 'utf8')).toBe('regular');
     expect(await readFile(path.join(directory, 'IBMPlexSansSC-SemiBold.woff2'), 'utf8')).toBe('semibold');
@@ -248,6 +249,11 @@ describe('font tarball fetching (R-8)', () => {
     await expect(fetchFonts(options)).rejects.toThrow('missing package/semibold');
     expect(await readdir(root)).toEqual(['test.tgz']);
   });
+  it('fails without writing when the licence is absent', async () => {
+    const { root, options } = await setup([['package/regular', 'regular'], ['package/semibold', 'semibold']]);
+    await expect(fetchFonts(options)).rejects.toThrow('missing package/LICENSE.txt');
+    expect(await readdir(root)).toEqual(['test.tgz']);
+  });
   it('rejects truncated or checksum-corrupted tar headers', () => {
     expect(() => readTar(Buffer.alloc(10))).toThrow('Truncated tar header');
     expect(() => readTar(Buffer.alloc(512, 1))).toThrow();
@@ -261,6 +267,7 @@ describe('font tarball fetching (R-8)', () => {
     for (const source of sources) {
       expect(source.tarball).toBe(`https://registry.npmjs.org/${source.package}/-/${source.package.split('/')[1]}-${source.version}.tgz`);
       expect(source.files).toEqual(['Regular', 'SemiBold'].map(weight => `package/fonts/complete/woff2/hinted/IBMPlexSans${source.family}-${weight}.woff2`));
+      expect(source.licence).toBe('package/LICENSE.txt');
     }
   });
 });

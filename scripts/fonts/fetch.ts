@@ -6,7 +6,7 @@ import { gunzipSync } from 'node:zlib';
 import sources from './sources.json' with { type: 'json' };
 
 export interface Source {
-  family: string; package: string; version: string; tarball: string; integrity: string; files: string[];
+  family: string; package: string; version: string; tarball: string; integrity: string; files: string[]; licence: string;
 }
 type Manifest = Record<string, { integrity: string; files: Record<string, string> }>;
 export const sha256 = (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
@@ -61,7 +61,8 @@ export async function fetchFonts(options: { root: string; from?: string; sources
     const basename = source.package.split('/').at(-1)!;
     if (!/^[a-z0-9-]+$/.test(basename) || !/^\d+\.\d+\.\d+$/.test(source.version) || !/^(SC|TC|JP)$/.test(source.family)) throw new Error('Invalid font source');
     const directory = `${basename}-${source.version}`;
-    const names = ['Regular', 'SemiBold'].map(weight => `${directory}/IBMPlexSans${source.family}-${weight}.woff2`);
+    // §6.6: the fonts plus the package's licence, which attributes them (LR-1).
+    const names = [...['Regular', 'SemiBold'].map(weight => `${directory}/IBMPlexSans${source.family}-${weight}.woff2`), `${directory}/LICENSE.txt`];
     const previous = manifest[source.package];
     if (previous?.integrity === source.integrity && Object.keys(previous.files).length === names.length) {
       const valid = await Promise.all(names.map(async name => {
@@ -78,16 +79,16 @@ export async function fetchFonts(options: { root: string; from?: string; sources
     })();
     const entries = verifiedEntries(bytes, source);
     if (source.files.length !== 2) throw new Error(`${source.package}: expected two font paths`);
-    const fonts = source.files.map(file => {
+    const extracted = [...source.files, source.licence].map(file => {
       const bytes = entries.get(file);
       if (!bytes) throw new Error(`${source.package}: missing ${file}`);
       return bytes;
     });
     await mkdir(path.join(output, directory), { recursive: true });
-    for (const [index, bytes] of fonts.entries()) await writeFile(path.join(output, names[index]), bytes);
-    manifest[source.package] = { integrity: source.integrity, files: Object.fromEntries(fonts.map((bytes, index) => [names[index], sha256(bytes)])) };
+    for (const [index, bytes] of extracted.entries()) await writeFile(path.join(output, names[index]), bytes);
+    manifest[source.package] = { integrity: source.integrity, files: Object.fromEntries(extracted.map((bytes, index) => [names[index], sha256(bytes)])) };
     await writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
-    options.log?.(`${source.package}: extracted ${fonts.length} fonts`);
+    options.log?.(`${source.package}: extracted ${source.files.length} fonts and the licence`);
   }
 }
 

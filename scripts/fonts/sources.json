@@ -8,7 +8,8 @@
     "files": [
       "package/fonts/complete/woff2/hinted/IBMPlexSansSC-Regular.woff2",
       "package/fonts/complete/woff2/hinted/IBMPlexSansSC-SemiBold.woff2"
-    ]
+    ],
+    "licence": "package/LICENSE.txt"
   },
   {
     "family": "TC",
@@ -19,7 +20,8 @@
     "files": [
       "package/fonts/complete/woff2/hinted/IBMPlexSansTC-Regular.woff2",
       "package/fonts/complete/woff2/hinted/IBMPlexSansTC-SemiBold.woff2"
-    ]
+    ],
+    "licence": "package/LICENSE.txt"
   },
   {
     "family": "JP",
@@ -30,6 +32,7 @@
     "files": [
       "package/fonts/complete/woff2/hinted/IBMPlexSansJP-Regular.woff2",
       "package/fonts/complete/woff2/hinted/IBMPlexSansJP-SemiBold.woff2"
-    ]
+    ],
+    "licence": "package/LICENSE.txt"
   }
 ]
