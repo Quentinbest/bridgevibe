@@ -61,6 +61,8 @@ export function LessonScreen({ onClose, provenanceLog, lesson = followSuit }: { 
   }
   if (state.summary) return <LevelComplete summary={state.summary} onClose={onClose} />;
   return <div className="lesson-screen" onKeyDown={event => {
+    // E-15: composing an input-method character must not open a hint.
+    if (event.nativeEvent.isComposing || event.key === 'Process') return;
     if (event.key.toLowerCase() === 'h' && !event.ctrlKey && !event.metaKey && !event.altKey) { event.preventDefault(); hint(); }
   }}>
     <header className="lesson-header">

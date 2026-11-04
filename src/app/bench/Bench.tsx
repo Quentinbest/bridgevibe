@@ -35,7 +35,7 @@ export default function Bench() {
     const link = document.createElement('a'); link.href = url; link.download = `bench-${report.createdAt.replaceAll(':', '-')}.json`;
     link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  return <main className="bench" data-bench={marker}>
+  return <main lang="en" className="bench" data-bench={marker}>
     <h1>{text('bench.title')}</h1><p>{text('bench.notice')}</p>
     <label>{text('bench.label')}<input value={label} disabled={running} onChange={event => setLabel(event.target.value)} /></label>
     <label>{text('bench.conditions')}<input value={conditions} disabled={running} onChange={event => setConditions(event.target.value)} /></label>

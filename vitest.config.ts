@@ -6,8 +6,8 @@ const { version } = JSON.parse(readFileSync(new URL('./package.json', import.met
 export default defineConfig({ plugins: [react()], assetsInclude: ['**/*.wasm'], define: { __APP_VERSION__: JSON.stringify(version) }, test: { projects: [
   // Some node tests start ESLint (type-aware), dependency-cruiser or the solver; a cold start under
   // parallel load can pass 5 s. Headroom, not retries: a hang still fails (as for e2e, #87).
-  { extends: true, test: { name: 'node', environment: 'node', testTimeout: 20_000, include: ['src/**/*.test.{ts,tsx}', 'test/*.test.ts'], exclude: ['**/*.browser.test.*'] } },
+  { extends: true, test: { name: 'node', setupFiles: ['./test/setupLocale.ts'], environment: 'node', testTimeout: 20_000, include: ['src/**/*.test.{ts,tsx}', 'test/*.test.ts'], exclude: ['**/*.browser.test.*'] } },
   // #111: bridge-dds is reached only by dynamic import; without prebundling, Vite can discover it
   // mid-run and reload the page under a running test.
-  { extends: true, optimizeDeps: { include: ['bridge-dds'] }, test: { name: 'browser', include: ['src/table/**/*.test.ts', 'src/app/**/*.browser.test.tsx'], browser: { enabled: true, headless: true, provider: playwright(), instances: [{ browser: 'chromium' }] } } },
+  { extends: true, optimizeDeps: { include: ['bridge-dds'] }, test: { name: 'browser', setupFiles: ['./test/setupLocale.ts'], include: ['src/table/**/*.test.ts', 'src/app/**/*.browser.test.tsx'], browser: { enabled: true, headless: true, provider: playwright(), instances: [{ browser: 'chromium' }] } } },
 ] } });

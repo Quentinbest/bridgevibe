@@ -9,7 +9,7 @@ test('English satisfies the learner catalogue contract', () => { expect(learnerC
 
 test('I18N-08: every entry has scope and only benchmark and debug entries are internal', () => {
   expect(Object.values(catalogue).every(entry => ['learner', 'internal'].includes(entry.scope))).toBe(true);
-  expect(Object.keys(catalogue)).toHaveLength(309);
+  expect(Object.keys(catalogue)).toHaveLength(310);
   const internal = Object.entries(catalogue).filter(([, entry]) => entry.scope === 'internal').map(([key]) => key);
   expect(internal).toHaveLength(23);
   expect(internal).toEqual(Object.keys(catalogue).filter(key => key.startsWith('bench.') || key.startsWith('debug.')));
