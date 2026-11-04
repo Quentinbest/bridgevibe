@@ -1,3 +1,4 @@
+import { renderCopy } from './copy';
 import { useEffect, useRef, type KeyboardEvent } from 'react';
 import { text } from '../explanation';
 import type { HintSnapshot } from './hints';
@@ -26,8 +27,8 @@ export default function HintSheet({ hint, dismiss, contractChoice = false }: { c
     <p className="hint-label">{text('hint.label')}</p>
     {/* UX §10: abstentions are announced assertively; advice politely. */}
     <div role={hint.abstained ? 'alert' : 'status'} aria-live={hint.abstained ? 'assertive' : 'polite'} aria-busy={hint.thinking}>
-      <p>{hint.thinking ? text('hint.thinking') : hint.advice}</p>
-      {hint.reason && <p>{hint.reason}</p>}
+      <p>{hint.thinking ? text('hint.thinking') : hint.advice && renderCopy(hint.advice)}</p>
+      {hint.reason && <p>{renderCopy(hint.reason)}</p>}
     </div>
     <p>{text(contractChoice ? 'hint.choose-contract' : 'hint.choose')}</p>
     <button ref={close} type="button" onClick={dismiss}>{text('hint.dismiss')}</button>

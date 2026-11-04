@@ -3,7 +3,7 @@ import { APP_VERSION } from '../../src/app/appVersion';
 import { createProvenanceLog, validateEntry, type LogEntry } from '../../src/coach/provenance';
 import { lessonById } from '../../src/curriculum/content';
 import { createLessonPlayer } from '../../src/curriculum/lessonPlayer';
-import { cardName, text, type StringId } from '../../src/explanation';
+import { catalogueVersion, currentLocale, cardName, text, type StringId } from '../../src/explanation';
 import { card, generateCoach, visibleContext } from './generate';
 
 // VAL-08: fixed metadata replaces wall clocks; this is a fixture epoch, not a run timestamp.
@@ -54,7 +54,7 @@ function lessonOutputs() {
 }
 export async function generateReport() {
   const coach = await generateCoach(), lesson = lessonOutputs();
-  const log = createProvenanceLog(APP_VERSION);
+  const log = createProvenanceLog(APP_VERSION, () => ({ locale: currentLocale(), catalogueVersion: catalogueVersion() }));
   const outputs = [...coach, ...lesson.outputs];
   const playthroughIds = new Map<string, string>();
   for (const output of outputs) {

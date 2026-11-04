@@ -129,7 +129,7 @@ test('US-11.1: rejected robot choice falls back with provenance instead of start
   const stop = play.start(); vi.advanceTimersByTime(3500);
   expect(play.record().setupEvents?.at(-1)).toMatchObject({ kind: 'contract-choice', provenance: { policy: 'bv-contract-placeholder', version: '0', ruleId: 'placeholder-dep-02', fallback: 'engine-failure' } });
   expect(play.provenanceLog.counters().silentFallbacks).toBe(0);
-  expect(play.getSnapshot().reason).toBe(''); stop();
+  expect(play.getSnapshot().reason).toBeNull(); stop();
 });
 
 // US-07.1, ADR-0001: the worker receives only the rotated Deal's declaring Seat View.

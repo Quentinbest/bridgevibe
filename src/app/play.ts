@@ -5,7 +5,8 @@ import { APP_VERSION } from './appVersion';
 import { principlesPolicy, fallbackRobotPolicy, contractChoicePolicy } from '../robots';
 import { startMiniBridge, encodeSetupSeatView, sideOf, SEATS, seatViewSeed, type Playthrough, type SetupSeatView, type ContractChoice, type Objective, type Side, type Card, type Deal, type SeatView, type Seat, type PlayedCard, type ReasonCode, type RobotProvenance } from '../table';
 import { createRobotHost, type RobotHostOptions } from './robotHost';
-import { cardName, reasonStrings, text } from '../explanation';
+import { catalogueVersion, currentLocale, cardName, reasonStrings, text } from '../explanation';
+import { renderCopy, type Copy } from './copy';
 import { fixedDeal } from './fixture';
 import { browserRobotAudit, exposeRobotPending, robotAudit } from './robotAudit';
 
@@ -21,7 +22,7 @@ export type LearnerView = Readonly<Pick<SeatView,
   displayedTrick: readonly PlayedCard[];
   collecting: boolean;
   lastTrickWinner: Seat | null;
-  reason: string;
+  reason: Copy | null;
   reasonCode: ReasonCode | null;
   rejectionId: number;
   rejectedCard: Card | null;
@@ -39,7 +40,7 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
       [contractChoicePolicy.name]: contractChoicePolicy.version } } });
   let table: Playthrough | null = null;
   const record = () => { if (!table) throw new Error('setup-in-progress'); return table.record(); };
-  const provenanceLog = createProvenanceLog(APP_VERSION);
+  const provenanceLog = createProvenanceLog(APP_VERSION, () => ({ locale: currentLocale(), catalogueVersion: catalogueVersion() }));
   let entryId = 0;
   function log(entry: Pick<LogEntry, 'kind' | 'summary' | 'text' | 'provenance' | 'positionIndex' | 'abstention'>) {
     // US-14.11: setup precedes the card-play record; use its Deal identity until then.
@@ -65,12 +66,12 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
   let running = false;
   let collecting = false;
   let displayedTrick: readonly PlayedCard[] = [];
-  let reason = '';
+  let reason: Copy | null = null;
   let rejectionId = 0;
   let reasonCode: ReasonCode | null = null;
   let rejectedCard: Card | null = null;
   let rejectedSeat: Seat | null = null;
-  function clearRejection() { reason = ''; reasonCode = null; rejectedCard = null; rejectedSeat = null; }
+  function clearRejection() { reason = null; reasonCode = null; rejectedCard = null; rejectedSeat = null; }
   const announcements: string[] = [];
   function learnerView(): LearnerView {
     // ADR-0001, US-16.4: UI data comes exclusively from Declarer's Seat View.
@@ -149,8 +150,8 @@ export function createPlay(robotOptions: RobotHostOptions = {}, deal: Deal = fix
     if (result.kind === 'rejected') {
       rejectionId++;
       reasonCode = result.reason; rejectedCard = card; rejectedSeat = seat;
-      reason = text(reasonStrings[result.reason], result.details.suit ? { suit: text(`suit.${result.details.suit}`) } : {});
-      log({ positionIndex, kind: 'statement', summary: result.reason, text: reason, provenance: { sourceKind: 'template', templateId: reasonStrings[result.reason] } });
+      reason = { id: reasonStrings[result.reason], params: result.details.suit ? { suit: { id: `suit.${result.details.suit}` } } : {} };
+      log({ positionIndex, kind: 'statement', summary: result.reason, text: renderCopy(reason), provenance: { sourceKind: 'template', templateId: reasonStrings[result.reason] } });
     } else {
       if (controller === 'robot' && provenance) log({ positionIndex, kind: 'robot-action', summary: JSON.stringify({ seat, action: { kind: 'play-card', card } }),
         provenance: { sourceKind: 'robot', kind: 'robot', policy: provenance.policy, version: provenance.version,

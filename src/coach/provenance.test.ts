@@ -112,3 +112,30 @@ test('US-14.11: forced-play templates are never recorded with engine provenance'
     expect(validateEntry(engine)).toContain('provenance.template');
   }
 });
+
+test('I18N-20: optional stamps are paired nonempty strings and never belong to robot actions', () => {
+  for (const stamp of [{ locale: 'en' }, { catalogueVersion: 'abc' }, { locale: '', catalogueVersion: 'abc' },
+    { locale: 'en', catalogueVersion: ' ' }, { locale: 42, catalogueVersion: 'abc' }, { locale: undefined }]) {
+    expect(validateEntry({ ...entry(), ...stamp }).length).toBeGreaterThan(0);
+  }
+  expect(validateEntry({ ...entry(), locale: 'en', catalogueVersion: 'abc' })).toEqual([]);
+  expect(validateEntry({ ...entry(sources[6]), locale: 'en', catalogueVersion: 'abc' })).toContain('locale.kind');
+});
+test('E-16, E-17: stamps text at record time, leaves robots untouched and rejects a conflicting locale', () => {
+  const stamp = { locale: 'en', catalogueVersion: '0123456789ab' };
+  const log = createProvenanceLog('test', () => stamp);
+  const original = entry();
+  log.record(original);
+  expect(original.locale).toBeUndefined();
+  expect(log.entries()[0]).toEqual({ ...original, ...stamp });
+  const robot = { ...entry(sources[6]), id: 'robot', text: undefined };
+  log.record(robot);
+  expect(log.entries()[1]).toEqual(robot);
+  expect(log.entries()[1]).not.toHaveProperty('locale');
+  expect(log.entries()[1]).not.toHaveProperty('catalogueVersion');
+  expect(() => log.record({ ...entry(), id: 'conflict', locale: 'es' })).toThrow('locale mismatch');
+  expect(log.entries()).toHaveLength(2);
+  const unstamped = createProvenanceLog(); unstamped.record(original);
+  expect(unstamped.entries()).toEqual([original]);
+  expect(() => createProvenanceLog('test', () => ({ locale: '', catalogueVersion: '' })).record(original)).toThrow('Incomplete provenance');
+});

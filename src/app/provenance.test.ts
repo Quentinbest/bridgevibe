@@ -1,3 +1,4 @@
+import { renderCopy } from './copy';
 import { choosePractice } from '../../test/miniBridge';
 import { version } from '../../package.json';
 import { afterEach, expect, test, vi } from 'vitest';
@@ -24,7 +25,7 @@ test('US-40.1, F5: complete real-policy Playthrough and learner rejection have c
   const stop = play.start(); choosePractice(play);
   try {
     play.play('south', play.getSnapshot().hand[0]);
-    const reason = play.getSnapshot().reason;
+    const reason = renderCopy(play.getSnapshot().reason!);
     expect(reason).not.toBe('');
     for (let index = 0; index < 52; index++) {
       const view = play.getSnapshot();

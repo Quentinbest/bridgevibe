@@ -357,7 +357,7 @@ test('US-11.1: in the composition a rejected robot card shows no learner message
     worker.emit({ type: 'decided', requestId, playthroughId, positionKey,
       action: { kind: 'play-card', card: fixedDeal.hands.south[0] }, provenance: { kind: 'robot', policy: 'bv-basic', version: '1', durationMs: 1 } });
     vi.advanceTimersByTime(500);
-    expect(play.getSnapshot().reason).toBe('');
+    expect(play.getSnapshot().reason).toBeNull();
     expect(play.record().actions[0]).toMatchObject({ seat: 'west', provenance: { fallback: 'engine-failure' } });
   } finally { stop(); }
 });

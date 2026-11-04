@@ -38,6 +38,8 @@
       "positionIndex": 3,
       "informationMode": "VISIBLE",
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "hint",
@@ -74,6 +76,8 @@
       "positionIndex": 3,
       "informationMode": "VISIBLE",
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "abstention",
@@ -110,6 +114,8 @@
       "positionIndex": 3,
       "informationMode": "VISIBLE",
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "abstention",
@@ -148,6 +154,8 @@
       "positionIndex": 4,
       "informationMode": "VISIBLE",
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "hint",
@@ -186,6 +194,8 @@
       "positionIndex": 8,
       "informationMode": "VISIBLE",
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "hint",
@@ -211,6 +221,8 @@
       "positionIndex": 0,
       "informationMode": "VISIBLE",
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "abstention",
@@ -249,6 +261,8 @@
         }
       },
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "moment verdict",
@@ -288,6 +302,8 @@
         }
       },
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "moment label",
@@ -327,6 +343,8 @@
         }
       },
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "moment verdict",
@@ -366,6 +384,8 @@
         }
       },
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "moment label",
@@ -404,6 +424,8 @@
         }
       },
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "moment alternative",
@@ -443,6 +465,8 @@
         }
       },
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "moment verdict",
@@ -482,6 +506,8 @@
         }
       },
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "moment label",
@@ -520,6 +546,8 @@
         }
       },
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "moment alternative",
@@ -559,6 +587,8 @@
         }
       },
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "moment verdict",
@@ -598,6 +628,8 @@
         }
       },
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "moment label",
@@ -623,6 +655,8 @@
         "mode": "ALL_HANDS",
         "sampleCount": 0
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "trick cost",
@@ -647,6 +681,8 @@
         "mode": "ALL_HANDS",
         "sampleCount": 0
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "trick cost",
@@ -671,6 +707,8 @@
         "mode": "ALL_HANDS",
         "sampleCount": 0
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "trick cost",
@@ -695,6 +733,8 @@
         "mode": "ALL_HANDS",
         "sampleCount": 0
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "trick cost",
@@ -719,6 +759,8 @@
         "mode": "ALL_HANDS",
         "sampleCount": 0
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "trick cost",
@@ -743,6 +785,8 @@
         "mode": "ALL_HANDS",
         "sampleCount": 0
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "trick cost",
@@ -775,6 +819,8 @@
         }
       },
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "sampled quality",
@@ -796,6 +842,8 @@
       "positionIndex": 1,
       "informationMode": "VISIBLE",
       "at": "2026-10-26T00:00:00.000Z",
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "hint",
@@ -818,6 +866,8 @@
         "contentId": "follow-suit.exercise",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -854,6 +904,8 @@
         "contentId": "follow-suit.exercise",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -890,6 +942,8 @@
         "contentId": "follow-suit.prompt",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -950,6 +1004,8 @@
         "contentId": "follow-suit.exercise",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -986,6 +1042,8 @@
         "contentId": "follow-suit.exercise",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -1022,6 +1080,8 @@
         "contentId": "follow-suit-2.exercise",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -1058,6 +1118,8 @@
         "contentId": "follow-suit-2.exercise",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -1098,6 +1160,8 @@
         "contentId": "follow-suit-2.exercise",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -1134,6 +1198,8 @@
         "contentId": "follow-suit-2.prompt",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -1194,6 +1260,8 @@
         "contentId": "follow-suit-2.exercise",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -1230,6 +1298,8 @@
         "contentId": "follow-suit-2.exercise",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -1266,6 +1336,8 @@
         "contentId": "follow-suit-3.exercise",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -1302,6 +1374,8 @@
         "contentId": "follow-suit-3.exercise",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -1338,6 +1412,8 @@
         "contentId": "follow-suit-3.prompt",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -1394,6 +1470,8 @@
         "contentId": "follow-suit-3.exercise",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",
@@ -1430,6 +1508,8 @@
         "contentId": "follow-suit-3.exercise",
         "version": "1"
       },
+      "locale": "en",
+      "catalogueVersion": "86f6965ad8c9",
       "grade": null,
       "graderNote": null,
       "outputKind": "lesson step",

@@ -1,3 +1,4 @@
+import { renderCopy } from './copy';
 import { afterEach, expect, test, vi } from 'vitest';
 import { encodeSeatView, startPlaythrough, sameCard, seatViewSeed, type Deal, type SeatView, type Card } from '../table';
 import { visibleClasses, sampledEstimate } from '../analysis/sampledEstimate';
@@ -7,7 +8,7 @@ import { createPlay } from './play';
 import { fixedDeal } from './fixture';
 import { choosePractice } from '../../test/miniBridge';
 import { createHints, hintSeat, renderHint } from './hints';
-import { cardName, catalogue, list, text } from '../explanation';
+import { catalogue, text } from '../explanation';
 import { hintStatement } from '../coach/hint';
 import { faultHintRunner, type HintFault } from './hintFaults';
 import { completeFixedDeal } from '../../test/strategy';
@@ -103,7 +104,7 @@ test('a shown unavailable abstention logs its timeout cause and a missed U-01 ta
   vi.useFakeTimers();
   const { play, stop } = begin(fixedDeal, (_view, _cards, done) => { done({ abstention: { reason: 'unavailable', cause: 'timeout' }, sampleCount: 0, enumerated: false }, 3001); return vi.fn(); });
   play.showHint();
-  expect(play.getSnapshot().hint?.advice).toBe(text('hint.unavailable-timeout'));
+  expect(renderCopy(play.getSnapshot().hint!.advice!)).toBe(text('hint.unavailable-timeout'));
   expect(play.provenanceLog.entries().find(e => e.abstention)).toMatchObject({ abstention: { reason: 'unavailable', cause: 'timeout' }, provenance: { hint: { durationMs: 3001, exceededTarget: true } } });
   expect(play.hintTimings()).toEqual([{ durationMs: 3001, exceededTarget: true }]); stop();
 });
@@ -174,7 +175,7 @@ test('US-14.11: forced cards bypass the runner throughout a Playthrough and log 
         expect(calls).not.toContain(view.positionIndex);
         play.showHint();
         expect(play.getSnapshot().hint).toMatchObject({ thinking: false, abstained: false,
-          advice: text(templateId, { card: cardName(snapshot.legalCards[0]), cards: list(snapshot.legalCards.map(cardName)) }) });
+          advice: { id: templateId, params: { card: snapshot.legalCards[0], cards: snapshot.legalCards } } });
         const logged = play.provenanceLog.entries().at(-1)!;
         expect(logged).toMatchObject({ informationMode: 'VISIBLE', provenance: { sourceKind: 'template', templateId } });
         expect(validateEntry(logged)).toEqual([]);
@@ -196,7 +197,7 @@ test.each([false, true])('US-14.11: contract choice uses authored lookup (%s), n
   play.showHint();
   expect(runner).not.toHaveBeenCalled(); expect(lookup).toHaveBeenCalled();
   expect(play.getSnapshot().hint).toMatchObject({ open: true, thinking: false, abstained: !authored,
-    advice: text(authored ? 'lesson.hint-text' : 'hint.not-covered') });
+    advice: { id: authored ? 'lesson.hint-text' : 'hint.not-covered', params: {} } });
   const entry = play.provenanceLog.entries().at(-1)!;
   expect(entry).toMatchObject({ informationMode: 'VISIBLE', provenance: { sourceKind: authored ? 'authored' : 'template' } });
   if (!authored) expect(entry.abstention).toEqual({ reason: 'not-covered', cause: 'no-authored-hint' });
@@ -215,8 +216,8 @@ test.each<HintFault>(['timeout', 'no-layout', 'low-confidence', 'error', 'worker
     : fault === 'timeout' ? 'hint.unavailable-timeout' : 'hint.unavailable-failure';
   const snapshot = play.getSnapshot().hint!;
   expect(snapshot).toMatchObject({ open: true, thinking: false, abstained: true });
-  expect(snapshot.advice).toBe(text(templateId));
-  expect(snapshot.advice).not.toMatch(/samples|rule of thumb|best card/i);
+  expect(renderCopy(snapshot.advice!)).toBe(text(templateId));
+  expect(renderCopy(snapshot.advice!)).not.toMatch(/samples|rule of thumb|best card/i);
   const entries = play.provenanceLog.entries().filter(entry => entry.abstention);
   expect(entries).toHaveLength(1);
   expect(entries[0]).toMatchObject({ summary: templateId, abstention: { reason, cause }, provenance: { hint: { templateId } } });
@@ -248,8 +249,8 @@ test('US-14.11: a real Table with an entire legal suit in one visible class star
   hints.sync(view, cards, { playthroughId: table.record().playthroughId, positionKey: table.positionKey() }); hints.show();
   expect(cards).toHaveLength(13); expect(runner).not.toHaveBeenCalled();
   expect(hints.snapshot()).toMatchObject({ open: true, thinking: false, abstained: false,
-    advice: text('hint.forced-class', { cards: list(cards.map(cardName)) }) });
-  expect(hints.snapshot().advice).toBe('These cards are all the same here: King of diamonds, Queen of diamonds, 9 of diamonds, 7 of diamonds, 10 of diamonds, 6 of diamonds, 4 of diamonds, Ace of diamonds, Jack of diamonds, 5 of diamonds, 2 of diamonds, 8 of diamonds, and 3 of diamonds');
+    advice: { id: 'hint.forced-class', params: { card: cards[0], cards } } });
+  expect(renderCopy(hints.snapshot().advice!)).toBe('These cards are all the same here: King of diamonds, Queen of diamonds, 9 of diamonds, 7 of diamonds, 10 of diamonds, 6 of diamonds, 4 of diamonds, Ace of diamonds, Jack of diamonds, 5 of diamonds, 2 of diamonds, 8 of diamonds, and 3 of diamonds');
   expect(log).toHaveBeenCalledWith(expect.objectContaining({ summary: 'hint.forced-class', provenance: { sourceKind: 'template', templateId: 'hint.forced-class' } }), 0);
   const entry = { ...log.mock.calls[0][0], id: 'equivalent', playthroughId: table.record().playthroughId, positionIndex: 0, informationMode: 'VISIBLE', at: new Date().toISOString() };
   expect(validateEntry(entry)).toEqual([]);

@@ -15,6 +15,7 @@ export type Provenance =
 export type LogEntry = {
   id: string; playthroughId: string; positionIndex: number; kind: 'statement' | 'robot-action';
   abstention?: Abstention;
+  locale?: string; catalogueVersion?: string;
   summary: string; text?: string; informationMode: InformationMode; provenance: Provenance; at: string;
 };
 const object = (value: unknown): value is Record<string, unknown> => !!value && typeof value === 'object' && !Array.isArray(value);
@@ -32,6 +33,12 @@ export function validateEntry(entry: unknown): string[] {
   if (entry.kind !== 'statement' && entry.kind !== 'robot-action') errors.push('kind');
   if (entry.kind === 'statement' && !nonempty(entry.text)) errors.push('text');
   if (entry.text !== undefined && !nonempty(entry.text)) errors.push('text');
+  // I18N-20: stamps are paired and belong to statements, never robot actions.
+  if ('locale' in entry || 'catalogueVersion' in entry) {
+    if (!nonempty(entry.locale)) errors.push('locale');
+    if (!nonempty(entry.catalogueVersion)) errors.push('catalogueVersion');
+    if (entry.kind === 'robot-action') errors.push('locale.kind');
+  }
   if (!mode(entry.informationMode)) errors.push('informationMode');
   if (entry.abstention !== undefined) {
     const a = entry.abstention;
@@ -111,7 +118,7 @@ export function validateEntry(entry: unknown): string[] {
 }
 
 // A-05, U-07: memory only; callers receive independent snapshots, including exports.
-export function createProvenanceLog(appVersion = 'development') {
+export function createProvenanceLog(appVersion = 'development', stamp?: () => { locale: string; catalogueVersion: string }) {
   const entries: LogEntry[] = [];
   const listeners = new Set<() => void>();
   let revision = 0;
@@ -124,6 +131,12 @@ export function createProvenanceLog(appVersion = 'development') {
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
     revision: () => revision,
     record(entry: LogEntry) {
+      // E-16, E-17: composition supplies the locale at the synchronous recording seam.
+      if (stamp && entry.text !== undefined) {
+        const renderedIn = stamp();
+        if (entry.locale !== undefined && entry.locale !== renderedIn.locale) throw new Error('Provenance locale mismatch');
+        entry = { ...entry, ...renderedIn };
+      }
       const errors = validateEntry(entry);
       if (errors.length) throw new Error(`Incomplete provenance: ${errors.join(', ')}`);
       if (entries.some(existing => existing.id === entry.id)) throw new Error('Duplicate provenance id');

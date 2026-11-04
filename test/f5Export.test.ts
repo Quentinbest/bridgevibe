@@ -48,6 +48,9 @@ test('VAL-08: F5 real composition export is complete and reproducible', async ()
     expect(entry.ref).toBe(`F5-${String(index + 1).padStart(2, '0')}`);
     expect(entry.grade).toBeNull(); expect(entry.graderNote).toBeNull();
     expect(entry.text).not.toMatch(/\{\w+\}/);
+    // I18N-20, E-16: every exported statement identifies its rendered catalogue.
+    expect(entry.locale).toBe('en');
+    expect(entry.catalogueVersion).toMatch(/^[0-9a-f]{12}$/);
     if (entry.informationMode === 'VISIBLE') expect(entry.visibleContext).not.toContain('ALL_HANDS remaining cards');
     else { expect(entry.visibleContext).toContain('ALL_HANDS remaining cards'); expect(entry.visibleContext).toContain('Reviewed play:'); }
     for (const label of ['Contract:', "Learner's seat:", 'Own hand:', 'Dummy:', 'Announcements:', 'Tricks so far:', 'Current trick:']) expect(entry.visibleContext).toContain(label);
@@ -55,6 +58,7 @@ test('VAL-08: F5 real composition export is complete and reproducible', async ()
   expect(columns).toHaveLength(15);
   expect(csv([['a,b', '"quoted"', 'line\nbreak']])).toBe('"a,b","""quoted""","line\nbreak"\r\n');
   expect(first.sheet).not.toMatch(/durationMs|exportedAt|exceededTarget/);
+  expect(columns.join(',')).not.toMatch(/locale|catalogueVersion/i);
   if (process.env.F5_REPORT === '1') {
     const dir = new URL('../docs/reports/f5/', import.meta.url);
     mkdirSync(dir, { recursive: true });

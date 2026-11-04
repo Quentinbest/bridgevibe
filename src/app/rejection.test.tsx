@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { renderCopy } from './copy';
 import { openPractice } from '../../test/openPractice';
 import { choosePractice } from '../../test/miniBridge';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
@@ -23,10 +24,10 @@ test('US-01.9: real Table rejection fills the Template and preserves the positio
   const play = createPlay(); const stop = play.start(); choosePractice(play); vi.advanceTimersByTime(500);
   const before = play.getSnapshot();
   play.play('north', { suit: 'hearts', rank: 'Q' });
-  expect(play.getSnapshot()).toMatchObject({ reason: 'Not that one. You still have spades.', reasonCode: 'must-follow-suit', positionIndex: before.positionIndex, hand: before.hand, dummy: before.dummy, displayedTrick: before.displayedTrick });
+  expect(play.getSnapshot()).toMatchObject({ reason: { id: 'reason.must-follow-suit', params: { suit: { id: 'suit.spades' } } }, reasonCode: 'must-follow-suit', positionIndex: before.positionIndex, hand: before.hand, dummy: before.dummy, displayedTrick: before.displayedTrick });
   vi.advanceTimersByTime(60000);
-  expect(play.getSnapshot().reason).toBe('Not that one. You still have spades.');
-  play.clearRejection(); expect(play.getSnapshot().reason).toBe(''); stop();
+  expect(renderCopy(play.getSnapshot().reason!)).toBe('Not that one. You still have spades.');
+  play.clearRejection(); expect(play.getSnapshot().reason).toBeNull(); stop();
 });
 for (const nextAction of ['raise', 'play', 'Escape'] as const) {
   test(`UX §3.4: disclosure preserves feedback; ${nextAction} clears it`, () => {

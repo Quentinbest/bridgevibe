@@ -6,6 +6,12 @@ import { completedRecord, type CompletedPlaythroughRecord } from '../table';
 import { text } from '../explanation';
 
 export type AnalysisState = { running: boolean; costs: readonly TrickCost[]; abstention?: LogEntry };
+// E-02, E-17: retain logged text, but render display and deferred moments from outcome parameters.
+export function renderCost(outcome: TrickCost): string {
+  const engine = outcome.statement.provenance;
+  if (engine.sourceKind !== 'engine') throw new Error('trick-cost-engine-required');
+  return text('review.cost-description', { cost: outcome.cost, name: engine.name, version: engine.version });
+}
 const empty: AnalysisState = { running: false, costs: [] };
 const keyOf = (record: CompletedPlaythroughRecord, engine: { name: string; version: string }) =>
   JSON.stringify([record.playthroughId, record.engineVersions, engine.name, engine.version]);
