@@ -16,7 +16,8 @@ const knownLayout: Record<string, string> = {
 // #150: the hint sheet's dismiss button is below 44 px in every locale, English included.
 const knownSmallTarget = (html: string) => html.startsWith('<button type="button">') && html.endsWith(`>${text('hint.dismiss')}</button>`);
 
-async function inspect(page: Page, screen: string) {
+// axe needs running timers, so it runs only where the clock may run (see the test).
+async function inspect(page: Page, screen: string, { axe = true } = {}) {
   // I18N-17: name what sticks out, so a failure says which element overflows.
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth ? []
     : [...document.querySelectorAll('body *')].filter(el => el.getBoundingClientRect().right > document.documentElement.clientWidth + 1)
@@ -39,34 +40,53 @@ async function inspect(page: Page, screen: string) {
     if (box && (box.width < 44 || box.height < 44) && !knownSmallTarget(html)) small.push(`${Math.round(box.width)}×${Math.round(box.height)} ${html.slice(0, 120)}`);
   }
   expect(small, screen).toEqual([]);
-  expect((await new AxeBuilder({ page }).analyze()).violations, screen).toEqual([]);
+  if (axe) expect((await new AxeBuilder({ page }).analyze()).violations, screen).toEqual([]);
 }
 
 test('I18N-17: preview landing and screens', async ({ page }, info) => {
   const id = info.project.name.startsWith('es-') ? 'es' : info.project.name.startsWith('ja-') ? 'ja' : 'en-XA';
   const tag = id === 'es' ? 'es-419' : id;
   setLocale(id, id === 'en-XA' ? pseudoLocalise(catalogue) : stubCatalogue(catalogue, id === 'es' ? 'long' : 'cjk'), tag);
+  // Review of #151: play the scripted Deal on a paused clock, as the English full-Deal tests do, so a
+  // robot deadline never fires on a slow runner and changes the line.
   await installPausedClock(page);
-  await page.goto('/');
-  await expect(page.locator('html')).toHaveAttribute('lang', tag);
-  await expect(page.getByRole('heading', { level: 1, name: text('product') })).toBeVisible();
-  await page.clock.resume(); await inspect(page, 'home');
-  await page.goto('/?lesson=follow-suit'); await inspect(page, 'lesson');
   await page.goto('/?practice=1');
+  await expect(page.locator('html')).toHaveAttribute('lang', tag);
+  await page.clock.runFor(3000);
   await page.getByRole('button', { name: text('setup.game', { target: 9 }), exact: true }).click();
   await page.getByRole('button', { name: text('setup.choose'), exact: true }).click();
-  await inspect(page, 'practice');
-  await page.getByRole('button', { name: text('hint.button'), exact: true }).click(); await inspect(page, 'hint');
-  await page.getByRole('button', { name: text('hint.dismiss'), exact: true }).click();
+  await inspect(page, 'practice', { axe: false });
+  let hinted = false;
   for (const entry of completeFixedDeal('principles').actions) {
     if (entry.controller === 'robot') await robotTurn(page);
     else {
+      // The hint is offered on the learner's turn, so open it at the first one.
+      if (!hinted) {
+        await page.getByRole('button', { name: text('hint.button'), exact: true }).click(); await inspect(page, 'hint', { axe: false });
+        await page.getByRole('button', { name: text('hint.dismiss'), exact: true }).click(); hinted = true;
+      }
       const card = cardName(entry.action.card);
       await page.getByRole('button', { name: text('card.playable', { card }), exact: true }).click();
       await page.getByRole('button', { name: text('play.card', { card }), exact: true }).click();
     }
     if (entry.index % 4 === 3) await page.clock.runFor(1000);
   }
-  await expect(page.getByRole('region', { name: text('result.title') })).toBeVisible(); await inspect(page, 'result');
+  await expect(page.getByRole('region', { name: text('result.title') })).toBeVisible();
+  // UX §10: with the Deal complete no robot timer is pending, so axe may run timers from here on.
+  await page.clock.resume();
+  await inspect(page, 'result');
   await page.getByRole('button', { name: text('result.review'), exact: true }).click(); await inspect(page, 'review');
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('lang', tag);
+  await expect(page.getByRole('heading', { level: 1, name: text('product') })).toBeVisible();
+  await inspect(page, 'home');
+  await page.goto('/?lesson=follow-suit'); await inspect(page, 'lesson');
+  // axe on the table and hint: a fresh Deal on the running clock, checked once no robot is pending. It
+  // follows no scripted line, so a robot fallback on a slow runner can't break it.
+  await page.goto('/?practice=1');
+  await page.getByRole('button', { name: text('setup.game', { target: 9 }), exact: true }).click();
+  await page.getByRole('button', { name: text('setup.choose'), exact: true }).click();
+  await expect.poll(() => page.evaluate(() => !(window as { __robotPending?: () => boolean }).__robotPending?.())).toBe(true);
+  await inspect(page, 'practice');
+  await page.getByRole('button', { name: text('hint.button'), exact: true }).click(); await inspect(page, 'hint');
 });
