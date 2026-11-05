@@ -178,3 +178,13 @@ test('North-declared lesson puts North at bottom and plays South dummy then Nort
   fireEvent.keyDown(card, { key: 'Enter' }); fireEvent.keyDown(card, { key: 'Enter' });
   expect(screen.getByRole('button', { name: 'Finish level' })).toBeTruthy();
 });
+
+// E-15: input-method composition must not trigger the H shortcut.
+test.each(['h', 'H', 'Process'])('composing %s does not open a hint; plain h does', key => {
+  openPrompt();
+  const card = screen.getByRole('button', { name: 'King of hearts' });
+  fireEvent.keyDown(card, { key, isComposing: key !== 'Process' });
+  expect(screen.queryByText('Authored hint · follow-suit.prompt · version 1')).toBeNull();
+  fireEvent.keyDown(card, { key: 'h' });
+  expect(screen.getByText('Authored hint · follow-suit.prompt · version 1')).toBeTruthy();
+});

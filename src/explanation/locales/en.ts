@@ -3,6 +3,7 @@ import type { Entry } from '../types';
 
 // CI-8: every entry awaits teacher sign-off.
 export const en = {
+  'locale.load-failed': { text: "That language couldn't load. Try again later.", status: 'draft', scope: 'learner' },
   // US-43: internal device-benchmark tool (owner-facing, internal builds only).
   'bench.title': { text: "Device benchmark (#28)", status: 'draft', scope: 'internal' },
   'bench.notice': { text: "Internal tool. Keep the screen on and this page visible. Reference phones: iPhone 16 / Safari and Google Pixel 9 / Chrome. Full runs take roughly 45 minutes per candidate, plus solver time. Download the JSON and attach it to the gate PR.", status: 'draft', scope: 'internal' },

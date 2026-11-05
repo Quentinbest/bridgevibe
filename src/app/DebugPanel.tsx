@@ -14,7 +14,7 @@ export default function DebugPanel({ play }: { play: ReturnType<typeof createPla
     link.href = url; link.download = 'bridgevibe-f5.json'; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
-  return <aside className="debug-panel" data-testid="provenance-debug-panel" aria-labelledby="provenance-title">
+  return <aside lang="en" className="debug-panel" data-testid="provenance-debug-panel" aria-labelledby="provenance-title">
     <h2 id="provenance-title">{text('debug.title')}</h2>
     <p className="debug-badge">{text('debug.internal')}</p>
     <dl className="debug-counters">

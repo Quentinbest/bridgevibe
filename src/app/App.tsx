@@ -15,6 +15,7 @@ import { dealFromUrl, dealSession } from './deals';
 import { DealControls } from './DealControls';
 import { LessonScreen } from './LessonScreen';
 import { lessonById } from '../curriculum/content';
+import { createLocaleController, type LocaleController } from './locale';
 
 // US-40.2: the constant build guard removes the entire debug import from production.
 const DebugPanel = import.meta.env.MODE === 'internal' || import.meta.env.MODE === 'audit' || import.meta.env.MODE === 'development'
@@ -191,7 +192,15 @@ function routeFromUrl() {
   return lesson ? { screen: 'lesson' as const, lesson } : { screen: params.has('seed') || params.has('deal') || params.has('practice') ? 'practice' as const : 'home' as const };
 }
 
-export function App() {
+export function App({ controller }: { controller?: LocaleController }) {
+  const [fallback] = useState(createLocaleController);
+  const locale = controller ?? fallback;
+  const { failed } = useSyncExternalStore(locale.subscribe, locale.getSnapshot);
+  // E-05: recreate the child element on updates without changing its identity or key.
+  return <><AppContent /><div role={failed ? 'status' : undefined} aria-live="polite">{failed ? text('locale.load-failed') : ''}</div></>;
+}
+
+function AppContent() {
   const [route, setRoute] = useState(routeFromUrl);
   const [dealsPlayed, setDealsPlayed] = useState(0);
   const countCompleted = useCallback(() => setDealsPlayed(count => count + 1), []);
