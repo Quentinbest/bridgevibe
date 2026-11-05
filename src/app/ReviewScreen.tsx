@@ -7,10 +7,10 @@ import type { createProvenanceLog } from '../coach/provenance';
 import { assessDecisions, keyMoments } from '../coach/decisionAssessment';
 import { KeyMoments } from './KeyMoments';
 import { ResultCard } from './ResultCard';
-import { type AnalysisState } from './analysisHost';
+import { renderCost, type AnalysisState } from './analysisHost';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { replay, exportPbn, exportRecordJson, SEATS, SUITS, type CompletedPlaythroughRecord } from '../table';
-import { cardName, text } from '../explanation';
+import { cardName, currentLocale, text } from '../explanation';
 import { Card } from './Card';
 import { reviewSetup } from './reviewSetup';
 
@@ -37,7 +37,7 @@ export function ReviewScreen({ record, onBack, analysis, onTryAgain, provenanceL
     const logged = new Set(provenanceLog.entries().map(entry => entry.id));
     for (const moment of moments) {
       const entries = momentLogEntries(moment, record.playthroughId, templateId => {
-        const rendered = templateId === 'review.cost-description' ? moment.outcome!.statement.text!
+        const rendered = templateId === 'review.cost-description' ? renderCost(moment.outcome!)
           : text(templateId, { card: moment.alternative ? cardName(moment.alternative) : '' });
         return templateId === 'moment.alternative' || templateId === 'review.cost-description'
           ? rendered : `${rendered} ${text('review.hindsight')}`;
@@ -45,7 +45,10 @@ export function ReviewScreen({ record, onBack, analysis, onTryAgain, provenanceL
       for (const entry of entries) if (!logged.has(entry.id)) { provenanceLog.record(entry); logged.add(entry.id); }
     }
   }, [moments, record.playthroughId, provenanceLog]);
-  const setup = useMemo(() => reviewSetup(record), [record]);
+  const locale = currentLocale();
+  // E-02: no rendered copy in useMemo, useState or a ref unless the locale is a dependency.
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- E-02: text() reads the active locale implicitly.
+  const setup = useMemo(() => reviewSetup(record), [record, locale]);
   const [index, setIndex] = useState(0);
   const [showHands, setShowHands] = useState(() => window.matchMedia?.('(min-width:1000px)').matches ?? false);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -83,7 +86,7 @@ export function ReviewScreen({ record, onBack, analysis, onTryAgain, provenanceL
     {analysis?.running && <p role="status" className="review-analysis-skeleton">{text('review.working')}</p>}
     {sampling && <p role="status" className="review-analysis-skeleton">{text('review.sampling')}</p>}
     {analysis?.abstention && <div className="review-unavailable">
-      <p role="status">{analysis.abstention.text}</p>
+      <p role="status">{text('review.unavailable')}</p>
       <button type="button" onClick={() => { heading.current?.focus(); onTryAgain?.(); }}>{text('review.try-again')}</button>
     </div>}
     <KeyMoments moments={moments} />
@@ -102,7 +105,7 @@ export function ReviewScreen({ record, onBack, analysis, onTryAgain, provenanceL
           const decision = decisions.find(d => d.positionIndex === badge?.positionIndex);
           return <li key={seat}><Card card={card} /><span>{text(`seat.${seat}`)}</span>
             {badge && <span className={`review-cost ${badge.cost ? 'review-cost-xray' : 'review-cost-neutral'}`}
-              role="img" aria-label={badge.statement.text}>
+              role="img" aria-label={renderCost(badge)}>
               <b>{text(badge.cost ? 'review.cost-negative' : 'review.cost-zero', { cost: badge.cost })}</b>
               <small>{text('review.hindsight')}</small>
             </span>}

@@ -118,7 +118,7 @@ test('a defending learner sees the tricks needed to defeat the contract', () => 
   const view: LearnerView = { setup: null, objective: 'game', north: null, dummySeat: 'west',
     contract: { level: 4, strain: 'spades', declarer: 'east' }, hand: [], dummy: [], positionIndex: 52, turn: null,
     tricksWon: { northSouth: 4, eastWest: 9 }, cardCounts: { north: 0, east: 0, south: 0, west: 0 }, status: 'completed',
-    legalCards: [], displayedTrick: [], collecting: false, lastTrickWinner: 'east', reason: '', reasonCode: null,
+    legalCards: [], displayedTrick: [], collecting: false, lastTrickWinner: 'east', reason: null, reasonCode: null,
     rejectionId: 0, rejectedCard: null, rejectedSeat: null, announcements: [] };
   render(<TableScreen view={view} play={() => {}} clearRejection={() => {}} invalid={false} onNew={() => {}}
     info={{ dealId: 'deal-test', origin: { kind: 'seed', seed: 'abc', index: 1, rotation: 0, algorithm: 'bv-deal-1' } }} />);

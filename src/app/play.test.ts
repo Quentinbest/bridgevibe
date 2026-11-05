@@ -1,3 +1,4 @@
+import { renderCopy } from './copy';
 import { choosePractice } from '../../test/miniBridge';
 import { fixedDeal } from './fixture';
 import { afterEach, expect, test, vi } from 'vitest';
@@ -44,12 +45,12 @@ test('composition retains reason until the next action and publishes each play a
   vi.useFakeTimers(); const play = createPlay({}, fixedDeal); const stop = play.start(); choosePractice(play);
   vi.advanceTimersByTime(500);
   play.play('north', { suit: 'hearts', rank: 'Q' });
-  expect(play.getSnapshot().reason).toBe('Not that one. You still have spades.');
+  expect(renderCopy(play.getSnapshot().reason!)).toBe('Not that one. You still have spades.');
   expect(play.getSnapshot().positionIndex).toBe(1);
   vi.advanceTimersByTime(2000);
-  expect(play.getSnapshot().reason).toBe('Not that one. You still have spades.');
+  expect(renderCopy(play.getSnapshot().reason!)).toBe('Not that one. You still have spades.');
   play.play('north', play.getSnapshot().legalCards[0]);
-  expect(play.getSnapshot().reason).toBe('');
+  expect(play.getSnapshot().reason).toBeNull();
   vi.advanceTimersByTime(500); play.play('south', play.getSnapshot().legalCards[0]);
   expect(play.getSnapshot().announcements).toEqual(['West plays the 9 of spades', 'North plays the Ace of spades', 'East plays the 3 of spades', 'South plays the King of spades']); stop();
 });

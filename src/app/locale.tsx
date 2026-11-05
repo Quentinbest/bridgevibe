@@ -1,3 +1,4 @@
+import { flushSync } from 'react-dom';
 import { catalogue, currentLanguageTag, currentLocale, setLocale, text, type Entry, type StringId } from '../explanation';
 
 // I-12: derive shipped locales from sign-off records when that ticket lands.
@@ -26,6 +27,55 @@ export function createLocaleController({ loaders = defaultLoaders, shipped = SHI
   let snapshot = { locale: currentLocale(), failed: false };
   let request = 0;
   const listeners = new Set<() => void>();
+  const liveRegions = new Map<Element, string | null>();
+  let cancelRestore: (() => void) | undefined;
+  let observer: MutationObserver | undefined;
+  function restoreLiveRegion(element: Element) {
+    const original = liveRegions.get(element);
+    liveRegions.delete(element);
+    // I18N §6.3: a result arriving during the window may change React's live-region props.
+    if (original === undefined || element.getAttribute('aria-live') !== 'off') return;
+    if (original === null) element.removeAttribute('aria-live');
+    else element.setAttribute('aria-live', original);
+  }
+  function restoreChangedRegions(mutations: MutationRecord[]) {
+    for (const element of liveRegions.keys()) {
+      if (mutations.some(mutation => element.contains(mutation.target))) restoreLiveRegion(element);
+    }
+  }
+  function muteLiveRegions() {
+    // I18N §6.3: a newer commit inherits the originals, never the temporary "off".
+    cancelRestore?.();
+    // I18N §6.3: account for new content even if its observer callback hasn't run yet.
+    const pending = observer?.takeRecords() ?? [];
+    observer?.disconnect(); observer = undefined;
+    restoreChangedRegions(pending);
+    for (const element of document.querySelectorAll('[aria-live],[role~="status"],[role~="alert"],[role~="log"]')) {
+      if (!liveRegions.has(element)) liveRegions.set(element, element.getAttribute('aria-live'));
+      element.setAttribute('aria-live', 'off');
+    }
+  }
+  function restoreLiveRegionsLater() {
+    const restore = () => {
+      observer?.disconnect(); observer = undefined;
+      for (const element of liveRegions.keys()) restoreLiveRegion(element);
+      cancelRestore = undefined;
+    };
+    if (!liveRegions.size) return;
+    // I18N §6.3: observe only after flushSync; later mutations are new content, not translation.
+    observer = new MutationObserver(restoreChangedRegions);
+    for (const element of liveRegions.keys()) observer.observe(element, {
+      childList: true, characterData: true, subtree: true, attributes: true, attributeFilter: ['aria-live'],
+    });
+    // I18N §6.3: let the browser process the muted text changes before restoring announcements.
+    if (typeof requestAnimationFrame === 'function') {
+      let frame = requestAnimationFrame(() => { frame = requestAnimationFrame(restore); });
+      cancelRestore = () => cancelAnimationFrame(frame);
+    } else {
+      const timer = setTimeout(restore, 50);
+      cancelRestore = () => clearTimeout(timer);
+    }
+  }
   function publish(locale: string, failed: boolean) {
     snapshot = { locale, failed };
     listeners.forEach(listener => listener());
@@ -42,9 +92,16 @@ export function createLocaleController({ loaders = defaultLoaders, shipped = SHI
       const loaded = tag === 'en' ? catalogue : await loaders[tag]();
       // E-03: discard older loads, including when the latest request failed.
       if (pending !== request) return;
-      setLocale(tag, loaded, LANGUAGE_TAGS[tag] ?? tag);
-      updateMetadata();
-      publish(tag, false);
+      muteLiveRegions();
+      try {
+        // I18N §6.3: unchanged aria-live props leave the pre-existing DOM regions muted.
+        // Regions mounted by this commit are new content and retain their normal announcements.
+        flushSync(() => {
+          setLocale(tag, loaded, LANGUAGE_TAGS[tag] ?? tag);
+          updateMetadata();
+          publish(tag, false);
+        });
+      } finally { restoreLiveRegionsLater(); }
     } catch (error) {
       console.warn('locale.load-failed', tag, error);
       if (pending === request) {

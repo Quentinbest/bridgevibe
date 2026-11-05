@@ -1,4 +1,5 @@
 import type { Card, ReasonCode } from '../table';
+import { versionOf } from './catalogueVersion';
 
 import { formatMessage, list as formatList, number as formatNumber } from './format';
 
@@ -19,6 +20,7 @@ export function setLocale(id: string, catalogue: Partial<Record<StringId, Entry>
 }
 export function currentLocale(): string { return active.locale; }
 export function currentLanguageTag(): string { return active.languageTag; }
+export function catalogueVersion(): string { return versionOf(active.catalogue); }
 export function text(id: StringId, params: Readonly<Record<string, string | number>> = {}): string {
   const english = en[id];
   // I18N-08, I18N-11.2: internal and missing translations use English formatting too.

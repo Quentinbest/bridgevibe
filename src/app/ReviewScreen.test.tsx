@@ -150,7 +150,7 @@ test('US-16.2: setup offsets never shift trick-cost badges or trick buttons', ()
   const costs = [0, 3, 4, 51].map(positionIndex => ({ positionIndex, cost: positionIndex + 1, statement: {
     id: `cost-${positionIndex}`, playthroughId: record.playthroughId, positionIndex, kind: 'statement' as const,
     summary: 'test cost', text: `Cost at action ${positionIndex}`, informationMode: 'ALL_HANDS' as const,
-    provenance: { sourceKind: 'template' as const, templateId: 'review.cost-description' }, at: new Date().toISOString(),
+    provenance: { sourceKind: 'engine' as const, name: 'test', version: '1', mode: 'ALL_HANDS' as const, sampleCount: 0 }, at: new Date().toISOString(),
   } }));
   render(<ReviewScreen record={record} onBack={() => {}} analysis={{ running: false, costs }} />);
   const strip = within(document.querySelector('.review-strip') as HTMLElement);
@@ -159,7 +159,7 @@ test('US-16.2: setup offsets never shift trick-cost badges or trick buttons', ()
     fireEvent.click(strip.getByRole('button', { name: `Trick ${trick}`, hidden: true }));
     expect(screen.getByRole('heading', { name: `Trick ${trick} of 13` })).toBeTruthy();
     expect(Array.from(document.querySelectorAll('.review-cost')).map(badge => badge.getAttribute('aria-label')))
-      .toEqual(positions.map(position => `Cost at action ${position}`));
+      .toEqual(positions.map(position => text('review.cost-description', { cost: position + 1, name: 'test', version: '1' })));
   }
   expect(screen.getByRole('button', { name: 'Next trick' }).hasAttribute('disabled')).toBe(true);
 });

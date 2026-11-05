@@ -1,3 +1,4 @@
+import { renderCopy } from './copy';
 import { ResultCard } from './ResultCard';
 import { Home } from './Home';
 import HintSheet from './HintSheet';
@@ -108,7 +109,7 @@ export function TableScreen({ view, play, clearRejection, info, invalid, onNew, 
             ? text('result.defending', { won: view.tricksWon.northSouth, target: 14 - target })
             : text('result', { won: view.tricksWon.northSouth, target })) : banner}</p>
           <div className="rejection-panel" data-visible={!!view.reason}>
-            <p className="reason" aria-live="assertive" aria-atomic="true">{view.reason}</p>
+            <p className="reason" aria-live="assertive" aria-atomic="true">{view.reason && renderCopy(view.reason)}</p>
             {view.reasonCode && <>
               <button ref={disclosureRef} type="button" className="rule-disclosure" aria-expanded={ruleOpen} aria-controls="rule-reference"
                 onClick={() => { if (!ruleOpen) onShowRule?.(); setRuleOpen(open => !open); }}>{text('rule.why')}</button>
