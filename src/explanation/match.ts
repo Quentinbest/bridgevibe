@@ -9,6 +9,11 @@ export function matchLocale(preferences: readonly string[], shipped: readonly st
   for (const preference of preferences) {
     const locale = expanded(preference);
     if (!locale) continue;
+    const exact = candidates.find(candidate => {
+      try { return Intl.getCanonicalLocales(candidate.tag)[0] === Intl.getCanonicalLocales(preference)[0]; }
+      catch { return false; }
+    });
+    if (exact) return exact.tag;
     const match = candidates.find(candidate => candidate.locale?.language === locale.language && candidate.locale.script === locale.script);
     if (match) return match.tag;
   }

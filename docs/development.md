@@ -853,3 +853,7 @@ README to `docs/reports/t5/` by default, without drafter expectations. Both teac
 grades and resolution notes are blank. Results distinguish `rule`, `not-covered`,
 `no-provenance` and candidate `not-run` with a reason; pons requires a BBA-free build
 manifest (LR-3, T3). This offline tool cannot be imported from `src/` and is not shipped.
+
+## Locales
+
+In development, set the browser's preferred language to `en-XA`, `es` or `ja`, or use a browser locale override and reload. The locale Playwright projects check device-language landing, layout and accessibility using preview catalogues. These stubs disappear as real catalogues ship; production includes English only.
