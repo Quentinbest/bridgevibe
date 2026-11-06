@@ -27,3 +27,7 @@ test('device preferences use languages, then language, then an empty list', () =
   expect(devicePreferences({})).toEqual([]);
   expect(devicePreferences({ languages: [], language: '' })).toEqual([]);
 });
+test('I18N-23: exact pseudo tag wins without capturing ordinary English', () => {
+  expect(matchLocale(['en-XA'], ['en', 'en-XA'])).toBe('en-XA');
+  expect(matchLocale(['en-US'], ['en', 'en-XA'])).toBe('en');
+});

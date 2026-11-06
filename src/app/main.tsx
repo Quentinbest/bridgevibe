@@ -10,12 +10,12 @@ import './tokens.css';
 import './styles.css';
 import { devicePreferences, matchLocale } from '../explanation/match';
 import { App } from './App';
-import { createLocaleController, SHIPPED_LOCALES } from './locale';
+import { createLocaleController, ELIGIBLE_LOCALES } from './locale';
 
 async function boot() {
   const controller = createLocaleController();
   // E-03: commit the catalogue and title before the first learner-facing render.
-  await controller.boot(matchLocale(devicePreferences(navigator), SHIPPED_LOCALES));
+  await controller.boot(matchLocale(devicePreferences(navigator), ELIGIBLE_LOCALES));
   ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><App controller={controller} /></React.StrictMode>);
 }
 void boot();

@@ -7,6 +7,9 @@ export const SHIPPED_LOCALES = ['en'] as const;
 const LANGUAGE_TAGS: Readonly<Partial<Record<string, string>>> = { 'zh-Hant': 'zh-Hant-TW', es: 'es-419' };
 type LocaleCatalogue = Partial<Record<StringId, Entry>>;
 type Loaders = Record<string, () => Promise<LocaleCatalogue>>;
+const preview = import.meta.env.MODE === 'development' || import.meta.env.MODE === 'audit' || import.meta.env.MODE === 'internal';
+export const ELIGIBLE_LOCALES: readonly string[] = preview ? [...SHIPPED_LOCALES, 'en-XA', 'es', 'ja'] : SHIPPED_LOCALES;
+const previewLoaders: Loaders = preview ? Object.fromEntries(['en-XA', 'es', 'ja'].map(tag => [tag, async () => (await import('./previewLocales')).previewCatalogue(tag)])) : {};
 // I18N-21: English stays eager; each other catalogue is a separate lazy chunk.
 const modules = import.meta.glob<Record<string, LocaleCatalogue>>([
   '../explanation/locales/*.ts', '!../explanation/locales/en.ts',
@@ -21,7 +24,7 @@ const defaultLoaders: Loaders = Object.fromEntries(Object.entries(modules).map((
   }];
 }));
 
-export function createLocaleController({ loaders = defaultLoaders, shipped = SHIPPED_LOCALES }: {
+export function createLocaleController({ loaders = { ...defaultLoaders, ...previewLoaders }, shipped = ELIGIBLE_LOCALES }: {
   loaders?: Loaders; shipped?: readonly string[];
 } = {}) {
   let snapshot = { locale: currentLocale(), failed: false };
