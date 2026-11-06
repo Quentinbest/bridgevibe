@@ -202,6 +202,19 @@ test('E-03: a CJK switch waits for its fonts and commits anyway after 3 s', asyn
   await vi.advanceTimersByTimeAsync(200);
   await switching;
   expect(currentLocale()).toBe('ja');
+  // Review of #153: a font module whose own import stalls is inside the 3 s budget too.
+  const stalled = createLocaleController({ loaders, shipped: ['en', 'ja'], fonts: { ja: () => deferred<{ ready?: () => Promise<unknown> }>().promise } });
+  await stalled.switchTo('en');
+  const stalledSwitch = stalled.switchTo('ja');
+  await vi.advanceTimersByTimeAsync(2900);
+  expect(currentLocale()).toBe('en');
+  await vi.advanceTimersByTimeAsync(200);
+  await stalledSwitch;
+  expect(currentLocale()).toBe('ja');
+  // A font module that fails to load doesn't fail the switch.
+  const failing = createLocaleController({ loaders, shipped: ['en', 'ja'], fonts: { ja: () => Promise.reject(new Error('font chunk')) } });
+  await failing.switchTo('en'); await failing.switchTo('ja');
+  expect(failing.getSnapshot()).toEqual({ locale: 'ja', failed: false });
   // Fonts that arrive in time commit at once.
   const quick = createLocaleController({ loaders, shipped: ['en', 'ja'], fonts: { ja: async () => ({ ready: async () => [] }) } });
   await quick.switchTo('en'); await quick.switchTo('ja');

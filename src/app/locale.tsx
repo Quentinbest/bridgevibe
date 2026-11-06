@@ -98,15 +98,18 @@ export function createLocaleController({ loaders = { ...defaultLoaders, ...previ
     const pending = ++request;
     try {
       if (!shipped.includes(tag)) throw new Error(`locale-unshipped:${tag}`);
-      // I18N-21: the catalogue and its font CSS load together, each as its own lazy chunk.
-      const [loaded, localeFonts] = await Promise.all([tag === 'en' ? catalogue : loaders[tag](), fonts[tag]?.()]);
-      if (localeFonts?.ready) {
-        // E-03: wait for the trimmed face, but commit after 3 s anyway; the system fallback is acceptable.
-        let timer: ReturnType<typeof setTimeout> | undefined;
-        try { await Promise.race([localeFonts.ready(), new Promise<void>(resolve => { timer = setTimeout(resolve, 3000); })]); }
-        catch { /* E-03: as above. */ }
-        finally { clearTimeout(timer); }
-      }
+      // I18N-21, E-03: the catalogue and the font load in parallel, each as its own lazy chunk. The whole
+      // font operation (its module, then its faces) gets 3 s; after that, or if it fails, the switch
+      // commits on the system fallback, so a stalled font request never blocks boot or a switch.
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const loadFonts = fonts[tag];
+      const fontsReady = loadFonts && Promise.race([
+        loadFonts().then(module => module.ready?.()).catch(() => undefined),
+        new Promise<void>(resolve => { timer = setTimeout(resolve, 3000); }),
+      ]);
+      let loaded: LocaleCatalogue;
+      try { loaded = tag === 'en' ? catalogue : await loaders[tag](); await fontsReady; }
+      finally { clearTimeout(timer); }
       // E-03: discard older loads, including when the latest request failed.
       if (pending !== request) return;
       muteLiveRegions();
