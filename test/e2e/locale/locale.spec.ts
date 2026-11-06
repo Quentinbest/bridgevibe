@@ -53,8 +53,10 @@ test('I18N-17: preview landing and screens', async ({ page }, info) => {
   await page.goto('/?practice=1');
   await expect(page.locator('html')).toHaveAttribute('lang', tag);
   if (id === 'ja') {
-    // I18N-16.2 (approximated): boot waited for the trimmed face, so it is loaded, not the fallback.
-    expect(await page.evaluate(() => document.fonts.check('1em "BridgeVibe Sans JP"'))).toBe(true);
+    // I18N-16.2 (approximated): boot waited for the trimmed faces, so both are registered and loaded, not
+    // the fallback. (document.fonts.check() alone passes when no such face exists, as the #153 review found.)
+    expect(await page.evaluate(() => [...document.fonts].filter(face => face.family.replace(/"/g, '') === 'BridgeVibe Sans JP' && face.status === 'loaded')
+      .map(face => face.weight).sort())).toEqual(['400', '600']);
     // I18N-16.3: the shipped notice names the trimmed font as a Modified Version of its IBM source.
     expect(await page.evaluate(() => fetch('/NOTICE.txt').then(response => response.text())))
       .toContain('BridgeVibe Sans JP: Modified Version of IBM Plex Sans JP 3.0.0');

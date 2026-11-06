@@ -69,9 +69,10 @@ export function localeFonts(): Plugin {
     configResolved(value) { config = value; command = value.command; },
     configureServer(server) {
       server.middlewares.use('/__locale-fonts/', (req, res, next) => {
-        const bytes = memory.get((req.url ?? '').split('?')[0].slice(1));
+        const name = (req.url ?? '').split('?')[0].slice(1);
+        const bytes = memory.get(name);
         if (!bytes) return next();
-        res.setHeader('Content-Type', 'font/woff2'); res.end(bytes);
+        res.setHeader('Content-Type', name.endsWith('.css') ? 'text/css' : 'font/woff2'); res.end(bytes);
       });
     },
     async buildStart() {
@@ -85,7 +86,7 @@ export function localeFonts(): Plugin {
           const catalogue = existsSync(file) ? Object.values(await loader.ssrLoadModule(`/src/explanation/locales/${tag}.ts`))[0] : (await loader.ssrLoadModule('/src/app/previewLocales.ts')).previewCatalogue(tag);
           const { text, keys } = characters(catalogue as Record<string, Entry>, tag, latinRanges(config.root));
           const family = families[tag];
-          const urls: string[] = [];
+          const faces: string[] = [];
           for (const weight of ['Regular', 'SemiBold'] as const) {
             const { sourcePath, absolute } = fontSource(config.root, family, weight);
             const bytes = readFileSync(absolute);
@@ -99,15 +100,25 @@ export function localeFonts(): Plugin {
               trimmed = result.woff2; mkdirSync(path.dirname(cache), { recursive: true }); writeFileSync(cache, trimmed);
             }
             validateFont([], trimmed, keys);
-            if (command === 'build') {
-              const ref = this.emitFile({ type: 'asset', name: `BridgeVibeSans${family}-${weight}.woff2`, originalFileName: sourcePath, source: trimmed });
-              urls.push(`import.meta.ROLLUP_FILE_URL_${ref}`);
-            } else { memory.set(`${hash}.woff2`, trimmed); urls.push(JSON.stringify(`${config.base}__locale-fonts/${hash}.woff2`)); }
+            // §6.6: a content-hashed name of our own, so the stylesheet beside it can reference it relatively.
+            const name = `BridgeVibeSans${family}-${weight}-${createHash('sha256').update(trimmed).digest('hex').slice(0, 8)}.woff2`;
+            if (command === 'build') this.emitFile({ type: 'asset', fileName: `${config.build.assetsDir}/${name}`, originalFileName: sourcePath, source: trimmed });
+            else memory.set(name, trimmed);
+            faces.push(`@font-face{font-family:"BridgeVibe Sans ${family}";src:url("./${name}") format("woff2");font-weight:${weight === 'Regular' ? 400 : 600};font-display:swap}`);
           }
-          const css = urls.map((url, i) => `@font-face{font-family:"BridgeVibe Sans ${family}";src:url("' + ${url} + '") format("woff2");font-weight:${i ? 600 : 400};font-display:swap}`).join('');
-          // E-03: the module also says how to wait for its own face, so app code never names a font.
-          ids.set(tag, `const style=document.createElement('style');style.textContent='${css}';document.head.appendChild(style);`
-            + `export function ready(){return document.fonts?Promise.all([400,600].map(weight=>document.fonts.load(weight+' 1em "BridgeVibe Sans ${family}"'))):Promise.resolve();}`);
+          // Review of #153: the CSP allows same-origin stylesheets (style-src 'self'), not inline <style>,
+          // so the @font-face rules ship as their own file in the locale's lazy chunk.
+          const css = faces.join('\n');
+          const sheet = `locale-fonts-${tag}-${createHash('sha256').update(css).digest('hex').slice(0, 8)}.css`;
+          let href: string;
+          // LR-5: generated like the locale-fonts module, whose virtual id is under src/app, so first-party.
+          if (command === 'build') href = `import.meta.ROLLUP_FILE_URL_${this.emitFile({ type: 'asset', fileName: `${config.build.assetsDir}/${sheet}`, originalFileName: `src/app/locale-fonts-${tag}.css`, source: css })}`;
+          else { memory.set(sheet, Buffer.from(css)); href = JSON.stringify(`${config.base}__locale-fonts/${sheet}`); }
+          // E-03: the module also says how to wait for its own face, so app code never names a font. A face
+          // only exists once its stylesheet has loaded, so ready() waits for the sheet first.
+          ids.set(tag, `const link=document.createElement('link');link.rel='stylesheet';link.href=${href};`
+            + `const sheet=new Promise(resolve=>{link.onload=resolve;link.onerror=resolve;});document.head.appendChild(link);`
+            + `export function ready(){return sheet.then(()=>document.fonts?Promise.all([400,600].map(weight=>document.fonts.load(weight+' 1em "BridgeVibe Sans ${family}"'))):undefined);}`);
         }
       } finally { await loader.close(); }
     },
