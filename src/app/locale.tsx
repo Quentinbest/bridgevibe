@@ -14,6 +14,12 @@ const previewLoaders: Loaders = preview ? Object.fromEntries(['en-XA', 'es', 'ja
 const modules = import.meta.glob<Record<string, LocaleCatalogue>>([
   '../explanation/locales/*.ts', '!../explanation/locales/en.ts',
 ]);
+type LocaleFonts = { ready?: () => Promise<unknown> };
+const fontLoaders: Record<string, () => Promise<LocaleFonts>> = {
+  'zh-Hans': () => import('virtual:locale-fonts/zh-Hans'),
+  'zh-Hant': () => import('virtual:locale-fonts/zh-Hant'),
+  ja: () => import('virtual:locale-fonts/ja'),
+};
 const defaultLoaders: Loaders = Object.fromEntries(Object.entries(modules).map(([path, load]) => {
   const tag = path.slice(path.lastIndexOf('/') + 1, -3);
   return [tag, async () => {
@@ -24,8 +30,8 @@ const defaultLoaders: Loaders = Object.fromEntries(Object.entries(modules).map((
   }];
 }));
 
-export function createLocaleController({ loaders = { ...defaultLoaders, ...previewLoaders }, shipped = ELIGIBLE_LOCALES }: {
-  loaders?: Loaders; shipped?: readonly string[];
+export function createLocaleController({ loaders = { ...defaultLoaders, ...previewLoaders }, shipped = ELIGIBLE_LOCALES, fonts = fontLoaders }: {
+  loaders?: Loaders; shipped?: readonly string[]; fonts?: Record<string, () => Promise<LocaleFonts>>;
 } = {}) {
   let snapshot = { locale: currentLocale(), failed: false };
   let request = 0;
@@ -92,7 +98,15 @@ export function createLocaleController({ loaders = { ...defaultLoaders, ...previ
     const pending = ++request;
     try {
       if (!shipped.includes(tag)) throw new Error(`locale-unshipped:${tag}`);
-      const loaded = tag === 'en' ? catalogue : await loaders[tag]();
+      // I18N-21: the catalogue and its font CSS load together, each as its own lazy chunk.
+      const [loaded, localeFonts] = await Promise.all([tag === 'en' ? catalogue : loaders[tag](), fonts[tag]?.()]);
+      if (localeFonts?.ready) {
+        // E-03: wait for the trimmed face, but commit after 3 s anyway; the system fallback is acceptable.
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        try { await Promise.race([localeFonts.ready(), new Promise<void>(resolve => { timer = setTimeout(resolve, 3000); })]); }
+        catch { /* E-03: as above. */ }
+        finally { clearTimeout(timer); }
+      }
       // E-03: discard older loads, including when the latest request failed.
       if (pending !== request) return;
       muteLiveRegions();

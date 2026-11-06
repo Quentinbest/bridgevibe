@@ -52,6 +52,13 @@ test('I18N-17: preview landing and screens', async ({ page }, info) => {
   await installPausedClock(page);
   await page.goto('/?practice=1');
   await expect(page.locator('html')).toHaveAttribute('lang', tag);
+  if (id === 'ja') {
+    // I18N-16.2 (approximated): boot waited for the trimmed face, so it is loaded, not the fallback.
+    expect(await page.evaluate(() => document.fonts.check('1em "BridgeVibe Sans JP"'))).toBe(true);
+    // I18N-16.3: the shipped notice names the trimmed font as a Modified Version of its IBM source.
+    expect(await page.evaluate(() => fetch('/NOTICE.txt').then(response => response.text())))
+      .toContain('BridgeVibe Sans JP: Modified Version of IBM Plex Sans JP 3.0.0');
+  }
   await page.clock.runFor(3000);
   await page.getByRole('button', { name: text('setup.game', { target: 9 }), exact: true }).click();
   await page.getByRole('button', { name: text('setup.choose'), exact: true }).click();

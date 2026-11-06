@@ -188,3 +188,22 @@ test('E-03, I18N-04: a failed boot renders English with English metadata and fai
   expect(controller.getSnapshot()).toEqual({ locale: 'en', failed: true });
   expect(warn).toHaveBeenCalledOnce();
 });
+
+// E-03, I18N-16: a CJK switch waits for its trimmed font, but never blocks on it.
+test('E-03: a CJK switch waits for its fonts and commits anyway after 3 s', async () => {
+  vi.useFakeTimers();
+  const ready = vi.fn(() => deferred<unknown>().promise);
+  const loaders = { ja: async () => ({ product: { ...catalogue.product, text: 'ブリッジ' } }) };
+  const controller = createLocaleController({ loaders, shipped: ['en', 'ja'], fonts: { ja: async () => ({ ready }) } });
+  const switching = controller.switchTo('ja');
+  await vi.advanceTimersByTimeAsync(2900);
+  expect(ready).toHaveBeenCalledOnce();
+  expect(currentLocale()).toBe('en');
+  await vi.advanceTimersByTimeAsync(200);
+  await switching;
+  expect(currentLocale()).toBe('ja');
+  // Fonts that arrive in time commit at once.
+  const quick = createLocaleController({ loaders, shipped: ['en', 'ja'], fonts: { ja: async () => ({ ready: async () => [] }) } });
+  await quick.switchTo('en'); await quick.switchTo('ja');
+  expect(currentLocale()).toBe('ja');
+});

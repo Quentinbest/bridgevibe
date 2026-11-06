@@ -29,8 +29,12 @@ export function pseudoLocalise(catalogue: Entries): Record<string, Entry> {
   }), 0.4), true);
 }
 export function stubCatalogue(catalogue: Entries, kind: 'long' | 'cjk'): Record<string, Entry> {
-  return convert(catalogue, text => kind === 'long' ? pad(text, 0.3) : text.replace(/[A-Za-z0-9]/g, character => {
+  const result = convert(catalogue, text => kind === 'long' ? pad(text, 0.3) : text.replace(/[A-Za-z0-9]/g, character => {
     const samples = 'あいうえおかきくけこさしすせそたちつてとなにぬねの橋牌学習';
     return samples[character.toLowerCase().charCodeAt(0) % samples.length];
   }));
+  if (kind === 'cjk') for (const key of Object.keys(result)) {
+    if (key.startsWith('face.') || key.startsWith('symbol.')) result[key] = catalogue[key];
+  }
+  return result;
 }
