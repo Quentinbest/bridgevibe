@@ -13,8 +13,6 @@ const knownLayout: Record<string, string> = {
   'en-XA-320': '#149: unbreakable text widens the Home and lesson cards and clips the practice Exit label',
   'ja-390': '#149: the deal controls do not wrap',
 };
-// #150: the hint sheet's dismiss button is below 44 px in every locale, English included.
-const knownSmallTarget = (html: string) => html.startsWith('<button type="button">') && html.endsWith(`>${text('hint.dismiss')}</button>`);
 
 // axe needs running timers, so it runs only where the clock may run (see the test).
 async function inspect(page: Page, screen: string, { axe = true } = {}) {
@@ -37,7 +35,7 @@ async function inspect(page: Page, screen: string, { axe = true } = {}) {
     const label = target.locator('xpath=ancestor::label[1]');
     const box = await ((await label.count()) ? label : target).boundingBox();
     const html = await target.evaluate(el => el.outerHTML);
-    if (box && (box.width < 44 || box.height < 44) && !knownSmallTarget(html)) small.push(`${Math.round(box.width)}×${Math.round(box.height)} ${html.slice(0, 120)}`);
+    if (box && (box.width < 44 || box.height < 44)) small.push(`${Math.round(box.width)}×${Math.round(box.height)} ${html.slice(0, 120)}`);
   }
   expect(small, screen).toEqual([]);
   if (axe) expect((await new AxeBuilder({ page }).analyze()).violations, screen).toEqual([]);
