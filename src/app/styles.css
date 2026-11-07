@@ -70,7 +70,7 @@ main { max-width: 1164px; margin: auto; padding: var(--space-16) var(--space-32)
 .played-right { top: calc(50% - 32px); right: 4px; }
 .played-bottom { bottom: 4px; left: calc(50% - 22px); }
 .led { position: absolute; bottom: -15px; left: 0; border-radius: 4px; padding: 1px 4px; background: var(--card-face); color: var(--suit-black); font: 600 var(--type-11) var(--font-mono); }
-button.card { position: relative; cursor: pointer; font-family: inherit; }
+button.card { position: relative; cursor: pointer; font-family: var(--font-suit); }
 .card[data-selected="true"] { transform: translateY(-12px); }
 .card:focus-visible { outline: 3px solid var(--felt-text); outline-offset: 2px; }
 .turn-banner { margin-bottom: var(--space-4); font-weight: 600; }
@@ -399,3 +399,9 @@ button.card { position: relative; cursor: pointer; font-family: inherit; }
 .moment-hindsight, .moment-outcome { color: var(--muted); font-size: var(--type-13); }
 .review-quality { font-size: var(--type-11); overflow-wrap: anywhere; }
 .review-strip button[data-key-moment]::after { content: '◆'; display: block; color: var(--accent-text); }
+
+/* I18N-16: preserve card glyphs and CJK spacing. */
+.card { font-family: var(--font-suit); }
+:root:is(:lang(zh-Hans), :lang(zh-Hant), :lang(ja)) { font-synthesis-weight: none; }
+:root:is(:lang(zh-Hans), :lang(zh-Hant), :lang(ja)) body { line-height: 1.7; }
+:root:is(:lang(zh-Hans), :lang(zh-Hant), :lang(ja)) :is(h1, h2, h3, .lesson-counts dd, .rejection-panel .reason) { line-height: 1.3; letter-spacing: 0; }

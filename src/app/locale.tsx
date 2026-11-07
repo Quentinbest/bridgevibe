@@ -14,6 +14,12 @@ const previewLoaders: Loaders = preview ? Object.fromEntries(['en-XA', 'es', 'ja
 const modules = import.meta.glob<Record<string, LocaleCatalogue>>([
   '../explanation/locales/*.ts', '!../explanation/locales/en.ts',
 ]);
+type LocaleFonts = { ready?: () => Promise<unknown> };
+const fontLoaders: Record<string, () => Promise<LocaleFonts>> = {
+  'zh-Hans': () => import('virtual:locale-fonts/zh-Hans'),
+  'zh-Hant': () => import('virtual:locale-fonts/zh-Hant'),
+  ja: () => import('virtual:locale-fonts/ja'),
+};
 const defaultLoaders: Loaders = Object.fromEntries(Object.entries(modules).map(([path, load]) => {
   const tag = path.slice(path.lastIndexOf('/') + 1, -3);
   return [tag, async () => {
@@ -24,8 +30,8 @@ const defaultLoaders: Loaders = Object.fromEntries(Object.entries(modules).map((
   }];
 }));
 
-export function createLocaleController({ loaders = { ...defaultLoaders, ...previewLoaders }, shipped = ELIGIBLE_LOCALES }: {
-  loaders?: Loaders; shipped?: readonly string[];
+export function createLocaleController({ loaders = { ...defaultLoaders, ...previewLoaders }, shipped = ELIGIBLE_LOCALES, fonts = fontLoaders }: {
+  loaders?: Loaders; shipped?: readonly string[]; fonts?: Record<string, () => Promise<LocaleFonts>>;
 } = {}) {
   let snapshot = { locale: currentLocale(), failed: false };
   let request = 0;
@@ -92,7 +98,18 @@ export function createLocaleController({ loaders = { ...defaultLoaders, ...previ
     const pending = ++request;
     try {
       if (!shipped.includes(tag)) throw new Error(`locale-unshipped:${tag}`);
-      const loaded = tag === 'en' ? catalogue : await loaders[tag]();
+      // I18N-21, E-03: the catalogue and the font load in parallel, each as its own lazy chunk. The whole
+      // font operation (its module, then its faces) gets 3 s; after that, or if it fails, the switch
+      // commits on the system fallback, so a stalled font request never blocks boot or a switch.
+      let timer: ReturnType<typeof setTimeout> | undefined;
+      const loadFonts = fonts[tag];
+      const fontsReady = loadFonts && Promise.race([
+        loadFonts().then(module => module.ready?.()).catch(() => undefined),
+        new Promise<void>(resolve => { timer = setTimeout(resolve, 3000); }),
+      ]);
+      let loaded: LocaleCatalogue;
+      try { loaded = tag === 'en' ? catalogue : await loaders[tag](); await fontsReady; }
+      finally { clearTimeout(timer); }
       // E-03: discard older loads, including when the latest request failed.
       if (pending !== request) return;
       muteLiveRegions();

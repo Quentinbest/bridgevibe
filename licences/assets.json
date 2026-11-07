@@ -23,5 +23,50 @@
     "licenceFile": "src/analysis/dds31/LICENSE",
     "licence": "Apache-2.0",
     "attribution": "dds-bridge/dds v3.1.0 fe6a6581a13535779eda5d9141aa704b3f6c8965; emscripten 5.0.7; single-threaded."
+  },
+  "public/licences/fonts/ibm-plex-sans-sc-LICENSE.txt": {
+    "licenceFile": "public/licences/fonts/ibm-plex-sans-sc-LICENSE.txt",
+    "licence": "OFL-1.1",
+    "attribution": "IBM Plex Sans SC font licence notice"
+  },
+  ".font-sources/plex-sans-sc-1.1.0/IBMPlexSansSC-Regular.woff2": {
+    "licenceFile": "public/licences/fonts/ibm-plex-sans-sc-LICENSE.txt",
+    "licence": "OFL-1.1",
+    "attribution": "BridgeVibe Sans SC: Modified Version of IBM Plex Sans SC 1.1.0, © IBM Corp., OFL-1.1"
+  },
+  ".font-sources/plex-sans-sc-1.1.0/IBMPlexSansSC-SemiBold.woff2": {
+    "licenceFile": "public/licences/fonts/ibm-plex-sans-sc-LICENSE.txt",
+    "licence": "OFL-1.1",
+    "attribution": "BridgeVibe Sans SC: Modified Version of IBM Plex Sans SC 1.1.0, © IBM Corp., OFL-1.1"
+  },
+  "public/licences/fonts/ibm-plex-sans-tc-LICENSE.txt": {
+    "licenceFile": "public/licences/fonts/ibm-plex-sans-tc-LICENSE.txt",
+    "licence": "OFL-1.1",
+    "attribution": "IBM Plex Sans TC font licence notice"
+  },
+  ".font-sources/plex-sans-tc-1.1.1/IBMPlexSansTC-Regular.woff2": {
+    "licenceFile": "public/licences/fonts/ibm-plex-sans-tc-LICENSE.txt",
+    "licence": "OFL-1.1",
+    "attribution": "BridgeVibe Sans TC: Modified Version of IBM Plex Sans TC 1.1.1, © IBM Corp., OFL-1.1"
+  },
+  ".font-sources/plex-sans-tc-1.1.1/IBMPlexSansTC-SemiBold.woff2": {
+    "licenceFile": "public/licences/fonts/ibm-plex-sans-tc-LICENSE.txt",
+    "licence": "OFL-1.1",
+    "attribution": "BridgeVibe Sans TC: Modified Version of IBM Plex Sans TC 1.1.1, © IBM Corp., OFL-1.1"
+  },
+  "public/licences/fonts/ibm-plex-sans-jp-LICENSE.txt": {
+    "licenceFile": "public/licences/fonts/ibm-plex-sans-jp-LICENSE.txt",
+    "licence": "OFL-1.1",
+    "attribution": "IBM Plex Sans JP font licence notice"
+  },
+  ".font-sources/plex-sans-jp-3.0.0/IBMPlexSansJP-Regular.woff2": {
+    "licenceFile": "public/licences/fonts/ibm-plex-sans-jp-LICENSE.txt",
+    "licence": "OFL-1.1",
+    "attribution": "BridgeVibe Sans JP: Modified Version of IBM Plex Sans JP 3.0.0, © IBM Corp., OFL-1.1"
+  },
+  ".font-sources/plex-sans-jp-3.0.0/IBMPlexSansJP-SemiBold.woff2": {
+    "licenceFile": "public/licences/fonts/ibm-plex-sans-jp-LICENSE.txt",
+    "licence": "OFL-1.1",
+    "attribution": "BridgeVibe Sans JP: Modified Version of IBM Plex Sans JP 3.0.0, © IBM Corp., OFL-1.1"
   }
 }
