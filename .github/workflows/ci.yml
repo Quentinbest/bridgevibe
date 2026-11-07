@@ -15,6 +15,11 @@ jobs:
       - run: npm run lint
       - run: npm run deps:check
       - run: npm run content:check
+      - uses: actions/cache@v4
+        with:
+          path: .font-sources/
+          key: fonts-${{ hashFiles('scripts/fonts/sources.json') }}
+      - run: npm run fonts:fetch
       - run: npm test
       - run: npm run test:browser
       - run: npm run build

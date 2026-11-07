@@ -12,6 +12,7 @@
   --suit-orange: #AD5200;
   --suit-green: #1E7A3E;
   --font-body: 'IBM Plex Sans', sans-serif;
+  --font-suit: 'IBM Plex Sans', sans-serif;
   --font-display: 'Bricolage Grotesque', sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
   --radius-6: 6px;
@@ -102,4 +103,22 @@
   --accent-soft: var(--dark-accent-soft);
   --accent-soft-text: var(--dark-accent-soft-text);
   color-scheme: dark;
+}
+
+:root:lang(zh-Hans) {
+  --font-body: 'BridgeVibe Sans SC', 'IBM Plex Sans', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  --font-display: 'Bricolage Grotesque', 'BridgeVibe Sans SC', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'BridgeVibe Sans SC', 'PingFang SC', 'Noto Sans CJK SC', monospace;
+}
+
+:root:lang(zh-Hant) {
+  --font-body: 'BridgeVibe Sans TC', 'IBM Plex Sans', 'PingFang TC', 'Noto Sans CJK TC', 'Microsoft JhengHei', sans-serif;
+  --font-display: 'Bricolage Grotesque', 'BridgeVibe Sans TC', 'PingFang TC', 'Noto Sans CJK TC', 'Microsoft JhengHei', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'BridgeVibe Sans TC', 'PingFang TC', 'Noto Sans CJK TC', monospace;
+}
+
+:root:lang(ja) {
+  --font-body: 'BridgeVibe Sans JP', 'IBM Plex Sans', 'Hiragino Sans', 'Noto Sans CJK JP', 'Yu Gothic', 'Meiryo', sans-serif;
+  --font-display: 'Bricolage Grotesque', 'BridgeVibe Sans JP', 'Hiragino Sans', 'Noto Sans CJK JP', 'Yu Gothic', 'Meiryo', sans-serif;
+  --font-mono: 'IBM Plex Mono', 'BridgeVibe Sans JP', 'Hiragino Sans', 'Noto Sans CJK JP', 'Yu Gothic', 'Meiryo', monospace;
 }

@@ -188,3 +188,35 @@ test('E-03, I18N-04: a failed boot renders English with English metadata and fai
   expect(controller.getSnapshot()).toEqual({ locale: 'en', failed: true });
   expect(warn).toHaveBeenCalledOnce();
 });
+
+// E-03, I18N-16: a CJK switch waits for its trimmed font, but never blocks on it.
+test('E-03: a CJK switch waits for its fonts and commits anyway after 3 s', async () => {
+  vi.useFakeTimers();
+  const ready = vi.fn(() => deferred<unknown>().promise);
+  const loaders = { ja: async () => ({ product: { ...catalogue.product, text: 'ブリッジ' } }) };
+  const controller = createLocaleController({ loaders, shipped: ['en', 'ja'], fonts: { ja: async () => ({ ready }) } });
+  const switching = controller.switchTo('ja');
+  await vi.advanceTimersByTimeAsync(2900);
+  expect(ready).toHaveBeenCalledOnce();
+  expect(currentLocale()).toBe('en');
+  await vi.advanceTimersByTimeAsync(200);
+  await switching;
+  expect(currentLocale()).toBe('ja');
+  // Review of #153: a font module whose own import stalls is inside the 3 s budget too.
+  const stalled = createLocaleController({ loaders, shipped: ['en', 'ja'], fonts: { ja: () => deferred<{ ready?: () => Promise<unknown> }>().promise } });
+  await stalled.switchTo('en');
+  const stalledSwitch = stalled.switchTo('ja');
+  await vi.advanceTimersByTimeAsync(2900);
+  expect(currentLocale()).toBe('en');
+  await vi.advanceTimersByTimeAsync(200);
+  await stalledSwitch;
+  expect(currentLocale()).toBe('ja');
+  // A font module that fails to load doesn't fail the switch.
+  const failing = createLocaleController({ loaders, shipped: ['en', 'ja'], fonts: { ja: () => Promise.reject(new Error('font chunk')) } });
+  await failing.switchTo('en'); await failing.switchTo('ja');
+  expect(failing.getSnapshot()).toEqual({ locale: 'ja', failed: false });
+  // Fonts that arrive in time commit at once.
+  const quick = createLocaleController({ loaders, shipped: ['en', 'ja'], fonts: { ja: async () => ({ ready: async () => [] }) } });
+  await quick.switchTo('en'); await quick.switchTo('ja');
+  expect(currentLocale()).toBe('ja');
+});
