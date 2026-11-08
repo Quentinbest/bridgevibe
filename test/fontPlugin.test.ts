@@ -1,11 +1,11 @@
 import { createHash } from 'node:crypto';
-import { mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, renameSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { build } from 'vite';
+import { build, createServer } from 'vite';
 import { expect, test, vi } from 'vitest';
 import type { Entry } from '../src/explanation/types';
-import { characters, fontSource, latinRanges, validateFont } from '../scripts/fonts/plugin';
+import { characters, fontSource, isFontInput, latinRanges, validateFont } from '../scripts/fonts/plugin';
 
 const entry = (text: string, scope: Entry['scope'] = 'learner'): Entry => ({ text, scope, status: 'draft' });
 
@@ -67,4 +67,52 @@ test('§6.6: two audit builds give identical trimmed fonts', async () => {
   const first = await fonts('audit');
   expect(Object.keys(first).sort()).toEqual(['BridgeVibeSansJP-Regular', 'BridgeVibeSansJP-SemiBold']);
   expect(await fonts('audit')).toEqual(first);
+}, 120_000);
+
+test('§6.6 step 5 (#154): only catalogue inputs trigger a re-trim', () => {
+  const root = '/repo';
+  for (const file of ['src/explanation/locales/en.ts', 'src/explanation/locales/zh-Hans.ts', 'src/explanation/pseudo.ts', 'src/app/previewLocales.ts']) {
+    expect(isFontInput(root, join(root, file)), file).toBe(true);
+  }
+  for (const file of ['src/explanation/index.ts', 'src/app/App.tsx', 'src/explanation/locales/sub/x.ts', 'scripts/fonts/plugin.ts']) {
+    expect(isFontInput(root, join(root, file)), file).toBe(false);
+  }
+});
+
+test('§6.6 step 5 (#154): the dev server re-trims and reloads when a catalogue changes', async () => {
+  const server = await createServer({ configFile: join(process.cwd(), 'vite.config.ts'), mode: 'development', logLevel: 'silent',
+    server: { middlewareMode: true, ws: false }, appType: 'custom' });
+  try {
+    const code = (await server.transformRequest('virtual:locale-fonts/ja'))?.code ?? '';
+    expect(code).toContain('BridgeVibe Sans JP');
+    const module = [...server.moduleGraph.idToModuleMap.values()].find(item => /\/locale-fonts-ja\.js$/.test(item.id ?? ''))!;
+    expect(module.transformResult).not.toBeNull();
+    const send = vi.spyOn(server.ws, 'send');
+    const plugin = server.config.plugins.find(item => item.name === 'locale-fonts') as { api: { regeneration: () => Promise<void> } };
+    server.watcher.emit('change', join(process.cwd(), 'src/app/App.tsx'));
+    await plugin.api.regeneration();
+    expect(send).not.toHaveBeenCalled();
+    server.watcher.emit('change', join(process.cwd(), 'src/explanation/locales/en.ts'));
+    await plugin.api.regeneration();
+    expect(module.transformResult).toBeNull();
+    expect(send).toHaveBeenCalledWith({ type: 'full-reload' });
+    expect((await server.transformRequest('virtual:locale-fonts/ja'))?.code).toContain('BridgeVibe Sans JP');
+    // Review of #157: adding or removing a catalogue file re-trims too.
+    for (const event of ['add', 'unlink'] as const) {
+      send.mockClear();
+      server.watcher.emit(event, join(process.cwd(), 'src/explanation/locales/ja.ts'));
+      await plugin.api.regeneration();
+      expect(send, event).toHaveBeenCalledWith({ type: 'full-reload' });
+    }
+    // A re-trim that fails is shown in the dev server (logged and sent as an error), never silently kept.
+    const sources = join(process.cwd(), '.font-sources/plex-sans-jp-3.0.0');
+    const error = vi.spyOn(server.config.logger, 'error');
+    renameSync(sources, `${sources}.moved`);
+    try {
+      server.watcher.emit('change', join(process.cwd(), 'src/explanation/pseudo.ts'));
+      await plugin.api.regeneration();
+    } finally { renameSync(`${sources}.moved`, sources); }
+    expect(error).toHaveBeenCalledWith(expect.stringContaining('run `npm run fonts:fetch`'));
+    expect(send).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
+  } finally { await server.close(); }
 }, 120_000);
