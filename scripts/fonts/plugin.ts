@@ -59,23 +59,19 @@ export function fontSource(root: string, family: Family, weight: 'Regular' | 'Se
   if (!existsSync(absolute)) throw new Error(`${sourcePath}: run \`npm run fonts:fetch\``);
   return { sourcePath, absolute };
 }
+type EmitFile = (file: { type: 'asset'; fileName: string; originalFileName?: string; source: string | Uint8Array }) => string;
+// §6.6 step 5 (#154): the files whose text decides a locale's character set.
+export function isFontInput(root: string, file: string): boolean {
+  const relative = path.relative(root, file).split(path.sep).join('/');
+  return /^src\/explanation\/locales\/[^/]+\.ts$/.test(relative) || relative === 'src/explanation/pseudo.ts' || relative === 'src/app/previewLocales.ts';
+}
 export function localeFonts(): Plugin {
   let config: ResolvedConfig;
   let command = '';
   const memory = new Map<string, Buffer>();
   const ids = new Map<string, string>();
-  return {
-    name: 'locale-fonts',
-    configResolved(value) { config = value; command = value.command; },
-    configureServer(server) {
-      server.middlewares.use('/__locale-fonts/', (req, res, next) => {
-        const name = (req.url ?? '').split('?')[0].slice(1);
-        const bytes = memory.get(name);
-        if (!bytes) return next();
-        res.setHeader('Content-Type', name.endsWith('.css') ? 'text/css' : 'font/woff2'); res.end(bytes);
-      });
-    },
-    async buildStart() {
+  let regeneration: Promise<void> = Promise.resolve();
+  async function generate(emitFile?: EmitFile) {
       ids.clear(); memory.clear();
       const loader = await createServer({ configFile: false, root: config.root, mode: config.mode, server: { middlewareMode: true }, appType: 'custom', logLevel: 'silent' });
       try {
@@ -102,7 +98,7 @@ export function localeFonts(): Plugin {
             validateFont([], trimmed, keys);
             // §6.6: a content-hashed name of our own, so the stylesheet beside it can reference it relatively.
             const name = `BridgeVibeSans${family}-${weight}-${createHash('sha256').update(trimmed).digest('hex').slice(0, 8)}.woff2`;
-            if (command === 'build') this.emitFile({ type: 'asset', fileName: `${config.build.assetsDir}/${name}`, originalFileName: sourcePath, source: trimmed });
+            if (command === 'build' && emitFile) emitFile({ type: 'asset', fileName: `${config.build.assetsDir}/${name}`, originalFileName: sourcePath, source: trimmed });
             else memory.set(name, trimmed);
             faces.push(`@font-face{font-family:"BridgeVibe Sans ${family}";src:url("./${name}") format("woff2");font-weight:${weight === 'Regular' ? 400 : 600};font-display:swap}`);
           }
@@ -112,7 +108,7 @@ export function localeFonts(): Plugin {
           const sheet = `locale-fonts-${tag}-${createHash('sha256').update(css).digest('hex').slice(0, 8)}.css`;
           let href: string;
           // LR-5: generated like the locale-fonts module, whose virtual id is under src/app, so first-party.
-          if (command === 'build') href = `import.meta.ROLLUP_FILE_URL_${this.emitFile({ type: 'asset', fileName: `${config.build.assetsDir}/${sheet}`, originalFileName: `src/app/locale-fonts-${tag}.css`, source: css })}`;
+          if (command === 'build' && emitFile) href = `import.meta.ROLLUP_FILE_URL_${emitFile({ type: 'asset', fileName: `${config.build.assetsDir}/${sheet}`, originalFileName: `src/app/locale-fonts-${tag}.css`, source: css })}`;
           else { memory.set(sheet, Buffer.from(css)); href = JSON.stringify(`${config.base}__locale-fonts/${sheet}`); }
           // E-03: the module also says how to wait for its own face, so app code never names a font. A face
           // only exists once its stylesheet has loaded, so ready() waits for the sheet first.
@@ -121,7 +117,35 @@ export function localeFonts(): Plugin {
             + `export function ready(){return sheet.then(()=>document.fonts?Promise.all([400,600].map(weight=>document.fonts.load(weight+' 1em "BridgeVibe Sans ${family}"'))):undefined);}`);
         }
       } finally { await loader.close(); }
+  }
+  return {
+    name: 'locale-fonts',
+    // #154: lets tests wait for a dev-server re-trim to finish.
+    api: { regeneration: () => regeneration },
+    configResolved(value) { config = value; command = value.command; },
+    configureServer(server) {
+      server.middlewares.use('/__locale-fonts/', (req, res, next) => {
+        const name = (req.url ?? '').split('?')[0].slice(1);
+        const bytes = memory.get(name);
+        if (!bytes) return next();
+        res.setHeader('Content-Type', name.endsWith('.css') ? 'text/css' : 'font/woff2'); res.end(bytes);
+      });
+      // §6.6 step 5 (#154): an edited catalogue re-trims its fonts (cached by character set), so new
+      // characters get glyphs and a missing glyph is reported in the dev server, naming its key.
+      server.watcher.on('change', file => {
+        if (!isFontInput(config.root, file)) return;
+        regeneration = regeneration.then(() => generate()).then(() => {
+          for (const module of server.moduleGraph.idToModuleMap.values()) {
+            if (/\/locale-fonts-.+\.js$/.test(module.id ?? '')) server.moduleGraph.invalidateModule(module);
+          }
+          server.ws.send({ type: 'full-reload' });
+        }, (error: Error) => {
+          config.logger.error(`locale-fonts: ${error.message}`);
+          server.ws.send({ type: 'error', err: { message: error.message, stack: error.stack ?? '' } });
+        });
+      });
     },
+    async buildStart() { await generate(command === 'build' ? this.emitFile.bind(this) : undefined); },
     resolveId(id) {
       if (id.startsWith('virtual:locale-fonts/')) return path.join(config.root, 'src/app', `locale-fonts-${id.slice(21)}.js`);
     },
