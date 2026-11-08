@@ -29,12 +29,14 @@ export function pseudoLocalise(catalogue: Entries): Record<string, Entry> {
   }), 0.4), true);
 }
 export function stubCatalogue(catalogue: Entries, kind: 'long' | 'cjk'): Record<string, Entry> {
-  const result = convert(catalogue, text => kind === 'long' ? pad(text, 0.3) : text.replace(/[A-Za-z0-9]/g, character => {
-    const samples = 'あいうえおかきくけこさしすせそたちつてとなにぬねの橋牌学習';
-    return samples[character.toLowerCase().charCodeAt(0) % samples.length];
-  }));
+  // I18N-17, #149: a full-width kana is about two Latin letters wide, so each run of letters or digits
+  // becomes half as many kana, giving Japanese sample text of similar visual width to the English.
+  const samples = 'あいうえおかきくけこさしすせそたちつてとなにぬねの橋牌学習';
+  const result = convert(catalogue, text => kind === 'long' ? pad(text, 0.3) : text.replace(/[A-Za-z0-9]+/g, run =>
+    Array.from({ length: Math.ceil(run.length / 2) }, (_, index) => samples[run.toLowerCase().charCodeAt(index * 2) % samples.length]).join('')));
   if (kind === 'cjk') for (const key of Object.keys(result)) {
-    if (key.startsWith('face.') || key.startsWith('symbol.')) result[key] = catalogue[key];
+    // U-23, #149: card faces, suits and the brand name stay as in English, as a real CJK catalogue keeps them.
+    if (/^(face|symbol)\.|^product(\.|$)/.test(key)) result[key] = catalogue[key];
   }
   return result;
 }

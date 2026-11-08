@@ -5,29 +5,20 @@ import { pseudoLocalise, stubCatalogue } from '../../../src/explanation/pseudo';
 import { completeFixedDeal } from '../../strategy';
 import { installPausedClock, robotTurn } from '../miniBridge';
 
-// #149: these projects found overflow and clipping that recur across screens (Home and lesson cards and
-// the practice Exit label in en-XA at 320; the deal controls in ja at 390). Until #149 is fixed, they
-// skip only the overflow and clipping checks; landing, lang, target size and axe still run, and es-390
-// runs everything.
-const knownLayout: Record<string, string> = {
-  'en-XA-320': '#149: unbreakable text widens the Home and lesson cards and clips the practice Exit label',
-  'ja-390': '#149: the deal controls do not wrap',
-};
-
 // axe needs running timers, so it runs only where the clock may run (see the test).
 async function inspect(page: Page, screen: string, { axe = true } = {}) {
   // I18N-17: name what sticks out, so a failure says which element overflows.
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth ? []
     : [...document.querySelectorAll('body *')].filter(el => el.getBoundingClientRect().right > document.documentElement.clientWidth + 1)
       .map(el => `${el.tagName.toLowerCase()}.${el.className} ${Math.round(el.getBoundingClientRect().right)}px: ${el.textContent?.trim().slice(0, 40)}`).slice(0, 8));
-  const known = knownLayout[test.info().project.name];
-  if (known) test.info().annotations.push({ type: 'known layout finding', description: `${screen}: ${known}` });
-  else expect(overflow, screen).toEqual([]);
+  expect(overflow, screen).toEqual([]);
   const clipped = await page.locator('body *').evaluateAll(elements => elements.filter(el => {
     const style = getComputedStyle(el);
-    return !el.closest('.sr-only') && el.getClientRects().length > 0 && el.childNodes.length > 0 && [...el.childNodes].some(node => node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) && ['hidden', 'clip'].includes(style.overflowX) && el.scrollWidth > el.clientWidth + 1;
+    // #149: a visually hidden label (the 1 px, clip-path: inset(50%) pattern) is hidden on purpose, not clipped.
+    const hidden = el.closest('.sr-only') || el.getBoundingClientRect().width <= 1 || style.clipPath === 'inset(50%)';
+    return !hidden && el.getClientRects().length > 0 && el.childNodes.length > 0 && [...el.childNodes].some(node => node.nodeType === Node.TEXT_NODE && node.textContent?.trim()) && ['hidden', 'clip'].includes(style.overflowX) && el.scrollWidth > el.clientWidth + 1;
   }).map(el => el.outerHTML.slice(0, 200)));
-  if (!known) expect(clipped, screen).toEqual([]);
+  expect(clipped, screen).toEqual([]);
   const targets = await page.locator('button:visible, a[href]:visible, input:visible, select:visible, textarea:visible, .card:visible').all();
   const small: string[] = [];
   for (const target of targets) {
