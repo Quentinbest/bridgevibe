@@ -132,7 +132,9 @@ export function localeFonts(): Plugin {
       });
       // §6.6 step 5 (#154): an edited catalogue re-trims its fonts (cached by character set), so new
       // characters get glyphs and a missing glyph is reported in the dev server, naming its key.
-      server.watcher.on('change', file => {
+      // Review of #157: adding or removing a catalogue switches between it and the preview stub, so
+      // add and unlink re-trim too.
+      const onInput = (file: string) => {
         if (!isFontInput(config.root, file)) return;
         regeneration = regeneration.then(() => generate()).then(() => {
           for (const module of server.moduleGraph.idToModuleMap.values()) {
@@ -143,7 +145,8 @@ export function localeFonts(): Plugin {
           config.logger.error(`locale-fonts: ${error.message}`);
           server.ws.send({ type: 'error', err: { message: error.message, stack: error.stack ?? '' } });
         });
-      });
+      };
+      for (const event of ['change', 'add', 'unlink'] as const) server.watcher.on(event, onInput);
     },
     async buildStart() { await generate(command === 'build' ? this.emitFile.bind(this) : undefined); },
     resolveId(id) {

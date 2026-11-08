@@ -97,6 +97,13 @@ test('§6.6 step 5 (#154): the dev server re-trims and reloads when a catalogue 
     expect(module.transformResult).toBeNull();
     expect(send).toHaveBeenCalledWith({ type: 'full-reload' });
     expect((await server.transformRequest('virtual:locale-fonts/ja'))?.code).toContain('BridgeVibe Sans JP');
+    // Review of #157: adding or removing a catalogue file re-trims too.
+    for (const event of ['add', 'unlink'] as const) {
+      send.mockClear();
+      server.watcher.emit(event, join(process.cwd(), 'src/explanation/locales/ja.ts'));
+      await plugin.api.regeneration();
+      expect(send, event).toHaveBeenCalledWith({ type: 'full-reload' });
+    }
     // A re-trim that fails is shown in the dev server (logged and sent as an error), never silently kept.
     const sources = join(process.cwd(), '.font-sources/plex-sans-jp-3.0.0');
     const error = vi.spyOn(server.config.logger, 'error');
