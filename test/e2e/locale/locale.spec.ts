@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { catalogue, setLocale, text, cardName } from '../../../src/explanation';
 import { pseudoLocalise, stubCatalogue } from '../../../src/explanation/pseudo';
+import { zhHans } from '../../../src/explanation/locales/zh-Hans';
 import { completeFixedDeal } from '../../strategy';
 import { installPausedClock, robotTurn } from '../miniBridge';
 
@@ -33,22 +34,26 @@ async function inspect(page: Page, screen: string, { axe = true } = {}) {
 }
 
 test('I18N-17: preview landing and screens', async ({ page }, info) => {
-  const id = info.project.name.startsWith('es-') ? 'es' : info.project.name.startsWith('ja-') ? 'ja' : 'en-XA';
+  const id = (['es', 'ja', 'zh-Hans'] as const).find(prefix => info.project.name.startsWith(`${prefix}-`)) ?? 'en-XA';
   const tag = id === 'es' ? 'es-419' : id;
-  setLocale(id, id === 'en-XA' ? pseudoLocalise(catalogue) : stubCatalogue(catalogue, id === 'es' ? 'long' : 'cjk'), tag);
+  // U-24: zh-Hans runs on its real AI-drafted catalogue, so the suite measures real Chinese copy, not a stub.
+  setLocale(id, id === 'en-XA' ? pseudoLocalise(catalogue) : id === 'zh-Hans' ? zhHans
+    : stubCatalogue(catalogue, id === 'es' ? 'long' : 'cjk'), tag);
   // Review of #151: play the scripted Deal on a paused clock, as the English full-Deal tests do, so a
   // robot deadline never fires on a slow runner and changes the line.
   await installPausedClock(page);
   await page.goto('/?practice=1');
   await expect(page.locator('html')).toHaveAttribute('lang', tag);
-  if (id === 'ja') {
+  const font = id === 'ja' ? { family: 'BridgeVibe Sans JP', source: 'IBM Plex Sans JP 3.0.0' }
+    : id === 'zh-Hans' ? { family: 'BridgeVibe Sans SC', source: 'IBM Plex Sans SC 1.1.0' } : undefined;
+  if (font) {
     // I18N-16.2 (approximated): boot waited for the trimmed faces, so both are registered and loaded, not
     // the fallback. (document.fonts.check() alone passes when no such face exists, as the #153 review found.)
-    expect(await page.evaluate(() => [...document.fonts].filter(face => face.family.replace(/"/g, '') === 'BridgeVibe Sans JP' && face.status === 'loaded')
-      .map(face => face.weight).sort())).toEqual(['400', '600']);
+    expect(await page.evaluate(family => [...document.fonts].filter(face => face.family.replace(/"/g, '') === family && face.status === 'loaded')
+      .map(face => face.weight).sort(), font.family)).toEqual(['400', '600']);
     // I18N-16.3: the shipped notice names the trimmed font as a Modified Version of its IBM source.
     expect(await page.evaluate(() => fetch('/NOTICE.txt').then(response => response.text())))
-      .toContain('BridgeVibe Sans JP: Modified Version of IBM Plex Sans JP 3.0.0');
+      .toContain(`${font.family}: Modified Version of ${font.source}`);
   }
   await page.clock.runFor(3000);
   await page.getByRole('button', { name: text('setup.game', { target: 9 }), exact: true }).click();

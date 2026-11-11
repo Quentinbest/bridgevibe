@@ -111,11 +111,10 @@ test('U-24, CI-8: the zh-Hans glossary is an AI draft until its teacher signs it
   expect(glossaries['zh-Hans']!.entries.every(entry => entry.source === 'ai-draft' && entry.status === 'draft')).toBe(true);
 });
 
-const locales = import.meta.glob<Record<string, Catalogue>>('./locales/*.ts');
 for (const [tag, realGlossary] of Object.entries(glossaries)) {
   if (!realGlossary || !existsSync(new URL(`./locales/${tag}.ts`, import.meta.url))) continue;
   test(`I18N-09, I18N-18: real locale ${tag} avoids forbidden terms and covers the domain glossary`, async () => {
-    const module = await locales[`./locales/${tag}.ts`]();
+    const module = await import(`./locales/${tag}.ts`) as Record<string, Catalogue>;
     const [catalogue] = Object.values(module);
     expect(catalogue).toBeDefined();
     expect(avoidViolations(catalogue, realGlossary)).toEqual([]);
