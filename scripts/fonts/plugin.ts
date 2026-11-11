@@ -82,9 +82,17 @@ export function localeFonts(): Plugin {
           const catalogue = existsSync(file) ? Object.values(await loader.ssrLoadModule(`/src/explanation/locales/${tag}.ts`))[0] : (await loader.ssrLoadModule('/src/app/previewLocales.ts')).previewCatalogue(tag);
           const { text, keys } = characters(catalogue as Record<string, Entry>, tag, latinRanges(config.root));
           const family = families[tag];
+          let fontSources: { weight: 'Regular' | 'SemiBold'; sourcePath: string; absolute: string }[];
+          try { fontSources = (['Regular', 'SemiBold'] as const).map(weight => ({ weight, ...fontSource(config.root, family, weight) })); }
+          catch (error) {
+            // §6.6: builds need the sources. The dev server warns instead of refusing to start, and the
+            // locale renders in system fonts (its font module is empty, so switching doesn't wait).
+            if (command === 'build') throw error;
+            config.logger.warn(`locale-fonts: ${(error as Error).message}; ${tag} uses system fonts until then.`);
+            continue;
+          }
           const faces: string[] = [];
-          for (const weight of ['Regular', 'SemiBold'] as const) {
-            const { sourcePath, absolute } = fontSource(config.root, family, weight);
+          for (const { weight, sourcePath, absolute } of fontSources) {
             const bytes = readFileSync(absolute);
             const hash = createHash('sha256').update(bytes).update(text).update(family).digest('hex');
             const cache = path.join(config.root, '.font-sources', '.cache', `${hash}.woff2`);

@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { mkdtempSync, readFileSync, readdirSync, renameSync, rmSync } from 'node:fs';
+import { mkdtempSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { build, createServer } from 'vite';
@@ -104,15 +104,40 @@ test('§6.6 step 5 (#154): the dev server re-trims and reloads when a catalogue 
       await plugin.api.regeneration();
       expect(send, event).toHaveBeenCalledWith({ type: 'full-reload' });
     }
-    // A re-trim that fails is shown in the dev server (logged and sent as an error), never silently kept.
+    // Missing sources only warn in the dev server; the locale falls back to system fonts.
     const sources = join(process.cwd(), '.font-sources/plex-sans-jp-3.0.0');
+    const warn = vi.spyOn(server.config.logger, 'warn');
     const error = vi.spyOn(server.config.logger, 'error');
+    send.mockClear();
     renameSync(sources, `${sources}.moved`);
     try {
       server.watcher.emit('change', join(process.cwd(), 'src/explanation/pseudo.ts'));
       await plugin.api.regeneration();
     } finally { renameSync(`${sources}.moved`, sources); }
-    expect(error).toHaveBeenCalledWith(expect.stringContaining('run `npm run fonts:fetch`'));
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('run `npm run fonts:fetch`'));
+    expect(send).not.toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
+    // A re-trim that fails is shown in the dev server (logged and sent as an error), never silently
+    // kept: here the JP source is briefly the small SC fixture, which the trim and rename reject.
+    const regular = join(sources, 'IBMPlexSansJP-Regular.woff2');
+    const original = readFileSync(regular);
+    writeFileSync(regular, readFileSync(new URL('./fonts/plex-sans-sc-fixture.woff2', import.meta.url)));
+    try {
+      server.watcher.emit('change', join(process.cwd(), 'src/explanation/pseudo.ts'));
+      await plugin.api.regeneration();
+    } finally { writeFileSync(regular, original); }
+    expect(error).toHaveBeenCalledWith(expect.stringMatching(/^locale-fonts: /));
     expect(send).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
   } finally { await server.close(); }
+}, 120_000);
+
+test('§6.6: the dev server starts without the font sources, warning once per locale', async () => {
+  const sources = join(process.cwd(), '.font-sources/plex-sans-jp-3.0.0');
+  renameSync(sources, `${sources}.moved`);
+  try {
+    const server = await createServer({ configFile: join(process.cwd(), 'vite.config.ts'), mode: 'development', logLevel: 'silent',
+      server: { middlewareMode: true, ws: false }, appType: 'custom' });
+    try {
+      expect((await server.transformRequest('virtual:locale-fonts/ja'))?.code ?? '').not.toContain('BridgeVibe Sans JP');
+    } finally { await server.close(); }
+  } finally { renameSync(`${sources}.moved`, sources); }
 }, 120_000);
