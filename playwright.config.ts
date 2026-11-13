@@ -8,7 +8,7 @@ export default defineConfig({
   projects: [...[320, 390, 600, 1440].flatMap(width => (['light', 'dark'] as const).map(colorScheme => ({
     name: `${width}-${colorScheme}`, testIgnore: /locale\/.*\.spec\.ts/, use: { viewport: { width, height: width === 320 ? 568 : width === 390 ? 844 : 900 }, colorScheme },
   }))),
-    ...[['es-390', 'es-MX', 390, 844], ['ja-390', 'ja-JP', 390, 844], ['en-XA-320', 'en-XA', 320, 568]].map(([name, locale, width, height]) => ({
+    ...[['es-390', 'es-MX', 390, 844], ['ja-390', 'ja-JP', 390, 844], ['zh-Hans-390', 'zh-CN', 390, 844],['en-XA-320', 'en-XA', 320, 568]].map(([name, locale, width, height]) => ({
       name: name as string, testMatch: /locale\/.*\.spec\.ts/, use: { locale: locale as string, viewport: { width: width as number, height: height as number } },
     })),
   ],
