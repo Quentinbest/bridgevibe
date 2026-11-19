@@ -26,6 +26,7 @@ Node 24. Each check also runs on its own (`npm run lint`, `npm run test:e2e`…)
 2. **Behaviour is shown, not assumed.** Every acceptance criterion has a test at the highest practical seam (engineering spec §5): the Table API, the composition seam, or end-to-end in a headless browser. A bug fix or a new guard comes with a check that fails without it. The rules core is never mocked.
 3. **Review findings are answered before a merge is asked for.** After the latest push, wait for the automated review (Codex reviews a PR when it opens; after a later push, comment `@codex review`). Answer each finding in its thread with **Fixed** (the commit), **Rejected** (one line why) or **Deferred** (an issue, or the ticket that owns it).
 4. **The PR says** what changed, what was checked and what was not, which design-versus-spec conflicts it resolved and how, and `Closes #n` for its ticket.
+5. **Account for new files at handoff.** Review `git status --short --untracked-files=all` and inspect the output directories used by the task, including ignored paths. Report any retained generated file and the test, review, or reproduction step that needs it. Remove task-owned scratch files after verification.
 
 ## Decisions
 
@@ -42,6 +43,8 @@ Node 24. Each check also runs on its own (`npm run lint`, `npm run test:e2e`…)
 
 - **One ticket per PR**, under about 1,000 changed lines (the lockfile, licence texts and generated files aside). A larger one says why.
 - **Check `git status` and the branch before editing**, and branch from `main`. The owner merges; never merge yourself.
+- **Put temporary outputs outside the checkout.** Use a task-scoped OS temporary directory for probes, screenshots, logs, and trial reports. For experimental tools that accept an output path, pass it explicitly. Keep heavyweight toolchains and build caches in a reusable, size-limited cache outside the checkout when the tool supports it. Preserve the pinned revision, local patch, reproduction command, and evidence required by the ticket.
+- **Reuse a checkout for sequential work.** Create one worktree per ticket when isolation is needed. Before retiring it, check `git status --short --untracked-files=all --ignored=matching`, confirm the branch tip is retained, and save any unique changes or evidence. Once the session using it has ended, remove the worktree with `git worktree remove` from its owning repository.
 - **Comments cite spec IDs** (`// ADR-0001: …`, `// CI-8: …`).
 - **Codex** only non-interactively (`codex exec … -s read-only`, `codex review`): never bare `codex`, never `~/.codex/`, never `--dangerously-bypass-approvals-and-sandbox`.
 
