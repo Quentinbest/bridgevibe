@@ -149,8 +149,12 @@ export function localeFonts(): Plugin {
       for (const event of ['change', 'add', 'unlink'] as const) server.watcher.on(event, onInput);
     },
     async buildStart() { await generate(command === 'build' ? this.emitFile.bind(this) : undefined); },
-    resolveId(id) {
-      if (id.startsWith('virtual:locale-fonts/')) return path.join(config.root, 'src/app', `locale-fonts-${id.slice(21)}.js`);
+    resolveId(id, _importer, options) {
+      if (!id.startsWith('virtual:locale-fonts/')) return;
+      // Vite's dependency scanner passes `{ scan: true }` and reads resolved file paths from disk without calling load();
+      // virtual locale-font modules have no npm dependencies, so mark them virtual/external during scan.
+      if ((options as { scan?: boolean } | undefined)?.scan) return { id: `\0${id}`, external: true };
+      return path.join(config.root, 'src/app', `locale-fonts-${id.slice(21)}.js`);
     },
     load(id) {
       const match = /\/locale-fonts-(.+)\.js$/.exec(id);

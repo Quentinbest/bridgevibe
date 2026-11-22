@@ -12,5 +12,7 @@ const shippedLocales = JSON.parse(readFileSync(new URL('./scripts/content/shippe
 export default defineConfig({
   plugins: [react(), localeSignOff(), localeFonts(), licences(), network()],
   assetsInclude: ['**/*.wasm'],
+  // Limit dev dependency scanning to the app entry, skipping the static 5.8 MB design gallery under docs/design/.
+  optimizeDeps: { entries: ['index.html'] },
   define: { __APP_VERSION__: JSON.stringify(version), __SHIPPED_LOCALES__: JSON.stringify(shippedLocales) },
 });
