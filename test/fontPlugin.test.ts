@@ -65,7 +65,8 @@ test('I18N-21: production emits no CJK font while no CJK locale ships', async ()
 
 test('§6.6: two audit builds give identical trimmed fonts', async () => {
   const first = await fonts('audit');
-  expect(Object.keys(first).sort()).toEqual(['BridgeVibeSansJP-Regular', 'BridgeVibeSansJP-SemiBold']);
+  // The ja stub and the zh-Hans draft (U-24) each trim their own faces; zh-Hant has no catalogue yet.
+  expect(Object.keys(first).sort()).toEqual(['BridgeVibeSansJP-Regular', 'BridgeVibeSansJP-SemiBold', 'BridgeVibeSansSC-Regular', 'BridgeVibeSansSC-SemiBold']);
   expect(await fonts('audit')).toEqual(first);
 }, 120_000);
 

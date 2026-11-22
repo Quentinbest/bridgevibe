@@ -134,11 +134,10 @@ test('I18N-09, R-3: registered glossaries enforce key regional and domain avoid 
   ]);
 });
 
-const locales = import.meta.glob<Record<string, Catalogue>>('./locales/*.ts');
 for (const [tag, realGlossary] of Object.entries(glossaries)) {
   if (!realGlossary || !existsSync(new URL(`./locales/${tag}.ts`, import.meta.url))) continue;
   test(`I18N-09, I18N-18: real locale ${tag} avoids forbidden terms and covers the domain glossary`, async () => {
-    const module = await locales[`./locales/${tag}.ts`]();
+    const module = await import(`./locales/${tag}.ts`) as Record<string, Catalogue>;
     const [catalogue] = Object.values(module);
     expect(catalogue).toBeDefined();
     expect(avoidViolations(catalogue, realGlossary)).toEqual([]);
