@@ -10,8 +10,11 @@ test('CJK stub preserves card faces, suits and the brand name', () => {
   for (const key of Object.keys(learner).filter(key => /^(face|symbol)\.|^product(\.|$)/.test(key))) expect(stub[key]).toEqual(learner[key]);
   expect(stub.product?.text).toBe('BridgeVibe');
 });
-test.each([['en', pseudoLocalise(learner)], ['es', stubCatalogue(learner, 'long')], ['ja', stubCatalogue(learner, 'cjk')]] as const)('preview %s preserves messages', (locale, result) => {
+test.each([['en', pseudoLocalise(learner)], ['es', stubCatalogue(learner, 'long')], ['ja', stubCatalogue(learner, 'cjk')]] as const)('preview %s preserves messages and endonyms', (locale, result) => {
   expect(parityErrors(learner, result, locale)).toEqual([]);
   for (const entry of Object.values(result)) expect(() => parseMessage(entry.text)).not.toThrow();
   expect(formatMessage(result['moment.position'].text, { n: 2, card: 'CARD' }, locale)).toContain('CARD');
+  for (const key of Object.keys(learner).filter(name => name.startsWith('locale.name.'))) {
+    expect(result[key]).toEqual(learner[key]);
+  }
 });
