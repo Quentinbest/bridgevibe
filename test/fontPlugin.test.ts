@@ -117,3 +117,23 @@ test('§6.6 step 5 (#154): the dev server re-trims and reloads when a catalogue 
     expect(send).toHaveBeenCalledWith(expect.objectContaining({ type: 'error' }));
   } finally { await server.close(); }
 }, 120_000);
+
+test('dev dependency scan skips virtual locale-font modules without UNLOADABLE_DEPENDENCY errors', async () => {
+  const errors: string[] = [];
+  const server = await createServer({
+    configFile: join(process.cwd(), 'vite.config.ts'),
+    mode: 'development',
+    optimizeDeps: { force: true },
+    server: { port: 0, strictPort: false, ws: false },
+    customLogger: {
+      info() {}, warn() {}, warnOnce() {}, clearScreen() {}, hasWarned: false,
+      error(msg) { errors.push(msg); },
+      hasErrorLogged: () => errors.length > 0,
+    },
+  });
+  try {
+    await server.listen();
+    await server.environments.client.depsOptimizer?.scanProcessing;
+    expect(errors).toEqual([]);
+  } finally { await server.close(); }
+}, 60_000);
