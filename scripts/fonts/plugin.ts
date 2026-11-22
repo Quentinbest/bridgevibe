@@ -33,6 +33,8 @@ export function characters(entries: Readonly<Record<string, Entry>>, locale: str
   for (const [key, entry] of Object.entries(entries)) {
     if (entry.scope !== 'learner') continue;
     const text = literals(parseMessage(entry.text));
+    // I18N-02, I18N-16.1: another locale's endonym renders in its own script, not this locale's trimmed font.
+    if (key.startsWith('locale.name.') && key !== `locale.name.${locale}`) continue;
     // I18N-16.1, §6.5 rule 4: suits, card faces and decorative icons (`*-symbol`, aria-hidden) render
     // with the shared suit and system stack, as in English, so they're checked, not trimmed.
     if (/^(symbol|face)\.|-symbol$/.test(key)) {

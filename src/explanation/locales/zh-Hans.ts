@@ -9,6 +9,12 @@ const integrity = (text: string): Entry => ({ ...t(text), integrity: true });
 
 export const zhHans = {
   'locale.load-failed': t('这个语言没能加载。请稍后再试。'),
+  'locale.label': t('语言'),
+  'locale.name.en': t('English'),
+  'locale.name.zh-Hans': t('简体中文'),
+  'locale.name.zh-Hant': t('繁體中文'),
+  'locale.name.ja': t('日本語'),
+  'locale.name.es': t('Español'),
   'moment.heading': t('{count, plural, other {# 个关键时刻}}'),
   'moment.position': t('第 {n} 墩 · 你出了{card}'),
   'moment.trick': t('第 {n} 墩，关键时刻'),

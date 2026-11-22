@@ -13,9 +13,11 @@ test('I18N-16.1: the trim set covers learner branches, punctuation, lists and nu
   const { text, keys } = characters({
     plain: entry('橋'), branch: entry('{n, plural, other {牌 #}}'), internal: entry('学', 'internal'),
     'symbol.spades': entry('♠'), 'face.A': entry('A'), 'home.exit-symbol': entry('✕'),
+    'locale.name.ja': entry('日本語'), 'locale.name.zh-Hans': entry('简体中文'),
   }, 'ja');
-  expect(Object.keys(keys).sort()).toEqual(['branch', 'plain']);
-  for (const character of ['橋', '牌', '、', '。']) expect(text).toContain(character);
+  expect(Object.keys(keys).sort()).toEqual(['branch', 'locale.name.ja', 'plain']);
+  for (const character of ['橋', '牌', '日', '本', '語', '、', '。']) expect(text).toContain(character);
+  expect(text).not.toContain('简');
   expect(text).not.toContain('学');
   expect(text).not.toContain('♠');
   expect(text).not.toContain('✕');
