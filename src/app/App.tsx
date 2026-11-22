@@ -196,12 +196,13 @@ function routeFromUrl() {
 export function App({ controller }: { controller?: LocaleController }) {
   const [fallback] = useState(createLocaleController);
   const locale = controller ?? fallback;
-  const { failed } = useSyncExternalStore(locale.subscribe, locale.getSnapshot);
+  const { locale: activeLocale, failed } = useSyncExternalStore(locale.subscribe, locale.getSnapshot);
+  const switchLocale = useCallback((tag: string) => { void locale.switchTo(tag); }, [locale]);
   // E-05: recreate the child element on updates without changing its identity or key.
-  return <><AppContent /><div role={failed ? 'status' : undefined} aria-live="polite">{failed ? text('locale.load-failed') : ''}</div></>;
+  return <><AppContent locale={activeLocale} locales={locale.locales} onLocaleChange={switchLocale} /><div role={failed ? 'status' : undefined} aria-live="polite">{failed ? text('locale.load-failed') : ''}</div></>;
 }
 
-function AppContent() {
+function AppContent({ locale, locales, onLocaleChange }: { locale: string; locales: readonly string[]; onLocaleChange: (tag: string) => void }) {
   const [route, setRoute] = useState(routeFromUrl);
   const [dealsPlayed, setDealsPlayed] = useState(0);
   const countCompleted = useCallback(() => setDealsPlayed(count => count + 1), []);
@@ -236,5 +237,5 @@ function AppContent() {
   if (Bench && new URLSearchParams(window.location.search).get('bench') === '1') return <Suspense fallback={null}><Bench /></Suspense>;
   if (route.screen === 'lesson') return <LessonScreen key={route.lesson.contentId} lesson={route.lesson} onClose={leave} />;
   if (route.screen === 'practice') return <PracticeScreen onExit={leave} onCompleted={countCompleted} firstIndex={nextPracticeIndex} onStarted={practiceStarted} />;
-  return <Home dealsPlayed={dealsPlayed} navigate={navigate} />;
+  return <Home dealsPlayed={dealsPlayed} navigate={navigate} locale={locale} locales={locales} onLocaleChange={onLocaleChange} />;
 }

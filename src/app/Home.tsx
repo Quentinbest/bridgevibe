@@ -1,12 +1,22 @@
 import { useEffect, useRef, type MouseEvent } from 'react';
 import { fullFollowSuit } from '../curriculum/content';
-import { text, type StringId } from '../explanation';
+import { catalogue, text, type StringId } from '../explanation';
 import { sessionAttempts } from '../progress/attemptStore';
 
 // UX §1: a lesson takes 3–5 minutes. Provisional midpoint estimate, not lesson content data.
 const PROVISIONAL_LESSON_DURATION_MINUTES = 4;
 
-export function Home({ dealsPlayed, navigate }: { dealsPlayed: number; navigate: (search: string) => void }) {
+// I-05, UX §8: fixed display order of endonyms, filtered to eligible locales (I18N-23.1: never mention en-XA in production code).
+const LOCALE_ORDER = ['en', 'zh-Hans', 'zh-Hant', 'ja', 'es'] as const;
+const localeLabel = (tag: string) => {
+  const key = `locale.name.${tag}` as StringId;
+  return Object.hasOwn(catalogue, key) ? text(key) : tag;
+};
+
+export function Home({ dealsPlayed, navigate, locale = 'en', locales = ['en'], onLocaleChange }: {
+  dealsPlayed: number; navigate: (search: string) => void;
+  locale?: string; locales?: readonly string[]; onLocaleChange?: (tag: string) => void;
+}) {
   const heading = useRef<HTMLHeadingElement>(null);
   // UX §10: returning to Learn announces the screen and restores a useful keyboard starting point.
   useEffect(() => { heading.current?.focus(); }, []);
@@ -28,8 +38,15 @@ export function Home({ dealsPlayed, navigate }: { dealsPlayed: number; navigate:
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault(); navigate(search);
   }
+  const available = [...LOCALE_ORDER.filter(tag => locales.includes(tag)), ...locales.filter(tag => !(LOCALE_ORDER as readonly string[]).includes(tag))];
   return <div className="home-shell">
-    <header className="home-brand"><h1 aria-label={text('product')}><span>{text('product.first')}</span><span className="wordmark-accent">{text('product.second')}</span></h1></header>
+    <header className="home-brand">
+      <h1 aria-label={text('product')}><span>{text('product.first')}</span><span className="wordmark-accent">{text('product.second')}</span></h1>
+      {/* I18N-02, UX §8: endonym-only picker; hidden when only one locale is eligible (production today). */}
+      {available.length > 1 && onLocaleChange && <select className="locale-picker" aria-label={text('locale.label')} value={locale} onChange={event => onLocaleChange(event.target.value)}>
+        {available.map(tag => <option key={tag} value={tag} lang={tag}>{localeLabel(tag)}</option>)}
+      </select>}
+    </header>
     <main className="home-content">
       <h2 ref={heading} tabIndex={-1}>{text('home.next')}</h2>
       <a className="home-lesson" href={hrefFor(lessonUrl)} onClick={event => follow(event, lessonUrl)}>

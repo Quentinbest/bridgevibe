@@ -138,6 +138,7 @@ export function createLocaleController({ loaders = { ...defaultLoaders, ...previ
   return {
     boot: switchTo,
     switchTo,
+    locales: shipped,
     getSnapshot: () => snapshot,
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
   };
