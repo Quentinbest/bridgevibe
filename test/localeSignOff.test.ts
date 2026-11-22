@@ -231,4 +231,58 @@ test('I18N-11.1: shipped locale requires signed entries, signed glossary and glo
     shipped: ['en', 'ja'], english: catalogue, locales: { ja }, glossaries: { ja: draftGlossary },
     glossaryDomainTerms: domainTerms, lessons: [lesson], signOffs,
   }).errors).toContain(`ja: Locale Glossary has unsigned entries: ${glossary.entries[0].term}.`);
+
+  // I18N-13.1: a glossary with ai-draft entries cannot be signed off as human without aiDraftConfirmed.
+  const aiGlossary: LocaleGlossary = {
+    ...glossary,
+    entries: glossary.entries.map((item, idx) => idx === 0 ? { ...item, source: 'ai-draft' } : item),
+  };
+  expect(validateLocaleRelease({
+    shipped: ['en', 'ja'], english: catalogue, locales: { ja }, glossaries: { ja: aiGlossary },
+    glossaryDomainTerms: domainTerms, lessons: [lesson], signOffs,
+  }).errors).toContain('ja: Locale Glossary contains ai-draft entries and requires an ai-draft sign-off with aiDraftConfirmed: true (I18N-13.1).');
+
+  const confirmedAiGlossarySignOffs: SignOffStore = {
+    schemaVersion: 1,
+    records: signOffs.records.map(record => record.kind === 'glossary'
+      ? { ...record, source: 'ai-draft', aiDraftConfirmed: true } : record),
+  };
+  expect(validateLocaleRelease({
+    shipped: ['en', 'ja'], english: catalogue, locales: { ja }, glossaries: { ja: aiGlossary },
+    glossaryDomainTerms: domainTerms, lessons: [lesson], signOffs: confirmedAiGlossarySignOffs,
+  }).errors).toEqual([]);
+});
+
+test('I18N-12: entry and glossary sign-offs resolve by highest version regardless of record order', () => {
+  const { catalogue: ja, glossary, signOffs } = makeSignedLocale('ja');
+  const staleV1: SignOffRecord = {
+    kind: 'entry',
+    contentId: 'home.learn',
+    version: 1,
+    locale: 'ja',
+    source: 'ai-draft',
+    aiDraftConfirmed: true,
+    sourceHash: entrySourceHash('Old English text'),
+    reviewer: 'Bridge Teacher',
+    date: '2026-11-20',
+  };
+  const freshV2: SignOffRecord = {
+    kind: 'entry',
+    contentId: 'home.learn',
+    version: 2,
+    locale: 'ja',
+    source: 'ai-draft',
+    aiDraftConfirmed: true,
+    sourceHash: entrySourceHash(catalogue['home.learn'].text),
+    reviewer: 'Bridge Teacher',
+    date: '2026-11-22',
+  };
+  const rest = signOffs.records.filter(record => !(record.kind === 'entry' && record.contentId === 'home.learn'));
+  // Placing v1 after v2 must still resolve v2 (order-independent).
+  for (const ordered of [[...rest, freshV2, staleV1], [...rest, staleV1, freshV2]]) {
+    expect(validateLocaleRelease({
+      shipped: ['en', 'ja'], english: catalogue, locales: { ja }, glossaries: { ja: glossary },
+      glossaryDomainTerms: domainTerms, lessons: [lesson], signOffs: { schemaVersion: 1, records: ordered },
+    }).errors).toEqual([]);
+  }
 });

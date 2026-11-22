@@ -185,9 +185,17 @@ export function validateLocaleRelease({ shipped, english, locales, glossaries, g
   const lessonRecords = new Map<string, LessonSignOffRecord>();
   const glossaryRecords = new Map<string, GlossarySignOffRecord>();
   for (const record of records) {
-    if (record.kind === 'entry') entryRecords.set(`${record.locale}:${record.contentId}`, record);
-    else if (record.kind === 'lesson') lessonRecords.set(`${record.locale}:${record.contentId}@${record.version}`, record);
-    else glossaryRecords.set(record.locale, record);
+    if (record.kind === 'entry') {
+      // I18N-12: resolve by highest version rather than array order when multiple versions exist.
+      const key = `${record.locale}:${record.contentId}`;
+      const existing = entryRecords.get(key);
+      if (!existing || record.version > existing.version) entryRecords.set(key, record);
+    } else if (record.kind === 'lesson') {
+      lessonRecords.set(`${record.locale}:${record.contentId}@${record.version}`, record);
+    } else if (record.contentId === `glossary:${record.locale}`) {
+      const existing = glossaryRecords.get(record.locale);
+      if (!existing || record.version > existing.version) glossaryRecords.set(record.locale, record);
+    }
   }
 
   const englishLearner: Record<string, Entry> = {};
@@ -273,8 +281,12 @@ export function validateLocaleRelease({ shipped, english, locales, glossaries, g
       if (unsignedTerms.length) {
         errors.push(`${locale}: Locale Glossary has unsigned entries: ${unsignedTerms.slice(0, 5).join(', ')}${unsignedTerms.length > 5 ? ` (+${unsignedTerms.length - 5} more)` : ''}.`);
       }
-      if (!glossaryRecords.has(locale)) {
+      const glossaryRecord = glossaryRecords.get(locale);
+      if (!glossaryRecord) {
         errors.push(`${locale}: missing Locale Glossary sign-off record (I18N-11.1).`);
+      } else if (glossary.entries.some(item => item.source === 'ai-draft')
+        && (glossaryRecord.source !== 'ai-draft' || glossaryRecord.aiDraftConfirmed !== true)) {
+        errors.push(`${locale}: Locale Glossary contains ai-draft entries and requires an ai-draft sign-off with aiDraftConfirmed: true (I18N-13.1).`);
       }
     }
   }
