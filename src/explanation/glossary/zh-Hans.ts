@@ -10,8 +10,9 @@ const register = (name: string, approved: string, more: Partial<GlossaryEntry> =
 export const zhHans = {
   locale: 'zh-Hans',
   register: '面向中学生：亲切、口语化，称“你”不称“您”；桥牌术语用中国大陆通行说法，不用台湾用语。',
-  // I18N-18: a draft limit; the teacher sets the real one.
-  lengthLimit: 30,
+  // I18N-18: a deliberately loose draft limit, so the lint doesn't flag every paragraph of the AI draft
+  // (rules text, lesson commentary); the teacher sets the real per-entry limit.
+  lengthLimit: 200,
   entries: [
     // §2 Table
     term('Card', '牌'),

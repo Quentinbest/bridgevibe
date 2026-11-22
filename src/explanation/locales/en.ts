@@ -4,6 +4,13 @@ import type { Entry } from '../types';
 // CI-8: every entry awaits teacher sign-off.
 export const en = {
   'locale.load-failed': { text: "That language couldn't load. Try again later.", status: 'draft', scope: 'learner' },
+  // I18N-02, UX §8: language picker label and endonyms (no flags).
+  'locale.label': { text: 'Language', status: 'draft', scope: 'learner' },
+  'locale.name.en': { text: 'English', status: 'draft', scope: 'learner' },
+  'locale.name.zh-Hans': { text: '简体中文', status: 'draft', scope: 'learner' },
+  'locale.name.zh-Hant': { text: '繁體中文', status: 'draft', scope: 'learner' },
+  'locale.name.ja': { text: '日本語', status: 'draft', scope: 'learner' },
+  'locale.name.es': { text: 'Español', status: 'draft', scope: 'learner' },
   // US-43: internal device-benchmark tool (owner-facing, internal builds only).
   'bench.title': { text: "Device benchmark (#28)", status: 'draft', scope: 'internal' },
   'bench.notice': { text: "Internal tool. Keep the screen on and this page visible. Reference phones: iPhone 16 / Safari and Google Pixel 9 / Chrome. Full runs take roughly 45 minutes per candidate, plus solver time. Download the JSON and attach it to the gate PR.", status: 'draft', scope: 'internal' },

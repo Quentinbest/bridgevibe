@@ -13,9 +13,11 @@ test('I18N-16.1: the trim set covers learner branches, punctuation, lists and nu
   const { text, keys } = characters({
     plain: entry('橋'), branch: entry('{n, plural, other {牌 #}}'), internal: entry('学', 'internal'),
     'symbol.spades': entry('♠'), 'face.A': entry('A'), 'home.exit-symbol': entry('✕'),
+    'locale.name.ja': entry('日本語'), 'locale.name.zh-Hans': entry('简体中文'),
   }, 'ja');
-  expect(Object.keys(keys).sort()).toEqual(['branch', 'plain']);
-  for (const character of ['橋', '牌', '、', '。']) expect(text).toContain(character);
+  expect(Object.keys(keys).sort()).toEqual(['branch', 'locale.name.ja', 'plain']);
+  for (const character of ['橋', '牌', '日', '本', '語', '、', '。']) expect(text).toContain(character);
+  expect(text).not.toContain('简');
   expect(text).not.toContain('学');
   expect(text).not.toContain('♠');
   expect(text).not.toContain('✕');
@@ -65,7 +67,8 @@ test('I18N-21: production emits no CJK font while no CJK locale ships', async ()
 
 test('§6.6: two audit builds give identical trimmed fonts', async () => {
   const first = await fonts('audit');
-  expect(Object.keys(first).sort()).toEqual(['BridgeVibeSansJP-Regular', 'BridgeVibeSansJP-SemiBold']);
+  // The ja stub and the zh-Hans draft (U-24) each trim their own faces; zh-Hant has no catalogue yet.
+  expect(Object.keys(first).sort()).toEqual(['BridgeVibeSansJP-Regular', 'BridgeVibeSansJP-SemiBold', 'BridgeVibeSansSC-Regular', 'BridgeVibeSansSC-SemiBold']);
   expect(await fonts('audit')).toEqual(first);
 }, 120_000);
 
@@ -141,3 +144,23 @@ test('§6.6: the dev server starts without the font sources, warning once per lo
     } finally { await server.close(); }
   } finally { renameSync(`${sources}.moved`, sources); }
 }, 120_000);
+
+test('dev dependency scan skips virtual locale-font modules without UNLOADABLE_DEPENDENCY errors', async () => {
+  const errors: string[] = [];
+  const server = await createServer({
+    configFile: join(process.cwd(), 'vite.config.ts'),
+    mode: 'development',
+    optimizeDeps: { force: true },
+    server: { port: 0, strictPort: false, ws: false },
+    customLogger: {
+      info() {}, warn() {}, warnOnce() {}, clearScreen() {}, hasWarned: false,
+      error(msg) { errors.push(msg); },
+      hasErrorLogged: () => errors.length > 0,
+    },
+  });
+  try {
+    await server.listen();
+    await server.environments.client.depsOptimizer?.scanProcessing;
+    expect(errors).toEqual([]);
+  } finally { await server.close(); }
+}, 60_000);

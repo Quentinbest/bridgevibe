@@ -107,15 +107,37 @@ for (const [tag, registered] of Object.entries(glossaries)) {
   });
 }
 
-test('U-24, CI-8: the zh-Hans glossary is an AI draft until its teacher signs it off (I-11)', () => {
-  expect(glossaries['zh-Hans']!.entries.every(entry => entry.source === 'ai-draft' && entry.status === 'draft')).toBe(true);
+test('U-24, CI-8: all four locale glossaries are registered as AI drafts until signed off (I-11, I-14)', () => {
+  expect(Object.keys(glossaries).sort()).toEqual(['es', 'ja', 'zh-Hans', 'zh-Hant']);
+  for (const [tag, registered] of Object.entries(glossaries)) {
+    expect(registered!.entries.every(entry => entry.source === 'ai-draft' && entry.status === 'draft'), tag).toBe(true);
+  }
 });
 
-const locales = import.meta.glob<Record<string, Catalogue>>('./locales/*.ts');
+test('I18N-09, R-3: registered glossaries enforce key regional and domain avoid rules', () => {
+  expect(avoidViolations({ a: entry('打無將合約時明手亮牌') }, glossaries['zh-Hant']!)).toEqual([
+    'a: uses avoided "明手" (Dummy)',
+    'a: uses avoided "無將" (No-trumps)',
+  ]);
+  expect(avoidViolations({ a: entry('定約與首攻由將牌決定') }, glossaries['zh-Hant']!)).toEqual([
+    'a: uses avoided "將牌" (Trump suit)',
+    'a: uses avoided "定約" (Contract)',
+    'a: uses avoided "首攻" (Opening lead)',
+  ]);
+  expect(avoidViolations({ ok: entry('ノートランプで切り札なし'), bad: entry('トランプを使う') }, glossaries.ja!)).toEqual([
+    'bad: uses avoided "トランプ" (Trump suit)',
+  ]);
+  expect(avoidViolations({ ok: entry('El equipo dijo contra en sin atout.') }, glossaries.es!)).toEqual([
+    'ok: uses avoided "equipo" (Side)',
+    'ok: uses avoided "contra" (Double)',
+    'ok: uses avoided "sin atout" (No-trumps)',
+  ]);
+});
+
 for (const [tag, realGlossary] of Object.entries(glossaries)) {
   if (!realGlossary || !existsSync(new URL(`./locales/${tag}.ts`, import.meta.url))) continue;
   test(`I18N-09, I18N-18: real locale ${tag} avoids forbidden terms and covers the domain glossary`, async () => {
-    const module = await locales[`./locales/${tag}.ts`]();
+    const module = await import(`./locales/${tag}.ts`) as Record<string, Catalogue>;
     const [catalogue] = Object.values(module);
     expect(catalogue).toBeDefined();
     expect(avoidViolations(catalogue, realGlossary)).toEqual([]);

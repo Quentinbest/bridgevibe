@@ -13,6 +13,8 @@ function serialize(nodes: readonly MessageNode[], transform: (text: string) => s
 }
 function convert(catalogue: Entries, transform: (text: string) => string, wrap = false): Record<string, Entry> {
   return Object.fromEntries(Object.entries(catalogue).filter(([, entry]) => entry.scope === 'learner').map(([key, entry]) => {
+    // I18N-02, UX §8: endonyms stay in their own script across every locale, including preview catalogues.
+    if (key.startsWith('locale.name.')) return [key, entry];
     const message = serialize(parseMessage(entry.text), transform);
     return [key, { ...entry, text: wrap ? `⟦${message}⟧` : message }];
   }));

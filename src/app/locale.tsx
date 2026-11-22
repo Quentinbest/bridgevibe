@@ -1,19 +1,24 @@
 import { flushSync } from 'react-dom';
 import { catalogue, currentLanguageTag, currentLocale, setLocale, text, type Entry, type StringId } from '../explanation';
 
-// I-12: derive shipped locales from sign-off records when that ticket lands.
-export const SHIPPED_LOCALES = ['en'] as const;
+// I-12, I18N-11.1: injected from scripts/content/shipped-locales.json via vite.config.ts `define`,
+// so the manifest stays out of the bundle and never fails the licence check (#3).
+declare const __SHIPPED_LOCALES__: readonly string[];
+export const SHIPPED_LOCALES: readonly string[] = __SHIPPED_LOCALES__;
 // U-20, U-21: catalogue identity is separate from its formatting and document language.
 const LANGUAGE_TAGS: Readonly<Partial<Record<string, string>>> = { 'zh-Hant': 'zh-Hant-TW', es: 'es-419' };
 type LocaleCatalogue = Partial<Record<StringId, Entry>>;
 type Loaders = Record<string, () => Promise<LocaleCatalogue>>;
 const preview = import.meta.env.MODE === 'development' || import.meta.env.MODE === 'audit' || import.meta.env.MODE === 'internal';
-export const ELIGIBLE_LOCALES: readonly string[] = preview ? [...SHIPPED_LOCALES, 'en-XA', 'es', 'ja'] : SHIPPED_LOCALES;
+// U-24, I18N-11.2: zh-Hans is an unsigned AI draft, so it's a preview until a teacher signs it off.
+export const ELIGIBLE_LOCALES: readonly string[] = preview ? [...SHIPPED_LOCALES, 'en-XA', 'es', 'ja', 'zh-Hans'] : SHIPPED_LOCALES;
 const previewLoaders: Loaders = preview ? Object.fromEntries(['en-XA', 'es', 'ja'].map(tag => [tag, async () => (await import('./previewLocales')).previewCatalogue(tag)])) : {};
-// I18N-21: English stays eager; each other catalogue is a separate lazy chunk.
-const modules = import.meta.glob<Record<string, LocaleCatalogue>>([
+// I18N-21: English stays eager; each other catalogue is a separate lazy chunk. I18N-11: while no
+// non-English locale has shipped, production loads none, so no unsigned draft reaches its bundle;
+// I-12 adds each locale here once it is signed off.
+const modules = preview ? import.meta.glob<Record<string, LocaleCatalogue>>([
   '../explanation/locales/*.ts', '!../explanation/locales/en.ts',
-]);
+]) : {};
 type LocaleFonts = { ready?: () => Promise<unknown> };
 const fontLoaders: Record<string, () => Promise<LocaleFonts>> = {
   'zh-Hans': () => import('virtual:locale-fonts/zh-Hans'),
@@ -133,6 +138,7 @@ export function createLocaleController({ loaders = { ...defaultLoaders, ...previ
   return {
     boot: switchTo,
     switchTo,
+    locales: shipped,
     getSnapshot: () => snapshot,
     subscribe(listener: () => void) { listeners.add(listener); return () => { listeners.delete(listener); }; },
   };

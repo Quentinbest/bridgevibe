@@ -33,6 +33,8 @@ export function characters(entries: Readonly<Record<string, Entry>>, locale: str
   for (const [key, entry] of Object.entries(entries)) {
     if (entry.scope !== 'learner') continue;
     const text = literals(parseMessage(entry.text));
+    // I18N-02, I18N-16.1: another locale's endonym renders in its own script, not this locale's trimmed font.
+    if (key.startsWith('locale.name.') && key !== `locale.name.${locale}`) continue;
     // I18N-16.1, §6.5 rule 4: suits, card faces and decorative icons (`*-symbol`, aria-hidden) render
     // with the shared suit and system stack, as in English, so they're checked, not trimmed.
     if (/^(symbol|face)\.|-symbol$/.test(key)) {
@@ -73,7 +75,7 @@ export function localeFonts(): Plugin {
   let regeneration: Promise<void> = Promise.resolve();
   async function generate(emitFile?: EmitFile) {
       ids.clear(); memory.clear();
-      const loader = await createServer({ configFile: false, root: config.root, mode: config.mode, server: { middlewareMode: true }, appType: 'custom', logLevel: 'silent' });
+      const loader = await createServer({ configFile: false, root: config.root, mode: config.mode, define: config.define, server: { middlewareMode: true }, appType: 'custom', logLevel: 'silent' });
       try {
         const localeModule = await loader.ssrLoadModule('/src/app/locale.tsx');
         const tags: string[] = config.mode === 'production' ? localeModule.SHIPPED_LOCALES : localeModule.ELIGIBLE_LOCALES;
@@ -157,8 +159,12 @@ export function localeFonts(): Plugin {
       for (const event of ['change', 'add', 'unlink'] as const) server.watcher.on(event, onInput);
     },
     async buildStart() { await generate(command === 'build' ? this.emitFile.bind(this) : undefined); },
-    resolveId(id) {
-      if (id.startsWith('virtual:locale-fonts/')) return path.join(config.root, 'src/app', `locale-fonts-${id.slice(21)}.js`);
+    resolveId(id, _importer, options) {
+      if (!id.startsWith('virtual:locale-fonts/')) return;
+      // Vite's dependency scanner passes `{ scan: true }` and reads resolved file paths from disk without calling load();
+      // virtual locale-font modules have no npm dependencies, so mark them virtual/external during scan.
+      if ((options as { scan?: boolean } | undefined)?.scan) return { id: `\0${id}`, external: true };
+      return path.join(config.root, 'src/app', `locale-fonts-${id.slice(21)}.js`);
     },
     load(id) {
       const match = /\/locale-fonts-(.+)\.js$/.exec(id);

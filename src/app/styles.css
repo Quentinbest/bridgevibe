@@ -338,8 +338,10 @@ button.card { position: relative; cursor: pointer; font-family: var(--font-suit)
 
 /* UX §2.1–2.3: the Learn landing uses a phone bar and a rail from 900px. */
 .home-shell { min-height: 100dvh; padding-bottom: 88px; }
-.home-brand { padding: var(--space-24) var(--space-20) var(--space-8); }
-.home-brand h1 { max-width: 1000px; }
+.home-brand { max-width: 1040px; padding: var(--space-24) var(--space-20) var(--space-8); display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); flex-wrap: wrap; }
+.home-brand h1 { margin: 0; }
+.locale-picker { min-width: 44px; min-height: 44px; max-width: 100%; padding: var(--space-8) var(--space-12); border: 1px solid var(--border); border-radius: var(--radius-8); background: var(--surface); color: var(--text); font: 500 var(--type-14) var(--font-body); cursor: pointer; }
+.locale-picker:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 2px; }
 /* #149, I18N-17: text may break anywhere rather than widen its box; text that fits renders as before. */
 .home-content { max-width: 1040px; padding: var(--space-20); display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-20); overflow-wrap: anywhere; }
 .home-content h2 { margin: 0; font: 800 var(--type-32)/1.1 var(--font-display); letter-spacing: -.03em; }

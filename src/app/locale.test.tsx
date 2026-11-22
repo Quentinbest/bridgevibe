@@ -220,3 +220,32 @@ test('E-03: a CJK switch waits for its fonts and commits anyway after 3 s', asyn
   await quick.switchTo('en'); await quick.switchTo('ja');
   expect(currentLocale()).toBe('ja');
 });
+
+test('I18N-02: Home language picker switches locale live with endonyms and hides when only one locale is eligible', async () => {
+  const single = createLocaleController({ shipped: ['en'] });
+  const { unmount } = render(<App controller={single} />);
+  expect(screen.queryByRole('combobox', { name: 'Language' })).toBeNull();
+  unmount();
+
+  const controller = createLocaleController({
+    shipped: ['es', 'en', 'zh-Hans'],
+    loaders: {
+      es: async () => ({ ...spanish, 'locale.label': { ...catalogue['locale.label'], text: 'Idioma' } }),
+      'zh-Hans': async () => ({ 'home.next': { ...catalogue['home.next'], text: '下一步' }, 'locale.label': { ...catalogue['locale.label'], text: '语言' } }),
+    },
+    fonts: {},
+  });
+  await controller.boot('en');
+  render(<App controller={controller} />);
+  const picker = screen.getByRole('combobox', { name: 'Language' }) as HTMLSelectElement;
+  expect([...picker.options].map(option => [option.value, option.textContent])).toEqual([
+    ['en', 'English'],
+    ['zh-Hans', '简体中文'],
+    ['es', 'Español'],
+  ]);
+  await act(async () => { fireEvent.change(picker, { target: { value: 'zh-Hans' } }); });
+  expect(currentLocale()).toBe('zh-Hans');
+  expect(document.documentElement.lang).toBe('zh-Hans');
+  expect(screen.getByRole('heading', { name: '下一步' })).toBeTruthy();
+  expect(screen.getByRole('combobox', { name: '语言' })).toBe(picker);
+});
