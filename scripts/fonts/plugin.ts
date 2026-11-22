@@ -73,7 +73,7 @@ export function localeFonts(): Plugin {
   let regeneration: Promise<void> = Promise.resolve();
   async function generate(emitFile?: EmitFile) {
       ids.clear(); memory.clear();
-      const loader = await createServer({ configFile: false, root: config.root, mode: config.mode, server: { middlewareMode: true }, appType: 'custom', logLevel: 'silent' });
+      const loader = await createServer({ configFile: false, root: config.root, mode: config.mode, define: config.define, server: { middlewareMode: true }, appType: 'custom', logLevel: 'silent' });
       try {
         const localeModule = await loader.ssrLoadModule('/src/app/locale.tsx');
         const tags: string[] = config.mode === 'production' ? localeModule.SHIPPED_LOCALES : localeModule.ELIGIBLE_LOCALES;
