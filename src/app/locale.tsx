@@ -1,8 +1,10 @@
 import { flushSync } from 'react-dom';
 import { catalogue, currentLanguageTag, currentLocale, setLocale, text, type Entry, type StringId } from '../explanation';
 
-// I-12: derive shipped locales from sign-off records when that ticket lands.
-export const SHIPPED_LOCALES = ['en'] as const;
+// I-12, I18N-11.1: injected from scripts/content/shipped-locales.json via vite.config.ts `define`,
+// so the manifest stays out of the bundle and never fails the licence check (#3).
+declare const __SHIPPED_LOCALES__: readonly string[];
+export const SHIPPED_LOCALES: readonly string[] = __SHIPPED_LOCALES__;
 // U-20, U-21: catalogue identity is separate from its formatting and document language.
 const LANGUAGE_TAGS: Readonly<Partial<Record<string, string>>> = { 'zh-Hant': 'zh-Hant-TW', es: 'es-419' };
 type LocaleCatalogue = Partial<Record<StringId, Entry>>;

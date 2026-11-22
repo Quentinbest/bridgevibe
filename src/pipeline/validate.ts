@@ -9,6 +9,21 @@ const nonempty = (value: unknown): value is string => typeof value === 'string' 
 function error(report: Report, rule: string, item: { contentId?: string }, message: string) {
   report.errors.push({ rule, contentId: item.contentId || '(unknown)', message });
 }
+// E-11, I18N-12.1: collect the exact catalogue keys a Lesson references (same set references() checks).
+export function lessonTextRefs(lesson: Lesson): string[] {
+  const refs = new Set<string>();
+  refs.add(lesson.titleRef);
+  for (const exercise of lesson.exercises) {
+    for (const step of exercise.steps) {
+      if (step.kind === 'commentary') refs.add(step.textRef);
+      if (step.kind !== 'prompt') continue;
+      const prompt = step.prompt;
+      for (const ref of [prompt.textRef, prompt.commentaryRef, prompt.correctRef, prompt.wrongRef, prompt.shownRef]) refs.add(ref);
+      if (prompt.hint) refs.add(prompt.hint.textRef);
+    }
+  }
+  return [...refs];
+}
 function references(lesson: Lesson, catalogue: ReadonlySet<string>, report: Report, includeTitle = true) {
   // CI-8: every learner-facing string comes from the catalogue; a missing reference crashes the screen.
   const check = (item: { contentId?: string }, ref: unknown) => {
